@@ -1,6 +1,7 @@
 package com.sie.identidad.application;
 
 import com.sie.identidad.application.dto.CrearUsuarioRequest;
+import com.sie.identidad.application.dto.UpdateProfileRequest;
 import com.sie.identidad.application.dto.UsuarioResponse;
 import com.sie.identidad.domain.*;
 import com.sie.identidad.infrastructure.RolRepository;
@@ -64,6 +65,16 @@ public class UsuarioService {
     public UsuarioResponse obtenerUsuario(UUID id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        return toResponse(usuario);
+    }
+
+    @Transactional
+    public UsuarioResponse actualizarPerfil(UUID id, UpdateProfileRequest request) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+        usuario.setNombre(request.nombre());
+        usuario.setPrimerLogin(false);
+        usuarioRepository.save(usuario);
         return toResponse(usuario);
     }
 
