@@ -195,5 +195,23 @@ backend/
 | Build | Vite | 5+ |
 | CSS | Tailwind CSS | 3+ |
 | Components | shadcn/ui | latest |
+| Email (dev) | Mailpit (Docker) | latest |
+| Email (test) | GreenMail (embedded) | 2.x |
+| Email (prod) | SendGrid / AWS SES | Phase 2 |
 | Testing | JUnit 5, Mockito, Testcontainers | — |
 | CI/CD | GitHub Actions | — |
+
+### Development Prerequisites (Epic 0 additions)
+
+**Docker Compose services:**
+- PostgreSQL 15 (port 5432)
+- RabbitMQ 3.x + Management UI (ports 5672, 15672)
+- Mailpit SMTP + Web UI (ports 1025, 8025)
+
+**Startup:** `docker compose up` → `./mvnw spring-boot:run` → `npm run dev`
+
+### Phase 2 Deferred Items
+- Carmenta / MinEduc data export integration
+- IdP externo (Keycloak / Entra ID)
+- Production email service (SendGrid/SES)
+- i18n full implementation

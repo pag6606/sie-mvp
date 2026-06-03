@@ -106,8 +106,8 @@ Epic and story breakdown for the SIE MVP. 4 epics matching the 4 bounded context
 
 ## Epic List
 
-1. Epic 0: Fundación del Proyecto
-2. Epic 1: Módulo Identidad
+1. Epic 0: Fundación del Proyecto (incluye prerrequisitos + servicio email)
+2. Epic 1: Módulo Identidad (incluye onboarding contextual)
 3. Epic 2: Módulo Académico
 4. Epic 3: Módulo Matrícula
 5. Epic 4: Módulo Calificaciones
@@ -116,7 +116,23 @@ Epic and story breakdown for the SIE MVP. 4 epics matching the 4 bounded context
 
 ## Epic 0: Fundación del Proyecto
 
-**Goal:** Establecer la infraestructura base del monolito modular con CI/CD, estructura hexagonal, y configuración compartida.
+**Goal:** Establecer la infraestructura base del monolito modular, entorno de desarrollo con Docker Compose, CI/CD, estructura hexagonal, y servicios compartidos.
+
+### Story 0.0: Docker Compose de Desarrollo
+
+As a desarrollador,
+I want un `docker-compose.yml` con PostgreSQL, RabbitMQ y Mailpit,
+So that el entorno de desarrollo levante con un solo comando.
+
+**Acceptance Criteria:**
+
+- **Given** Docker está instalado
+- **When** ejecuto `docker compose up`
+- **Then** PostgreSQL 15 está disponible en localhost:5432
+- **And** RabbitMQ 3.x está disponible en localhost:5672 con management UI en localhost:15672
+- **And** Mailpit SMTP está disponible en localhost:1025 con web UI en localhost:8025
+- **And** el archivo `application-dev.properties` apunta a estos servicios
+- **And** existe script `dev.sh` que ejecuta compose + backend + frontend
 
 ### Story 0.1: Scaffolding del Proyecto
 
@@ -176,6 +192,22 @@ So that cada commit pase validación automática antes de merge.
 - **And** el reporte de cobertura se publica en el PR
 - **And** el pipeline de main incluye build de producción
 
+### Story 0.5: Servicio de Email (Mock para MVP)
+
+As a desarrollador,
+I want un servicio de email que use Mailpit en desarrollo y sea reemplazable por SMTP real en producción,
+So that las notificaciones de activación, restablecimiento y recordatorios funcionen sin depender de un servicio externo durante el desarrollo.
+
+**Acceptance Criteria:**
+
+- **Given** el perfil `dev` está activo
+- **When** el sistema envía un email (activación de cuenta, restablecimiento de contraseña, recordatorio de cierre)
+- **Then** el email se entrega a Mailpit y es visible en la web UI (localhost:8025)
+- **And** el `EmailService` es un puerto en la capa de aplicación (arquitectura hexagonal)
+- **And** la implementación `SmtpEmailService` usa `JavaMailSender` de Spring
+- **And** la configuración SMTP se define por perfil (`application-dev.properties` → Mailpit, `application-prod.properties` → SendGrid/SES en fase 2)
+- **And** los tests de integración usan GreenMail (embebido, sin Docker)
+
 ---
 
 ## Epic 1: Módulo Identidad
@@ -227,6 +259,37 @@ So that recupere acceso si la olvido.
 - **Then** el sistema siempre muestra "Si el email está registrado, recibirás un enlace" (no revela existencia)
 - **And** el enlace expira en 30 minutos y es de un solo uso
 - **And** la nueva contraseña debe tener mínimo 10 caracteres, al menos un número y una letra
+
+### Story 1.4: Pantalla de Bienvenida Contextual por Rol
+
+As a Usuario nuevo,
+I want ver una pantalla de bienvenida adaptada a mi rol la primera vez que ingreso,
+So que sepa qué esperar del sistema sin pensar que está roto o vacío.
+
+**Acceptance Criteria:**
+
+- **Given** es el primer login de un usuario
+- **When** se autentica exitosamente
+- **Then** en lugar de un dashboard vacío, ve una pantalla contextual según su rol:
+
+**Admin:**
+- Ya cubierto en spec 1.1 (Dashboard con CTA "Configurar tu primer período"). ✅
+
+**Docente:**
+- Título: "Bienvenida, {nombre}. Estamos preparando tu período."
+- Subtítulo: "Tu administrador te asignará secciones cuando configure 2026-2."
+- 3 cards ilustrativas (lucide-react icons): "Así tomarás asistencia" (ClipboardCheck), "Así ingresarás notas" (Calculator), "Así cerrarás el período" (Lock). Cada card: icono + título + 1 frase descriptiva. Sin interacción forzada — exploración opcional.
+- Al asignarle secciones, la pantalla se reemplaza automáticamente por "Mis Secciones" (2.1).
+
+**Estudiante:**
+- Título: "Bienvenido, {nombre}. Tus resultados aparecerán aquí."
+- Subtítulo: "Cuando tus docentes publiquen las notas, las verás en esta sección."
+- Preview simulado de cómo se verá una tarjeta de calificación (datos de ejemplo).
+
+- **And** la pantalla de bienvenida solo se muestra en el primer login (flag `primer_login` en el usuario)
+- **And** una vez que el usuario tiene datos reales (secciones asignadas / notas publicadas), la pantalla de bienvenida no vuelve a aparecer
+
+### Story 1.5: Perfil de Usuario (Mi Perfil)
 
 ---
 
