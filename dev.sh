@@ -3,7 +3,7 @@
 # Usage: ./dev.sh
 
 echo "🐳 Starting Docker services..."
-docker compose up -d
+podman compose up -d
 
 echo "⏳ Waiting for services..."
 sleep 5
