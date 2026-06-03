@@ -37,8 +37,8 @@ development_status:
   0-1-scaffolding-del-proyecto: done
   0-2-configuracion-de-base-de-datos: done
   0-3-configuracion-de-rabbitmq-y-event-bus: done
-  0-4-cicd-con-github-actions: backlog
-  0-5-servicio-de-email-mock-para-mvp: backlog
+  0-4-cicd-con-github-actions: done
+  0-5-servicio-de-email-mock-para-mvp: done
   epic-0-retrospective: optional
 
   # ── Epic 1: Módulo Identidad ──
