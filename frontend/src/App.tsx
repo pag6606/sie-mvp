@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from '@/pages/auth/LoginPage'
+import PasswordResetPage from '@/pages/auth/PasswordResetPage'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
 import CrearPeriodo from '@/pages/admin/CrearPeriodo'
 import ClonarSecciones from '@/pages/admin/ClonarSecciones'
@@ -8,10 +9,13 @@ import ConfirmarApertura from '@/pages/admin/ConfirmarApertura'
 import DashboardCierres from '@/pages/admin/DashboardCierres'
 import MatriculaPage from '@/pages/admin/MatriculaPage'
 import ImportarCSV from '@/pages/admin/ImportarCSV'
+import UsuariosPage from '@/pages/admin/UsuariosPage'
+import SeccionesPage from '@/pages/admin/SeccionesPage'
 import DocenteDashboard from '@/pages/docente/DocenteDashboard'
 import AsistenciaPage from '@/pages/docente/AsistenciaPage'
 import NotasPage from '@/pages/docente/NotasPage'
 import CierrePage from '@/pages/docente/CierrePage'
+import EsquemaEvaluacionPage from '@/pages/docente/EsquemaEvaluacionPage'
 import EstudianteDashboard from '@/pages/estudiante/EstudianteDashboard'
 
 export default function App() {
@@ -19,6 +23,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/reset-password" element={<PasswordResetPage />} />
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/periodos/nuevo" element={<CrearPeriodo />} />
       <Route path="/admin/periodos/:periodoId/clonar" element={<ClonarSecciones />} />
@@ -27,10 +32,13 @@ export default function App() {
       <Route path="/admin/cierres" element={<DashboardCierres />} />
       <Route path="/admin/matricula" element={<MatriculaPage />} />
       <Route path="/admin/matricula/importar" element={<ImportarCSV />} />
+      <Route path="/admin/usuarios" element={<UsuariosPage />} />
+      <Route path="/admin/secciones" element={<SeccionesPage />} />
       <Route path="/docente" element={<DocenteDashboard />} />
       <Route path="/docente/:seccionId/asistencia" element={<AsistenciaPage />} />
       <Route path="/docente/:seccionId/notas" element={<NotasPage />} />
       <Route path="/docente/:seccionId/cerrar" element={<CierrePage />} />
+      <Route path="/docente/:seccionId/esquema" element={<EsquemaEvaluacionPage />} />
       <Route path="/estudiante" element={<EstudianteDashboard />} />
     </Routes>
   )
