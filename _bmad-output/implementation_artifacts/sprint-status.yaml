@@ -45,9 +45,9 @@ development_status:
   epic-1: in-progress
   1-1-registro-y-gestion-de-usuarios: done
   1-2-login-y-autorizacion-por-rol: done
-  1-3-recuperacion-de-contrasena: backlog
-  1-4-pantalla-de-bienvenida-contextual-por-rol: backlog
-  1-5-mi-perfil: backlog
+  1-3-recuperacion-de-contrasena: done
+  1-4-pantalla-de-bienvenida-contextual-por-rol: done
+  1-5-mi-perfil: done
   epic-1-retrospective: optional
 
   # ── Epic 2: Módulo Académico ──
