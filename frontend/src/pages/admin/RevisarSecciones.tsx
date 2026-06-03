@@ -89,7 +89,7 @@ export default function RevisarSecciones() {
       setFormAula('')
       setFormDocenteId('')
     } catch (err: any) {
-      alert(err.response?.data?.mensaje || 'Error al crear sección')
+      setError(err.response?.data?.mensaje || 'Error al crear sección')
     } finally {
       setFormSaving(false)
     }
