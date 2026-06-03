@@ -42,8 +42,8 @@ development_status:
   epic-0-retrospective: optional
 
   # ── Epic 1: Módulo Identidad ──
-  epic-1: backlog
-  1-1-registro-y-gestion-de-usuarios: backlog
+  epic-1: in-progress
+  1-1-registro-y-gestion-de-usuarios: done
   1-2-login-y-autorizacion-por-rol: backlog
   1-3-recuperacion-de-contrasena: backlog
   1-4-pantalla-de-bienvenida-contextual-por-rol: backlog
