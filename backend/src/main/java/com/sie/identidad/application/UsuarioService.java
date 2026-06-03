@@ -38,26 +38,26 @@ public class UsuarioService {
         usuario.setPrimerLogin(true);
         usuario.setHashPassword(passwordEncoder.encode(generateTemporaryPassword()));
 
-        usuario = usuarioRepository.save(usuario);
+        Usuario savedUsuario = usuarioRepository.save(usuario);
 
-        usuario.setUsuarioRoles(request.roles().stream()
+        savedUsuario.setUsuarioRoles(request.roles().stream()
                 .map(codigo -> {
                     Rol rol = rolRepository.findByCodigo(codigo)
                             .orElseThrow(() -> new IllegalArgumentException("Rol no encontrado: " + codigo));
                     UsuarioRol ur = new UsuarioRol();
-                    ur.setId(new UsuarioRolId(usuario.getId(), rol.getId()));
-                    ur.setUsuario(usuario);
+                    ur.setId(new UsuarioRolId(savedUsuario.getId(), rol.getId()));
+                    ur.setUsuario(savedUsuario);
                     ur.setRol(rol);
                     return ur;
                 })
                 .collect(Collectors.toSet()));
 
-        usuarioRepository.save(usuario);
+        usuarioRepository.save(savedUsuario);
 
         String activationToken = UUID.randomUUID().toString();
-        emailService.sendActivationEmail(usuario.getEmail(), usuario.getNombre(), activationToken);
+        emailService.sendActivationEmail(savedUsuario.getEmail(), savedUsuario.getNombre(), activationToken);
 
-        return toResponse(usuario);
+        return toResponse(savedUsuario);
     }
 
     @Transactional(readOnly = true)
