@@ -119,4 +119,67 @@ class AcademicoServiceTest {
         when(periodoRepository.existsByCodigo("2026-2")).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> svc.crearPeriodo(req, UUID.randomUUID()));
     }
+
+    @Test
+    void crearSeccion_exitosa() {
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        UUID colegioId = UUID.randomUUID();
+        Curso curso = new Curso(); curso.setCodigo("MAT-101"); curso.setNombre("M"); curso.setCreditos(3);
+        Periodo periodo = new Periodo(); periodo.setCodigo("2026-2"); periodo.setNombre("P");
+        periodo.setFechaInicio(LocalDate.now()); periodo.setFechaFin(LocalDate.now().plusMonths(3));
+        var req = new CrearSeccionRequest(curso.getId() != null ? curso.getId() : UUID.randomUUID(),
+                UUID.randomUUID(), "MAT-101-A", 30,
+                List.of(new HorarioRequest("MONDAY", "08:00", "09:30", "A-12")));
+
+        when(cursoRepository.findById(any())).thenReturn(Optional.of(curso));
+        when(periodoRepository.findById(any())).thenReturn(Optional.of(periodo));
+        when(seccionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var resp = svc.crearSeccion(req, colegioId);
+        assertEquals("MAT-101-A", resp.codigo());
+        assertEquals(30, resp.capacidad());
+    }
+
+    @Test
+    void asignarDocente_exitoso() {
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        UUID colegioId = UUID.randomUUID();
+        Curso curso = new Curso(); curso.setCodigo("MAT-101"); curso.setNombre("M"); curso.setCreditos(3);
+        Periodo periodo = new Periodo(); periodo.setCodigo("2026-2"); periodo.setNombre("P");
+        periodo.setFechaInicio(LocalDate.now()); periodo.setFechaFin(LocalDate.now().plusMonths(3));
+        Seccion seccion = new Seccion();
+        seccion.setCodigo("MAT-101-A"); seccion.setCurso(curso); seccion.setPeriodo(periodo);
+        seccion.setCapacidad(30); seccion.setColegioId(colegioId);
+
+        when(seccionRepository.findById(any())).thenReturn(Optional.of(seccion));
+        when(seccionRepository.save(any())).thenReturn(seccion);
+
+        var resp = svc.asignarDocente(UUID.randomUUID(), UUID.randomUUID(), "TITULAR");
+        assertEquals(1, resp.docentes().size());
+        assertEquals("TITULAR", resp.docentes().get(0).rol());
+    }
+
+    @Test
+    void clonarPeriodo_exitoso() {
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        UUID colegioId = UUID.randomUUID();
+        Curso curso = new Curso(); curso.setCodigo("MAT-101"); curso.setNombre("M"); curso.setCreditos(3);
+        Periodo origen = new Periodo(); origen.setCodigo("2026-1"); origen.setNombre("O");
+        origen.setFechaInicio(LocalDate.now().minusMonths(6)); origen.setFechaFin(LocalDate.now().minusMonths(3));
+        Periodo destino = new Periodo(); destino.setCodigo("2026-2"); destino.setNombre("D");
+        destino.setFechaInicio(LocalDate.now()); destino.setFechaFin(LocalDate.now().plusMonths(3));
+        destino.setColegioId(colegioId);
+
+        Seccion seccionOrig = new Seccion();
+        seccionOrig.setCodigo("MAT-101-A"); seccionOrig.setCurso(curso); seccionOrig.setPeriodo(origen);
+        seccionOrig.setCapacidad(30); seccionOrig.setColegioId(colegioId);
+
+        when(seccionRepository.findByPeriodoId(any())).thenReturn(List.of(seccionOrig));
+        when(periodoRepository.findById(any())).thenReturn(Optional.of(destino));
+        when(seccionRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var resp = svc.clonarPeriodo(UUID.randomUUID(), UUID.randomUUID());
+        assertEquals(1, resp.size());
+        assertEquals("MAT-101-A", resp.get(0).codigo());
+    }
 }
