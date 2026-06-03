@@ -34,7 +34,7 @@ development_status:
   # ── Epic 0: Fundación del Proyecto ──
   epic-0: in-progress
   0-0-docker-compose-desarrollo: done
-  0-1-scaffolding-del-proyecto: backlog
+  0-1-scaffolding-del-proyecto: done
   0-2-configuracion-de-base-de-datos: backlog
   0-3-configuracion-de-rabbitmq-y-event-bus: backlog
   0-4-cicd-con-github-actions: backlog
