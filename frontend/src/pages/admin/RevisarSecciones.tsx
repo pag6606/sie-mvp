@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/UIPatterns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '@/services/api'
@@ -88,13 +89,13 @@ export default function RevisarSecciones() {
       setFormAula('')
       setFormDocenteId('')
     } catch (err: any) {
-      alert(err.response?.data?.mensaje || 'Error al crear sección')
+      setError(err.response?.data?.mensaje || 'Error al crear sección')
     } finally {
       setFormSaving(false)
     }
   }
 
-  if (loading) return null
+  if (loading) return <LoadingSkeleton rows={4} />
 
   const allReviewed = secciones.length > 0 && revisadas.size === secciones.length
 

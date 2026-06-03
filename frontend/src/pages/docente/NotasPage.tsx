@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/UIPatterns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '@/services/api'
@@ -38,7 +39,7 @@ export default function NotasPage() {
 
   const handleCerrar = () => navigate(`/docente/${seccionId}/cerrar`)
 
-  if (loading) return null
+  if (loading) return <LoadingSkeleton rows={4} />
 
   const componentes = notas[0]?.componentes || []
 

@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/UIPatterns'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import api from '@/services/api'
@@ -40,7 +41,7 @@ export default function AsistenciaPage() {
     }
   }
 
-  if (loading) return null
+  if (loading) return <LoadingSkeleton rows={4} />
 
   return (
     <div className="min-h-screen bg-gray-50">
