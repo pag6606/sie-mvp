@@ -9,6 +9,9 @@ import DashboardCierres from '@/pages/admin/DashboardCierres'
 import MatriculaPage from '@/pages/admin/MatriculaPage'
 import ImportarCSV from '@/pages/admin/ImportarCSV'
 import DocenteDashboard from '@/pages/docente/DocenteDashboard'
+import AsistenciaPage from '@/pages/docente/AsistenciaPage'
+import NotasPage from '@/pages/docente/NotasPage'
+import CierrePage from '@/pages/docente/CierrePage'
 import EstudianteDashboard from '@/pages/estudiante/EstudianteDashboard'
 
 export default function App() {
@@ -25,6 +28,9 @@ export default function App() {
       <Route path="/admin/matricula" element={<MatriculaPage />} />
       <Route path="/admin/matricula/importar" element={<ImportarCSV />} />
       <Route path="/docente" element={<DocenteDashboard />} />
+      <Route path="/docente/:seccionId/asistencia" element={<AsistenciaPage />} />
+      <Route path="/docente/:seccionId/notas" element={<NotasPage />} />
+      <Route path="/docente/:seccionId/cerrar" element={<CierrePage />} />
       <Route path="/estudiante" element={<EstudianteDashboard />} />
     </Routes>
   )
