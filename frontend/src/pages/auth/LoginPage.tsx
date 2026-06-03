@@ -18,6 +18,11 @@ export default function LoginPage() {
       const { data } = await api.post('/auth/login', { email, password })
       localStorage.setItem('token', data.token)
 
+      if (!data.roles || data.roles.length === 0) {
+        setError('Cuenta sin permisos. Contacta al administrador.')
+        return
+      }
+
       if (data.roles.includes('ADMIN')) navigate('/admin')
       else if (data.roles.includes('DOCENTE')) navigate('/docente')
       else navigate('/estudiante')
