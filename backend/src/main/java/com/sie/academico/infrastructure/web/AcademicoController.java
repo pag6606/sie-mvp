@@ -2,6 +2,7 @@ package com.sie.academico.infrastructure.web;
 
 import com.sie.academico.application.AcademicoService;
 import com.sie.academico.application.dto.*;
+import com.sie.academico.infrastructure.PeriodoRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,14 @@ import java.util.UUID;
 public class AcademicoController {
 
     private final AcademicoService service;
+    private final PeriodoRepository periodoRepository;
 
     @GetMapping("/periodos")
     public List<PeriodoResponse> listarPeriodos() {
-        return List.of(); // TODO: periodoRepository.findAll()
+        return periodoRepository.findAll().stream()
+                .map(p -> new PeriodoResponse(p.getId(), p.getCodigo(), p.getNombre(),
+                        p.getFechaInicio(), p.getFechaFin(), p.getEstado()))
+                .toList();
     }
 
     @PostMapping("/periodos")
