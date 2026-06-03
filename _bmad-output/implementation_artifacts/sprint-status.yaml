@@ -35,8 +35,8 @@ development_status:
   epic-0: in-progress
   0-0-docker-compose-desarrollo: done
   0-1-scaffolding-del-proyecto: done
-  0-2-configuracion-de-base-de-datos: backlog
-  0-3-configuracion-de-rabbitmq-y-event-bus: backlog
+  0-2-configuracion-de-base-de-datos: done
+  0-3-configuracion-de-rabbitmq-y-event-bus: done
   0-4-cicd-con-github-actions: backlog
   0-5-servicio-de-email-mock-para-mvp: backlog
   epic-0-retrospective: optional
