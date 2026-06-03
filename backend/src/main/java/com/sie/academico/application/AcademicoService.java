@@ -79,13 +79,15 @@ public class AcademicoService {
         s.setCodigo(req.codigo()); s.setCurso(curso); s.setPeriodo(periodo);
         s.setCapacidad(req.capacidad()); s.setColegioId(colegioId);
 
-        req.horarios().forEach(h -> {
+        if (req.horarios() != null) {
+            req.horarios().forEach(h -> {
             HorarioSesion hs = new HorarioSesion();
             hs.setSeccion(s); hs.setDiaSemana(DayOfWeek.valueOf(h.diaSemana().toUpperCase()));
             hs.setHoraInicio(LocalTime.parse(h.horaInicio())); hs.setHoraFin(LocalTime.parse(h.horaFin()));
             hs.setAula(h.aula());
-            s.getHorarios().add(hs);
-        });
+                s.getHorarios().add(hs);
+            });
+        }
 
         return toResponse(seccionRepository.save(s));
     }

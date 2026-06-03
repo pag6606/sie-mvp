@@ -12,5 +12,5 @@ public record CrearSeccionRequest(
         @NotNull UUID periodoId,
         @NotBlank String codigo,
         @Positive int capacidad,
-        @NotNull List<HorarioRequest> horarios
+        List<HorarioRequest> horarios
 ) {}
