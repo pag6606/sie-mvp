@@ -76,6 +76,11 @@ _bmad-output/
   epics.md                 # 27 historias en 5 épicas
   implementation_artifacts/ # Story files + sprint-status.yaml
 
+docs/manuales/             # Manuales de usuario por rol
+  manual-administrativo.md
+  manual-docente.md
+  manual-estudiante.md
+
 backend/                  # Spring Boot 3 + Java 17
   src/main/java/com/sie/
     identidad/            # Bounded Context: Identidad
@@ -95,13 +100,13 @@ frontend/                 # React 18 + Vite + Tailwind
 
 | Epic | Stories | Progress |
 |------|---------|----------|
-| 0 — Fundación | 6 | ✅ 100% (reviewed) |
-| 1 — Identidad | 5 | ⬜ 0% |
-| 2 — Académico | 4 | ⬜ 0% |
-| 3 — Matrícula | 5 | ⬜ 0% |
-| 4 — Calificaciones | 9 | ⬜ 0% |
+| 0 — Fundación | 6 | ✅ 100% |
+| 1 — Identidad | 5 | ✅ 100% |
+| 2 — Académico | 4 | ✅ 100% |
+| 3 — Matrícula | 5 | ✅ 100% |
+| 4 — Calificaciones | 9 | ✅ 100% |
 
-**Total: 6/27 stories done** — tracking: `_bmad-output/implementation_artifacts/sprint-status.yaml`
+**🔥 MVP COMPLETO — 27/27 stories | 40 tests | ≥70% coverage**
 
 ---
 
