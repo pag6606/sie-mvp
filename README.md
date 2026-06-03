@@ -72,23 +72,90 @@ _bmad-output/
   B-Trigger-Map/          # Fase 2: Trigger Map (psicología de usuario)
   C-UX-Scenarios/         # Fase 3: Escenarios UX (6 escenarios, 28 páginas)
     Sketches/              # Wireframes Excalidraw
+  architecture.md         # 7 ADRs formales
+  epics.md                 # 27 historias en 5 épicas
+  implementation_artifacts/ # Story files + sprint-status.yaml
 
-.opencode/                # Configuración de agentes WDS
+backend/                  # Spring Boot 3 + Java 17
+  src/main/java/com/sie/
+    identidad/            # Bounded Context: Identidad
+    academico/            # Bounded Context: Académico
+    matricula/            # Bounded Context: Matrícula
+    calificaciones/       # Bounded Context: Calificaciones
+    shared/               # Kernel: BaseEntity, DomainEvent, AuditLog
+
+frontend/                 # React 18 + Vite + Tailwind
+  src/pages/auth/         # Login
+  src/pages/admin/        # Admin Dashboard
+  src/pages/docente/      # Docente Dashboard
+  src/pages/estudiante/   # Estudiante Dashboard
 ```
+
+## 📊 Sprint Status
+
+| Epic | Stories | Progress |
+|------|---------|----------|
+| 0 — Fundación | 6 | ✅ 100% (reviewed) |
+| 1 — Identidad | 5 | ⬜ 0% |
+| 2 — Académico | 4 | ⬜ 0% |
+| 3 — Matrícula | 5 | ⬜ 0% |
+| 4 — Calificaciones | 9 | ⬜ 0% |
+
+**Total: 6/27 stories done** — tracking: `_bmad-output/implementation_artifacts/sprint-status.yaml`
 
 ---
 
 ## 🚀 Inicio rápido
 
-```bash
-# Backend (requiere Java 17+)
-cd backend
-./mvnw spring-boot:run
+### Requisitos
 
-# Frontend (requiere Node 18+)
+- **Java 17+** (SDKMAN: `sdk install java 17.0.x-tem`)
+- **Node 20+** (nvm: `nvm install 20`)
+- **Podman** (o Docker)
+- **Maven** (instalado vía `sdk install maven` o usando `./mvnw` wrapper)
+
+### Levantar servicios
+
+```bash
+# Opción 1: Script automático (recomendado)
+./dev.sh start    # PostgreSQL + RabbitMQ + Mailpit
+./dev.sh status   # Verificar que los 3 servicios estén corriendo
+
+# Opción 2: Docker Compose (referencia)
+podman compose up -d   # o docker compose up -d
+```
+
+Servicios disponibles:
+| Servicio | Puerto | UI / Credenciales |
+|----------|--------|-------------------|
+| PostgreSQL 15 | 5432 | `sie` / `sie_dev` |
+| RabbitMQ 3 | 5672, 15672 | `sie` / `sie_dev` (UI: :15672) |
+| Mailpit | 1025, 8025 | Web UI: http://localhost:8025 |
+
+### Backend
+
+```bash
+cd backend
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+
+# Swagger UI: http://localhost:8080/swagger-ui.html
+# Health:     http://localhost:8080/actuator/health
+```
+
+### Frontend
+
+```bash
 cd frontend
 npm install
 npm run dev
+
+# App: http://localhost:5173
+```
+
+### Detener
+
+```bash
+./dev.sh stop
 ```
 
 ---
