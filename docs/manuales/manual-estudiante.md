@@ -12,17 +12,18 @@
 
 ---
 
-## 2. Mis calificaciones
+## 2. Mi dashboard
+
+Al ingresar ves un dashboard con **dos pestañas**:
+
+- 📅 **Horario** — visible por defecto si aún no hay notas publicadas. Muestra tus secciones matriculadas con horario. Botón "Exportar horario" descarga un archivo .ics para agregar a tu calendario (Google Calendar, Apple Calendar).
+- 📊 **Notas** — visible por defecto si ya hay notas publicadas. Muestra calificaciones, asistencia y botón de boletín.
 
 ### Ver tus notas
-- Al ingresar ves **"Mis Calificaciones"**
 - Cada materia muestra:
   - 📚 Nombre del curso
-  - 👩‍🏫 Nombre del docente
-  - 🔢 **Nota final** en grande y con color:
-    - 🟢 14-20 (aprobado)
-    - 🟡 10-13 (recuperación)
-    - 🔴 0-9 (reprobado)
+  - 👩‍🏫 Nombre del docente  
+  - 🔢 **Nota final** en grande y con color (🟢🟡🔴)
 - Toca una materia para ver el detalle: cada componente, su peso y tu nota
 
 ### ¿Cuándo aparecen las notas?
@@ -56,11 +57,9 @@ El porcentaje se actualiza cada vez que tu docente registra asistencia.
 
 ---
 
-## 5. Mi horario
+## 5. Exportar horario
 
-- Ve a **"Mi Horario"** para ver tus clases de la semana
-- Cada entrada muestra: curso, sección, docente, día, hora y aula
-- Puedes exportarlo a tu calendario (Google Calendar, Apple Calendar)
+En la pestaña 📅 **Horario**, haz clic en **"Exportar horario"**. Se descarga un archivo `.ics` que puedes importar en Google Calendar, Apple Calendar o cualquier app de calendario.
 
 ---
 

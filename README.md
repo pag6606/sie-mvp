@@ -108,6 +108,29 @@ frontend/                 # React 18 + Vite + Tailwind
 
 **🔥 MVP COMPLETO — 27/27 stories | 40 tests | ≥70% coverage**
 
+### Frontend Pages (17)
+
+| Rol | Páginas |
+|-----|---------|
+| 🔴 Admin | Dashboard, Wizard 4 pasos, Cierres, Matrícula, Importar CSV, Usuarios, Secciones (10) |
+| 🟠 Docente | Mis Secciones, Asistencia, Notas, Esquema Evaluación, Cierre (5) |
+| 🟡 Estudiante | Dashboard (tabs Horario/Notas), iCal export (1) |
+| 🔑 Auth | Login, Recuperar contraseña (2) |
+
+### Cuentas de prueba
+
+| Rol | Email | Contraseña |
+|-----|-------|------------|
+| 🔴 Admin (Alma) | `admin@sie.edu.ec` | `Admin123!` |
+| 🟠 Docente (Diana) | `diana@colegio.edu.ec` | `Docente1!` |
+| 🟡 Estudiante (Ernesto) | `ernesto@colegio.edu.ec` | `Estudiante1!` |
+
+### Pendientes para Sprint 5
+
+- PDF boletín (US-CA-006)
+- PDF lista de asistencia (US-MT-005)
+- WCAG 2.1 AA audit
+
 ---
 
 ## 🔀 Estrategia de Branching

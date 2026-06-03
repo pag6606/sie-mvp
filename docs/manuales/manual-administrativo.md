@@ -77,8 +77,8 @@ Cuando el período está en curso:
   - **PENDIENTE** — faltan notas por ingresar
   - **LISTA** — todas las notas ingresadas, esperando cierre del docente
   - **CERRADA** — el docente ya cerró
-- Puedes **enviar recordatorio por email** a docentes con cierre pendiente
-- Filtra por docente, curso o estado
+- Puedes **enviar recordatorio por email** (📧) a docentes con cierre pendiente
+- Filtra por período desde el selector superior
 
 ---
 
@@ -91,6 +91,15 @@ Cuando **todas** las secciones están cerradas:
 
 ---
 
+## 7. Ver secciones y gestionar usuarios
+
+Desde el dashboard puedes acceder a:
+
+- **Ver secciones** — listado completo de secciones del período con capacidad, estado y horario. Filtrable por período.
+- **Gestionar usuarios** — crear nuevos usuarios (email, nombre, rol), ver lista, desactivar. El sistema envía email de activación automático.
+
+---
+
 ## Atajos útiles
 
 | Acción | Ruta |
@@ -99,5 +108,7 @@ Cuando **todas** las secciones están cerradas:
 | Configurar período | Botón destacado en dashboard |
 | Ver secciones | Link rápido "Ver secciones" |
 | Gestionar usuarios | Link rápido "Gestionar usuarios" |
+| Dashboard de cierres | Link "Dashboard de cierres" |
+| Matricular estudiantes | Link "Matricular estudiantes" |
 
 **¿Problemas?** Si algo no funciona como esperas, contacta al equipo de soporte. El sistema está diseñado para ser intuitivo — si te preguntas "¿y ahora qué hago?", probablemente encontramos un bug.
