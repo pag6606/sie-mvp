@@ -19,7 +19,7 @@ services:
       retries: 5
 
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:3-management
     container_name: sie-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: sie
@@ -29,9 +29,10 @@ services:
       - "15672:15672"
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
-      interval: 5s
-      timeout: 5s
+      interval: 10s
+      timeout: 10s
       retries: 5
+      start_period: 30s
 
   mailpit:
     image: axllent/mailpit:latest
@@ -40,12 +41,9 @@ services:
       - "1025:1025"
       - "8025:8025"
     environment:
-      MP_MAX_MESSAGES: 5000
-      MP_DATA_FILE: /data/mailpit.db
+      MP_MAX_MESSAGES: "5000"
       MP_SMTP_AUTH_ACCEPT_ANY: "true"
-    volumes:
-      - mailpit_data:/data
+      MP_SMTP_AUTH_ALLOW_INSECURE: "true"
 
 volumes:
   postgres_data:
-  mailpit_data:
