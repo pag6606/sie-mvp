@@ -1,3 +1,4 @@
+import { LoadingSkeleton } from '@/components/UIPatterns'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '@/services/api'
@@ -45,7 +46,7 @@ export default function EstudianteDashboard() {
     URL.revokeObjectURL(url)
   }
 
-  if (loading) return null
+  if (loading) return <LoadingSkeleton rows={4} />
 
   return (
     <div className="min-h-screen bg-gray-50">
