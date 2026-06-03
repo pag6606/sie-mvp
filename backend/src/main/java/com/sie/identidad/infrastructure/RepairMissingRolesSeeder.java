@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class RepairMissingRolesSeeder implements CommandLineRunner {
     private final RolRepository rolRepository;
 
     @Override
+    @Transactional
     public void run(String... args) {
         List<Usuario> usuarios = usuarioRepository.findAll();
         for (Usuario usuario : usuarios) {
