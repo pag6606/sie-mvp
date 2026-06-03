@@ -185,6 +185,16 @@ npm run dev
 
 ---
 
+## 📚 Manuales de Usuario
+
+| Manual | Para |
+|--------|------|
+| [Administrativo](docs/manuales/manual-administrativo.md) | Alma — configurar períodos, gestionar usuarios, matricular, supervisar cierres |
+| [Docente](docs/manuales/manual-docente.md) | Diana — tomar asistencia, definir evaluación, ingresar notas, cerrar secciones |
+| [Estudiante](docs/manuales/manual-estudiante.md) | Ernesto — consultar calificaciones, descargar boletín, ver asistencia |
+
+---
+
 ## ✅ Criterios de éxito
 
 | Métrica | Meta |
