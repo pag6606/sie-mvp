@@ -78,7 +78,7 @@ export default function LoginPage() {
           </button>
         </form>
         <p className="text-center text-sm text-gray-500">
-          <a href="#" className="text-blue-600 hover:underline">
+          <a onClick={() => navigate('/reset-password')} className="cursor-pointer text-blue-600 hover:underline">
             ¿Olvidaste tu contraseña?
           </a>
         </p>

@@ -78,6 +78,8 @@ export default function DocenteDashboard() {
                     className="rounded-md bg-blue-600 px-3 py-1.5 text-xs text-white hover:bg-blue-700">Tomar asistencia</button>
                   <button onClick={() => navigate(`/docente/${s.id}/notas`)}
                     className="rounded-md border px-3 py-1.5 text-xs hover:bg-gray-50">Ver notas</button>
+                  <button onClick={() => navigate(`/docente/${s.id}/esquema`)}
+                    className="rounded-md border px-3 py-1.5 text-xs hover:bg-gray-50">Esquema</button>
                 </div>
               </div>
             ))}
