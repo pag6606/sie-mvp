@@ -105,6 +105,31 @@ frontend/                 # React 18 + Vite + Tailwind
 
 ---
 
+## 🔀 Estrategia de Branching
+
+```
+main ←── PR + code-review ── story/N-N-descripcion
+```
+
+| Rama | Propósito |
+|------|-----------|
+| `main` | Producción. Solo merge vía PR aprobado con code review. |
+| `story/N-N-descripcion` | Una rama por historia de usuario. Se crea desde `main` al iniciar, se mergea tras code review, se elimina. |
+
+**Flujo por historia:**
+```bash
+git checkout main && git pull
+git checkout -b story/N-N-descripcion
+# ... implementar historia ...
+git add -A && git commit -m "feat: Story N.N — descripcion"
+git push -u origin story/N-N-descripcion
+# Crear PR en GitHub → code review → merge a main → delete branch
+```
+
+**Convención de commits:** `feat: Story N.N — descripción` (Conventional Commits)
+
+---
+
 ## 🚀 Inicio rápido
 
 ### Requisitos
