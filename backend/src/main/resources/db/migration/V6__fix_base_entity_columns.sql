@@ -1,0 +1,15 @@
+-- V6: Add missing BaseEntity columns to tables created without them
+
+ALTER TABLE asistencias ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+ALTER TABLE asistencias ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+
+ALTER TABLE esquema_evaluacion ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+ALTER TABLE esquema_evaluacion ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+
+ALTER TABLE notas ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW();
+ALTER TABLE notas ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+ALTER TABLE notas ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+
+ALTER TABLE cierre_secciones ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW();
+ALTER TABLE cierre_secciones ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;
+ALTER TABLE cierre_secciones ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
