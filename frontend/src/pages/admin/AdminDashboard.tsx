@@ -96,6 +96,12 @@ export default function AdminDashboard() {
           >
             📊 Dashboard de cierres
           </button>
+          <button
+            onClick={() => navigate('/admin/matricula')}
+            className="rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+          >
+            📝 Matricular estudiantes
+          </button>
         </div>
       </main>
     </div>

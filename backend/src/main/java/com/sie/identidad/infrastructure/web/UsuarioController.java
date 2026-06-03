@@ -3,12 +3,14 @@ package com.sie.identidad.infrastructure.web;
 import com.sie.identidad.application.UsuarioService;
 import com.sie.identidad.application.dto.CrearUsuarioRequest;
 import com.sie.identidad.application.dto.UsuarioResponse;
+import com.sie.identidad.infrastructure.UsuarioRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,6 +20,17 @@ import java.util.UUID;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final UsuarioRepository usuarioRepository;
+
+    @GetMapping
+    public ResponseEntity<?> buscarUsuario(@RequestParam(required = false) String email) {
+        if (email != null) {
+            var usuario = usuarioRepository.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+            return ResponseEntity.ok(usuarioService.obtenerUsuario(usuario.getId()));
+        }
+        return ResponseEntity.ok(List.of());
+    }
 
     @PostMapping
     public ResponseEntity<UsuarioResponse> crearUsuario(
