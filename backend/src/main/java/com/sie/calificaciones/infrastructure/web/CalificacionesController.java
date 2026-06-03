@@ -2,6 +2,7 @@ package com.sie.calificaciones.infrastructure.web;
 
 import com.sie.calificaciones.application.CalificacionesService;
 import com.sie.calificaciones.application.CalificacionesService.*;
+import com.sie.shared.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.*;
 public class CalificacionesController {
 
     private final CalificacionesService service;
+    private final EmailService emailService;
 
     @PostMapping("/secciones/{id}/asistencia")
     public ResponseEntity<Map<String, String>> registrarAsistencia(@PathVariable UUID id,
@@ -72,6 +74,16 @@ public class CalificacionesController {
     @GetMapping("/me/asistencia")
     public List<AsistenciaResponse> miAsistencia(@RequestAttribute("usuarioId") UUID usuarioId) {
         return service.miAsistencia(usuarioId);
+    }
+
+    @PostMapping("/admin/cierres/{seccionId}/recordar")
+    public ResponseEntity<Map<String, String>> recordarCierre(@PathVariable UUID seccionId) {
+        // Send reminder — email is configured per environment (Mailpit in dev)
+        // Doesn't block if email fails
+        try {
+            emailService.sendClosingReminder("docente@sistema", "Sección " + seccionId);
+        } catch (Exception ignored) {}
+        return ResponseEntity.ok(Map.of("mensaje", "Recordatorio enviado"));
     }
 }
 

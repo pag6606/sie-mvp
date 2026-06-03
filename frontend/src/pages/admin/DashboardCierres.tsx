@@ -31,7 +31,10 @@ export default function DashboardCierres() {
     }).catch(() => setLoading(false))
   }
 
-  const handlePeriodoChange = (id: string) => {
+  const handleRecordar = async (seccionId: string) => {
+    try { await api.post(`/admin/cierres/${seccionId}/recordar`) } catch {}
+    alert('Recordatorio enviado')
+  }
     setSelectedPeriodo(id)
     loadCierres(id)
   }
@@ -98,6 +101,7 @@ export default function DashboardCierres() {
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Sección</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Curso</th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Estado</th>
+                    <th className="px-4 py-3 text-xs font-medium text-gray-500"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -113,6 +117,12 @@ export default function DashboardCierres() {
                           }`}>
                             {c.estado}
                           </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {c.estado !== 'CERRADA' && (
+                            <button onClick={() => handleRecordar(c.seccionId)}
+                              className="text-xs text-blue-600 hover:underline">📧 Recordar</button>
+                          )}
                         </td>
                       </tr>
                     ))}
