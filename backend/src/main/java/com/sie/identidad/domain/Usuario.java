@@ -16,7 +16,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class Usuario extends BaseEntity {
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)

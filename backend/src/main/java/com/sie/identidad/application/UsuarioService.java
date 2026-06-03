@@ -52,6 +52,8 @@ public class UsuarioService {
                 })
                 .collect(Collectors.toSet()));
 
+        usuarioRepository.save(usuario);
+
         String activationToken = UUID.randomUUID().toString();
         emailService.sendActivationEmail(usuario.getEmail(), usuario.getNombre(), activationToken);
 
