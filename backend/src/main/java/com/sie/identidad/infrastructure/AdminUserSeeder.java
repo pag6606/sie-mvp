@@ -5,22 +5,21 @@ import com.sie.identidad.domain.RolCodigo;
 import com.sie.identidad.domain.Usuario;
 import com.sie.identidad.domain.UsuarioRol;
 import com.sie.identidad.domain.UsuarioRolId;
-import com.sie.identidad.infrastructure.RolRepository;
-import com.sie.identidad.infrastructure.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 @Profile("dev")
+@Order(2)
 public class AdminUserSeeder implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;
@@ -45,7 +44,8 @@ public class AdminUserSeeder implements CommandLineRunner {
         admin = usuarioRepository.save(admin);
 
         for (RolCodigo codigo : RolCodigo.values()) {
-            Rol rol = rolRepository.findByCodigo(codigo).orElseThrow();
+            Rol rol = rolRepository.findByCodigo(codigo)
+                    .orElseThrow(() -> new IllegalStateException("Roles not seeded. Run RolDataInitializer first."));
             UsuarioRol ur = new UsuarioRol();
             ur.setId(new UsuarioRolId(admin.getId(), rol.getId()));
             ur.setUsuario(admin);
@@ -53,6 +53,8 @@ public class AdminUserSeeder implements CommandLineRunner {
             admin.getUsuarioRoles().add(ur);
         }
         usuarioRepository.save(admin);
-        log.info("Admin user created: admin@sie.edu.ec / Admin123!");
+        log.info("==============================================");
+        log.info("  Admin user: admin@sie.edu.ec / Admin123!");
+        log.info("==============================================");
     }
 }

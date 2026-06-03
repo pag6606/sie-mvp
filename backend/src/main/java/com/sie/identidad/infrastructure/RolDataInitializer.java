@@ -9,9 +9,12 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+import org.springframework.core.annotation.Order;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@Order(1)
 public class RolDataInitializer implements CommandLineRunner {
 
     private final RolRepository rolRepository;
