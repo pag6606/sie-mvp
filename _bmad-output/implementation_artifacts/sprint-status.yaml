@@ -1,0 +1,80 @@
+# generated: 2026-06-03
+# last_updated: 2026-06-03
+# project: sis-mvp
+# project_key: SIE
+# tracking_system: file-system
+# story_location: _bmad-output/implementation_artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+
+generated: 2026-06-03
+last_updated: 2026-06-03
+project: sis-mvp
+project_key: SIE
+tracking_system: file-system
+story_location: _bmad-output/implementation_artifacts
+
+development_status:
+  # ── Epic 0: Fundación del Proyecto ──
+  epic-0: backlog
+  0-0-docker-compose-desarrollo: backlog
+  0-1-scaffolding-del-proyecto: backlog
+  0-2-configuracion-de-base-de-datos: backlog
+  0-3-configuracion-de-rabbitmq-y-event-bus: backlog
+  0-4-cicd-con-github-actions: backlog
+  0-5-servicio-de-email-mock-para-mvp: backlog
+  epic-0-retrospective: optional
+
+  # ── Epic 1: Módulo Identidad ──
+  epic-1: backlog
+  1-1-registro-y-gestion-de-usuarios: backlog
+  1-2-login-y-autorizacion-por-rol: backlog
+  1-3-recuperacion-de-contrasena: backlog
+  1-4-pantalla-de-bienvenida-contextual-por-rol: backlog
+  1-5-mi-perfil: backlog
+  epic-1-retrospective: optional
+
+  # ── Epic 2: Módulo Académico ──
+  epic-2: backlog
+  2-1-gestion-de-periodos-academicos: backlog
+  2-2-catalogo-de-cursos: backlog
+  2-3-secciones-con-docente-y-horario: backlog
+  2-4-listado-y-filtrado-de-secciones: backlog
+  epic-2-retrospective: optional
+
+  # ── Epic 3: Módulo Matrícula ──
+  epic-3: backlog
+  3-1-matricula-individual: backlog
+  3-2-importacion-masiva-csv: backlog
+  3-3-retiro-de-estudiante: backlog
+  3-4-vista-de-estudiante-mis-matriculas: backlog
+  3-5-vista-de-docente-lista-de-estudiantes: backlog
+  epic-3-retrospective: optional
+
+  # ── Epic 4: Módulo Calificaciones ──
+  epic-4: backlog
+  4-1-registro-de-asistencia: backlog
+  4-2-esquema-de-evaluacion: backlog
+  4-3a-ingreso-de-notas-con-calculo-automatico: backlog
+  4-3b-auditoria-de-notas-y-validaciones-avanzadas: backlog
+  4-4-cierre-de-seccion: backlog
+  4-5-dashboard-de-cierres-admin: backlog
+  4-6-consulta-de-notas-estudiante: backlog
+  4-7-consulta-de-asistencia-estudiante: backlog
+  epic-4-retrospective: optional
