@@ -1,0 +1,13 @@
+# .gitignore
+_bmad/
+.agents/
+.opencode/
+design-artifacts/
+node_modules/
+target/
+*.class
+*.jar
+*.war
+*.log
+.env
+.DS_Store
