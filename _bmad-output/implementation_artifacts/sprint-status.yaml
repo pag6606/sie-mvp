@@ -68,13 +68,13 @@ development_status:
   epic-3-retrospective: optional
 
   # ── Epic 4: Módulo Calificaciones ──
-  epic-4: backlog
-  4-1-registro-de-asistencia: backlog
-  4-2-esquema-de-evaluacion: backlog
-  4-3a-ingreso-de-notas-con-calculo-automatico: backlog
-  4-3b-auditoria-de-notas-y-validaciones-avanzadas: backlog
-  4-4-cierre-de-seccion: backlog
-  4-5-dashboard-de-cierres-admin: backlog
-  4-6-consulta-de-notas-estudiante: backlog
-  4-7-consulta-de-asistencia-estudiante: backlog
+  epic-4: in-progress
+  4-1-registro-de-asistencia: done
+  4-2-esquema-de-evaluacion: done
+  4-3a-ingreso-de-notas-con-calculo-automatico: done
+  4-3b-auditoria-de-notas-y-validaciones-avanzadas: done
+  4-4-cierre-de-seccion: done
+  4-5-dashboard-de-cierres-admin: done
+  4-6-consulta-de-notas-estudiante: done
+  4-7-consulta-de-asistencia-estudiante: done
   epic-4-retrospective: optional
