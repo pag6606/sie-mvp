@@ -106,11 +106,11 @@ Epic and story breakdown for the SIE MVP. 4 epics matching the 4 bounded context
 
 ## Epic List
 
-1. Epic 0: Fundación del Proyecto (incluye prerrequisitos + servicio email)
-2. Epic 1: Módulo Identidad (incluye onboarding contextual)
-3. Epic 2: Módulo Académico
-4. Epic 3: Módulo Matrícula
-5. Epic 4: Módulo Calificaciones
+1. Epic 0: Fundación del Proyecto (incluye prerrequisitos + servicio email) — 6 stories
+2. Epic 1: Módulo Identidad (incluye onboarding contextual + perfil) — 5 stories
+3. Epic 2: Módulo Académico — 4 stories
+4. Epic 3: Módulo Matrícula — 5 stories
+5. Epic 4: Módulo Calificaciones — 9 stories
 
 ---
 
@@ -289,7 +289,20 @@ So que sepa qué esperar del sistema sin pensar que está roto o vacío.
 - **And** la pantalla de bienvenida solo se muestra en el primer login (flag `primer_login` en el usuario)
 - **And** una vez que el usuario tiene datos reales (secciones asignadas / notas publicadas), la pantalla de bienvenida no vuelve a aparecer
 
-### Story 1.5: Perfil de Usuario (Mi Perfil)
+### Story 1.5: Mi Perfil
+
+As a Usuario,
+I want ver y editar mi perfil básico y cerrar sesión,
+So that pueda gestionar mi cuenta sin depender del administrador.
+
+**Acceptance Criteria:**
+
+- **Given** estoy autenticado
+- **When** accedo a Mi Perfil (desde el avatar en la navbar)
+- **Then** veo mi nombre (editable), email (readonly, solo Admin puede cambiar), y rol(es) asignado(s)
+- **And** puedo guardar cambios en mi nombre
+- **And** veo un botón "Cerrar sesión" que invalida el token JWT y redirige al Login
+- **And** el Admin puede cambiar el email desde la gestión de usuarios (Story 1.1), no desde aquí
 
 ---
 
@@ -470,11 +483,11 @@ So que el cálculo de la nota final esté estructurado.
 - **And** el esquema solo puede modificarse antes de ingresar la primera nota
 - **And** una vez ingresada la primera nota, los pesos quedan congelados
 
-### Story 4.3: Ingreso de Notas con Cálculo Automático
+### Story 4.3a: Ingreso de Notas con Cálculo Automático
 
 As a Docente,
 I want ingresar notas en una grilla estudiante × componente con cálculo en vivo,
-So que el promedio final esté siempre visible y correcto.
+So that el promedio final esté siempre visible y correcto.
 
 **Acceptance Criteria:**
 
@@ -484,8 +497,22 @@ So que el promedio final esté siempre visible y correcto.
 - **And** la nota final se recalcula en vivo: Σ(nota × peso/100), redondeo HALF_UP a 1 decimal
 - **And** la nota final solo se muestra si TODOS los componentes tienen nota (si no, "— ⚠")
 - **And** validación en rango: 0-20, mensaje de error inmediato si fuera de rango
-- **And** cada cambio queda registrado en log_auditoria (autor, fecha, valor anterior/nuevo)
-- **And** el encabezado de la grilla muestra los pesos y permanece fijo al hacer scroll
+- **And** el encabezado de la grilla muestra los pesos y permanece fijo al hacer scroll horizontal
+
+### Story 4.3b: Auditoría de Notas y Validaciones Avanzadas
+
+As a Docente,
+I want que cada cambio de nota quede registrado y que el sistema valide la integridad de los datos,
+So that haya trazabilidad completa y se cumpla con los requerimientos de auditoría.
+
+**Acceptance Criteria:**
+
+- **Given** se modifica una nota en la grilla
+- **When** se guarda el cambio
+- **Then** se registra en `log_auditoria`: autor, fecha, IP, valor anterior, valor nuevo
+- **And** el log es inmutable (solo escritura, sin updates ni deletes)
+- **And** si un intento de guardado falla (conflicto de versión, nota fuera de rango), se muestra mensaje específico
+- **And** el botón "Guardar cambios" muestra un badge con el número de celdas modificadas sin guardar
 
 ### Story 4.4: Cierre de Sección
 
