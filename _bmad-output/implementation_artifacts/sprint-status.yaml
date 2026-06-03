@@ -59,12 +59,12 @@ development_status:
   epic-2-retrospective: optional
 
   # ── Epic 3: Módulo Matrícula ──
-  epic-3: backlog
-  3-1-matricula-individual: backlog
-  3-2-importacion-masiva-csv: backlog
-  3-3-retiro-de-estudiante: backlog
-  3-4-vista-de-estudiante-mis-matriculas: backlog
-  3-5-vista-de-docente-lista-de-estudiantes: backlog
+  epic-3: in-progress
+  3-1-matricula-individual: done
+  3-2-importacion-masiva-csv: done
+  3-3-retiro-de-estudiante: done
+  3-4-vista-de-estudiante-mis-matriculas: done
+  3-5-vista-de-docente-lista-de-estudiantes: done
   epic-3-retrospective: optional
 
   # ── Epic 4: Módulo Calificaciones ──
