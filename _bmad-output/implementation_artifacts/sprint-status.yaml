@@ -51,11 +51,11 @@ development_status:
   epic-1-retrospective: optional
 
   # ── Epic 2: Módulo Académico ──
-  epic-2: backlog
-  2-1-gestion-de-periodos-academicos: backlog
-  2-2-catalogo-de-cursos: backlog
-  2-3-secciones-con-docente-y-horario: backlog
-  2-4-listado-y-filtrado-de-secciones: backlog
+  epic-2: in-progress
+  2-1-gestion-de-periodos-academicos: done
+  2-2-catalogo-de-cursos: done
+  2-3-secciones-con-docente-y-horario: done
+  2-4-listado-y-filtrado-de-secciones: done
   epic-2-retrospective: optional
 
   # ── Epic 3: Módulo Matrícula ──
