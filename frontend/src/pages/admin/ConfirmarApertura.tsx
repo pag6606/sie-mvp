@@ -30,12 +30,12 @@ export default function ConfirmarApertura() {
         <div className="rounded-lg border bg-card p-8 text-center">
           <div className="mb-6 text-4xl" aria-hidden="true">✅</div>
           <h2 className="text-xl font-semibold text-foreground">Período listo</h2>
-          <p className="mt-2 text-muted-foreground">Todos los pasos completados. Las secciones están configuradas.</p>
+          <p className="mt-2 text-muted-foreground">Todos los pasos completados. Las secciones (paralelos) están configuradas.</p>
 
           <div className="mt-8 rounded-lg border border-amber-200 bg-amber-50 p-4 text-left">
             <p className="text-sm font-medium text-amber-800">⚠️ Al abrir el período:</p>
             <ul className="mt-2 space-y-1 text-sm text-amber-700">
-              <li>• Las secciones estarán disponibles para matrícula</li>
+              <li>• Las secciones (paralelos) estarán disponibles para matrícula</li>
               <li>• Los estudiantes podrán matricularse</li>
               <li>• Esta acción no se puede deshacer</li>
             </ul>

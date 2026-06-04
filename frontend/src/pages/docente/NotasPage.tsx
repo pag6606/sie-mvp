@@ -77,7 +77,7 @@ export default function NotasPage() {
             </button>
             <button onClick={handleCerrar}
               className="rounded-md border border-red-600 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-              Cerrar sección
+              Cerrar sección (paralelo)
             </button>
           </div>
         </div>

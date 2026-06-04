@@ -45,7 +45,7 @@ export default function SeccionesPage() {
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-foreground">Secciones</h2>
+          <h2 className="text-2xl font-semibold text-foreground">Secciones (paralelos)</h2>
           <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
         </div>
 
@@ -58,7 +58,7 @@ export default function SeccionesPage() {
           <LoadingSkeleton rows={4} />
         ) : secciones.length === 0 ? (
           <div className="rounded-lg border bg-card p-12 text-center">
-            <p className="text-lg text-muted-foreground">No hay secciones en este período</p>
+            <p className="text-lg text-muted-foreground">No hay secciones (paralelos) en este período</p>
           </div>
         ) : (
           <div className="rounded-lg border bg-card">

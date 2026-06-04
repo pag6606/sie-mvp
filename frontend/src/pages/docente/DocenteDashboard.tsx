@@ -54,11 +54,11 @@ export default function DocenteDashboard() {
   return (
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
-        <h2 className="text-2xl font-semibold text-foreground mb-6">Mis Secciones</h2>
+        <h2 className="text-2xl font-semibold text-foreground mb-6">Mis Secciones (paralelos)</h2>
 
         {secciones.length === 0 ? (
           <div className="rounded-lg border bg-card p-12 text-center">
-            <p className="text-lg text-muted-foreground">Aún no tienes secciones asignadas</p>
+            <p className="text-lg text-muted-foreground">Aún no tienes secciones (paralelos) asignadas</p>
             <p className="text-sm text-muted-foreground mt-1">Tu administrador te asignará cuando configure el período</p>
           </div>
         ) : (

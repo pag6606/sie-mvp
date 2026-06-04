@@ -74,14 +74,14 @@ export default function DashboardCierres() {
             </div>
             {cierres.length === 0 ? (
               <div className="rounded-lg border bg-card p-12 text-center">
-                <p className="text-lg text-muted-foreground">No hay secciones en este período</p>
+                <p className="text-lg text-muted-foreground">No hay secciones (paralelos) en este período</p>
               </div>
             ) : (
               <div className="rounded-lg border bg-card">
                 <table className="w-full">
                   <thead className="border-b bg-muted">
                     <tr>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Sección</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Sección (paralelo)</th>
                       <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Curso</th>
                       <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Estado</th>
                     </tr>

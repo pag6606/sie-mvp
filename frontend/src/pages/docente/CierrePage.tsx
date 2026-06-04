@@ -20,7 +20,7 @@ export default function CierrePage() {
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
         <div className="w-full max-w-md rounded-xl bg-card p-8 shadow-lg text-center">
-          <h2 className="text-xl font-semibold text-foreground mb-4">Cerrar sección</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-4">Cerrar sección (paralelo)</h2>
 
           {cerrarMutation.isError && (
             <div className="mb-4">
@@ -29,7 +29,7 @@ export default function CierrePage() {
           )}
 
           <div className="rounded-lg border border-warning bg-warning/10 p-4 text-left mb-6">
-            <p className="text-sm font-medium text-warning">Al cerrar esta sección:</p>
+            <p className="text-sm font-medium text-warning">Al cerrar esta sección (paralelo):</p>
             <ul className="mt-2 space-y-1 text-sm text-warning">
               <li>• Las notas serán definitivas</li>
               <li>• No podrán modificarse</li>
@@ -40,7 +40,7 @@ export default function CierrePage() {
           <div className="flex gap-4">
             <button onClick={() => navigate(-1)} className="flex-1 rounded-md border border-input bg-card px-4 py-3 text-foreground hover:bg-accent">Volver</button>
             <button onClick={handleCerrar} disabled={cerrarMutation.isPending} className="flex-1 rounded-md bg-red-600 px-4 py-3 text-sm text-white hover:bg-red-700 disabled:opacity-50">
-              {cerrarMutation.isPending ? 'Cerrando...' : 'Cerrar sección'}
+              {cerrarMutation.isPending ? 'Cerrando...' : 'Cerrar sección (paralelo)'}
             </button>
           </div>
         </div>

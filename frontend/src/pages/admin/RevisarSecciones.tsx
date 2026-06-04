@@ -155,18 +155,18 @@ export default function RevisarSecciones() {
         <ProgressBar steps={STEPS} current={2} />
 
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Secciones del período</h2>
+          <h2 className="text-lg font-semibold text-foreground">Secciones (paralelos) del período</h2>
           <button
             onClick={() => setShowForm(!showForm)}
             className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
           >
-            + Nueva sección
++ Nueva sección (paralelo)
           </button>
         </div>
 
         {showForm && (
           <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-6">
-            <h3 className="mb-4 font-medium text-foreground">Nueva sección</h3>
+            <h3 className="mb-4 font-medium text-foreground">Nueva sección (paralelo)</h3>
             {formError && <InlineError message={formError} />}
             <form onSubmit={handleCrearSeccion} className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
@@ -185,7 +185,7 @@ export default function RevisarSecciones() {
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="formCodigoSeccion" className="block text-xs font-medium text-muted-foreground">Código sección</label>
+                  <label htmlFor="formCodigoSeccion" className="block text-xs font-medium text-muted-foreground">Código sección (paralelo)</label>
                   <input id="formCodigoSeccion" value={formCodigo} onChange={e => setFormCodigo(e.target.value)} required
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" placeholder="MAT-101-A" />
                 </div>
@@ -250,7 +250,7 @@ export default function RevisarSecciones() {
               <div className="flex gap-4">
                 <button type="submit" disabled={formSaving}
                   className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700 disabled:opacity-50">
-                  {formSaving ? 'Guardando...' : 'Crear sección'}
+                  {formSaving ? 'Guardando...' : 'Crear sección (paralelo)'}
                 </button>
                 <button type="button" onClick={() => setShowForm(false)}
                   className="rounded-md border border-input px-4 py-2 text-sm text-foreground hover:bg-muted">
@@ -267,7 +267,7 @@ export default function RevisarSecciones() {
               <table className="w-full">
                 <thead className="border-b bg-muted">
                   <tr>
-                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Sección</th>
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Sección (paralelo)</th>
                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Capacidad</th>
                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Docente</th>
                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Horario</th>
@@ -285,8 +285,8 @@ export default function RevisarSecciones() {
         ) : (
           <div className="rounded-lg border bg-card p-12 text-center">
             <p className="text-5xl" aria-hidden="true">📋</p>
-            <p className="mt-4 text-lg font-medium text-foreground">No hay secciones todavía</p>
-            <p className="mt-1 text-sm text-muted-foreground">Usa el botón "+ Nueva sección" para crear la primera</p>
+            <p className="mt-4 text-lg font-medium text-foreground">No hay secciones (paralelos) todavía</p>
+            <p className="mt-1 text-sm text-muted-foreground">Usa el botón "+ Nueva sección (paralelo)" para crear la primera</p>
           </div>
         )}
 

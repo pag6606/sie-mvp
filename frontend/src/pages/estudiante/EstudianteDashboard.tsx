@@ -50,7 +50,7 @@ export default function EstudianteDashboard() {
             <h2 className="text-lg font-semibold text-foreground mb-4">Mi Horario</h2>
             {matriculas.length === 0 ? (
               <div className="rounded-lg border bg-card p-12 text-center">
-                <p className="text-muted-foreground">No tienes secciones matriculadas</p>
+                <p className="text-muted-foreground">No tienes paralelos matriculados</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -80,14 +80,14 @@ export default function EstudianteDashboard() {
             {notasData.length === 0 ? (
               <div className="rounded-lg border bg-card p-12 text-center">
                 <p className="text-lg text-muted-foreground">Aun no hay notas publicadas</p>
-                <p className="text-sm text-muted-foreground mt-1">Tus calificaciones apareceran cuando el docente cierre la seccion</p>
+                <p className="text-sm text-muted-foreground mt-1">Tus calificaciones apareceran cuando el docente cierre el paralelo</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {notasData.map((n: NotaResp, i: number) => (
                   <div key={i} className="rounded-lg border bg-card p-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-foreground">Seccion</h3>
+                      <h3 className="font-medium text-foreground">Paralelo</h3>
                       <span className={`text-2xl font-bold ${n.notaFinal >= 14 ? 'text-emerald-600' : n.notaFinal >= 10 ? 'text-amber-600' : 'text-destructive'}`}>
                         {n.notaFinal}
                       </span>

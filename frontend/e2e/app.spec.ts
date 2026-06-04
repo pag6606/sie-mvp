@@ -46,7 +46,7 @@ test('S08: Admin navigates via sidebar to all sections', async ({ page }) => {
   await expect(page).toHaveURL(/\/usuarios/, { timeout: 5000 })
   await expect(page.locator('h2')).toBeVisible()
 
-  await page.click('aside >> text=Académico')
+  await page.click('aside >> text=Secciones (paralelos)')
   await expect(page).toHaveURL(/\/secciones/, { timeout: 5000 })
 
   await page.click('aside >> text=Matrícula')
@@ -116,9 +116,9 @@ test('S04: Admin creates a period (step 1 of wizard)', async ({ page }) => {
 test('S05: Docente login and see dashboard', async ({ page }) => {
   await login(page, DOCENTE.email, DOCENTE.password)
   await expect(page).toHaveURL('/docente')
-  await expect(page.locator('h2:has-text("Mis Secciones")')).toBeVisible()
+  await expect(page.locator('h2:has-text("Mis Secciones (paralelos)")')).toBeVisible()
   await expect(page.locator('aside')).toBeVisible()
-  await expect(page.locator('aside >> text=Mis Secciones')).toBeVisible()
+  await expect(page.locator('aside >> text=Mis Secciones (paralelos)')).toBeVisible()
 })
 
 // ── Scenario 6: Estudiante ──
@@ -135,7 +135,7 @@ test('S06: Estudiante login and see dashboard', async ({ page }) => {
 test('S10: Admin dashboard shows KPI cards', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
   await expect(page.locator('text=Estudiantes')).toBeVisible({ timeout: 5000 })
-  await expect(page.locator('text=Secciones activas')).toBeVisible()
+  await expect(page.locator('text=Secciones activas (paralelos)')).toBeVisible({ timeout: 5000 })
   await expect(page.locator('text=% Asistencia')).toBeVisible()
 })
 

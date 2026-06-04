@@ -19,7 +19,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, 
 
 const KPI_CARDS = [
   { key: 'totalEstudiantes' as const, label: 'Estudiantes', icon: '👥', color: 'text-primary' },
-  { key: 'seccionesActivas' as const, label: 'Secciones activas', icon: '📚', color: 'text-success' },
+  { key: 'seccionesActivas' as const, label: 'Secciones activas (paralelos)', icon: '📚', color: 'text-success' },
   { key: 'porcentajeAsistencia' as const, label: '% Asistencia', icon: '📊', color: 'text-warning', suffix: '%' },
 ]
 
@@ -162,7 +162,7 @@ export default function AdminDashboard() {
             </h2>
             <p className="mt-2 text-muted-foreground">
               {periodo && periodo.estado !== 'BORRADOR'
-                ? 'Crea secciones, asigna docentes y abre la matrícula en 4 pasos'
+                ? 'Crea secciones (paralelos), asigna docentes y abre la matrícula en 4 pasos'
                 : 'Configura tu primer período académico en 4 pasos guiados'}
             </p>
             <button

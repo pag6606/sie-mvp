@@ -28,11 +28,12 @@
 - [ ] Clic en "Iniciar sesión"
 - [ ] **AC:** Redirige a `/admin`, se ve el sidebar con Dashboard, Usuarios, Académico, Matrícula
 - [ ] **AC:** El sidebar muestra avatar del admin en la parte inferior
+- [ ] **AC:** Sidebar muestra: Dashboard, Usuarios, Secciones (paralelos), Matrícula
 
 ### UA-01.2 Login exitoso Docente
 - [ ] Cerrar sesión (clic en avatar → Cerrar sesión → Confirmar)
 - [ ] Ingresar `diana@colegio.edu.ec` / `Docente1!`
-- [ ] **AC:** Redirige a `/docente`, sidebar muestra solo "Mis Secciones"
+- [ ] **AC:** Redirige a `/docente`, sidebar muestra solo "Mis Secciones (paralelos)"
 
 ### UA-01.3 Login exitoso Estudiante
 - [ ] Cerrar sesión
@@ -101,7 +102,7 @@
 
 ### UA-03.1 KPI Cards
 - [ ] Login como Admin
-- [ ] **AC:** Se muestran 3 tarjetas KPI: "Estudiantes", "Secciones activas", "% Asistencia"
+- [ ] **AC:** Se muestran 3 tarjetas KPI: "Estudiantes", "Secciones activas (paralelos)", "% Asistencia"
 - [ ] **AC:** Cada tarjeta tiene ícono, etiqueta y valor numérico
 
 ### UA-03.2 Gráfico de evolución
@@ -259,11 +260,11 @@
 ### UA-09.1 Ver mis secciones
 - [ ] Login como Docente
 - [ ] **AC:** URL `/docente`
-- [ ] **AC:** Título "Mis Secciones"
+- [ ] **AC:** Título "Mis Secciones (paralelos)"
 - [ ] **AC:** Sidebar muestra solo "Mis Secciones"
 
-### UA-09.2 Tarjetas de sección
-- [ ] **AC:** Cada sección muestra: código, horario, aula, capacidad
+### UA-09.2 Tarjetas de sección (paralelo)
+- [ ] **AC:** Cada sección (paralelo) muestra: código, horario, aula, capacidad
 - [ ] **AC:** 3 botones por sección: "Tomar asistencia", "Ver notas", "Esquema"
 
 ### UA-09.3 Navegar a asistencia

@@ -48,7 +48,7 @@ export default function ClonarSecciones() {
         <ProgressBar steps={STEPS} current={1} />
 
         <div className="rounded-lg border bg-card p-8">
-          <h2 className="mb-6 text-xl font-semibold text-foreground">Configurar secciones</h2>
+          <h2 className="mb-6 text-xl font-semibold text-foreground">Configurar secciones (paralelos)</h2>
 
           {periodoAnterior ? (
             <button
@@ -69,10 +69,10 @@ export default function ClonarSecciones() {
             className="w-full cursor-pointer rounded-lg border border-gray-200 p-6 text-left hover:border-gray-400"
           >
             <p className="text-lg font-medium text-foreground"><span aria-hidden="true">✨</span> Empezar desde cero</p>
-            <p className="mt-1 text-sm text-muted-foreground">Crear secciones manualmente</p>
+            <p className="mt-1 text-sm text-muted-foreground">Crear secciones (paralelos) manualmente</p>
           </button>
 
-          {mutation.isPending && <p className="mt-4 text-center text-primary">Clonando secciones...</p>}
+          {mutation.isPending && <p className="mt-4 text-center text-primary">Clonando secciones (paralelos)...</p>}
         </div>
       </div>
     </AppLayout>
