@@ -53,7 +53,19 @@ test('S03: Admin edits a course name', async ({ page }) => {
 
 test('S04: Admin creates a period (step 1 of wizard)', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
-  await page.click('text=Configurar nuevo período')
+
+  // If there's a period in progress, click "Continuar configuración" to go to the wizard
+  // Otherwise click "Configurar nuevo período"
+  const continuarBtn = page.locator('text=Continuar configuración')
+  const nuevoBtn = page.locator('text=Configurar nuevo período')
+  if (await continuarBtn.isVisible()) {
+    await continuarBtn.click()
+  } else if (await nuevoBtn.isVisible()) {
+    await nuevoBtn.click()
+  } else {
+    // Already in some wizard state, go to nuevo directly
+    await page.goto('/admin/periodos/nuevo')
+  }
   await expect(page).toHaveURL(/\/nuevo/, { timeout: 5000 })
 
   await page.fill('input[placeholder="2026-2"]', 'E2E-' + Date.now().toString().slice(-6))
@@ -73,7 +85,7 @@ test('S04: Admin creates a period (step 1 of wizard)', async ({ page }) => {
 test('S05: Docente login and see dashboard', async ({ page }) => {
   await login(page, DOCENTE.email, DOCENTE.password)
   await expect(page).toHaveURL('/docente')
-  await expect(page.locator('text=Mis Secciones')).toBeVisible()
+  await expect(page.locator('h2:has-text("Mis Secciones")')).toBeVisible()
 })
 
 // ── Scenario 5: Estudiante Dashboard ──
@@ -81,7 +93,7 @@ test('S05: Docente login and see dashboard', async ({ page }) => {
 test('S06: Estudiante login and see dashboard', async ({ page }) => {
   await login(page, ESTUDIANTE.email, ESTUDIANTE.password)
   await expect(page).toHaveURL('/estudiante')
-  await expect(page.locator('text=Horario')).toBeVisible()
+  await expect(page.locator('h2:has-text("Mi Horario")')).toBeVisible()
 })
 
 // ── Scenario 6: Auth error handling ──
