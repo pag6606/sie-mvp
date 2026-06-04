@@ -5,11 +5,8 @@ import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
 
 interface MatriculaData { id: string; estudianteId: string; seccionId: string; estudianteNombre: string; cursoNombre: string }
-interface NotaResp { estudianteId: string; notaFinal: number; componentes: { nombre: string; peso: number; valor: number }[] }
-interface AsistenciaResp { estudianteId: string; porcentaje: number; totalSesiones: number; presentes: number }
-
-const DIAS = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY']
-const DIAS_LABEL: Record<string,string> = { MONDAY:'Lunes', TUESDAY:'Martes', WEDNESDAY:'Miercoles', THURSDAY:'Jueves', FRIDAY:'Viernes', SATURDAY:'Sabado' }
+interface NotaResp { cursoNombre?: string; notaFinal: number; componentes: { nombre: string; peso: number; valor: number }[] }
+interface AsistenciaResp { cursoNombre?: string; porcentaje: number; totalSesiones: number; presentes: number }
 
 export default function EstudianteDashboard() {
   const [tab, setTab] = useState<'horario' | 'notas'>('horario')
@@ -33,99 +30,161 @@ export default function EstudianteDashboard() {
 
   return (
     <AppLayout role="estudiante">
-      <div className="p-6 md:p-8">
-        <div className="mb-6 flex border-b" role="tablist">
-          <button onClick={() => setTab('horario')} role="tab" aria-selected={tab === 'horario'}
-            className={`px-4 py-2 text-sm font-medium border-b-2 ${tab === 'horario' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}>
-            Horario
+      <div className="flex flex-col h-full">
+        <div className="flex border-b bg-card shrink-0" role="tablist">
+          <button
+            onClick={() => setTab('horario')}
+            role="tab"
+            aria-selected={tab === 'horario'}
+            className={`flex-1 py-3 text-sm font-semibold border-b-2 transition-colors ${
+              tab === 'horario'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground'
+            }`}
+          >
+            📅 Horario
           </button>
-          <button onClick={() => setTab('notas')} role="tab" aria-selected={tab === 'notas'}
-            className={`px-4 py-2 text-sm font-medium border-b-2 ${tab === 'notas' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}>
-            Notas {notasData.length > 0 && `(${notasData.length})`}
+          <button
+            onClick={() => setTab('notas')}
+            role="tab"
+            aria-selected={tab === 'notas'}
+            className={`flex-1 py-3 text-sm font-semibold border-b-2 transition-colors ${
+              tab === 'notas'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground'
+            }`}
+          >
+            📊 Notas
           </button>
         </div>
 
-        {tab === 'horario' ? (
-          <>
-            <h2 className="text-lg font-semibold text-foreground mb-4">Mi Horario</h2>
-            {matriculas.length === 0 ? (
-              <div className="rounded-lg border bg-card p-12 text-center">
-                <p className="text-muted-foreground">No tienes secciones (paralelos) matriculadas</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {DIAS.map(dia => {
-                  const delDia = matriculas.filter((_m: MatriculaData) => {
-                    return true
-                  })
-                  if (delDia.length === 0) return null
-                  return (
-                    <div key={dia}>
-                      <p className="text-xs font-medium text-muted-foreground mb-1">{DIAS_LABEL[dia]}</p>
-                      {delDia.map((m: MatriculaData, i: number) => (
-                        <div key={i} className="rounded-lg border bg-card p-3 mb-2">
-                          <p className="font-medium text-sm text-foreground">{m.cursoNombre || 'Sección (paralelo)'}</p>
-                          <p className="text-xs text-muted-foreground">ID: {m.seccionId?.slice(0,8)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            <h2 className="text-lg font-semibold text-foreground mb-4">Mis Calificaciones</h2>
-            {notasData.length === 0 ? (
-              <div className="rounded-lg border bg-card p-12 text-center">
-                <p className="text-lg text-muted-foreground">Aun no hay notas publicadas</p>
-                <p className="text-sm text-muted-foreground mt-1">Tus calificaciones apareceran cuando el docente cierre la sección (paralelo)</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {notasData.map((n: NotaResp, i: number) => (
-                  <div key={i} className="rounded-lg border bg-card p-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-foreground">Sección (paralelo)</h3>
-                      <span className={`text-2xl font-bold ${n.notaFinal >= 14 ? 'text-emerald-600' : n.notaFinal >= 10 ? 'text-amber-600' : 'text-destructive'}`}>
-                        {n.notaFinal}
-                      </span>
-                    </div>
-                    <div className="mt-2 space-y-1">
-                      {n.componentes.map((c, ci) => (
-                        <div key={ci} className="flex justify-between text-sm text-muted-foreground">
-                          <span>{c.nombre} ({c.peso}%)</span>
-                          <span>{c.valor ?? '—'}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <h2 className="text-lg font-semibold text-foreground mt-8 mb-4">Mi Asistencia</h2>
-            {asistencia.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Sin datos</p>
-            ) : (
-              asistencia.map((a: AsistenciaResp, i: number) => (
-                <div key={i} className="mb-2 flex items-center gap-3">
-                  <div className="flex-1 h-4 rounded-full bg-muted" role="progressbar" aria-valuenow={Math.round(a.porcentaje)} aria-valuemin={0} aria-valuemax={100} aria-label={`Asistencia: ${Math.round(a.porcentaje)}%`}>
-                    <div className={`h-4 rounded-full ${a.porcentaje >= 80 ? 'bg-emerald-500' : a.porcentaje >= 70 ? 'bg-amber-500' : 'bg-red-500'}`}
-                      style={{ width: `${a.porcentaje}%` }} />
-                  </div>
-                  <span className="text-sm font-medium w-10 text-right text-foreground">{Math.round(a.porcentaje)}%</span>
-                </div>
-              ))
-            )}
-
-            <button className="mt-6 w-full rounded-lg bg-primary px-4 py-3 text-primary-foreground hover:opacity-90">
-              Descargar boletin PDF
-            </button>
-          </>
-        )}
+        <div className="flex-1 overflow-y-auto p-4">
+          {tab === 'horario' ? (
+            <HorarioTab matriculas={matriculas} />
+          ) : (
+            <NotasTab notas={notasData} asistencia={asistencia} />
+          )}
+        </div>
       </div>
     </AppLayout>
+  )
+}
+
+function HorarioTab({ matriculas }: { matriculas: MatriculaData[] }) {
+  return (
+    <>
+      <h2 className="text-lg font-bold text-foreground mb-4">Mi Horario</h2>
+      {matriculas.length === 0 ? (
+        <div className="rounded-xl bg-card border p-8 text-center">
+          <p className="text-5xl mb-3">📚</p>
+          <p className="text-foreground font-medium">Sin secciones</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Aún no estás matriculado en ningún paralelo
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {matriculas.map((m, i) => (
+            <div key={i} className="rounded-xl bg-card border p-4 flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <span className="text-primary font-bold">{m.cursoNombre?.charAt(0) || 'S'}</span>
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold text-foreground truncate">
+                  {m.cursoNombre || 'Sección (paralelo)'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {m.estudianteNombre}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  )
+}
+
+function NotasTab({ notas, asistencia }: { notas: NotaResp[]; asistencia: AsistenciaResp[] }) {
+  return (
+    <div className="space-y-5">
+      {notas.length > 0 && (
+        <div>
+          <h2 className="text-lg font-bold text-foreground mb-3">Mis Calificaciones</h2>
+          {notas.map((n, i) => (
+            <div key={i} className="rounded-xl bg-card border p-4 mb-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-semibold text-foreground text-sm">
+                    {n.cursoNombre || 'Sección (paralelo)'}
+                  </p>
+                  <div className="mt-2 space-y-1">
+                    {n.componentes.map((c, ci) => (
+                      <div key={ci} className="text-sm flex justify-between gap-4">
+                        <span className="text-muted-foreground truncate">{c.nombre}</span>
+                        <span className="text-foreground font-medium shrink-0">
+                          {c.valor != null ? c.valor : '—'} / {c.peso}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className={`shrink-0 rounded-full w-14 h-14 flex items-center justify-center text-xl font-extrabold ${
+                  n.notaFinal >= 14 ? 'bg-success/10 text-success' :
+                  n.notaFinal >= 10 ? 'bg-warning/10 text-warning' :
+                  'bg-destructive/10 text-destructive'
+                }`}>
+                  {n.notaFinal}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {notas.length === 0 && (
+        <div className="rounded-xl bg-card border p-8 text-center">
+          <p className="text-5xl mb-3">📝</p>
+          <p className="text-foreground font-medium">Sin notas aún</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Tus calificaciones aparecerán cuando el docente cierre la sección (paralelo)
+          </p>
+        </div>
+      )}
+
+      {asistencia.length > 0 && (
+        <div>
+          <h2 className="text-lg font-bold text-foreground mb-3">Mi Asistencia</h2>
+          <div className="rounded-xl bg-card border p-4 space-y-4">
+            {asistencia.map((a, i) => (
+              <div key={i}>
+                <div className="flex justify-between mb-1.5">
+                  <span className="text-sm font-medium text-foreground">
+                    {a.cursoNombre || `Materia ${i + 1}`}
+                  </span>
+                  <span className="text-sm font-bold text-foreground">{Math.round(a.porcentaje)}%</span>
+                </div>
+                <div className="h-3 rounded-full bg-muted overflow-hidden" role="progressbar" aria-valuenow={Math.round(a.porcentaje)} aria-valuemin={0} aria-valuemax={100}>
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      a.porcentaje >= 80 ? 'bg-success' :
+                      a.porcentaje >= 70 ? 'bg-warning' : 'bg-destructive'
+                    }`}
+                    style={{ width: `${Math.min(a.porcentaje, 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {a.presentes} de {a.totalSesiones} sesiones presentes
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <button className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
+        📄 Descargar boletín PDF
+      </button>
+    </div>
   )
 }
