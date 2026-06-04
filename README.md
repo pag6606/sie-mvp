@@ -121,7 +121,7 @@ frontend/                 # React 18 + Vite + Tailwind
 
 | Rol | Email | Contraseña |
 |-----|-------|------------|
-| 🔴 Admin (Alma) | `admin@sie.edu.ec` | `Admin123!` |
+| 🔴 Admin (Alma) | `admin@sie.edu.ec` | `Admin123!!` |
 | 🟠 Docente (Diana) | `diana@colegio.edu.ec` | `Docente1!` |
 | 🟡 Estudiante (Ernesto) | `ernesto@colegio.edu.ec` | `Estudiante1!` |
 

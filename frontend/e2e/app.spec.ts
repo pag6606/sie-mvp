@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
-const ADMIN = { email: 'admin@sie.edu.ec', password: 'Admin123!' }
+const ADMIN = { email: 'admin@sie.edu.ec', password: 'Admin123!!' }
 const DOCENTE = { email: 'diana@colegio.edu.ec', password: 'Docente1!' }
 const ESTUDIANTE = { email: 'ernesto@colegio.edu.ec', password: 'Estudiante1!' }
 

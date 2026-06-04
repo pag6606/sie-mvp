@@ -41,7 +41,7 @@ so that pueda entrar al sistema sin fricción y sin depender del mouse.
 
 - [ ] Task 3: Verificar (AC: 8)
   - [ ] 3.1 `npm run typecheck`
-  - [ ] 3.2 `npm run dev` — probar login con credenciales de prueba (admin@sie.edu.ec / Admin123!)
+  - [ ] 3.2 `npm run dev` — probar login con credenciales de prueba (admin@sie.edu.ec / Admin123!!)
 
 ## Dev Notes
 

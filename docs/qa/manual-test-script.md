@@ -11,7 +11,7 @@
 
 | Rol | Email | Contraseña |
 |-----|-------|------------|
-| Administrador | `admin@sie.edu.ec` | `Admin123!` |
+| Administrador | `admin@sie.edu.ec` | `Admin123!!` |
 | Docente | `diana@colegio.edu.ec` | `Docente1!` |
 | Estudiante | `ernesto@colegio.edu.ec` | `Estudiante1!` |
 
@@ -24,7 +24,7 @@
 - [X] Verificar que aparece el panel izquierdo con degradado índigo (SIE branding)
 - [X] Verificar que dice "Bienvenido de vuelta"
 - [X] Verificar que aparece el logo de SIE
-- [X] Ingresar `admin@sie.edu.ec` / `Admin123!`
+- [X] Ingresar `admin@sie.edu.ec` / `Admin123!!`
 - [X] Clic en "Iniciar sesión"
 - [X] **AC:** Redirige a `/admin`, se ve el sidebar con Dashboard, Usuarios, Académico, Matrícula
 - [X] **AC:** El sidebar muestra avatar del admin en la parte inferior

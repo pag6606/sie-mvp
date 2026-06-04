@@ -37,7 +37,7 @@ public class AdminUserSeeder implements CommandLineRunner {
         Usuario admin = new Usuario();
         admin.setEmail(email);
         admin.setNombre("Administrador");
-        admin.setHashPassword(passwordEncoder.encode("Admin123!"));
+        admin.setHashPassword(passwordEncoder.encode("Admin123!!"));
         admin.setColegioId(UUID.fromString("00000000-0000-0000-0000-000000000001"));
         admin.setActivo(true);
         admin.setPrimerLogin(false);
@@ -54,7 +54,7 @@ public class AdminUserSeeder implements CommandLineRunner {
         }
         usuarioRepository.save(admin);
         log.info("==============================================");
-        log.info("  Admin user: admin@sie.edu.ec / Admin123!");
+        log.info("  Admin user: admin@sie.edu.ec / Admin123!!");
         log.info("==============================================");
     }
 }
