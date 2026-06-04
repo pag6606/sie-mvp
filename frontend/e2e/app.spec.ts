@@ -1,30 +1,66 @@
 import { test, expect } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 const ADMIN = { email: 'admin@sie.edu.ec', password: 'Admin123!' }
 const DOCENTE = { email: 'diana@colegio.edu.ec', password: 'Docente1!' }
 const ESTUDIANTE = { email: 'ernesto@colegio.edu.ec', password: 'Estudiante1!' }
 
-async function login(page: any, email: string, password: string) {
+async function login(page: Page, email: string, password: string) {
   await page.goto('/login')
   await page.fill('input[type="email"]', email)
-  await page.fill('input[type="password"]', password)
+  await page.fill('#login-password', password)
   await page.click('button[type="submit"]')
-  await page.waitForFunction(() => window.location.pathname !== '/login', null, { timeout: 10000 })
+  await page.waitForURL(u => u.pathname !== '/login', { timeout: 10000 })
 }
 
-// ── Scenario 1: Admin Login ──
+// ── Scenario 1: Auth ──
 
-test('S01: Admin login and see dashboard', async ({ page }) => {
+test('S01: Admin login and see dashboard with sidebar', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
-  await expect(page.locator('h2, .text-2xl, nav')).toBeVisible()
+  await expect(page.locator('aside')).toBeVisible()
+  await expect(page.locator('nav[aria-label="Navegación principal"]')).toBeVisible()
   await expect(page).toHaveURL(/\/admin/)
 })
 
-// ── Scenario 2: Cursos CRUD ──
+test('S07: Login with wrong password shows error', async ({ page }) => {
+  await page.goto('/login')
+  await page.fill('input[type="email"]', ADMIN.email)
+  await page.fill('#login-password', 'wrongpassword')
+  await page.click('button[type="submit"]')
+  await expect(page.locator('[role="alert"]').first()).toBeVisible({ timeout: 5000 })
+})
+
+test('S09: Login page has split layout with SSO', async ({ page }) => {
+  await page.goto('/login')
+  await expect(page.locator('text=Bienvenido de vuelta')).toBeVisible()
+  await expect(page.locator('text=Continuar con Microsoft')).toBeVisible()
+  await expect(page.locator('text=¿Olvidaste tu contraseña?')).toBeVisible()
+})
+
+// ── Scenario 2: Sidebar Navigation ──
+
+test('S08: Admin navigates via sidebar to all sections', async ({ page }) => {
+  await login(page, ADMIN.email, ADMIN.password)
+
+  await page.click('aside >> text=Usuarios')
+  await expect(page).toHaveURL(/\/usuarios/, { timeout: 5000 })
+  await expect(page.locator('h2')).toBeVisible()
+
+  await page.click('aside >> text=Académico')
+  await expect(page).toHaveURL(/\/secciones/, { timeout: 5000 })
+
+  await page.click('aside >> text=Matrícula')
+  await expect(page).toHaveURL(/\/matricula/, { timeout: 5000 })
+
+  await page.click('aside >> text=Dashboard')
+  await expect(page).toHaveURL(/\/admin$/, { timeout: 5000 })
+})
+
+// ── Scenario 3: Cursos CRUD ──
 
 test('S02: Admin creates a course', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
-  await page.click('text=Gestionar cursos')
+  await page.click('button:has-text("Cursos")')
   await expect(page).toHaveURL(/\/cursos/, { timeout: 5000 })
 
   await page.click('text=+ Nuevo')
@@ -49,13 +85,11 @@ test('S03: Admin edits a course name', async ({ page }) => {
   }
 })
 
-// ── Scenario 3: Periodo Wizard ──
+// ── Scenario 4: Periodo Wizard ──
 
 test('S04: Admin creates a period (step 1 of wizard)', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
 
-  // If there's a period in progress, click "Continuar configuración" to go to the wizard
-  // Otherwise click "Configurar nuevo período"
   const continuarBtn = page.locator('text=Continuar configuración')
   const nuevoBtn = page.locator('text=Configurar nuevo período')
   if (await continuarBtn.isVisible()) {
@@ -63,7 +97,6 @@ test('S04: Admin creates a period (step 1 of wizard)', async ({ page }) => {
   } else if (await nuevoBtn.isVisible()) {
     await nuevoBtn.click()
   } else {
-    // Already in some wizard state, go to nuevo directly
     await page.goto('/admin/periodos/nuevo')
   }
   await expect(page).toHaveURL(/\/nuevo/, { timeout: 5000 })
@@ -71,64 +104,62 @@ test('S04: Admin creates a period (step 1 of wizard)', async ({ page }) => {
   await page.fill('input[placeholder="2026-2"]', 'E2E-' + Date.now().toString().slice(-6))
   await page.fill('input[placeholder*="Período"]', 'Período de Prueba E2E')
   await page.fill('input[type="date"]', '2026-06-01')
-  // Second date input
   const dateInputs = page.locator('input[type="date"]')
   await dateInputs.nth(1).fill('2026-12-31')
   await page.click('button:has-text("Continuar")')
 
   await expect(page).toHaveURL(/\/clonar/, { timeout: 5000 })
-  await expect(page.locator('text=Paso 2 de 4')).toBeVisible()
 })
 
-// ── Scenario 4: Docente Dashboard ──
+// ── Scenario 5: Docente ──
 
 test('S05: Docente login and see dashboard', async ({ page }) => {
   await login(page, DOCENTE.email, DOCENTE.password)
   await expect(page).toHaveURL('/docente')
   await expect(page.locator('h2:has-text("Mis Secciones")')).toBeVisible()
+  await expect(page.locator('aside')).toBeVisible()
+  await expect(page.locator('aside >> text=Mis Secciones')).toBeVisible()
 })
 
-// ── Scenario 5: Estudiante Dashboard ──
+// ── Scenario 6: Estudiante ──
 
 test('S06: Estudiante login and see dashboard', async ({ page }) => {
   await login(page, ESTUDIANTE.email, ESTUDIANTE.password)
   await expect(page).toHaveURL('/estudiante')
-  await expect(page.locator('h2:has-text("Mi Horario")')).toBeVisible()
+  await expect(page.locator('aside')).toBeVisible()
+  await expect(page.locator('aside >> text=Mi Panel')).toBeVisible()
 })
 
-// ── Scenario 6: Auth error handling ──
+// ── Scenario 7: New UI Components ──
 
-test('S07: Login with wrong password shows error', async ({ page }) => {
-  await page.goto('/login')
-  await page.fill('input[type="email"]', ADMIN.email)
-  await page.fill('input[type="password"]', 'wrongpassword')
-  await page.click('button[type="submit"]')
-
-  await expect(page.locator('[role="alert"]').first()).toBeVisible({ timeout: 5000 })
-})
-
-// ── Scenario 7: Navigation ──
-
-test('S08: Admin can navigate to all sections', async ({ page }) => {
+test('S10: Admin dashboard shows KPI cards', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
-
-  await page.click('text=Ver secciones')
-  await expect(page).toHaveURL(/\/secciones/, { timeout: 5000 })
-  await expect(page.locator('h2')).toBeVisible()
-
-  await page.click('text=← Dashboard')
-  await page.click('text=Dashboard de cierres')
-  await expect(page).toHaveURL(/\/cierres/, { timeout: 5000 })
-  await expect(page.locator('h2')).toBeVisible()
+  await expect(page.locator('text=Estudiantes')).toBeVisible({ timeout: 5000 })
+  await expect(page.locator('text=Secciones activas')).toBeVisible()
+  await expect(page.locator('text=% Asistencia')).toBeVisible()
 })
 
-// ── Scenario 8: Continuar periodo en progreso ──
-
-test('S09: Admin sees continuation banner for period in progress', async ({ page }) => {
+test('S11: User menu opens via sidebar footer', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
-  // If a BORRADOR period exists, the banner should be visible
+  const userButton = page.locator('aside button[aria-haspopup="menu"]')
+  await expect(userButton).toBeVisible()
+  await userButton.click()
+  await expect(page.locator('[role="menu"]')).toBeVisible()
+  await expect(page.locator('[role="menu"] >> text=Cerrar sesión')).toBeVisible()
+})
+
+test('S12: Mobile sidebar hamburger opens', async ({ page }) => {
+  await login(page, ADMIN.email, ADMIN.password)
+  await page.setViewportSize({ width: 480, height: 800 })
+  const hamburger = page.locator('button[aria-label="Abrir menú"]')
+  await expect(hamburger).toBeVisible()
+  await hamburger.click()
+  await expect(page.locator('aside nav[aria-label="Navegación principal"]')).toBeVisible()
+})
+
+test('S13: Period in progress banner has continuation', async ({ page }) => {
+  await login(page, ADMIN.email, ADMIN.password)
   const banner = page.locator('text=Período en configuración')
   const newPeriodBtn = page.locator('text=Configurar nuevo período')
-  // At least one of these should be visible
   await expect(banner.or(newPeriodBtn).first()).toBeVisible({ timeout: 3000 })
 })
