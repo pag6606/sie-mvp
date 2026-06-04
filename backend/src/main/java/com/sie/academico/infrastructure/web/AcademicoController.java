@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -57,6 +58,17 @@ public class AcademicoController {
     public ResponseEntity<CursoResponse> crearCurso(@Valid @RequestBody CrearCursoRequest req,
                                                      @RequestAttribute("colegioId") UUID colegioId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.crearCurso(req, colegioId));
+    }
+
+    @PutMapping("/cursos/{id}")
+    public CursoResponse actualizarCurso(@PathVariable UUID id, @RequestBody Map<String, String> body) {
+        return service.actualizarCurso(id, body.get("nombre"));
+    }
+
+    @PostMapping("/cursos/{id}/desactivar")
+    public ResponseEntity<Map<String, String>> desactivarCurso(@PathVariable UUID id) {
+        service.desactivarCurso(id);
+        return ResponseEntity.ok(Map.of("mensaje", "Curso desactivado"));
     }
 
     @GetMapping("/secciones")

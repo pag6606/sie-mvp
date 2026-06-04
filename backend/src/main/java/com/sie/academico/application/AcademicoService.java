@@ -70,6 +70,22 @@ public class AcademicoService {
         return cursoRepository.findAll().stream().map(this::toResponse).toList();
     }
 
+    @Transactional
+    public CursoResponse actualizarCurso(UUID id, String nombre) {
+        Curso c = cursoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado"));
+        c.setNombre(nombre);
+        return toResponse(cursoRepository.save(c));
+    }
+
+    @Transactional
+    public void desactivarCurso(UUID id) {
+        Curso c = cursoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado"));
+        c.setActivo(false);
+        cursoRepository.save(c);
+    }
+
     // ── Secciones ──
 
     @Transactional
