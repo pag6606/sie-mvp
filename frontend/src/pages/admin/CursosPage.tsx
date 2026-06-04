@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
+import type { ApiError } from '@/types/api'
 import Navbar from '@/components/Navbar'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
 import Pagination from '@/components/Pagination'
@@ -46,22 +47,33 @@ export default function CursosPage() {
       setFormCodigo('')
       setFormNombre('')
     },
-    onError: (err: any) => {
+    onError: (err: ApiError) => {
       setFormError(err.response?.data?.mensaje || err.message || 'Error al crear curso')
     },
   })
+
+  const [updateError, setUpdateError] = useState('')
 
   const updateMutation = useMutation({
     mutationFn: ({ id, nombre }: { id: string; nombre: string }) => api.put(`/cursos/${id}`, { nombre }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cursos'] })
       setEditingId(null)
+      setUpdateError('')
+    },
+    onError: (err: ApiError) => {
+      setUpdateError(err.response?.data?.mensaje || err.message || 'Error al actualizar')
     },
   })
+
+  const [desactivarError, setDesactivarError] = useState('')
 
   const desactivarMutation = useMutation({
     mutationFn: (id: string) => api.post(`/cursos/${id}/desactivar`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cursos'] }),
+    onError: (err: ApiError) => {
+      setDesactivarError(err.response?.data?.mensaje || err.message || 'Error al desactivar')
+    },
   })
 
   const handleCrear = (e: React.FormEvent) => {
@@ -72,9 +84,10 @@ export default function CursosPage() {
 
   const handleDesactivar = (curso: Curso) => {
     if (curso.seccionesActivas && curso.seccionesActivas > 0) {
-      alert('No se puede desactivar: tiene alumnos activos en secciones de este curso.')
+      setDesactivarError(`No se puede desactivar ${curso.codigo}: tiene alumnos activos.`)
       return
     }
+    setDesactivarError('')
     if (!confirm(`¿Desactivar el curso ${curso.codigo}?`)) return
     desactivarMutation.mutate(curso.id)
   }
@@ -119,6 +132,8 @@ export default function CursosPage() {
         )}
 
         {error ? <InlineError message="Error al cargar cursos" /> : null}
+        {desactivarError && <div className="mb-4"><InlineError message={desactivarError} /></div>}
+        {updateError && <div className="mb-4"><InlineError message={updateError} /></div>}
 
         {cursos.length === 0 && !error ? (
           <div className="rounded-lg border bg-card p-12 text-center">
