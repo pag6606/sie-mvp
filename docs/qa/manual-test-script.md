@@ -20,42 +20,42 @@
 ## UA-01 — Login
 
 ### UA-01.1 Login exitoso Admin
-- [ ] Navegar a `http://localhost:5173/login`
-- [ ] Verificar que aparece el panel izquierdo con degradado índigo (SIE branding)
-- [ ] Verificar que dice "Bienvenido de vuelta"
-- [ ] Verificar que aparece el logo de SIE
-- [ ] Ingresar `admin@sie.edu.ec` / `Admin123!`
-- [ ] Clic en "Iniciar sesión"
-- [ ] **AC:** Redirige a `/admin`, se ve el sidebar con Dashboard, Usuarios, Académico, Matrícula
-- [ ] **AC:** El sidebar muestra avatar del admin en la parte inferior
-- [ ] **AC:** Sidebar muestra: Dashboard, Usuarios, Secciones (paralelos), Matrícula
+- [X] Navegar a `http://localhost:5173/login`
+- [X] Verificar que aparece el panel izquierdo con degradado índigo (SIE branding)
+- [X] Verificar que dice "Bienvenido de vuelta"
+- [X] Verificar que aparece el logo de SIE
+- [X] Ingresar `admin@sie.edu.ec` / `Admin123!`
+- [X] Clic en "Iniciar sesión"
+- [X] **AC:** Redirige a `/admin`, se ve el sidebar con Dashboard, Usuarios, Académico, Matrícula
+- [X] **AC:** El sidebar muestra avatar del admin en la parte inferior
+- [X] **AC:** Sidebar muestra: Dashboard, Usuarios, Secciones (paralelos), Matrícula
 
 ### UA-01.2 Login exitoso Docente
-- [ ] Cerrar sesión (clic en avatar → Cerrar sesión → Confirmar)
-- [ ] Ingresar `diana@colegio.edu.ec` / `Docente1!`
-- [ ] **AC:** Redirige a `/docente`, sidebar muestra solo "Mis Secciones (paralelos)"
+- [X] Cerrar sesión (clic en avatar → Cerrar sesión → Confirmar)
+- [X] Ingresar `diana@colegio.edu.ec` / `Docente1!`
+- [X] **AC:** Redirige a `/docente`, sidebar muestra solo "Mis Secciones (paralelos)"
 
 ### UA-01.3 Login exitoso Estudiante
-- [ ] Cerrar sesión
-- [ ] Ingresar `ernesto@colegio.edu.ec` / `Estudiante1!`
-- [ ] **AC:** Redirige a `/estudiante`, sidebar muestra solo "Mi Panel"
+- [X] Cerrar sesión
+- [X] Ingresar `ernesto@colegio.edu.ec` / `Estudiante1!`
+- [X] **AC:** Redirige a `/estudiante`, sidebar muestra solo "Mi Panel"
 
 ### UA-01.4 Login fallido
-- [ ] Cerrar sesión
-- [ ] Ingresar email válido pero contraseña incorrecta
-- [ ] **AC:** Aparece error en rojo con `role="alert"`
-- [ ] **AC:** El campo email/password no pierden el foco
+- [X] Cerrar sesión
+- [X] Ingresar email válido pero contraseña incorrecta
+- [X] **AC:** Aparece error en rojo con `role="alert"`
+- [X] **AC:** El campo email/password no pierden el foco
 
 ### UA-01.5 Toggle visibilidad contraseña
-- [ ] Clic en el ícono del ojo 👁 junto al campo contraseña
-- [ ] **AC:** La contraseña se muestra en texto claro
-- [ ] Clic de nuevo
-- [ ] **AC:** Vuelve a ocultarse
+- [X] Clic en el ícono del ojo 👁 junto al campo contraseña
+- [X] **AC:** La contraseña se muestra en texto claro
+- [X] Clic de nuevo
+- [X] **AC:** Vuelve a ocultarse
 
 ### UA-01.6 Link "¿Olvidaste tu contraseña?"
-- [ ] Clic en "¿Olvidaste tu contraseña?"
-- [ ] **AC:** Navega a `/reset-password`
-- [ ] Volver atrás
+- [X] Clic en "¿Olvidaste tu contraseña?"
+- [X] **AC:** Navega a `/reset-password`
+- [X] Volver atrás
 
 ---
 
