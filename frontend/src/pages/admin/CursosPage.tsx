@@ -99,7 +99,7 @@ export default function CursosPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar role="admin" subtitle="Gestión de Cursos" />
-      <main className="mx-auto max-w-2xl px-8 py-12">
+      <main className="mx-auto max-w-3xl px-8 py-12">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-foreground">Catálogo de Cursos</h2>
           <div className="flex gap-2">
@@ -112,28 +112,28 @@ export default function CursosPage() {
           <div className="mb-6 rounded-lg border border-primary/30 bg-primary/5 p-6">
             <h3 className="mb-4 font-medium text-foreground">Nuevo curso</h3>
             {formError && <div className="mb-4"><InlineError message={formError} /></div>}
-            <form onSubmit={handleCrear} className="flex items-end gap-4">
-              <div>
+            <form onSubmit={handleCrear} className="flex items-end gap-3">
+              <div className="w-28">
                 <label htmlFor="curso-codigo" className="block text-xs font-medium text-muted-foreground">Código</label>
                 <input id="curso-codigo" value={formCodigo} onChange={e => setFormCodigo(e.target.value)} required
-                  className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="MAT-101" />
+                  className="mt-1 block w-full rounded-md border border-input bg-background px-2 py-2 text-sm" placeholder="MAT-101" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <label htmlFor="curso-nombre" className="block text-xs font-medium text-muted-foreground">Nombre</label>
                 <input id="curso-nombre" value={formNombre} onChange={e => setFormNombre(e.target.value)} required
                   className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Matemáticas I" />
               </div>
-              <div className="w-20">
-                <label htmlFor="curso-creditos" className="block text-xs font-medium text-muted-foreground">Créditos</label>
+              <div className="w-16">
+                <label htmlFor="curso-creditos" className="block text-xs font-medium text-muted-foreground">Créd.</label>
                 <input id="curso-creditos" type="number" min="1" value={formCreditos} onChange={e => setFormCreditos(Number(e.target.value))} required
-                  className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
+                  className="mt-1 block w-full rounded-md border border-input bg-background px-2 py-2 text-sm text-center" />
               </div>
               <button type="submit" disabled={createMutation.isPending}
-                className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700 disabled:opacity-50">
-                {createMutation.isPending ? 'Creando...' : 'Crear curso'}
+                className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50 whitespace-nowrap">
+                {createMutation.isPending ? 'Creando...' : 'Crear'}
               </button>
               <button type="button" onClick={() => setShowForm(false)}
-                className="rounded-md border border-input px-4 py-2 text-sm text-muted-foreground hover:bg-muted">Cancelar</button>
+                className="rounded-md border border-input px-3 py-2 text-sm text-muted-foreground hover:bg-muted whitespace-nowrap">Cancelar</button>
             </form>
           </div>
         )}
@@ -152,10 +152,10 @@ export default function CursosPage() {
             <table className="w-full">
               <thead className="border-b bg-muted/50">
                 <tr>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Código</th>
+                  <th scope="col" className="w-24 px-4 py-3 text-left text-xs font-medium text-muted-foreground">Código</th>
                   <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Nombre</th>
-                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Estado</th>
-                  <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Acción</th>
+                  <th scope="col" className="w-20 px-4 py-3 text-center text-xs font-medium text-muted-foreground">Estado</th>
+                  <th scope="col" className="w-24 px-4 py-3 text-center text-xs font-medium text-muted-foreground">Acción</th>
                 </tr>
               </thead>
               <tbody>
