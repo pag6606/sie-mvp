@@ -127,8 +127,7 @@ export default function RevisarSecciones() {
     }
   }
 
-  const handleCrearCursoAlVuelo = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleCrearCursoAlVuelo = async () => {
     setNuevoCursoError('')
     setNuevoCursoSaving(true)
     try {
@@ -189,7 +188,7 @@ export default function RevisarSecciones() {
                   {showNuevoCurso && (
                     <div className="mt-2 rounded border border-primary/30 bg-primary/5 p-3">
                       {nuevoCursoError && <div className="mb-2"><InlineError message={nuevoCursoError} /></div>}
-                      <form onSubmit={handleCrearCursoAlVuelo} className="flex items-end gap-2">
+                      <div className="flex items-end gap-2">
                         <div>
                           <label className="block text-xs text-muted-foreground">Código</label>
                           <input value={nuevoCursoCodigo} onChange={e => setNuevoCursoCodigo(e.target.value)} required
@@ -205,13 +204,13 @@ export default function RevisarSecciones() {
                           <input type="number" min="1" value={nuevoCursoCreditos} onChange={e => setNuevoCursoCreditos(Number(e.target.value))} required
                             className="mt-0.5 w-full rounded border border-input px-2 py-1 text-xs" />
                         </div>
-                        <button type="submit" disabled={nuevoCursoSaving}
+                        <button type="button" onClick={handleCrearCursoAlVuelo} disabled={nuevoCursoSaving}
                           className="rounded bg-emerald-600 px-3 py-1.5 text-xs text-white disabled:opacity-50">
                           {nuevoCursoSaving ? '...' : 'Crear'}
                         </button>
                         <button type="button" onClick={() => setShowNuevoCurso(false)}
                           className="text-xs text-muted-foreground hover:underline">Cancelar</button>
-                      </form>
+                      </div>
                     </div>
                   )}
                 </div>
