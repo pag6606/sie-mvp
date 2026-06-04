@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import ProgressBar from '@/components/ProgressBar'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 import { useSecciones } from '@/hooks/useSecciones'
 import { useCursos } from '@/hooks/useCursos'
 
@@ -150,10 +150,8 @@ export default function RevisarSecciones() {
   const allReviewed = useMemo(() => secciones.length > 0 && revisadas.size === secciones.length, [secciones.length, revisadas.size])
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="admin" subtitle={`Paso 3 de 4 · ${revisadas.size} de ${secciones.length} revisadas`} />
-
-      <main className="mx-auto max-w-4xl px-8 py-12">
+    <AppLayout role="admin">
+      <div className="p-6 md:p-8">
         <ProgressBar steps={STEPS} current={2} />
 
         <div className="mb-4 flex items-center justify-between">
@@ -305,7 +303,7 @@ export default function RevisarSecciones() {
             {secciones.length === 0 ? 'Sin secciones que revisar' : `${revisadas.size}/${secciones.length} — Continuar`}
           </button>
         </div>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

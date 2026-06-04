@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 import ProgressBar from '@/components/ProgressBar'
 import { InlineError } from '@/components/UIPatterns'
+import { ApiError } from '@/types/api'
 
 const STEPS = [
   { label: 'Crear período' },
@@ -27,8 +28,9 @@ export default function CrearPeriodo() {
     onSuccess: (data) => {
       navigate(`/admin/periodos/${data.id}/clonar`)
     },
-    onError: (err: any) => {
-      setError(err.response?.data?.mensaje || 'Error al crear el período')
+    onError: (err: unknown) => {
+      const apiErr = err as ApiError
+      setError(apiErr.response?.data?.mensaje || 'Error al crear el período')
     },
   })
 
@@ -39,10 +41,8 @@ export default function CrearPeriodo() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="admin" subtitle="Paso 1 de 4" />
-
-      <main className="mx-auto max-w-2xl px-8 py-12">
+    <AppLayout role="admin">
+      <div className="p-6 md:p-8">
         <ProgressBar steps={STEPS} current={0} />
 
         <div className="rounded-lg border bg-card p-8">
@@ -113,7 +113,7 @@ export default function CrearPeriodo() {
             </button>
           </p>
         </div>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

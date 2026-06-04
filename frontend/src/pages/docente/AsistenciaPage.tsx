@@ -3,11 +3,18 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
+import { ApiError } from '@/types/api'
 
 interface Estudiante {
   matriculaId: string; estudianteId: string; estudianteNombre: string
   porcentaje: number; estado?: string
+}
+
+interface AsistenciaResponse {
+  estudianteId: string
+  porcentaje: number
+  estudianteNombre?: string
 }
 
 export default function AsistenciaPage() {
@@ -20,7 +27,7 @@ export default function AsistenciaPage() {
   const { data: estudiantes = [], isLoading: loading, isError, error: queryError } = useQuery<Estudiante[]>({
     queryKey: ['asistencia', seccionId, fecha],
     queryFn: () => api.get(`/secciones/${seccionId}/asistencia?desde=${fecha}&hasta=${fecha}`)
-      .then(r => (r.data as any[]).map((a: any) => ({
+      .then(r => (r.data as AsistenciaResponse[]).map((a) => ({
         matriculaId: a.estudianteId,
         estudianteId: a.estudianteId,
         porcentaje: a.porcentaje,
@@ -45,28 +52,25 @@ export default function AsistenciaPage() {
   if (loading) return <LoadingSkeleton rows={4} />
 
   if (isError) return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="docente" />
-      <main className="mx-auto max-w-2xl px-8 py-12">
-        <InlineError message={(queryError as any)?.response?.data?.mensaje || 'Error al cargar asistencia'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['asistencia', seccionId, fecha] })} />
-      </main>
-    </div>
+    <AppLayout role="docente">
+      <div className="p-6 md:p-8">
+        <InlineError message={(queryError as ApiError)?.response?.data?.mensaje || 'Error al cargar asistencia'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['asistencia', seccionId, fecha] })} />
+      </div>
+    </AppLayout>
   )
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="docente" />
-
-      <main className="mx-auto max-w-2xl px-8 py-12">
+    <AppLayout role="docente">
+      <div className="p-6 md:p-8">
         <button onClick={() => navigate('/docente')} className="text-sm text-muted-foreground hover:underline mb-4 block">← Mis secciones</button>
 
         {guardarMutation.isError && (
           <div className="mb-4">
-            <InlineError message={(guardarMutation.error as any)?.response?.data?.mensaje || 'Error al guardar'} />
+            <InlineError message={(guardarMutation.error as ApiError)?.response?.data?.mensaje || 'Error al guardar'} />
           </div>
         )}
         {guardarMutation.isSuccess && (
-          <div className="mb-4 rounded-md bg-emerald-50 p-4 text-sm text-emerald-700">Asistencia guardada</div>
+          <div className="mb-4 rounded-md bg-success p-4 text-sm text-success-foreground">Asistencia guardada</div>
         )}
 
         <div className="flex items-center justify-between mb-6">
@@ -127,7 +131,7 @@ export default function AsistenciaPage() {
           className="mt-6 w-full rounded-lg bg-primary px-4 py-3 text-primary-foreground disabled:opacity-50">
           {guardarMutation.isPending ? 'Guardando...' : 'Guardar asistencia'}
         </button>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

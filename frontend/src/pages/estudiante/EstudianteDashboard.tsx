@@ -2,7 +2,7 @@ import { LoadingSkeleton } from '@/components/UIPatterns'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 
 interface MatriculaData { id: string; estudianteId: string; seccionId: string; estudianteNombre: string; cursoNombre: string }
 interface NotaResp { estudianteId: string; notaFinal: number; componentes: { nombre: string; peso: number; valor: number }[] }
@@ -29,27 +29,11 @@ export default function EstudianteDashboard() {
 
   const loading = loadingM || loadingN || loadingA
 
-  const generateWebcal = () => {
-    const events = matriculas.map((m: MatriculaData) => {
-      const start = new Date()
-      const end = new Date(start.getTime() + 90 * 60000)
-      return `BEGIN:VEVENT\nSUMMARY:${m.cursoNombre}\nDTSTART:${start.toISOString().replace(/[-:]/g,'').slice(0,15)}Z\nDTEND:${end.toISOString().replace(/[-:]/g,'').slice(0,15)}Z\nEND:VEVENT`
-    }).join('\n')
-    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SIE//Horario//ES\n${events}\nEND:VCALENDAR`
-    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url; a.download = 'horario.ics'; a.click()
-    URL.revokeObjectURL(url)
-  }
-
   if (loading) return <LoadingSkeleton rows={4} />
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="estudiante" extra={<button onClick={generateWebcal} className="rounded-md border border-primary px-3 py-1.5 text-xs text-primary hover:bg-primary/10" aria-label="Descargar horario en formato iCal">📅 Exportar horario</button>} />
-
-      <main className="mx-auto max-w-xl px-4 py-8">
+    <AppLayout role="estudiante">
+      <div className="p-6 md:p-8">
         <div className="mb-6 flex border-b" role="tablist">
           <button onClick={() => setTab('horario')} role="tab" aria-selected={tab === 'horario'}
             className={`px-4 py-2 text-sm font-medium border-b-2 ${tab === 'horario' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'}`}>
@@ -141,7 +125,7 @@ export default function EstudianteDashboard() {
             </button>
           </>
         )}
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

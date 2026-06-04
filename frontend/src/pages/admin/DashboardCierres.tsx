@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 import { usePeriodos } from '@/hooks/usePeriodos'
 import { LoadingSkeleton } from '@/components/UIPatterns'
 
@@ -45,9 +45,8 @@ export default function DashboardCierres() {
   const cerradas = useMemo(() => cierres.filter(c => c.estado === 'CERRADA').length, [cierres])
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="admin" />
-      <main className="mx-auto max-w-4xl px-8 py-12">
+    <AppLayout role="admin">
+      <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-foreground">Dashboard de Cierres</h2>
           <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
@@ -97,7 +96,7 @@ export default function DashboardCierres() {
             )}
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

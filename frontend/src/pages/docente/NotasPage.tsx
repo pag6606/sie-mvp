@@ -3,10 +3,12 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
+import { ApiError } from '@/types/api'
 
 interface ComponenteNota { componenteId: string; nombre: string; peso: number; valor: number | null }
 interface NotaEstudiante { estudianteId: string; estudianteNombre?: string; notaFinal: number | null; componentes: ComponenteNota[] }
+interface NotaEntry { matriculaId: string; componenteId: string; valor: number }
 
 export default function NotasPage() {
   const { seccionId } = useParams()
@@ -30,7 +32,7 @@ export default function NotasPage() {
   })
 
   const handleGuardar = () => {
-    const entries: any[] = []
+    const entries: NotaEntry[] = []
     Object.entries(editing).forEach(([key, valor]) => {
       const [idx, compIdx] = key.split('-').map(Number)
       entries.push({ matriculaId: notas[idx]?.estudianteId, componenteId: notas[idx]?.componentes[compIdx]?.componenteId, valor })
@@ -43,30 +45,27 @@ export default function NotasPage() {
   if (loading) return <LoadingSkeleton rows={4} />
 
   if (isError) return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="docente" />
-      <main className="mx-auto max-w-5xl px-4 py-12">
-        <InlineError message={(queryError as any)?.response?.data?.mensaje || 'Error al cargar notas'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['notas', seccionId] })} />
-      </main>
-    </div>
+    <AppLayout role="docente">
+      <div className="p-6 md:p-8">
+        <InlineError message={(queryError as ApiError)?.response?.data?.mensaje || 'Error al cargar notas'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['notas', seccionId] })} />
+      </div>
+    </AppLayout>
   )
 
   const componentes = notas[0]?.componentes || []
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="docente" />
-
-      <main className="mx-auto max-w-5xl px-4 py-12">
+    <AppLayout role="docente">
+      <div className="p-6 md:p-8">
         <button onClick={() => navigate('/docente')} className="text-sm text-muted-foreground hover:underline mb-4 block">← Mis secciones</button>
 
         {guardarMutation.isError && (
           <div className="mb-4">
-            <InlineError message={(guardarMutation.error as any)?.response?.data?.mensaje || 'Error al guardar'} />
+            <InlineError message={(guardarMutation.error as ApiError)?.response?.data?.mensaje || 'Error al guardar'} />
           </div>
         )}
         {guardarMutation.isSuccess && (
-          <div className="mb-4 rounded-md bg-emerald-50 p-4 text-sm text-emerald-700">Notas guardadas</div>
+          <div className="mb-4 rounded-md bg-success p-4 text-sm text-success-foreground">Notas guardadas</div>
         )}
 
         <div className="mb-6 flex items-center justify-between">
@@ -124,7 +123,7 @@ export default function NotasPage() {
             </tbody>
           </table>
         </div>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

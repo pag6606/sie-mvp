@@ -2,7 +2,7 @@ import { memo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSecciones } from '@/hooks/useSecciones'
 import { LoadingSkeleton } from '@/components/UIPatterns'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 
 const SeccionCard = memo(function SeccionCard({
   s,
@@ -44,19 +44,16 @@ export default function DocenteDashboard() {
   const handleNavigate = useCallback((to: string) => navigate(to), [navigate])
 
   if (loading) return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="docente" />
-      <main className="mx-auto max-w-3xl px-8 py-12">
-        <LoadingSkeleton rows={3} height="h-24" />
-      </main>
-    </div>
+    <AppLayout role="docente">
+      <div className="p-6 md:p-8">
+        <LoadingSkeleton rows={3} />
+      </div>
+    </AppLayout>
   )
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="docente" />
-
-      <main className="mx-auto max-w-3xl px-8 py-12">
+    <AppLayout role="docente">
+      <div className="p-6 md:p-8">
         <h2 className="text-2xl font-semibold text-foreground mb-6">Mis Secciones</h2>
 
         {secciones.length === 0 ? (
@@ -71,7 +68,7 @@ export default function DocenteDashboard() {
             ))}
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

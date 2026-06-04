@@ -1,6 +1,7 @@
 package com.sie.identidad.infrastructure.web;
 
 import com.sie.identidad.application.UsuarioService;
+import com.sie.identidad.application.dto.BatchRequest;
 import com.sie.identidad.application.dto.CrearUsuarioRequest;
 import com.sie.identidad.application.dto.UsuarioResponse;
 import com.sie.identidad.infrastructure.UsuarioRepository;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -58,5 +60,17 @@ public class UsuarioController {
         String motivo = body != null ? body.getOrDefault("motivo", "") : "";
         usuarioService.desactivarUsuario(id, motivo);
         return ResponseEntity.ok(Map.of("mensaje", "Usuario desactivado"));
+    }
+
+    @PostMapping("/batch/desactivar")
+    public ResponseEntity<Map<String, String>> desactivarUsuarios(@Valid @RequestBody BatchRequest request) {
+        usuarioService.desactivarUsuarios(request.ids(), "");
+        return ResponseEntity.ok(Map.of("mensaje", request.ids().size() + " usuarios desactivados"));
+    }
+
+    @DeleteMapping("/batch")
+    public ResponseEntity<Map<String, String>> eliminarUsuarios(@Valid @RequestBody BatchRequest request) {
+        usuarioService.eliminarUsuarios(request.ids());
+        return ResponseEntity.ok(Map.of("mensaje", request.ids().size() + " usuarios eliminados"));
     }
 }

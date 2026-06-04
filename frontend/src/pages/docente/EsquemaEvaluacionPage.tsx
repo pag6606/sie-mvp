@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 import { InlineError } from '@/components/UIPatterns'
+import { ApiError } from '@/types/api'
 
 interface Componente { id?: string; nombre: string; peso: number }
 
@@ -22,7 +23,7 @@ export default function EsquemaEvaluacionPage() {
 
   const add = () => setComponentes(prev => [...prev, { nombre: '', peso: 0 }])
   const remove = (i: number) => setComponentes(prev => prev.filter((_, idx) => idx !== i))
-  const update = (i: number, field: string, value: any) => {
+  const update = (i: number, field: string, value: string | number) => {
     setComponentes(prev => prev.map((c, idx) => idx === i ? { ...c, [field]: value } : c))
   }
 
@@ -33,9 +34,8 @@ export default function EsquemaEvaluacionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="docente" />
-      <main className="mx-auto max-w-xl px-8 py-12">
+    <AppLayout role="docente">
+      <div className="p-6 md:p-8">
         <button onClick={() => navigate('/docente')} className="text-sm text-muted-foreground hover:underline mb-4 block">← Mis secciones</button>
         <h2 className="text-xl font-semibold text-foreground mb-6">Esquema de Evaluación</h2>
 
@@ -46,7 +46,7 @@ export default function EsquemaEvaluacionPage() {
         )}
         {guardarMutation.isError && (
           <div className="mb-4">
-            <InlineError message={(guardarMutation.error as any)?.response?.data?.mensaje || 'Error al guardar'} />
+            <InlineError message={(guardarMutation.error as ApiError)?.response?.data?.mensaje || 'Error al guardar'} />
           </div>
         )}
 
@@ -72,7 +72,7 @@ export default function EsquemaEvaluacionPage() {
           </div>
         </div>
         <p className="mt-4 text-xs text-muted-foreground">⚠️ Al ingresar la primera nota, los pesos se congelan.</p>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

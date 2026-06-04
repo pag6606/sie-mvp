@@ -1,8 +1,9 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 import { InlineError } from '@/components/UIPatterns'
+import { ApiError } from '@/types/api'
 
 export default function CierrePage() {
   const { seccionId } = useParams()
@@ -16,21 +17,20 @@ export default function CierrePage() {
   const handleCerrar = () => cerrarMutation.mutate()
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="docente" />
-      <div className="flex items-center justify-center" style={{ minHeight: 'calc(100vh - 4rem)' }}>
+    <AppLayout role="docente">
+      <div className="p-6 md:p-8">
         <div className="w-full max-w-md rounded-xl bg-card p-8 shadow-lg text-center">
           <h2 className="text-xl font-semibold text-foreground mb-4">Cerrar sección</h2>
 
           {cerrarMutation.isError && (
             <div className="mb-4">
-              <InlineError message={(cerrarMutation.error as any)?.response?.data?.mensaje || 'Error al cerrar la sección'} />
+              <InlineError message={(cerrarMutation.error as ApiError)?.response?.data?.mensaje || 'Error al cerrar la sección'} />
             </div>
           )}
 
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-left mb-6">
-            <p className="text-sm font-medium text-amber-800">⚠️ Al cerrar esta sección:</p>
-            <ul className="mt-2 space-y-1 text-sm text-amber-700">
+          <div className="rounded-lg border border-warning bg-warning/10 p-4 text-left mb-6">
+            <p className="text-sm font-medium text-warning">Al cerrar esta sección:</p>
+            <ul className="mt-2 space-y-1 text-sm text-warning">
               <li>• Las notas serán definitivas</li>
               <li>• No podrán modificarse</li>
               <li>• Se publicarán para los estudiantes</li>
@@ -45,6 +45,6 @@ export default function CierrePage() {
           </div>
         </div>
       </div>
-    </div>
+    </AppLayout>
   )
 }

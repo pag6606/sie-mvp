@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 import { usePeriodos } from '@/hooks/usePeriodos'
 import { useSecciones } from '@/hooks/useSecciones'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
+import { ApiError } from '@/types/api'
+
+interface PeriodoItem { id: string; codigo: string; nombre: string; fechaInicio: string; fechaFin: string; estado: string }
 
 
 export default function MatriculaPage() {
@@ -18,7 +21,7 @@ export default function MatriculaPage() {
   // Auto-select first open periodo on load
   useEffect(() => {
     if (periodos.length > 0 && !selectedPeriodo) {
-      const abierto = periodos.find((p: any) => p.estado === 'ABIERTO' || p.estado === 'EN_CURSO')
+      const abierto = periodos.find((p: PeriodoItem) => p.estado === 'ABIERTO' || p.estado === 'EN_CURSO')
       if (abierto) setSelectedPeriodo(abierto.id)
     }
   }, [periodos, selectedPeriodo])
@@ -58,18 +61,17 @@ export default function MatriculaPage() {
       setFormEmail('')
       setFormSeccionId('')
       queryClient.invalidateQueries({ queryKey: ['secciones', selectedPeriodo] })
-    } catch (err: any) {
-      setFormError(err.response?.data?.mensaje || 'Error al matricular')
+    } catch (err: unknown) {
+      const apiErr = err as ApiError
+      setFormError(apiErr.response?.data?.mensaje || 'Error al matricular')
     } finally {
       setFormSaving(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="admin" />
-
-      <main className="mx-auto max-w-4xl px-8 py-12">
+    <AppLayout role="admin">
+      <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-foreground">Matrícula</h2>
           <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
@@ -79,7 +81,7 @@ export default function MatriculaPage() {
           <label htmlFor="periodoSelect" className="sr-only">Período</label>
           <select id="periodoSelect" value={selectedPeriodo} onChange={e => handlePeriodoChange(e.target.value)}
             className="rounded-md border border-input px-4 py-2 text-sm">
-            {periodos.map((p: any) => <option key={p.id} value={p.id}>{p.codigo} — {p.estado}</option>)}
+            {periodos.map((p: PeriodoItem) => <option key={p.id} value={p.id}>{p.codigo} — {p.estado}</option>)}
           </select>
           <button onClick={() => setShowForm(!showForm)} className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90">
             + Matricular estudiante
@@ -140,7 +142,7 @@ export default function MatriculaPage() {
             ))}
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

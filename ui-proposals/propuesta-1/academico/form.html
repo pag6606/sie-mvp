@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <title>Sección — SIE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { colors: { primary: { DEFAULT: '#4F46E5', foreground: '#FFFFFF' } }, fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+  </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .btn-primary { @apply bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-lg text-sm transition-colors inline-flex items-center gap-2; }
+    .btn-outline { @apply border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold px-4 py-2.5 rounded-lg text-sm transition-colors inline-flex items-center gap-2; }
+    .input { background: white; border: 1px solid #E2E8F0; color: #0F172A; border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none; transition: border-color .15s, box-shadow .15s; width: 100%; }
+    .input:focus { border-color: #4F46E5; box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+    .input::placeholder { color: #94A3B8; }
+    .label { @apply block text-sm font-medium text-slate-700 mb-1.5; }
+    .select { background: white; border: 1px solid #E2E8F0; color: #0F172A; border-radius: 8px; padding: 10px 12px; font-size: 14px; outline: none; transition: border-color .15s, box-shadow .15s; width: 100%; cursor: pointer; }
+    .select:focus { border-color: #4F46E5; box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+    .card { @apply bg-white rounded-xl border border-slate-200 shadow-sm; }
+    .section-title { @apply text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2; }
+    .checkbox-day { @apply w-5 h-5 rounded border-slate-300 text-indigo-600 cursor-pointer accent-indigo-600; }
+    .toggle-switch { position: relative; width: 44px; height: 24px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; inset: 0; background-color: #E2E8F0; border-radius: 24px; transition: .3s; }
+    .toggle-slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .3s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    input:checked + .toggle-slider { background-color: #4F46E5; }
+    input:checked + .toggle-slider:before { transform: translateX(20px); }
+  </style>
+</head>
+<body class="h-full bg-slate-50">
+<div class="flex h-screen overflow-hidden">
+  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
+    <div class="h-16 flex items-center px-4 border-b border-slate-200">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        </div>
+        <span class="font-semibold text-slate-900 text-sm">SIE</span>
+      </div>
+    </div>
+    <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+      <a href="../dashboard-admin.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a>
+      <a href="../identidad/list.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"><i data-lucide="users" class="w-4 h-4"></i> Usuarios</a>
+      <a href="list.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-indigo-50 text-indigo-700 font-semibold cursor-pointer"><i data-lucide="book-open" class="w-4 h-4"></i> Académico</a>
+      <a href="../matricula/wizard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Matrícula</a>
+    </nav>
+    <div class="p-3 border-t border-slate-200 relative">
+      <button onclick="toggleUserMenu()" class="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-slate-50 transition-colors group">
+        <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center shrink-0"><span class="text-xs font-semibold text-white">AL</span></div>
+        <div class="flex-1 min-w-0 text-left"><p class="text-xs font-semibold text-slate-900 truncate">Alma管理体系</p><p class="text-xs text-slate-500 truncate">Administrador</p></div>
+        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0"></i>
+      </button>
+      <div id="userMenu" class="hidden absolute bottom-full left-3 right-3 mb-1 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden">
+        <div class="px-4 py-3 bg-slate-50 border-b border-slate-100"><p class="text-sm font-semibold text-slate-900">Alma管理体系</p><p class="text-xs text-slate-500 mt-0.5">admin@sie.edu.ec</p></div>
+        <div class="py-1"><button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-semibold" onclick="window.location.href='../index.html'"><i data-lucide="log-out" class="w-4 h-4"></i> Cerrar sesión</button></div>
+      </div>
+    </div>
+  </aside>
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
+      <nav class="flex items-center gap-1 text-sm text-slate-500"><a href="../dashboard-admin.html" class="hover:text-slate-700">Inicio</a><i data-lucide="chevron-right" class="w-3 h-3"></i><a href="list.html" class="hover:text-slate-700">Académico</a><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-900 font-semibold" id="headerTitle">Nueva sección</span></nav>
+      <div class="flex items-center gap-2">
+        <div class="w-px h-5 bg-slate-200"></div>
+        <button onclick="toggleUserMenu()" class="flex items-center gap-2 pl-1 pr-3 py-1 hover:bg-slate-100 rounded-lg transition-colors"><div class="w-7 h-7 bg-indigo-600 rounded-full flex items-center justify-center"><span class="text-xs font-semibold text-white">AL</span></div><div class="text-left hidden sm:block"><p class="text-xs font-semibold text-slate-900 leading-tight">Alma管理体系</p><p class="text-xs text-slate-500 leading-tight">Administrador</p></div><i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i></button>
+      </div>
+    </header>
+    <div class="flex-1 overflow-y-auto p-6">
+      <form id="sectionForm" onsubmit="handleSubmit(event)">
+        <div class="max-w-3xl mx-auto">
+          <div class="flex items-start justify-between mb-6">
+            <div>
+              <h1 class="text-xl font-bold text-slate-900" id="pageTitle">Nueva sección</h1>
+              <p class="text-sm text-slate-500 mt-0.5" id="pageSubtitle">Complete la información de la sección</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <a href="list.html" class="btn-outline"><i data-lucide="arrow-left" class="w-4 h-4"></i> Cancelar</a>
+              <button type="submit" class="btn-primary"><i data-lucide="save" class="w-4 h-4"></i> <span id="submitText">Guardar</span></button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6">
+            <div class="col-span-2 card p-5">
+              <h2 class="section-title"><i data-lucide="layers" class="w-4 h-4 text-indigo-600"></i> Información de la Sección</h2>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="label" for="nombre">Nombre *</label>
+                  <input type="text" id="nombre" name="nombre" class="input" placeholder="Sección A" required />
+                </div>
+                <div>
+                  <label class="label" for="grado">Grado *</label>
+                  <select id="grado" name="grado" class="select" required>
+                    <option value="">Seleccionar grado</option>
+                    <option value="1 EGB">1ro EGB</option>
+                    <option value="2 EGB">2do EGB</option>
+                    <option value="3 EGB">3ro EGB</option>
+                    <option value="4 EGB">4to EGB</option>
+                    <option value="5 EGB">5to EGB</option>
+                    <option value="6 EGB">6to EGB</option>
+                    <option value="7 EGB">7mo EGB</option>
+                    <option value="8 EGB">8vo EGB</option>
+                    <option value="9 EGB">9no EGB</option>
+                    <option value="10 EGB">10mo EGB</option>
+                    <option value="1 BGU">1ro Bachillerato</option>
+                    <option value="2 BGU">2do Bachillerato</option>
+                    <option value="3 BGU">3ro Bachillerato</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" for="paralelo">Paralelo *</label>
+                  <select id="paralelo" name="paralelo" class="select" required>
+                    <option value="">Seleccionar paralelo</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" for="cupos">Cupos máximos *</label>
+                  <input type="number" id="cupos" name="cupos" class="input" placeholder="35" min="1" max="50" required />
+                </div>
+              </div>
+            </div>
+
+            <div class="card p-5">
+              <h2 class="section-title"><i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i> Asignación</h2>
+              <div class="space-y-4">
+                <div>
+                  <label class="label" for="docente">Docente *</label>
+                  <select id="docente" name="docente" class="select" required>
+                    <option value="">Seleccionar docente</option>
+                    <option value="1">Diana López</option>
+                    <option value="2">Carlos Mora</option>
+                    <option value="3">María Rodríguez</option>
+                    <option value="4">Pedro Jiménez</option>
+                    <option value="5">Laura Sánchez</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" for="materia">Materia *</label>
+                  <select id="materia" name="materia" class="select" required>
+                    <option value="">Seleccionar materia</option>
+                    <option value="Matemáticas">Matemáticas</option>
+                    <option value="Lengua y Literatura">Lengua y Literatura</option>
+                    <option value="Ciencias Naturales">Ciencias Naturales</option>
+                    <option value="Estudios Sociales">Estudios Sociales</option>
+                    <option value="Inglés">Inglés</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="card p-5">
+              <h2 class="section-title"><i data-lucide="clock" class="w-4 h-4 text-amber-600"></i> Configuración</h2>
+              <div class="space-y-4">
+                <div>
+                  <label class="label">¿Cupos limitados?</label>
+                  <div class="flex items-center gap-3">
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="cuposLimitados" name="cuposLimitados" checked />
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <label for="cuposLimitados" class="text-sm text-slate-600 cursor-pointer">Restringir inscripción</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-span-2 card p-5">
+              <h2 class="section-title"><i data-lucide="calendar" class="w-4 h-4 text-violet-600"></i> Horario</h2>
+              <div class="space-y-4">
+                <div>
+                  <label class="label">Días de clase *</label>
+                  <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center gap-2">
+                      <input type="checkbox" id="lunes" name="dias" value="Lunes" class="checkbox-day" checked />
+                      <label for="lunes" class="text-sm text-slate-600 cursor-pointer">Lunes</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <input type="checkbox" id="martes" name="dias" value="Martes" class="checkbox-day" checked />
+                      <label for="martes" class="text-sm text-slate-600 cursor-pointer">Martes</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <input type="checkbox" id="miercoles" name="dias" value="Miércoles" class="checkbox-day" checked />
+                      <label for="miercoles" class="text-sm text-slate-600 cursor-pointer">Miércoles</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <input type="checkbox" id="jueves" name="dias" value="Jueves" class="checkbox-day" checked />
+                      <label for="jueves" class="text-sm text-slate-600 cursor-pointer">Jueves</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <input type="checkbox" id="viernes" name="dias" value="Viernes" class="checkbox-day" checked />
+                      <label for="viernes" class="text-sm text-slate-600 cursor-pointer">Viernes</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="label" for="horaInicio">Hora inicio *</label>
+                    <input type="time" id="horaInicio" name="horaInicio" class="input" value="07:00" required />
+                  </div>
+                  <div>
+                    <label class="label" for="horaFin">Hora fin *</label>
+                    <input type="time" id="horaFin" name="horaFin" class="input" value="12:00" required />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+
+<div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-900 text-white text-sm px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 min-w-[260px]">
+  <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0" id="toastIcon"></i>
+  <span id="toastMsg">Cambios guardados</span>
+</div>
+
+<script>
+lucide.createIcons();
+
+const params = new URLSearchParams(window.location.search);
+const mode = params.get('mode') || 'create';
+const id = params.get('id');
+const isEdit = mode === 'edit';
+
+const MOCK_SECTION = {
+  id: 1,
+  nombre: 'Sección A',
+  grado: '1 BGU',
+  paralelo: 'A',
+  cupos: 35,
+  docente: '1',
+  materia: 'Matemáticas',
+  cuposLimitados: true,
+  dias: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+  horaInicio: '07:00',
+  horaFin: '12:00'
+};
+
+const item = isEdit ? MOCK_SECTION : null;
+
+if (isEdit && item) {
+  document.getElementById('headerTitle').textContent = 'Editar sección';
+  document.getElementById('pageTitle').textContent = 'Editar sección';
+  document.getElementById('pageSubtitle').textContent = `Sección: ${item.nombre}`;
+  document.getElementById('submitText').textContent = 'Guardar cambios';
+  document.getElementById('nombre').value = item.nombre || '';
+  document.getElementById('grado').value = item.grado || '';
+  document.getElementById('paralelo').value = item.paralelo || '';
+  document.getElementById('cupos').value = item.cupos || '';
+  document.getElementById('docente').value = item.docente || '';
+  document.getElementById('materia').value = item.materia || '';
+  document.getElementById('cuposLimitados').checked = item.cuposLimitados !== false;
+  document.getElementById('horaInicio').value = item.horaInicio || '';
+  document.getElementById('horaFin').value = item.horaFin || '';
+
+  if (item.dias) {
+    item.dias.forEach(dia => {
+      const checkbox = document.querySelector(`input[name="dias"][value="${dia}"]`);
+      if (checkbox) checkbox.checked = true;
+    });
+  }
+}
+
+function handleSubmit(e) {
+  e.preventDefault();
+  const form = document.getElementById('sectionForm');
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+  showToast(isEdit ? 'Sección actualizada correctamente' : 'Sección creada correctamente');
+  setTimeout(() => { window.location.href = 'list.html'; }, 1500);
+}
+
+function showToast(msg) {
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toast').classList.remove('hidden');
+  setTimeout(() => { document.getElementById('toast').classList.add('hidden'); }, 3000);
+}
+
+function toggleUserMenu() {
+  const menu = document.getElementById('userMenu');
+  menu.classList.toggle('hidden');
+}
+
+document.addEventListener('click', function(e) {
+  const userMenu = document.getElementById('userMenu');
+  if (userMenu && !e.target.closest('[onclick="toggleUserMenu()"]')) {
+    userMenu.classList.add('hidden');
+  }
+});
+</script>
+</body>
+</html>

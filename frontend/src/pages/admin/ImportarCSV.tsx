@@ -2,12 +2,19 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 import { InlineError } from '@/components/UIPatterns'
+import { ApiError } from '@/types/api'
+
+interface ImportResult {
+  matriculados: number
+  existentes: number
+  errores?: { linea: number; motivo: string }[]
+}
 
 export default function ImportarCSV() {
   const [file, setFile] = useState<File | null>(null)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<ImportResult | null>(null)
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
@@ -17,7 +24,10 @@ export default function ImportarCSV() {
         headers: { 'Content-Type': 'multipart/form-data' },
       }).then(r => r.data),
     onSuccess: (data) => setResult(data),
-    onError: (err: any) => setError(err.response?.data?.mensaje || 'Error al importar'),
+    onError: (err: unknown) => {
+      const apiErr = err as ApiError
+      setError(apiErr.response?.data?.mensaje || 'Error al importar')
+    },
   })
 
   const handleImport = (e: React.FormEvent) => {
@@ -30,10 +40,8 @@ export default function ImportarCSV() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="admin" />
-
-      <main className="mx-auto max-w-2xl px-8 py-12">
+    <AppLayout role="admin">
+      <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-foreground">Importar matrícula</h2>
           <button onClick={() => navigate('/admin/matricula')} className="text-sm text-muted-foreground hover:underline">← Matrícula</button>
@@ -71,25 +79,25 @@ export default function ImportarCSV() {
         ) : (
           <div className="space-y-4">
             <div className="grid grid-cols-3 gap-4">
-              <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-6 text-center">
-                <p className="text-3xl font-bold text-emerald-700">{result.matriculados}</p>
+              <div className="rounded-lg border border-success bg-success/10 p-6 text-center">
+                <p className="text-3xl font-bold text-success">{result.matriculados}</p>
                 <p className="text-sm text-emerald-600">Matriculados</p>
               </div>
-              <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-center">
-                <p className="text-3xl font-bold text-amber-700">{result.existentes}</p>
+              <div className="rounded-lg border border-warning bg-warning/10 p-6 text-center">
+                <p className="text-3xl font-bold text-warning">{result.existentes}</p>
                 <p className="text-sm text-amber-600">Ya existentes</p>
               </div>
-              <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-                <p className="text-3xl font-bold text-red-700">{result.errores?.length || 0}</p>
+              <div className="rounded-lg border border-destructive bg-destructive/10 p-6 text-center">
+                <p className="text-3xl font-bold text-destructive">{result.errores?.length || 0}</p>
                 <p className="text-sm text-red-600">Errores</p>
               </div>
             </div>
 
-            {result.errores?.length > 0 && (
-              <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-                <h3 className="mb-2 font-medium text-red-800">Errores encontrados</h3>
-                <ul className="space-y-1 text-sm text-red-700">
-                  {result.errores.map((e: any, i: number) => (
+            {result.errores && result.errores.length > 0 && (
+              <div className="rounded-lg border border-destructive bg-destructive/10 p-4">
+                <h3 className="mb-2 font-medium text-destructive">Errores encontrados</h3>
+                <ul className="space-y-1 text-sm text-destructive">
+                  {result.errores.map((e, i) => (
                     <li key={i}>Línea {e.linea}: {e.motivo}</li>
                   ))}
                 </ul>
@@ -102,7 +110,7 @@ export default function ImportarCSV() {
             </button>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api'
 
-interface Periodo {
+export interface Periodo {
   id: string
   codigo: string
   nombre: string

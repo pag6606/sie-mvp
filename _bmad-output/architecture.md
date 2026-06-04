@@ -215,3 +215,162 @@ backend/
 - IdP externo (Keycloak / Entra ID)
 - Production email service (SendGrid/SES)
 - i18n full implementation
+
+---
+
+## ADR-008: Dashboard Cross-Context Aggregation
+
+**Status:** Accepted
+
+**Date:** 2026-06-04
+
+**Decision:** Implementar `GET /api/dashboard/admin` como servicio de orquestacion dedicado (`DashboardService`) que consume los puertos publicos de cada bounded context via casos de uso (interfaces de servicio, no repositorios directamente). No se usa read model desnormalizado (CQRS) en esta fase.
+
+**Context:**
+- La Propuesta 1 de UI requiere un dashboard administrativo con KPIs agregados: total de alumnos, secciones activas, porcentaje de asistencia, periodo activo, y grafico de evolucion mensual de matriculas.
+- Estos datos residen en 3 bounded contexts distintos (matricula → alumnos, academico → secciones, calificaciones → asistencia).
+- Acceder directamente a repositorios de otros modulos viola la arquitectura hexagonal establecida en ADR-003.
+
+**Options considered:**
+
+| Opcion | Descripcion | Pros | Contras |
+|--------|-------------|------|---------|
+| A — Orquestacion | `DashboardService` consume interfaces de servicio de cada contexto | Respeta hexagonal, simple de implementar | Acoplamiento en runtime (si un contexto esta lento, el dashboard se degrada) |
+| B — Read model | Proyector que escucha domain events y mantiene vista materializada | Dashboard vuela, contextos 100% aislados | Complejidad operacional, nueva tabla/post/Redis |
+| C — Client-side | Frontend hace 3-4 llamadas independientes y agrega | Cero backend nuevo | Multiplica round-trips, expone logica de agregacion en el cliente |
+
+**Rationale:** Para un MVP con ~500 estudiantes y 200 usuarios concurrentes (NFR), la Opcion A es suficiente. Si en fase posterior hay degradacion de performance, migrar a Opcion B (read model) es un camino conocido y no requiere rediseno de los bounded contexts. La Opcion C se rechaza por exponer logica de negocio en el frontend.
+
+**Implementation:**
+- `DashboardService` en `com.sie.shared.dashboard` (shared porque cruza contextos, pero no es un bounded context — es un servicio de aplicacion transversal)
+- Consume: `PeriodoService.buscarActivo()`, `MatriculaService.contarActivas()`, `SeccionService.contarActivas()`, `AsistenciaService.porcentajePromedio()`, `MatriculaService.evolucionMensual()`
+- Responde con DTO plano `DashboardAdminDto` (sin logica de dominio)
+- Cache con `@Cacheable` (TTL 60s) para evitar recalculo en cada request
+
+---
+
+## ADR-009: Notificaciones como Quinto Bounded Context
+
+**Status:** Accepted
+
+**Date:** 2026-06-04
+
+**Decision:** Modelar Notificaciones como un quinto bounded context (`notificaciones`) desde el inicio, aunque con implementacion minimal en esta fase. Los demas contextos emiten eventos de dominio que `notificaciones` consume para generar notificaciones de usuario. La entrega en tiempo real al frontend usa Server-Sent Events (SSE) via un adapter separado del dominio.
+
+**Context:**
+- La Propuesta 1 de UI incluye una campana de notificaciones en el topbar con badge de no leidas.
+- Las notificaciones son transversales: cualquier bounded context puede generarlas (cierre de seccion, ingreso de notas, matricula completada).
+- Tratarlo como modulo compartido genera acoplamiento; tratarlo como contexto independiente permite evolucion futura (notificaciones por email, push mobile, etc.).
+
+**Domain model (minimal):**
+```
+Notificacion {
+  id: UUID v7
+  userId: UUID
+  titulo: String
+  mensaje: String
+  tipo: NotificacionTipo (CIERRE_SECCION, NOTA_INGRESADA, MATRICULA_COMPLETADA, SISTEMA)
+  leida: boolean
+  fechaCreacion: Instant
+}
+```
+
+**Event flow:**
+1. Cualquier bounded context emite su evento de dominio normal (ej. `SeccionCerrada`)
+2. Un consumer en `notificaciones` escucha ese evento y crea `Notificacion` para cada usuario relevante (docentes de la seccion, admin)
+3. El adapter SSE notifica al frontend si el usuario tiene conexion activa
+
+**Package structure:**
+```
+backend/src/main/java/com/sie/
+  └── notificaciones/
+      ├── application/    # NotificacionService, SseService
+      ├── domain/         # Notificacion, NotificacionRepository
+      └── infrastructure/ # NotificacionJpaRepository, SseController, RabbitMQ consumers
+```
+
+**Alternatives considered:**
+- Modulo compartido en `shared/`: Rechazado — un modulo compartido sin fronteras de dominio se convierte en bolsa de gatos con el tiempo.
+- WebSocket en lugar de SSE: Diferido — SSE es mas simple (HTTP nativo, reconexion automatica del navegador) y suficiente para notificaciones unidireccionales. WebSocket se reconsidera si en fase 3 se necesita bidireccionalidad.
+
+---
+
+## ADR-010: Operaciones Batch y Proteccion del Outbox
+
+**Status:** Accepted
+
+**Date:** 2026-06-04
+
+**Decision:** Las operaciones batch (activar, desactivar, eliminar multiples entidades) emiten UN solo evento de dominio de tipo lote en lugar de N eventos individuales. El consumidor itera sobre la lista de IDs. Se implementa rate limiting en el publisher del outbox y se exige idempotencia en todos los consumidores.
+
+**Context:**
+- La Propuesta 1 de UI incluye una DataTable enterprise con acciones masivas (seleccionar N filas y ejecutar accion sobre todas).
+- Si `DELETE /api/estudiantes/batch` con 200 IDs publica 200 `EstudianteEliminadoEvent`, el outbox se llena instantaneamente y RabbitMQ recibe una rafaga.
+- En una escuela de 2,000 estudiantes, un cierre masivo de periodo podria disparar miles de eventos.
+
+**Design:**
+
+1. **Evento de lote unico:** `EstudiantesEliminadosEnLoteEvent` contiene `List<String> ids` en lugar de 200 eventos individuales. El consumidor itera.
+2. **Rate limiting en publisher:** `BatchEventPublisher` envuelve al `OutboxPublisher` y controla el ritmo de emision (max 50 eventos/segundo via `RateLimiter` o `Semaphore`).
+3. **Idempotencia en consumidores:** Todos los consumers verifican si el evento ya fue procesado (por `eventId`) antes de actuar. Reintentos por DLQ no generan duplicados.
+4. **Batch endpoint REST:**
+   - `POST /api/{entidad}/batch/activar` → body: `{ ids: [...] }` → 1 evento `EntidadesActivadasEnLote`
+   - `DELETE /api/{entidad}/batch/eliminar` → body: `{ ids: [...] }` → 1 evento `EntidadesEliminadasEnLote`
+   - Validacion previa: verificar que todos los IDs existen y el usuario tiene permiso antes de emitir el evento
+
+**Alternatives considered:**
+- N eventos individuales: Rechazado — no escala. El outbox pattern no fue disenado para rafagas de cientos de eventos en milisegundos.
+- Transaccion sincronica sin eventos: Rechazado — rompe el patrón de comunicacion entre bounded contexts establecido en ADR-005. Otras partes del sistema necesitan reaccionar a eliminaciones masivas.
+
+---
+
+## ADR-011: Export Streaming de Datos
+
+**Status:** Accepted
+
+**Date:** 2026-06-04
+
+**Decision:** Los endpoints de exportacion (`GET /api/{entidad}?format=csv` y `GET /api/{entidad}?format=xlsx`) usan `StreamingResponseBody` de Spring Boot para escribir incrementalmente la respuesta HTTP, sin cargar el dataset completo en memoria. Las consultas a PostgreSQL usan `JdbcTemplate` con `fetchSize` para cursor-based streaming.
+
+**Context:**
+- La Propuesta 1 de UI incluye botones de exportacion CSV y Excel en la DataTable.
+- `GET /api/estudiantes?format=csv` con 5,000 registros cargados en memoria via `Page<Estudiante>` es una receta para `OutOfMemoryError`.
+
+**Implementation pattern:**
+```java
+@GetMapping(params = "format=csv")
+public ResponseEntity<StreamingResponseBody> exportarCsv() {
+    StreamingResponseBody stream = outputStream -> {
+        try (var writer = new OutputStreamWriter(outputStream)) {
+            jdbcTemplate.query(
+                "SELECT * FROM estudiantes WHERE colegio_id = ?",
+                ps -> ps.setObject(1, colegioId),
+                rs -> {
+                    // Escribir fila CSV incrementalmente
+                    writer.write(formatCsvRow(rs));
+                }
+            );
+        }
+    };
+    return ResponseEntity.ok()
+        .header("Content-Type", "text/csv")
+        .header("Content-Disposition", "attachment; filename=estudiantes.csv")
+        .body(stream);
+}
+```
+
+**Key constraints:**
+- Usar `JdbcTemplate` con `setFetchSize(Integer.MIN_VALUE)` para cursor-based streaming en PostgreSQL (evita que el driver cargue todo el ResultSet en memoria)
+- Nunca construir el CSV/XLSX completo en un `StringBuilder` o `ByteArrayOutputStream`
+- Para Excel, usar `SXSSFWorkbook` (streaming) de Apache POI, no `XSSFWorkbook`
+- Content-Type y Content-Disposition headers para forzar descarga en el navegador
+
+**Alternatives considered:**
+- `Page<Estudiante>` con paginacion y exportacion paginada: Rechazado — requiere N requests HTTP o logica de paginacion en el cliente, y sigue cargando paginas completas en memoria.
+- Generar archivo en disco y servir link: Rechazado para MVP — agrega gestion de archivos temporales y limpieza. Se reconsidera en fase 3 para exports de mas de 50,000 registros.
+
+### Phase 2 Deferred Items
+- Carmenta / MinEduc data export integration
+- IdP externo (Keycloak / Entra ID)
+- Production email service (SendGrid/SES)
+- i18n full implementation

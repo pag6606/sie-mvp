@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import type { ApiError } from '@/types/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
 import Pagination from '@/components/Pagination'
 
@@ -97,9 +97,8 @@ export default function CursosPage() {
   if (isLoading) return <LoadingSkeleton rows={4} />
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="admin" subtitle="Gestión de Cursos" />
-      <main className="mx-auto max-w-3xl px-8 py-12">
+    <AppLayout role="admin">
+      <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-foreground">Catálogo de Cursos</h2>
           <div className="flex gap-2">
@@ -202,7 +201,7 @@ export default function CursosPage() {
         )}
 
         <Pagination page={page} totalPages={totalPages} onPageChange={setPage} disabled={isLoading} />
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

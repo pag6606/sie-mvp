@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -92,6 +93,23 @@ public class UsuarioService {
         usuario.setActivo(false);
         usuario.softDelete();
         usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public void desactivarUsuarios(List<UUID> ids, String motivo) {
+        for (UUID id : ids) {
+            desactivarUsuario(id, motivo);
+        }
+    }
+
+    @Transactional
+    public void eliminarUsuarios(List<UUID> ids) {
+        for (UUID id : ids) {
+            Usuario usuario = usuarioRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + id));
+            usuario.softDelete();
+            usuarioRepository.save(usuario);
+        }
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {

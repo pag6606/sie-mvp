@@ -12,6 +12,14 @@ interface Seccion {
   docentes?: { docenteId: string; rol: string }[]
 }
 
+interface SpringPage<T> {
+  content: T[]
+  totalElements: number
+  totalPages: number  // eslint-disable-line
+  number: number
+  size: number
+}
+
 interface PaginatedResponse<T> {
   content: T[]
   totalElements: number
@@ -20,12 +28,24 @@ interface PaginatedResponse<T> {
   size: number
 }
 
+function normalizePageResponse<T>(data: T[] | SpringPage<T>): PaginatedResponse<T> {
+  if (Array.isArray(data)) {
+    return { content: data as T[], totalElements: data.length, totalPages: 1, number: 0, size: data.length }
+  }
+  return {
+    content: (data.content || []) as T[],
+    totalElements: data.totalElements ?? data.content?.length ?? 0,
+    totalPages: data.totalPages ?? 1,
+    number: data.number ?? 0,
+    size: data.size ?? 25,
+  }
+}
+
 export function useSecciones(periodoId: string) {
   return useQuery<Seccion[]>({
     queryKey: ['secciones', periodoId],
     queryFn: () => api.get(`/secciones?periodoId=${periodoId}&size=200`).then(r => {
-      const data = r.data
-      return Array.isArray(data) ? data : (data.content || [])
+      return normalizePageResponse<Seccion>(r.data).content
     }),
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
@@ -39,16 +59,7 @@ export function useSeccionesPaginadas(periodoId: string) {
   const query = useQuery<PaginatedResponse<Seccion>>({
     queryKey: ['secciones', periodoId, page],
     queryFn: () => api.get(`/secciones?periodoId=${periodoId}&page=${page}&size=25`).then(r => {
-      const d = r.data
-      const content = Array.isArray(d) ? d : (d.content || [])
-      const pageMeta = (d as any).page || d
-      return {
-        content,
-        totalElements: pageMeta.totalElements ?? (Array.isArray(d) ? d.length : content.length),
-        totalPages: pageMeta.totalPages ?? 1,
-        number: pageMeta.number ?? 0,
-        size: pageMeta.size ?? 25,
-      }
+      return normalizePageResponse<Seccion>(r.data)
     }),
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,

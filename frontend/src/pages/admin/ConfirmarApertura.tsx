@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 import ProgressBar from '@/components/ProgressBar'
 
 const STEPS = [
@@ -23,10 +23,8 @@ export default function ConfirmarApertura() {
   const handleAbrir = () => mutation.mutate()
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="admin" subtitle="Paso 4 de 4" />
-
-      <main className="mx-auto max-w-2xl px-8 py-12">
+    <AppLayout role="admin">
+      <div className="p-6 md:p-8">
         <ProgressBar steps={STEPS} current={3} />
 
         <div className="rounded-lg border bg-card p-8 text-center">
@@ -59,7 +57,7 @@ export default function ConfirmarApertura() {
             </button>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

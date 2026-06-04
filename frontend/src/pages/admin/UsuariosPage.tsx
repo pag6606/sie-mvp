@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
-import Navbar from '@/components/Navbar'
+import AppLayout from '@/components/AppLayout'
 import { useUsuariosPaginados } from '@/hooks/useUsuarios'
 import Pagination from '@/components/Pagination'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
+import { ApiError } from '@/types/api'
 
 
 export default function UsuariosPage() {
@@ -34,8 +35,9 @@ export default function UsuariosPage() {
       setShowForm(false)
       setFormEmail(''); setFormNombre(''); setFormRoles([])
       queryClient.invalidateQueries({ queryKey: ['usuarios'] })
-    } catch (err: any) {
-      setFormError(err.response?.data?.mensaje || 'Error')
+    } catch (err: unknown) {
+      const apiErr = err as ApiError
+      setFormError(apiErr.response?.data?.mensaje || 'Error')
     } finally { setFormSaving(false) }
   }
 
@@ -46,10 +48,8 @@ export default function UsuariosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar role="admin" />
-
-      <main className="mx-auto max-w-4xl px-8 py-12">
+    <AppLayout role="admin">
+      <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-2xl font-semibold text-foreground">Gestión de Usuarios</h2>
           <div className="flex gap-2">
@@ -139,7 +139,7 @@ export default function UsuariosPage() {
           </div>
         )}
         <Pagination page={page} totalPages={totalPages} onPageChange={setPage} disabled={isLoading} />
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   )
 }

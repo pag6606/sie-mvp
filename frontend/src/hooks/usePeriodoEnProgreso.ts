@@ -10,12 +10,16 @@ interface PeriodoEnProgreso {
   ruta: string
 }
 
+interface SeccionDocente {
+  docentes?: { docenteId: string; rol: string }[]
+}
+
 export function usePeriodoEnProgreso(): PeriodoEnProgreso | null {
   const { data: periodos } = usePeriodos()
   const borrador = periodos?.find(p => p.estado === 'BORRADOR')
   const periodoId = borrador?.id ?? ''
 
-  const { data: secciones } = useQuery<unknown[]>({
+  const { data: secciones } = useQuery<SeccionDocente[]>({
     queryKey: ['secciones', periodoId],
     queryFn: () => api.get(`/secciones?periodoId=${periodoId}&size=200`).then(r => {
       const d = r.data
@@ -40,11 +44,11 @@ export function usePeriodoEnProgreso(): PeriodoEnProgreso | null {
   }
 }
 
-function determinarPaso(secciones: unknown[] | undefined): number {
+function determinarPaso(secciones: SeccionDocente[] | undefined): number {
   if (!secciones || secciones.length === 0) return 2
 
   const todasRevisadas = secciones.every(
-    (s: any) => (s.docentes?.length ?? 0) > 0
+    (s) => (s.docentes?.length ?? 0) > 0
   )
   return todasRevisadas ? 4 : 3
 }
