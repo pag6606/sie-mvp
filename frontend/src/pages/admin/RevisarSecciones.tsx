@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import ProgressBar from '@/components/ProgressBar'
+import Navbar from '@/components/Navbar'
 import { useSecciones } from '@/hooks/useSecciones'
 import { useCursos } from '@/hooks/useCursos'
 
@@ -126,12 +127,7 @@ export default function RevisarSecciones() {
 
   return (
     <div className="min-h-screen bg-background">
-      <nav className="flex h-16 items-center justify-between border-b bg-card px-8">
-        <h1 className="cursor-pointer text-xl font-bold text-foreground" onClick={() => navigate('/admin')}>SIE</h1>
-        <span className="text-lg font-medium text-primary">
-          Paso 3 de 4 · {revisadas.size} de {secciones.length} revisadas
-        </span>
-      </nav>
+      <Navbar role="admin" subtitle={`Paso 3 de 4 · ${revisadas.size} de ${secciones.length} revisadas`} />
 
       <main className="mx-auto max-w-4xl px-8 py-12">
         <ProgressBar steps={STEPS} current={2} />

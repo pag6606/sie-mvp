@@ -10,7 +10,10 @@ interface Curso {
 export function useCursos() {
   return useQuery<Curso[]>({
     queryKey: ['cursos'],
-    queryFn: () => api.get('/cursos').then(r => r.data),
+    queryFn: () => api.get('/cursos').then(r => {
+      const data = r.data
+      return Array.isArray(data) ? data : (data.content || [])
+    }),
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   })
