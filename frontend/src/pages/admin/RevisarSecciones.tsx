@@ -189,12 +189,12 @@ export default function RevisarSecciones() {
                     <div className="mt-2 rounded border border-primary/30 bg-primary/5 p-3">
                       {nuevoCursoError && <div className="mb-2"><InlineError message={nuevoCursoError} /></div>}
                       <div className="flex items-end gap-2">
-                        <div>
+                        <div className="w-24">
                           <label className="block text-xs text-muted-foreground">Código</label>
                           <input value={nuevoCursoCodigo} onChange={e => setNuevoCursoCodigo(e.target.value)} required
-                            className="mt-0.5 w-28 rounded border border-input px-2 py-1 text-xs" placeholder="MAT-101" />
+                            className="mt-0.5 w-full rounded border border-input px-2 py-1 text-xs" placeholder="MAT-101" />
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <label className="block text-xs text-muted-foreground">Nombre</label>
                           <input value={nuevoCursoNombre} onChange={e => setNuevoCursoNombre(e.target.value)} required
                             className="mt-0.5 w-full rounded border border-input px-2 py-1 text-xs" placeholder="Matemáticas I" />
@@ -202,14 +202,14 @@ export default function RevisarSecciones() {
                         <div className="w-14">
                           <label className="block text-xs text-muted-foreground">Créd.</label>
                           <input type="number" min="1" value={nuevoCursoCreditos} onChange={e => setNuevoCursoCreditos(Number(e.target.value))} required
-                            className="mt-0.5 w-full rounded border border-input px-2 py-1 text-xs" />
+                            className="mt-0.5 w-full rounded border border-input px-1 py-1 text-xs text-center" />
                         </div>
                         <button type="button" onClick={handleCrearCursoAlVuelo} disabled={nuevoCursoSaving}
-                          className="rounded bg-emerald-600 px-3 py-1.5 text-xs text-white disabled:opacity-50">
+                          className="rounded bg-emerald-600 px-2.5 py-1.5 text-xs font-medium text-white disabled:opacity-50 whitespace-nowrap">
                           {nuevoCursoSaving ? '...' : 'Crear'}
                         </button>
                         <button type="button" onClick={() => setShowNuevoCurso(false)}
-                          className="text-xs text-muted-foreground hover:underline">Cancelar</button>
+                          className="text-xs text-muted-foreground hover:underline whitespace-nowrap">Cancelar</button>
                       </div>
                     </div>
                   )}
