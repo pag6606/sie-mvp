@@ -85,6 +85,12 @@ export default function AdminDashboard() {
 
         <div className="mt-12 flex gap-4">
           <button
+            onClick={() => navigate('/admin/cursos')}
+            className="rounded-md border border-input px-4 py-2 text-sm text-foreground hover:bg-muted"
+          >
+            <span aria-hidden="true">📚</span> Gestionar cursos
+          </button>
+          <button
             onClick={() => navigate('/admin/secciones')}
             className="rounded-md border border-input px-4 py-2 text-sm text-foreground hover:bg-muted"
           >

@@ -80,6 +80,11 @@ export default function RevisarSecciones() {
   const [formDocenteId, setFormDocenteId] = useState('')
   const [formSaving, setFormSaving] = useState(false)
   const [formError, setFormError] = useState('')
+  const [showNuevoCurso, setShowNuevoCurso] = useState(false)
+  const [nuevoCursoCodigo, setNuevoCursoCodigo] = useState('')
+  const [nuevoCursoNombre, setNuevoCursoNombre] = useState('')
+  const [nuevoCursoSaving, setNuevoCursoSaving] = useState(false)
+  const [nuevoCursoError, setNuevoCursoError] = useState('')
   const navigate = useNavigate()
 
   const toggleRevisada = useCallback((id: string) => {
@@ -121,6 +126,24 @@ export default function RevisarSecciones() {
     }
   }
 
+  const handleCrearCursoAlVuelo = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setNuevoCursoError('')
+    setNuevoCursoSaving(true)
+    try {
+      await api.post('/cursos', { codigo: nuevoCursoCodigo, nombre: nuevoCursoNombre })
+      queryClient.invalidateQueries({ queryKey: ['cursos'] })
+      setShowNuevoCurso(false)
+      setNuevoCursoCodigo('')
+      setNuevoCursoNombre('')
+    } catch (err: unknown) {
+      const apiErr = err as import('@/types/api').ApiError
+      setNuevoCursoError(apiErr.response?.data?.mensaje || apiErr.message || 'Error al crear curso')
+    } finally {
+      setNuevoCursoSaving(false)
+    }
+  }
+
   if (isLoading) return <LoadingSkeleton rows={4} />
 
   const allReviewed = useMemo(() => secciones.length > 0 && revisadas.size === secciones.length, [secciones.length, revisadas.size])
@@ -150,11 +173,40 @@ export default function RevisarSecciones() {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label htmlFor="formCurso" className="block text-xs font-medium text-muted-foreground">Curso</label>
-                  <select id="formCurso" value={formCursoId} onChange={e => setFormCursoId(e.target.value)} required
-                    className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm">
-                    <option value="">Seleccionar</option>
-                    {cursos.map(c => <option key={c.id} value={c.id}>{c.codigo} — {c.nombre}</option>)}
-                  </select>
+                  <div className="flex gap-1">
+                    <select id="formCurso" value={formCursoId} onChange={e => setFormCursoId(e.target.value)} required
+                      className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm">
+                      <option value="">Seleccionar</option>
+                      {cursos.map(c => <option key={c.id} value={c.id}>{c.codigo} — {c.nombre}</option>)}
+                    </select>
+                    <button type="button" onClick={() => setShowNuevoCurso(!showNuevoCurso)}
+                      className="mt-1 rounded-md border border-input px-2 text-xs text-primary hover:bg-muted" title="Nuevo curso">
+                      + Nuevo
+                    </button>
+                  </div>
+                  {showNuevoCurso && (
+                    <div className="mt-2 rounded border border-primary/30 bg-primary/5 p-3">
+                      {nuevoCursoError && <div className="mb-2"><InlineError message={nuevoCursoError} /></div>}
+                      <form onSubmit={handleCrearCursoAlVuelo} className="flex items-end gap-2">
+                        <div>
+                          <label className="block text-xs text-muted-foreground">Código</label>
+                          <input value={nuevoCursoCodigo} onChange={e => setNuevoCursoCodigo(e.target.value)} required
+                            className="mt-0.5 w-28 rounded border border-input px-2 py-1 text-xs" placeholder="MAT-101" />
+                        </div>
+                        <div className="flex-1">
+                          <label className="block text-xs text-muted-foreground">Nombre</label>
+                          <input value={nuevoCursoNombre} onChange={e => setNuevoCursoNombre(e.target.value)} required
+                            className="mt-0.5 w-full rounded border border-input px-2 py-1 text-xs" placeholder="Matemáticas I" />
+                        </div>
+                        <button type="submit" disabled={nuevoCursoSaving}
+                          className="rounded bg-emerald-600 px-3 py-1.5 text-xs text-white disabled:opacity-50">
+                          {nuevoCursoSaving ? '...' : 'Crear'}
+                        </button>
+                        <button type="button" onClick={() => setShowNuevoCurso(false)}
+                          className="text-xs text-muted-foreground hover:underline">Cancelar</button>
+                      </form>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label htmlFor="formCodigoSeccion" className="block text-xs font-medium text-muted-foreground">Código sección</label>

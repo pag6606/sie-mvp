@@ -14,6 +14,7 @@ const MatriculaPage = lazy(() => import('@/pages/admin/MatriculaPage'))
 const ImportarCSV = lazy(() => import('@/pages/admin/ImportarCSV'))
 const UsuariosPage = lazy(() => import('@/pages/admin/UsuariosPage'))
 const SeccionesPage = lazy(() => import('@/pages/admin/SeccionesPage'))
+const CursosPage = lazy(() => import('@/pages/admin/CursosPage'))
 const DocenteDashboard = lazy(() => import('@/pages/docente/DocenteDashboard'))
 const AsistenciaPage = lazy(() => import('@/pages/docente/AsistenciaPage'))
 const NotasPage = lazy(() => import('@/pages/docente/NotasPage'))
@@ -37,6 +38,7 @@ export default function App() {
       <Route path="/admin/matricula/importar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><ImportarCSV /></Suspense>} />
       <Route path="/admin/usuarios" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><UsuariosPage /></Suspense>} />
       <Route path="/admin/secciones" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><SeccionesPage /></Suspense>} />
+      <Route path="/admin/cursos" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><CursosPage /></Suspense>} />
       <Route path="/docente" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><DocenteDashboard /></Suspense>} />
       <Route path="/docente/:seccionId/asistencia" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AsistenciaPage /></Suspense>} />
       <Route path="/docente/:seccionId/notas" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><NotasPage /></Suspense>} />
