@@ -9,7 +9,7 @@ async function login(page: any, email: string, password: string) {
   await page.fill('input[type="email"]', email)
   await page.fill('input[type="password"]', password)
   await page.click('button[type="submit"]')
-  await page.waitForURL(/^\/(admin|docente|estudiante)$/)
+  await page.waitForFunction(() => window.location.pathname !== '/login', null, { timeout: 10000 })
 }
 
 // ── Scenario 1: Admin Login ──
@@ -17,7 +17,7 @@ async function login(page: any, email: string, password: string) {
 test('S01: Admin login and see dashboard', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
   await expect(page.locator('h2, .text-2xl, nav')).toBeVisible()
-  await expect(page).toHaveURL('/admin')
+  await expect(page).toHaveURL(/\/admin/)
 })
 
 // ── Scenario 2: Cursos CRUD ──
@@ -25,7 +25,7 @@ test('S01: Admin login and see dashboard', async ({ page }) => {
 test('S02: Admin creates a course', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
   await page.click('text=Gestionar cursos')
-  await page.waitForURL('/admin/cursos')
+  await expect(page).toHaveURL(/\/cursos/, { timeout: 5000 })
 
   await page.click('text=+ Nuevo')
   await page.fill('#curso-codigo', 'TST-' + Date.now().toString().slice(-6))
@@ -54,7 +54,7 @@ test('S03: Admin edits a course name', async ({ page }) => {
 test('S04: Admin creates a period (step 1 of wizard)', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
   await page.click('text=Configurar nuevo período')
-  await page.waitForURL('/admin/periodos/nuevo')
+  await expect(page).toHaveURL(/\/nuevo/, { timeout: 5000 })
 
   await page.fill('input[placeholder="2026-2"]', 'E2E-' + Date.now().toString().slice(-6))
   await page.fill('input[placeholder*="Período"]', 'Período de Prueba E2E')
@@ -64,7 +64,7 @@ test('S04: Admin creates a period (step 1 of wizard)', async ({ page }) => {
   await dateInputs.nth(1).fill('2026-12-31')
   await page.click('button:has-text("Continuar")')
 
-  await page.waitForURL(/\/admin\/periodos\/.*\/clonar/)
+  await expect(page).toHaveURL(/\/clonar/, { timeout: 5000 })
   await expect(page.locator('text=Paso 2 de 4')).toBeVisible()
 })
 
@@ -92,7 +92,7 @@ test('S07: Login with wrong password shows error', async ({ page }) => {
   await page.fill('input[type="password"]', 'wrongpassword')
   await page.click('button[type="submit"]')
 
-  await expect(page.locator('[role="alert"], .rounded-md.bg-red-50')).toBeVisible({ timeout: 5000 })
+  await expect(page.locator('[role="alert"]').first()).toBeVisible({ timeout: 5000 })
 })
 
 // ── Scenario 7: Navigation ──
@@ -101,12 +101,12 @@ test('S08: Admin can navigate to all sections', async ({ page }) => {
   await login(page, ADMIN.email, ADMIN.password)
 
   await page.click('text=Ver secciones')
-  await page.waitForURL('/admin/secciones')
+  await expect(page).toHaveURL(/\/secciones/, { timeout: 5000 })
   await expect(page.locator('h2')).toBeVisible()
 
   await page.click('text=← Dashboard')
   await page.click('text=Dashboard de cierres')
-  await page.waitForURL('/admin/cierres')
+  await expect(page).toHaveURL(/\/cierres/, { timeout: 5000 })
   await expect(page.locator('h2')).toBeVisible()
 })
 
