@@ -147,7 +147,7 @@ export default function CursosPage() {
             <p className="text-sm text-muted-foreground mt-1">Crea el primer curso con el botón "+ Nuevo"</p>
           </div>
         ) : (
-          <div className="rounded-lg border bg-card">
+          <div className="overflow-x-auto rounded-lg border bg-card">
             <table className="w-full">
               <thead className="border-b bg-muted/50">
                 <tr>

@@ -92,7 +92,7 @@ export default function AsistenciaPage() {
           }} className="rounded-md border border-red-600 px-3 py-1 text-xs text-red-700">Todos ausentes</button>
         </div>
 
-        <div className="rounded-lg border bg-card">
+        <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full">
             <thead className="border-b bg-muted">
               <tr>

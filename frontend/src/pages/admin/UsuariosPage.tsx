@@ -104,7 +104,7 @@ export default function UsuariosPage() {
             <p className="text-sm text-muted-foreground mt-1">Crea el primer usuario con el botón "+ Nuevo usuario"</p>
           </div>
         ) : (
-          <div className="rounded-lg border bg-card">
+          <div className="overflow-x-auto rounded-lg border bg-card">
             <table className="w-full">
               <thead className="border-b bg-muted">
                 <tr>

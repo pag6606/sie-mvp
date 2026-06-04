@@ -77,7 +77,7 @@ export default function DashboardCierres() {
                 <p className="text-lg text-muted-foreground">No hay secciones (paralelos) en este período</p>
               </div>
             ) : (
-              <div className="rounded-lg border bg-card">
+              <div className="overflow-x-auto rounded-lg border bg-card">
                 <table className="w-full">
                   <thead className="border-b bg-muted">
                     <tr>
