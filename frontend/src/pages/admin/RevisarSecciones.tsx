@@ -83,6 +83,7 @@ export default function RevisarSecciones() {
   const [showNuevoCurso, setShowNuevoCurso] = useState(false)
   const [nuevoCursoCodigo, setNuevoCursoCodigo] = useState('')
   const [nuevoCursoNombre, setNuevoCursoNombre] = useState('')
+  const [nuevoCursoCreditos, setNuevoCursoCreditos] = useState(3)
   const [nuevoCursoSaving, setNuevoCursoSaving] = useState(false)
   const [nuevoCursoError, setNuevoCursoError] = useState('')
   const navigate = useNavigate()
@@ -131,11 +132,12 @@ export default function RevisarSecciones() {
     setNuevoCursoError('')
     setNuevoCursoSaving(true)
     try {
-      await api.post('/cursos', { codigo: nuevoCursoCodigo, nombre: nuevoCursoNombre })
+      await api.post('/cursos', { codigo: nuevoCursoCodigo, nombre: nuevoCursoNombre, creditos: nuevoCursoCreditos })
       queryClient.invalidateQueries({ queryKey: ['cursos'] })
       setShowNuevoCurso(false)
       setNuevoCursoCodigo('')
       setNuevoCursoNombre('')
+      setNuevoCursoCreditos(3)
     } catch (err: unknown) {
       const apiErr = err as import('@/types/api').ApiError
       setNuevoCursoError(apiErr.response?.data?.mensaje || apiErr.message || 'Error al crear curso')
@@ -197,6 +199,11 @@ export default function RevisarSecciones() {
                           <label className="block text-xs text-muted-foreground">Nombre</label>
                           <input value={nuevoCursoNombre} onChange={e => setNuevoCursoNombre(e.target.value)} required
                             className="mt-0.5 w-full rounded border border-input px-2 py-1 text-xs" placeholder="Matemáticas I" />
+                        </div>
+                        <div className="w-14">
+                          <label className="block text-xs text-muted-foreground">Créd.</label>
+                          <input type="number" min="1" value={nuevoCursoCreditos} onChange={e => setNuevoCursoCreditos(Number(e.target.value))} required
+                            className="mt-0.5 w-full rounded border border-input px-2 py-1 text-xs" />
                         </div>
                         <button type="submit" disabled={nuevoCursoSaving}
                           className="rounded bg-emerald-600 px-3 py-1.5 text-xs text-white disabled:opacity-50">

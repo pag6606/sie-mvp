@@ -22,6 +22,7 @@ export default function CursosPage() {
   const [showForm, setShowForm] = useState(false)
   const [formCodigo, setFormCodigo] = useState('')
   const [formNombre, setFormNombre] = useState('')
+  const [formCreditos, setFormCreditos] = useState(3)
   const [formError, setFormError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editNombre, setEditNombre] = useState('')
@@ -40,12 +41,13 @@ export default function CursosPage() {
   const totalPages = pageData?.totalPages ?? 1
 
   const createMutation = useMutation({
-    mutationFn: (data: { codigo: string; nombre: string }) => api.post('/cursos', data),
+    mutationFn: (data: { codigo: string; nombre: string; creditos: number }) => api.post('/cursos', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cursos'] })
       setShowForm(false)
       setFormCodigo('')
       setFormNombre('')
+      setFormCreditos(3)
     },
     onError: (err: ApiError) => {
       setFormError(err.response?.data?.mensaje || err.message || 'Error al crear curso')
@@ -79,7 +81,7 @@ export default function CursosPage() {
   const handleCrear = (e: React.FormEvent) => {
     e.preventDefault()
     setFormError('')
-    createMutation.mutate({ codigo: formCodigo, nombre: formNombre })
+    createMutation.mutate({ codigo: formCodigo, nombre: formNombre, creditos: formCreditos })
   }
 
   const handleDesactivar = (curso: Curso) => {
@@ -120,6 +122,11 @@ export default function CursosPage() {
                 <label htmlFor="curso-nombre" className="block text-xs font-medium text-muted-foreground">Nombre</label>
                 <input id="curso-nombre" value={formNombre} onChange={e => setFormNombre(e.target.value)} required
                   className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Matemáticas I" />
+              </div>
+              <div className="w-20">
+                <label htmlFor="curso-creditos" className="block text-xs font-medium text-muted-foreground">Créditos</label>
+                <input id="curso-creditos" type="number" min="1" value={formCreditos} onChange={e => setFormCreditos(Number(e.target.value))} required
+                  className="mt-1 block w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
               </div>
               <button type="submit" disabled={createMutation.isPending}
                 className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white hover:bg-emerald-700 disabled:opacity-50">
