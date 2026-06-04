@@ -447,12 +447,12 @@
 
 | ID | Escenario | Resultado | Observaciones |
 |----|-----------|-----------|---------------|
-| UA-01.1 | Login exitoso Admin | ⬜ Pass / ⬜ Fail | |
-| UA-01.2 | Login exitoso Docente | ⬜ Pass / ⬜ Fail | |
-| UA-01.3 | Login exitoso Estudiante | ⬜ Pass / ⬜ Fail | |
-| UA-01.4 | Login fallido | ⬜ Pass / ⬜ Fail | |
-| UA-01.5 | Toggle contraseña | ⬜ Pass / ⬜ Fail | |
-| UA-01.6 | Reset password link | ⬜ Pass / ⬜ Fail | |
+| UA-01.1 | Login exitoso Admin | ✅ Pass | |
+| UA-01.2 | Login exitoso Docente | ✅ Pass | |
+| UA-01.3 | Login exitoso Estudiante | ✅ Pass | |
+| UA-01.4 | Login fallido | ✅ Pass | |
+| UA-01.5 | Toggle contraseña | ✅ Pass | |
+| UA-01.6 | Reset password link | ✅ Pass | |
 | UA-02.1 | Nav Admin por sidebar | ⬜ Pass / ⬜ Fail | |
 | UA-02.2 | Menú de usuario | ⬜ Pass / ⬜ Fail | |
 | UA-02.3 | Cerrar sesión | ⬜ Pass / ⬜ Fail | |
