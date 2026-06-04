@@ -37,6 +37,33 @@ test('S09: Login page has split layout', async ({ page }) => {
   await expect(page.locator('text=Contactar soporte')).toBeVisible()
 })
 
+test('S14: Password reset — confirm form with token', async ({ page }) => {
+  await page.goto('/reset-password?token=test-token-123')
+  await expect(page.locator('text=Nueva contraseña')).toBeVisible()
+  await expect(page.locator('#new-password')).toBeVisible()
+  await expect(page.locator('#confirm-password')).toBeVisible()
+
+  // test min length validation
+  await page.fill('#new-password', 'corta')
+  await page.fill('#confirm-password', 'corta')
+  await expect(page.locator('text=al menos 10 caracteres')).toBeVisible()
+
+  // test mismatch validation
+  await page.fill('#new-password', 'UnaClaveLarga123!')
+  await page.fill('#confirm-password', 'OtraClaveDiferente!')
+  await expect(page.locator('text=no coinciden')).toBeVisible()
+
+  // button should be disabled when passwords mismatch
+  await expect(page.locator('button:has-text("Restablecer contraseña")')).toBeDisabled()
+})
+
+test('S15: Password reset — request form (no token)', async ({ page }) => {
+  await page.goto('/reset-password')
+  await expect(page.locator('text=Recuperar contraseña')).toBeVisible()
+  await expect(page.locator('#reset-email')).toBeVisible()
+  await expect(page.locator('button:has-text("Enviar enlace")')).toBeVisible()
+})
+
 // ── Scenario 2: Sidebar Navigation ──
 
 test('S08: Admin navigates via sidebar to all sections', async ({ page }) => {

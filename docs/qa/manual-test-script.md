@@ -52,10 +52,24 @@
 - [X] Clic de nuevo
 - [X] **AC:** Vuelve a ocultarse
 
-### UA-01.6 Link "¿Olvidaste tu contraseña?"
-- [X] Clic en "¿Olvidaste tu contraseña?"
-- [X] **AC:** Navega a `/reset-password`
-- [X] Volver atrás
+### UA-01.6 Recuperar contraseña (flujo completo)
+- [ ] Clic en "¿Olvidaste tu contraseña?"
+- [ ] **AC:** Navega a `/reset-password`, formulario pide email
+- [ ] Ingresar `admin@sie.edu.ec`, clic en "Enviar enlace"
+- [ ] **AC:** Mensaje "Revisa tu correo" con instrucciones
+- [ ] Abrir Mailpit en `http://localhost:8025`, verificar que llegó el correo
+- [ ] Copiar el link del correo (`/reset-password?token=...`)
+- [ ] Pegar en el navegador y abrir
+- [ ] **AC:** Muestra formulario "Nueva contraseña" con 2 campos
+- [ ] Ingresar contraseña de menos de 10 caracteres
+- [ ] **AC:** Error "La contraseña debe tener al menos 10 caracteres"
+- [ ] Ingresar contraseñas que no coinciden
+- [ ] **AC:** Error "Las contraseñas no coinciden"
+- [ ] Ingresar `NuevaClave123!` en ambos campos
+- [ ] Clic en "Restablecer contraseña"
+- [ ] **AC:** Mensaje "Contraseña restablecida" con botón al login
+- [ ] Clic en "Ir al inicio de sesión", hacer login con la nueva contraseña
+- [ ] **AC:** Login exitoso con la nueva contraseña
 
 ---
 
@@ -452,7 +466,7 @@
 | UA-01.3 | Login exitoso Estudiante | ✅ Pass | |
 | UA-01.4 | Login fallido | ✅ Pass | |
 | UA-01.5 | Toggle contraseña | ✅ Pass | |
-| UA-01.6 | Reset password link | ✅ Pass | |
+| UA-01.6 | Reset password (flujo completo) | ⬜ Pass / ⬜ Fail | |
 | UA-02.1 | Nav Admin por sidebar | ⬜ Pass / ⬜ Fail | |
 | UA-02.2 | Menú de usuario | ⬜ Pass / ⬜ Fail | |
 | UA-02.3 | Cerrar sesión | ⬜ Pass / ⬜ Fail | |
