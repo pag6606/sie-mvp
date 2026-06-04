@@ -15,7 +15,6 @@ const DIAS = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY']
 const DIAS_LABEL: Record<string,string> = { MONDAY:'Lun', TUESDAY:'Mar', WEDNESDAY:'Mié', THURSDAY:'Jue', FRIDAY:'Vie' }
 
 interface Curso { id: string; codigo: string; nombre: string }
-interface Docente { id: string; nombre: string; email: string }
 interface Seccion {
   id: string; codigo: string; cursoId: string; capacidad: number; estado: string
   docentes: { docenteId: string; rol: string }[]
@@ -28,7 +27,6 @@ export default function RevisarSecciones() {
   const [revisadas, setRevisadas] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [cursos, setCursos] = useState<Curso[]>([])
-  const [docentes, setDocentes] = useState<Docente[]>([])
 
   // Form state
   const [showForm, setShowForm] = useState(false)
@@ -41,6 +39,7 @@ export default function RevisarSecciones() {
   const [formAula, setFormAula] = useState('')
   const [formDocenteId, setFormDocenteId] = useState('')
   const [formSaving, setFormSaving] = useState(false)
+  const [formError, setFormError] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -67,6 +66,7 @@ export default function RevisarSecciones() {
 
   const handleCrearSeccion = async (e: React.FormEvent) => {
     e.preventDefault()
+    setFormError('')
     setFormSaving(true)
     try {
       const { data } = await api.post('/secciones', {
@@ -88,8 +88,9 @@ export default function RevisarSecciones() {
       setFormCodigo('')
       setFormAula('')
       setFormDocenteId('')
-    } catch (err: any) {
-      setError(err.response?.data?.mensaje || 'Error al crear sección')
+    } catch (err: unknown) {
+      const apiErr = err as import('@/types/api').ApiError
+      setFormError(apiErr.response?.data?.mensaje || apiErr.message || 'Error al crear sección')
     } finally {
       setFormSaving(false)
     }
@@ -124,6 +125,7 @@ export default function RevisarSecciones() {
         {showForm && (
           <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-6">
             <h3 className="mb-4 font-medium text-gray-900">Nueva sección</h3>
+            {formError && <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">{formError}</div>}
             <form onSubmit={handleCrearSeccion} className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div>

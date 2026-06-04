@@ -82,8 +82,7 @@ export default function EstudianteDashboard() {
             ) : (
               <div className="space-y-2">
                 {DIAS.map(dia => {
-                  const delDia = matriculas.filter(m => {
-                    // Simplified: we don't have schedule data in matricula response
+                  const delDia = matriculas.filter(_m => {
                     return true
                   })
                   if (delDia.length === 0) return null

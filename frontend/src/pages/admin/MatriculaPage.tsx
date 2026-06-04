@@ -3,11 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import api from '@/services/api'
 
 interface Seccion { id: string; codigo: string; curso: string; capacidad: number }
-interface Matricula { id: string; estudianteId: string; seccionId: string; estado: string; estudianteNombre: string; cursoNombre: string }
 
 export default function MatriculaPage() {
   const [secciones, setSecciones] = useState<Seccion[]>([])
-  const [matriculas, setMatriculas] = useState<Matricula[]>([])
   const [periodos, setPeriodos] = useState<any[]>([])
   const [selectedPeriodo, setSelectedPeriodo] = useState('')
   const [loading, setLoading] = useState(true)
@@ -77,11 +75,6 @@ export default function MatriculaPage() {
     } finally {
       setFormSaving(false)
     }
-  }
-
-  const handleRetirar = async (id: string) => {
-    if (!confirm('¿Retirar al estudiante de esta sección?')) return
-    await api.post(`/matriculas/${id}/retirar`)
   }
 
   return (

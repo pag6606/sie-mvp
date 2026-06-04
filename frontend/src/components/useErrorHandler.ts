@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { ApiError } from '@/types/api'
 
 export function useErrorHandler() {
   const [error, setError] = useState('')
@@ -7,7 +8,7 @@ export function useErrorHandler() {
 
   const clear = () => { setError(''); setSuccess('') }
 
-  const handleError = (err: any) => {
+  const handleError = (err: ApiError) => {
     setError(err.response?.data?.mensaje || err.message || 'Error inesperado')
   }
 
