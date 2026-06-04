@@ -38,13 +38,18 @@ export function useSeccionesPaginadas(periodoId: string) {
 
   const query = useQuery<PaginatedResponse<Seccion>>({
     queryKey: ['secciones', periodoId, page],
-    queryFn: () => api.get(`/secciones?periodoId=${periodoId}&page=${page}&size=25`).then(r => ({
-      content: Array.isArray(r.data) ? r.data : r.data.content || [],
-      totalElements: r.data.totalElements ?? (Array.isArray(r.data) ? r.data.length : 0),
-      totalPages: r.data.totalPages ?? 1,
-      number: r.data.number ?? 0,
-      size: r.data.size ?? 25,
-    })),
+    queryFn: () => api.get(`/secciones?periodoId=${periodoId}&page=${page}&size=25`).then(r => {
+      const d = r.data
+      const content = Array.isArray(d) ? d : (d.content || [])
+      const pageMeta = (d as any).page || d
+      return {
+        content,
+        totalElements: pageMeta.totalElements ?? (Array.isArray(d) ? d.length : content.length),
+        totalPages: pageMeta.totalPages ?? 1,
+        number: pageMeta.number ?? 0,
+        size: pageMeta.size ?? 25,
+      }
+    }),
     placeholderData: keepPreviousData,
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
