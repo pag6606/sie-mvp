@@ -5,6 +5,10 @@ import com.sie.academico.application.dto.*;
 import com.sie.academico.infrastructure.PeriodoRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,11 +25,11 @@ public class AcademicoController {
     private final PeriodoRepository periodoRepository;
 
     @GetMapping("/periodos")
-    public List<PeriodoResponse> listarPeriodos() {
-        return periodoRepository.findAll().stream()
+    public Page<PeriodoResponse> listarPeriodos(
+            @PageableDefault(size = 10, sort = "fechaInicio", direction = Sort.Direction.DESC) Pageable pageable) {
+        return periodoRepository.findAll(pageable)
                 .map(p -> new PeriodoResponse(p.getId(), p.getCodigo(), p.getNombre(),
-                        p.getFechaInicio(), p.getFechaFin(), p.getEstado()))
-                .toList();
+                        p.getFechaInicio(), p.getFechaFin(), p.getEstado()));
     }
 
     @PostMapping("/periodos")
@@ -56,8 +60,9 @@ public class AcademicoController {
     }
 
     @GetMapping("/secciones")
-    public List<SeccionResponse> listarSecciones(@RequestParam UUID periodoId) {
-        return service.listarSecciones(periodoId);
+    public Page<SeccionResponse> listarSecciones(@RequestParam UUID periodoId,
+            @PageableDefault(size = 25) Pageable pageable) {
+        return service.listarSecciones(periodoId, pageable);
     }
 
     @PostMapping("/secciones")

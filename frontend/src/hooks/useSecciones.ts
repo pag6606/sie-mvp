@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import api from '@/services/api'
+import { useState } from 'react'
 
 interface Seccion {
   id: string
@@ -11,6 +12,14 @@ interface Seccion {
   docentes?: { docenteId: string; rol: string }[]
 }
 
+interface PaginatedResponse<T> {
+  content: T[]
+  totalElements: number
+  totalPages: number
+  number: number
+  size: number
+}
+
 export function useSecciones(periodoId: string) {
   return useQuery<Seccion[]>({
     queryKey: ['secciones', periodoId],
@@ -20,3 +29,25 @@ export function useSecciones(periodoId: string) {
     enabled: !!periodoId,
   })
 }
+
+export function useSeccionesPaginadas(periodoId: string) {
+  const [page, setPage] = useState(0)
+
+  const query = useQuery<PaginatedResponse<Seccion>>({
+    queryKey: ['secciones', periodoId, page],
+    queryFn: () => api.get(`/secciones?periodoId=${periodoId}&page=${page}&size=25`).then(r => ({
+      content: Array.isArray(r.data) ? r.data : r.data.content || [],
+      totalElements: r.data.totalElements ?? (Array.isArray(r.data) ? r.data.length : 0),
+      totalPages: r.data.totalPages ?? 1,
+      number: r.data.number ?? 0,
+      size: r.data.size ?? 25,
+    })),
+    placeholderData: keepPreviousData,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    enabled: !!periodoId,
+  })
+
+  return { ...query, page, setPage }
+}
+

@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import Navbar from '@/components/Navbar'
-import { useUsuarios } from '@/hooks/useUsuarios'
+import { useUsuariosPaginados } from '@/hooks/useUsuarios'
+import Pagination from '@/components/Pagination'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
 
 
 export default function UsuariosPage() {
-  const { data: usuarios = [], isLoading } = useUsuarios()
+  const { data, isLoading, page, setPage } = useUsuariosPaginados()
+  const usuarios = data?.content ?? []
+  const totalPages = data?.totalPages ?? 1
   const queryClient = useQueryClient()
   const [showForm, setShowForm] = useState(false)
   const [formEmail, setFormEmail] = useState('')
@@ -135,6 +138,7 @@ export default function UsuariosPage() {
             </table>
           </div>
         )}
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} disabled={isLoading} />
       </main>
     </div>
   )

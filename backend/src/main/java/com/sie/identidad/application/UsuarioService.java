@@ -8,6 +8,8 @@ import com.sie.identidad.infrastructure.RolRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.shared.email.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +68,11 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
         return toResponse(usuario);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UsuarioResponse> listarUsuarios(Pageable pageable) {
+        return usuarioRepository.findAll(pageable).map(this::toResponse);
     }
 
     @Transactional

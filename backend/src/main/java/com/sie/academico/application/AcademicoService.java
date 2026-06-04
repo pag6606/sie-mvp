@@ -6,6 +6,8 @@ import com.sie.academico.infrastructure.CursoRepository;
 import com.sie.academico.infrastructure.PeriodoRepository;
 import com.sie.academico.infrastructure.SeccionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -125,6 +127,10 @@ public class AcademicoService {
         }).toList();
 
         return seccionRepository.saveAll(clonadas).stream().map(this::toResponse).toList();
+    }
+
+    public Page<SeccionResponse> listarSecciones(UUID periodoId, Pageable pageable) {
+        return seccionRepository.findByPeriodoId(periodoId, pageable).map(this::toResponse);
     }
 
     public List<SeccionResponse> listarSecciones(UUID periodoId) {

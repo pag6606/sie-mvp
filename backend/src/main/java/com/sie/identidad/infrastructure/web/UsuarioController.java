@@ -6,11 +6,14 @@ import com.sie.identidad.application.dto.UsuarioResponse;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,13 +26,15 @@ public class UsuarioController {
     private final UsuarioRepository usuarioRepository;
 
     @GetMapping
-    public ResponseEntity<?> buscarUsuario(@RequestParam(required = false) String email) {
+    public ResponseEntity<?> buscarUsuario(
+            @RequestParam(required = false) String email,
+            @PageableDefault(size = 25, sort = "nombre") Pageable pageable) {
         if (email != null) {
             var usuario = usuarioRepository.findByEmail(email)
                     .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
             return ResponseEntity.ok(usuarioService.obtenerUsuario(usuario.getId()));
         }
-        return ResponseEntity.ok(List.of());
+        return ResponseEntity.ok(usuarioService.listarUsuarios(pageable));
     }
 
     @PostMapping

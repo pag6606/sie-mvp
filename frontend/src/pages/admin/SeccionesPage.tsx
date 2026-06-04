@@ -2,7 +2,8 @@ import { memo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '@/components/Navbar'
 import { usePeriodos } from '@/hooks/usePeriodos'
-import { useSecciones } from '@/hooks/useSecciones'
+import { useSeccionesPaginadas } from '@/hooks/useSecciones'
+import Pagination from '@/components/Pagination'
 import { LoadingSkeleton } from '@/components/UIPatterns'
 
 const SeccionRow = memo(function SeccionRow({
@@ -36,7 +37,9 @@ export default function SeccionesPage() {
     }
   }, [periodos, selectedPeriodo])
 
-  const { data: secciones = [], isLoading } = useSecciones(selectedPeriodo)
+  const { data, isLoading, page, setPage } = useSeccionesPaginadas(selectedPeriodo)
+  const secciones = data?.content ?? []
+  const totalPages = data?.totalPages ?? 1
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,10 +78,11 @@ export default function SeccionesPage() {
                   <SeccionRow key={s.id} s={s} />
                 ))}
               </tbody>
-            </table>
-          </div>
-        )}
-      </main>
+          </table>
+        </div>
+      )}
+      <Pagination page={page} totalPages={totalPages} onPageChange={setPage} disabled={isLoading} />
+    </main>
     </div>
   )
 }
