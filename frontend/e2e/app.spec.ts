@@ -68,7 +68,7 @@ test('S02: Admin creates a course', async ({ page }) => {
   await page.fill('#curso-nombre', 'Curso de Prueba E2E')
   await page.locator('button[type="submit"]').click()
 
-  await expect(page.locator('td:has-text("Curso de Prueba E2E")')).toBeVisible({ timeout: 5000 })
+  await expect(page.locator('td:has-text("Curso de Prueba E2E")').first()).toBeVisible({ timeout: 5000 })
 })
 
 test('S03: Admin edits a course name', async ({ page }) => {
@@ -154,7 +154,7 @@ test('S12: Mobile sidebar hamburger opens', async ({ page }) => {
   const hamburger = page.locator('button[aria-label="Abrir menú"]')
   await expect(hamburger).toBeVisible()
   await hamburger.click()
-  await expect(page.locator('aside nav[aria-label="Navegación principal"]').first()).toBeVisible()
+  await expect(page.locator('.fixed nav[aria-label="Navegación principal"]')).toBeVisible()
 })
 
 test('S13: Period in progress banner has continuation', async ({ page }) => {

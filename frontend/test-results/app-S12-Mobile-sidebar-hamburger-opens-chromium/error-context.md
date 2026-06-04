@@ -14,87 +14,55 @@
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: locator('aside nav[aria-label="Navegación principal"]')
+Locator:  locator('aside nav[aria-label="Navegación principal"]').first()
 Expected: visible
-Error: strict mode violation: locator('aside nav[aria-label="Navegación principal"]') resolved to 2 elements:
-    1) <nav aria-label="Navegación principal" class="flex-1 space-y-0.5 overflow-y-auto p-3">…</nav> aka getByLabel('Navegación principal').first()
-    2) <nav aria-label="Navegación principal" class="flex-1 space-y-0.5 overflow-y-auto p-3">…</nav> aka getByRole('navigation', { name: 'Navegación principal' })
+Received: hidden
+Timeout:  5000ms
 
 Call log:
   - Expect "toBeVisible" with timeout 5000ms
-  - waiting for locator('aside nav[aria-label="Navegación principal"]')
+  - waiting for locator('aside nav[aria-label="Navegación principal"]').first()
+    14 × locator resolved to <nav aria-label="Navegación principal" class="flex-1 space-y-0.5 overflow-y-auto p-3">…</nav>
+       - unexpected value "hidden"
 
 ```
 
-# Page snapshot
-
 ```yaml
-- generic [ref=e2]:
-  - generic [ref=e3]:
-    - complementary [ref=e6]:
-      - generic [ref=e7]:
-        - generic [ref=e9]: SIE
-        - generic [ref=e10]: SIE
-      - navigation "Navegación principal" [ref=e11]:
-        - link "Dashboard" [ref=e12] [cursor=pointer]:
-          - /url: /admin
-          - generic [ref=e13]: ◫
-          - text: Dashboard
-        - link "Usuarios" [ref=e14] [cursor=pointer]:
-          - /url: /admin/usuarios
-          - generic [ref=e15]: 👥
-          - text: Usuarios
-        - link "Académico" [ref=e16] [cursor=pointer]:
-          - /url: /admin/secciones
-          - generic [ref=e17]: 📚
-          - text: Académico
-        - link "Matrícula" [ref=e18] [cursor=pointer]:
-          - /url: /admin/matricula
-          - generic [ref=e19]: 📋
-          - text: Matrícula
-      - button "AD Administrador Administrador" [ref=e21] [cursor=pointer]:
-        - generic [ref=e23]: AD
-        - generic [ref=e24]:
-          - paragraph [ref=e25]: Administrador
-          - paragraph [ref=e26]: Administrador
-        - generic [ref=e27]: ▾
-    - main [ref=e28]:
-      - generic [ref=e29]:
-        - button "Abrir menú" [active] [ref=e30] [cursor=pointer]: ☰
-        - generic [ref=e31]: SIE
-      - generic [ref=e32]:
-        - generic [ref=e33]:
-          - heading "2026-2 — Período 2026-2" [level=1] [ref=e34]
-          - paragraph [ref=e35]: Matrícula abierta · 2026-09-01 → 2026-12-15
-        - generic [ref=e37]:
-          - generic [ref=e38]:
-            - paragraph [ref=e39]: Período en configuración
-            - paragraph [ref=e40]: E2E-714104
-            - paragraph [ref=e41]: Paso 2 de 4 — Secciones
-          - button "Continuar configuración →" [ref=e42] [cursor=pointer]
-        - generic [ref=e43]:
-          - generic [ref=e44]:
-            - generic [ref=e45]:
-              - generic [ref=e46]: 👥
-              - text: Estudiantes
-            - paragraph [ref=e47]: "0"
-          - generic [ref=e48]:
-            - generic [ref=e49]:
-              - generic [ref=e50]: 📚
-              - text: Secciones activas
-            - paragraph [ref=e51]: "2"
-          - generic [ref=e52]:
-            - generic [ref=e53]:
-              - generic [ref=e54]: 📊
-              - text: "% Asistencia"
-            - paragraph [ref=e55]: 0%
-        - generic [ref=e56]:
-          - button "📚 Cursos" [ref=e57] [cursor=pointer]
-          - button "📋 Secciones" [ref=e58] [cursor=pointer]
-          - button "👥 Usuarios" [ref=e59] [cursor=pointer]
-          - button "📊 Cierres" [ref=e60] [cursor=pointer]
-          - button "📝 Matrícula" [ref=e61] [cursor=pointer]
-  - generic "Notificaciones"
+- complementary:
+  - text: SIE SIE
+  - navigation "Navegación principal":
+    - link "Dashboard":
+      - /url: /admin
+    - link "Usuarios":
+      - /url: /admin/usuarios
+    - link "Académico":
+      - /url: /admin/secciones
+    - link "Matrícula":
+      - /url: /admin/matricula
+  - button "AD Administrador Administrador":
+    - text: AD
+    - paragraph: Administrador
+    - paragraph: Administrador
+- main:
+  - button "Abrir menú": ☰
+  - text: SIE
+  - heading "2026-2 — Período 2026-2" [level=1]
+  - paragraph: Matrícula abierta · 2026-09-01 → 2026-12-15
+  - paragraph: Período en configuración
+  - paragraph: E2E-714104
+  - paragraph: Paso 2 de 4 — Secciones
+  - button "Continuar configuración →"
+  - text: Estudiantes
+  - paragraph: "0"
+  - text: Secciones activas
+  - paragraph: "2"
+  - text: "% Asistencia"
+  - paragraph: 0%
+  - button "📚 Cursos"
+  - button "📋 Secciones"
+  - button "👥 Usuarios"
+  - button "📊 Cierres"
+  - button "📝 Matrícula"
 ```
 
 # Test source
@@ -112,7 +80,7 @@ Call log:
   66  |   await page.click('text=+ Nuevo')
   67  |   await page.fill('#curso-codigo', 'TST-' + Date.now().toString().slice(-6))
   68  |   await page.fill('#curso-nombre', 'Curso de Prueba E2E')
-  69  |   await page.click('button:has-text("Crear curso")')
+  69  |   await page.locator('button[type="submit"]').click()
   70  | 
   71  |   await expect(page.locator('td:has-text("Curso de Prueba E2E")')).toBeVisible({ timeout: 5000 })
   72  | })
@@ -200,8 +168,8 @@ Call log:
   154 |   const hamburger = page.locator('button[aria-label="Abrir menú"]')
   155 |   await expect(hamburger).toBeVisible()
   156 |   await hamburger.click()
-> 157 |   await expect(page.locator('aside nav[aria-label="Navegación principal"]')).toBeVisible()
-      |                                                                              ^ Error: expect(locator).toBeVisible() failed
+> 157 |   await expect(page.locator('aside nav[aria-label="Navegación principal"]').first()).toBeVisible()
+      |                                                                                      ^ Error: expect(locator).toBeVisible() failed
   158 | })
   159 | 
   160 | test('S13: Period in progress banner has continuation', async ({ page }) => {

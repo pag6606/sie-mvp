@@ -12,13 +12,17 @@
 # Error details
 
 ```
-Test timeout of 30000ms exceeded.
-```
+Error: expect(locator).toBeVisible() failed
 
-```
-Error: page.click: Test timeout of 30000ms exceeded.
+Locator: locator('td:has-text("Curso de Prueba E2E")')
+Expected: visible
+Error: strict mode violation: locator('td:has-text("Curso de Prueba E2E")') resolved to 2 elements:
+    1) <td class="px-4 py-3 text-sm text-muted-foreground">Curso de Prueba E2E</td> aka getByRole('cell', { name: 'Curso de Prueba E2E' }).first()
+    2) <td class="px-4 py-3 text-sm text-muted-foreground">Curso de Prueba E2E</td> aka getByRole('cell', { name: 'Curso de Prueba E2E' }).nth(2)
+
 Call log:
-  - waiting for locator('button:has-text("Crear curso")')
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for locator('td:has-text("Curso de Prueba E2E")')
 
 ```
 
@@ -61,80 +65,70 @@ Call log:
           - generic [ref=e31]:
             - button "← Dashboard" [ref=e32] [cursor=pointer]
             - button "+ Nuevo" [ref=e33] [cursor=pointer]
-        - generic [ref=e34]:
-          - heading "Nuevo curso" [level=3] [ref=e35]
-          - generic [ref=e36]:
-            - generic [ref=e37]:
-              - generic [ref=e38]: Código
-              - textbox "Código" [ref=e39]:
-                - /placeholder: MAT-101
-                - text: TST-137942
-            - generic [ref=e40]:
-              - generic [ref=e41]: Nombre
-              - textbox "Nombre" [active] [ref=e42]:
-                - /placeholder: Matemáticas I
-                - text: Curso de Prueba E2E
-            - generic [ref=e43]:
-              - generic [ref=e44]: Créd.
-              - spinbutton "Créd." [ref=e45]: "3"
-            - button "Crear" [ref=e46] [cursor=pointer]
-            - button "Cancelar" [ref=e47] [cursor=pointer]
-        - table [ref=e49]:
-          - rowgroup [ref=e50]:
-            - row "Código Nombre Estado Acción" [ref=e51]:
-              - columnheader "Código" [ref=e52]
-              - columnheader "Nombre" [ref=e53]
-              - columnheader "Estado" [ref=e54]
-              - columnheader "Acción" [ref=e55]
-          - rowgroup [ref=e56]:
-            - row "MAT-101 Matemáticas 10A Activo Editar Matemáticas 10A Desactivar Matemáticas 10A" [ref=e57]:
-              - cell "MAT-101" [ref=e58]
-              - cell "Matemáticas 10A" [ref=e59]
-              - cell "Activo" [ref=e60]
-              - cell "Editar Matemáticas 10A Desactivar Matemáticas 10A" [ref=e61]:
-                - generic [ref=e62]:
-                  - button "Editar Matemáticas 10A" [ref=e63] [cursor=pointer]: ✎
-                  - button "Desactivar Matemáticas 10A" [ref=e64] [cursor=pointer]: Desactivar
-            - row "MAT-102 Matemáticas 102 Activo Editar Matemáticas 102 Desactivar Matemáticas 102" [ref=e65]:
-              - cell "MAT-102" [ref=e66]
-              - cell "Matemáticas 102" [ref=e67]
-              - cell "Activo" [ref=e68]
-              - cell "Editar Matemáticas 102 Desactivar Matemáticas 102" [ref=e69]:
-                - generic [ref=e70]:
-                  - button "Editar Matemáticas 102" [ref=e71] [cursor=pointer]: ✎
-                  - button "Desactivar Matemáticas 102" [ref=e72] [cursor=pointer]: Desactivar
-            - row "TST-811497 Curso de Prueba E2E Activo Editar Curso de Prueba E2E Desactivar Curso de Prueba E2E" [ref=e73]:
-              - cell "TST-811497" [ref=e74]
-              - cell "Curso de Prueba E2E" [ref=e75]
-              - cell "Activo" [ref=e76]
-              - cell "Editar Curso de Prueba E2E Desactivar Curso de Prueba E2E" [ref=e77]:
-                - generic [ref=e78]:
-                  - button "Editar Curso de Prueba E2E" [ref=e79] [cursor=pointer]: ✎
-                  - button "Desactivar Curso de Prueba E2E" [ref=e80] [cursor=pointer]: Desactivar
-            - row "TST-713042 Curso de Prueba E2E Activo Editar Curso de Prueba E2E Desactivar Curso de Prueba E2E" [ref=e81]:
-              - cell "TST-713042" [ref=e82]
-              - cell "Curso de Prueba E2E" [ref=e83]
-              - cell "Activo" [ref=e84]
-              - cell "Editar Curso de Prueba E2E Desactivar Curso de Prueba E2E" [ref=e85]:
-                - generic [ref=e86]:
-                  - button "Editar Curso de Prueba E2E" [ref=e87] [cursor=pointer]: ✎
-                  - button "Desactivar Curso de Prueba E2E" [ref=e88] [cursor=pointer]: Desactivar
-            - row "mat-103 MAtematicas 3 Activo Editar MAtematicas 3 Desactivar MAtematicas 3" [ref=e89]:
-              - cell "mat-103" [ref=e90]
-              - cell "MAtematicas 3" [ref=e91]
-              - cell "Activo" [ref=e92]
-              - cell "Editar MAtematicas 3 Desactivar MAtematicas 3" [ref=e93]:
-                - generic [ref=e94]:
-                  - button "Editar MAtematicas 3" [ref=e95] [cursor=pointer]: ✎
-                  - button "Desactivar MAtematicas 3" [ref=e96] [cursor=pointer]: Desactivar
-            - row "Geom-1 Gemotría 1 Activo Editar Gemotría 1 Desactivar Gemotría 1" [ref=e97]:
-              - cell "Geom-1" [ref=e98]
-              - cell "Gemotría 1" [ref=e99]
-              - cell "Activo" [ref=e100]
-              - cell "Editar Gemotría 1 Desactivar Gemotría 1" [ref=e101]:
-                - generic [ref=e102]:
-                  - button "Editar Gemotría 1" [ref=e103] [cursor=pointer]: ✎
-                  - button "Desactivar Gemotría 1" [ref=e104] [cursor=pointer]: Desactivar
+        - table [ref=e35]:
+          - rowgroup [ref=e36]:
+            - row "Código Nombre Estado Acción" [ref=e37]:
+              - columnheader "Código" [ref=e38]
+              - columnheader "Nombre" [ref=e39]
+              - columnheader "Estado" [ref=e40]
+              - columnheader "Acción" [ref=e41]
+          - rowgroup [ref=e42]:
+            - row "MAT-101 Matemáticas 10A Activo Editar Matemáticas 10A Desactivar Matemáticas 10A" [ref=e43]:
+              - cell "MAT-101" [ref=e44]
+              - cell "Matemáticas 10A" [ref=e45]
+              - cell "Activo" [ref=e46]
+              - cell "Editar Matemáticas 10A Desactivar Matemáticas 10A" [ref=e47]:
+                - generic [ref=e48]:
+                  - button "Editar Matemáticas 10A" [ref=e49] [cursor=pointer]: ✎
+                  - button "Desactivar Matemáticas 10A" [ref=e50] [cursor=pointer]: Desactivar
+            - row "MAT-102 Matemáticas 102 Activo Editar Matemáticas 102 Desactivar Matemáticas 102" [ref=e51]:
+              - cell "MAT-102" [ref=e52]
+              - cell "Matemáticas 102" [ref=e53]
+              - cell "Activo" [ref=e54]
+              - cell "Editar Matemáticas 102 Desactivar Matemáticas 102" [ref=e55]:
+                - generic [ref=e56]:
+                  - button "Editar Matemáticas 102" [ref=e57] [cursor=pointer]: ✎
+                  - button "Desactivar Matemáticas 102" [ref=e58] [cursor=pointer]: Desactivar
+            - row "TST-811497 Curso de Prueba E2E Activo Editar Curso de Prueba E2E Desactivar Curso de Prueba E2E" [ref=e59]:
+              - cell "TST-811497" [ref=e60]
+              - cell "Curso de Prueba E2E" [ref=e61]
+              - cell "Activo" [ref=e62]
+              - cell "Editar Curso de Prueba E2E Desactivar Curso de Prueba E2E" [ref=e63]:
+                - generic [ref=e64]:
+                  - button "Editar Curso de Prueba E2E" [ref=e65] [cursor=pointer]: ✎
+                  - button "Desactivar Curso de Prueba E2E" [ref=e66] [cursor=pointer]: Desactivar
+            - row "TST-713042 Curso de Prueba E2E Activo Editar Curso de Prueba E2E Desactivar Curso de Prueba E2E" [ref=e67]:
+              - cell "TST-713042" [ref=e68]
+              - cell "Curso de Prueba E2E" [ref=e69]
+              - cell "Activo" [ref=e70]
+              - cell "Editar Curso de Prueba E2E Desactivar Curso de Prueba E2E" [ref=e71]:
+                - generic [ref=e72]:
+                  - button "Editar Curso de Prueba E2E" [ref=e73] [cursor=pointer]: ✎
+                  - button "Desactivar Curso de Prueba E2E" [ref=e74] [cursor=pointer]: Desactivar
+            - row "mat-103 MAtematicas 3 Activo Editar MAtematicas 3 Desactivar MAtematicas 3" [ref=e75]:
+              - cell "mat-103" [ref=e76]
+              - cell "MAtematicas 3" [ref=e77]
+              - cell "Activo" [ref=e78]
+              - cell "Editar MAtematicas 3 Desactivar MAtematicas 3" [ref=e79]:
+                - generic [ref=e80]:
+                  - button "Editar MAtematicas 3" [ref=e81] [cursor=pointer]: ✎
+                  - button "Desactivar MAtematicas 3" [ref=e82] [cursor=pointer]: Desactivar
+            - row "Geom-1 Gemotría 1 Activo Editar Gemotría 1 Desactivar Gemotría 1" [ref=e83]:
+              - cell "Geom-1" [ref=e84]
+              - cell "Gemotría 1" [ref=e85]
+              - cell "Activo" [ref=e86]
+              - cell "Editar Gemotría 1 Desactivar Gemotría 1" [ref=e87]:
+                - generic [ref=e88]:
+                  - button "Editar Gemotría 1" [ref=e89] [cursor=pointer]: ✎
+                  - button "Desactivar Gemotría 1" [ref=e90] [cursor=pointer]: Desactivar
+            - row "TST-351451 Curso de Prueba E2E Activo Editar Curso de Prueba E2E Desactivar Curso de Prueba E2E" [ref=e91]:
+              - cell "TST-351451" [ref=e92]
+              - cell "Curso de Prueba E2E" [ref=e93]
+              - cell "Activo" [ref=e94]
+              - cell "Editar Curso de Prueba E2E Desactivar Curso de Prueba E2E" [ref=e95]:
+                - generic [ref=e96]:
+                  - button "Editar Curso de Prueba E2E" [ref=e97] [cursor=pointer]: ✎
+                  - button "Desactivar Curso de Prueba E2E" [ref=e98] [cursor=pointer]: Desactivar
   - generic "Notificaciones"
 ```
 
@@ -209,10 +203,10 @@ Call log:
   66  |   await page.click('text=+ Nuevo')
   67  |   await page.fill('#curso-codigo', 'TST-' + Date.now().toString().slice(-6))
   68  |   await page.fill('#curso-nombre', 'Curso de Prueba E2E')
-> 69  |   await page.click('button:has-text("Crear curso")')
-      |              ^ Error: page.click: Test timeout of 30000ms exceeded.
+  69  |   await page.locator('button[type="submit"]').click()
   70  | 
-  71  |   await expect(page.locator('td:has-text("Curso de Prueba E2E")')).toBeVisible({ timeout: 5000 })
+> 71  |   await expect(page.locator('td:has-text("Curso de Prueba E2E")')).toBeVisible({ timeout: 5000 })
+      |                                                                    ^ Error: expect(locator).toBeVisible() failed
   72  | })
   73  | 
   74  | test('S03: Admin edits a course name', async ({ page }) => {
@@ -298,7 +292,7 @@ Call log:
   154 |   const hamburger = page.locator('button[aria-label="Abrir menú"]')
   155 |   await expect(hamburger).toBeVisible()
   156 |   await hamburger.click()
-  157 |   await expect(page.locator('aside nav[aria-label="Navegación principal"]')).toBeVisible()
+  157 |   await expect(page.locator('aside nav[aria-label="Navegación principal"]').first()).toBeVisible()
   158 | })
   159 | 
   160 | test('S13: Period in progress banner has continuation', async ({ page }) => {
