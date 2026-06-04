@@ -1,50 +1,62 @@
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '@/services/api'
+import Navbar from '@/components/Navbar'
+import { usePeriodos } from '@/hooks/usePeriodos'
+import { LoadingSkeleton } from '@/components/UIPatterns'
 
-interface Periodo { id: string; codigo: string; estado: string }
 interface CierreStatus { seccionId: string; codigo: string; curso: string; estado: string }
 
+const CierreRow = memo(function CierreRow({ c }: { c: CierreStatus }) {
+  return (
+    <tr className="border-b">
+      <td className="px-4 py-3 text-sm font-medium text-foreground">{c.codigo}</td>
+      <td className="px-4 py-3 text-sm text-muted-foreground">{c.curso}</td>
+      <td className="px-4 py-3 text-center">
+        <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
+          c.estado === 'CERRADA' ? 'bg-emerald-100 text-emerald-700' : c.estado === 'LISTA' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'
+        }`}>{c.estado}</span>
+      </td>
+    </tr>
+  )
+})
+
 export default function DashboardCierres() {
-  const [periodos, setPeriodos] = useState<Periodo[]>([])
+  const { data: periodos = [] } = usePeriodos()
   const [selectedPeriodo, setSelectedPeriodo] = useState('')
   const [cierres, setCierres] = useState<CierreStatus[]>([])
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
-    api.get('/periodos').then(({ data }) => {
-      setPeriodos(data)
-      const enCurso = data.find((p: Periodo) => p.estado === 'EN_CURSO')
+    if (periodos.length > 0 && !selectedPeriodo) {
+      const enCurso = periodos.find(p => p.estado === 'EN_CURSO')
       if (enCurso) { setSelectedPeriodo(enCurso.id); loadCierres(enCurso.id) }
-    }).catch(() => {})
-  }, [])
+    }
+  }, [periodos, selectedPeriodo])
 
   const loadCierres = (id: string) => {
     setLoading(true)
     api.get(`/admin/cierres/${id}`).then(({ data }) => { setCierres(data); setLoading(false) }).catch(() => setLoading(false))
   }
 
-  const pendientes = cierres.filter(c => c.estado === 'PENDIENTE').length
-  const listas = cierres.filter(c => c.estado === 'LISTA').length
-  const cerradas = cierres.filter(c => c.estado === 'CERRADA').length
+  const pendientes = useMemo(() => cierres.filter(c => c.estado === 'PENDIENTE').length, [cierres])
+  const listas = useMemo(() => cierres.filter(c => c.estado === 'LISTA').length, [cierres])
+  const cerradas = useMemo(() => cierres.filter(c => c.estado === 'CERRADA').length, [cierres])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="flex h-16 items-center justify-between border-b bg-white px-8">
-        <h1 className="cursor-pointer text-xl font-bold text-gray-900" onClick={() => navigate('/admin')}>SIE</h1>
-        <button onClick={() => { localStorage.removeItem('token'); navigate('/login') }} className="text-sm text-red-500 hover:underline">Cerrar sesión</button>
-      </nav>
+    <div className="min-h-screen bg-background">
+      <Navbar role="admin" />
       <main className="mx-auto max-w-4xl px-8 py-12">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-gray-900">Dashboard de Cierres</h2>
-          <button onClick={() => navigate('/admin')} className="text-sm text-gray-500 hover:underline">← Dashboard</button>
+          <h2 className="text-2xl font-semibold text-foreground">Dashboard de Cierres</h2>
+          <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
         </div>
-        <select value={selectedPeriodo} onChange={e => { setSelectedPeriodo(e.target.value); loadCierres(e.target.value) }} className="mb-6 rounded-md border border-gray-300 px-4 py-2 text-sm">
+        <select value={selectedPeriodo} onChange={e => { setSelectedPeriodo(e.target.value); loadCierres(e.target.value) }} className="mb-6 rounded-md border border-input px-4 py-2 text-sm">
           {periodos.map(p => <option key={p.id} value={p.id}>{p.codigo} — {p.estado}</option>)}
         </select>
         {loading ? (
-          <div className="animate-pulse space-y-3">{[1,2,3,4,5].map(i => <div key={i} className="h-12 rounded-lg bg-gray-200" />)}</div>
+          <LoadingSkeleton rows={5} />
         ) : (
           <div>
             <div className="mb-6 grid grid-cols-3 gap-4">
@@ -62,30 +74,22 @@ export default function DashboardCierres() {
               </div>
             </div>
             {cierres.length === 0 ? (
-              <div className="rounded-lg border bg-white p-12 text-center">
-                <p className="text-lg text-gray-500">No hay secciones en este período</p>
+              <div className="rounded-lg border bg-card p-12 text-center">
+                <p className="text-lg text-muted-foreground">No hay secciones en este período</p>
               </div>
             ) : (
-              <div className="rounded-lg border bg-white">
+              <div className="rounded-lg border bg-card">
                 <table className="w-full">
-                  <thead className="border-b bg-gray-50">
+                  <thead className="border-b bg-muted">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Sección</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Curso</th>
-                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500">Estado</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Sección</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Curso</th>
+                      <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Estado</th>
                     </tr>
                   </thead>
                   <tbody>
                     {cierres.map(c => (
-                      <tr key={c.seccionId} className="border-b">
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{c.codigo}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{c.curso}</td>
-                        <td className="px-4 py-3 text-center">
-                          <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
-                            c.estado === 'CERRADA' ? 'bg-emerald-100 text-emerald-700' : c.estado === 'LISTA' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'
-                          }`}>{c.estado}</span>
-                        </td>
-                      </tr>
+                      <CierreRow key={c.seccionId} c={c} />
                     ))}
                   </tbody>
                 </table>

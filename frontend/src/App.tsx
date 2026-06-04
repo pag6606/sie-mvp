@@ -1,45 +1,48 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from '@/pages/auth/LoginPage'
-import PasswordResetPage from '@/pages/auth/PasswordResetPage'
-import AdminDashboard from '@/pages/admin/AdminDashboard'
-import CrearPeriodo from '@/pages/admin/CrearPeriodo'
-import ClonarSecciones from '@/pages/admin/ClonarSecciones'
-import RevisarSecciones from '@/pages/admin/RevisarSecciones'
-import ConfirmarApertura from '@/pages/admin/ConfirmarApertura'
-import DashboardCierres from '@/pages/admin/DashboardCierres'
-import MatriculaPage from '@/pages/admin/MatriculaPage'
-import ImportarCSV from '@/pages/admin/ImportarCSV'
-import UsuariosPage from '@/pages/admin/UsuariosPage'
-import SeccionesPage from '@/pages/admin/SeccionesPage'
-import DocenteDashboard from '@/pages/docente/DocenteDashboard'
-import AsistenciaPage from '@/pages/docente/AsistenciaPage'
-import NotasPage from '@/pages/docente/NotasPage'
-import CierrePage from '@/pages/docente/CierrePage'
-import EsquemaEvaluacionPage from '@/pages/docente/EsquemaEvaluacionPage'
-import EstudianteDashboard from '@/pages/estudiante/EstudianteDashboard'
+import { LoadingSkeleton } from '@/components/UIPatterns'
+
+const PasswordResetPage = lazy(() => import('@/pages/auth/PasswordResetPage'))
+const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'))
+const CrearPeriodo = lazy(() => import('@/pages/admin/CrearPeriodo'))
+const ClonarSecciones = lazy(() => import('@/pages/admin/ClonarSecciones'))
+const RevisarSecciones = lazy(() => import('@/pages/admin/RevisarSecciones'))
+const ConfirmarApertura = lazy(() => import('@/pages/admin/ConfirmarApertura'))
+const DashboardCierres = lazy(() => import('@/pages/admin/DashboardCierres'))
+const MatriculaPage = lazy(() => import('@/pages/admin/MatriculaPage'))
+const ImportarCSV = lazy(() => import('@/pages/admin/ImportarCSV'))
+const UsuariosPage = lazy(() => import('@/pages/admin/UsuariosPage'))
+const SeccionesPage = lazy(() => import('@/pages/admin/SeccionesPage'))
+const DocenteDashboard = lazy(() => import('@/pages/docente/DocenteDashboard'))
+const AsistenciaPage = lazy(() => import('@/pages/docente/AsistenciaPage'))
+const NotasPage = lazy(() => import('@/pages/docente/NotasPage'))
+const CierrePage = lazy(() => import('@/pages/docente/CierrePage'))
+const EsquemaEvaluacionPage = lazy(() => import('@/pages/docente/EsquemaEvaluacionPage'))
+const EstudianteDashboard = lazy(() => import('@/pages/estudiante/EstudianteDashboard'))
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/reset-password" element={<PasswordResetPage />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/admin/periodos/nuevo" element={<CrearPeriodo />} />
-      <Route path="/admin/periodos/:periodoId/clonar" element={<ClonarSecciones />} />
-      <Route path="/admin/periodos/:periodoId/revisar" element={<RevisarSecciones />} />
-      <Route path="/admin/periodos/:periodoId/confirmar" element={<ConfirmarApertura />} />
-      <Route path="/admin/cierres" element={<DashboardCierres />} />
-      <Route path="/admin/matricula" element={<MatriculaPage />} />
-      <Route path="/admin/matricula/importar" element={<ImportarCSV />} />
-      <Route path="/admin/usuarios" element={<UsuariosPage />} />
-      <Route path="/admin/secciones" element={<SeccionesPage />} />
-      <Route path="/docente" element={<DocenteDashboard />} />
-      <Route path="/docente/:seccionId/asistencia" element={<AsistenciaPage />} />
-      <Route path="/docente/:seccionId/notas" element={<NotasPage />} />
-      <Route path="/docente/:seccionId/cerrar" element={<CierrePage />} />
-      <Route path="/docente/:seccionId/esquema" element={<EsquemaEvaluacionPage />} />
-      <Route path="/estudiante" element={<EstudianteDashboard />} />
+      <Route path="/reset-password" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><PasswordResetPage /></Suspense>} />
+      <Route path="/admin" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AdminDashboard /></Suspense>} />
+      <Route path="/admin/periodos/nuevo" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><CrearPeriodo /></Suspense>} />
+      <Route path="/admin/periodos/:periodoId/clonar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><ClonarSecciones /></Suspense>} />
+      <Route path="/admin/periodos/:periodoId/revisar" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><RevisarSecciones /></Suspense>} />
+      <Route path="/admin/periodos/:periodoId/confirmar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><ConfirmarApertura /></Suspense>} />
+      <Route path="/admin/cierres" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><DashboardCierres /></Suspense>} />
+      <Route path="/admin/matricula" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><MatriculaPage /></Suspense>} />
+      <Route path="/admin/matricula/importar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><ImportarCSV /></Suspense>} />
+      <Route path="/admin/usuarios" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><UsuariosPage /></Suspense>} />
+      <Route path="/admin/secciones" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><SeccionesPage /></Suspense>} />
+      <Route path="/docente" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><DocenteDashboard /></Suspense>} />
+      <Route path="/docente/:seccionId/asistencia" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AsistenciaPage /></Suspense>} />
+      <Route path="/docente/:seccionId/notas" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><NotasPage /></Suspense>} />
+      <Route path="/docente/:seccionId/cerrar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><CierrePage /></Suspense>} />
+      <Route path="/docente/:seccionId/esquema" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><EsquemaEvaluacionPage /></Suspense>} />
+      <Route path="/estudiante" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><EstudianteDashboard /></Suspense>} />
     </Routes>
   )
 }

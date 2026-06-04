@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
+import Navbar from '@/components/Navbar'
 import ProgressBar from '@/components/ProgressBar'
+import { usePeriodos } from '@/hooks/usePeriodos'
+import { useSecciones } from '@/hooks/useSecciones'
 
 const STEPS = [
   { label: 'Crear período', done: true },
@@ -10,79 +13,68 @@ const STEPS = [
   { label: 'Confirmar' },
 ]
 
-interface Periodo {
-  codigo: string
-  secciones: number
-}
-
 export default function ClonarSecciones() {
   const { periodoId } = useParams()
-  const [loading, setLoading] = useState(false)
-  const [periodoAnterior, setPeriodoAnterior] = useState<Periodo | null>(null)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    api.get('/periodos').then(({ data }) => {
-      const cerrados = data.filter((p: any) => p.estado === 'CERRADO')
-      if (cerrados.length > 0) {
-        api.get(`/secciones?periodoId=${cerrados[0].id}`).then(({ data: secciones }) => {
-          setPeriodoAnterior({ codigo: cerrados[0].codigo, secciones: secciones.length })
-        }).catch(() => {})
-      }
-    }).catch(() => {})
-  }, [])
+  const { data: periodos } = usePeriodos()
+  const cerrados = periodos?.filter(p => p.estado === 'CERRADO') || []
+  const origenId = cerrados[0]?.id
+  const { data: seccionesAnteriores } = useSecciones(origenId || '')
 
-  const handleClonar = async () => {
-    if (!periodoAnterior) return
-    setLoading(true)
-    try {
-      const { data: periodos } = await api.get('/periodos')
-      const origen = periodos.find((p: any) => p.estado === 'CERRADO')
+  const periodoAnterior = cerrados.length > 0 && seccionesAnteriores
+    ? { codigo: cerrados[0].codigo, secciones: seccionesAnteriores.length }
+    : null
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const { data } = await api.get('/periodos')
+      const origen = data.find((p: any) => p.estado === 'CERRADO')
       await api.post(`/periodos/${origen.id}/clonar-a/${periodoId}`)
-      navigate(`/admin/periodos/${periodoId}/revisar`)
-    } catch (err: any) {
-      setLoading(false)
-      navigate(`/admin/periodos/${periodoId}/revisar`)
-    }
-  }
+    },
+    onSuccess: () => navigate(`/admin/periodos/${periodoId}/revisar`),
+    onError: () => navigate(`/admin/periodos/${periodoId}/revisar`),
+  })
+
+  const handleClonar = () => mutation.mutate()
 
   const handleDesdeCero = () => {
     navigate(`/admin/periodos/${periodoId}/revisar`)
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="flex h-16 items-center justify-between border-b bg-white px-8">
-        <h1 className="cursor-pointer text-xl font-bold text-gray-900" onClick={() => navigate('/admin')}>SIE</h1>
-        <span className="text-lg font-medium text-blue-600">Paso 2 de 4</span>
-      </nav>
+    <div className="min-h-screen bg-background">
+      <Navbar role="admin" subtitle="Paso 2 de 4" />
 
       <main className="mx-auto max-w-2xl px-8 py-12">
         <ProgressBar steps={STEPS} current={1} />
 
-        <div className="rounded-lg border bg-white p-8">
-          <h2 className="mb-6 text-xl font-semibold text-gray-900">Configurar secciones</h2>
+        <div className="rounded-lg border bg-card p-8">
+          <h2 className="mb-6 text-xl font-semibold text-foreground">Configurar secciones</h2>
 
           {periodoAnterior ? (
-            <div
+            <button
               onClick={handleClonar}
-              className="mb-4 cursor-pointer rounded-lg border-2 border-blue-200 bg-blue-50 p-6 hover:border-blue-400"
+              disabled={mutation.isPending}
+              aria-label={`Copiar estructura de ${periodoAnterior.codigo}`}
+              className="mb-4 w-full cursor-pointer rounded-lg border-2 border-blue-200 bg-blue-50 p-6 text-left hover:border-blue-400"
             >
-              <p className="text-lg font-medium text-gray-900">📦 Copiar estructura de {periodoAnterior.codigo}</p>
-              <p className="mt-1 text-sm text-gray-600">{periodoAnterior.secciones} secciones</p>
+              <p className="text-lg font-medium text-foreground"><span aria-hidden="true">📦</span> Copiar estructura de {periodoAnterior.codigo}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{periodoAnterior.secciones} secciones</p>
               <span className="mt-2 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Recomendado</span>
-            </div>
+            </button>
           ) : null}
 
-          <div
+          <button
             onClick={handleDesdeCero}
-            className="cursor-pointer rounded-lg border border-gray-200 p-6 hover:border-gray-400"
+            aria-label="Empezar desde cero"
+            className="w-full cursor-pointer rounded-lg border border-gray-200 p-6 text-left hover:border-gray-400"
           >
-            <p className="text-lg font-medium text-gray-900">✨ Empezar desde cero</p>
-            <p className="mt-1 text-sm text-gray-500">Crear secciones manualmente</p>
-          </div>
+            <p className="text-lg font-medium text-foreground"><span aria-hidden="true">✨</span> Empezar desde cero</p>
+            <p className="mt-1 text-sm text-muted-foreground">Crear secciones manualmente</p>
+          </button>
 
-          {loading && <p className="mt-4 text-center text-blue-600">Clonando secciones...</p>}
+          {mutation.isPending && <p className="mt-4 text-center text-primary">Clonando secciones...</p>}
         </div>
       </main>
     </div>

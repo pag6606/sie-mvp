@@ -80,18 +80,18 @@ development_status:
   epic-4-retrospective: optional
 
   # ── Epic 5: App Rápida, Accesible y Robusta (FRONTEND IMPROVEMENT) ──
-  epic-5: in-progress
+  epic-5: done
   5-01-setup-testing-y-tipos-estrictos: done
-  5-02-design-tokens-y-focus-visible: ready-for-dev
-  5-03-hooks-compartidos-usequery: ready-for-dev
-  5-04-code-splitting-react-lazy: ready-for-dev
-  5-05-migrar-paginas-auth: ready-for-dev
-  5-06-migrar-dashboard-admin-wizard: ready-for-dev
-  5-07-migrar-paginas-admin-restantes: ready-for-dev
-  5-08-migrar-paginas-docente: ready-for-dev
-  5-09-migrar-pagina-estudiante: ready-for-dev
-  5-10-navbar-unificado-con-aria: ready-for-dev
-  5-11-memoizacion-filas-de-tabla: ready-for-dev
+  5-02-design-tokens-y-focus-visible: done
+  5-03-hooks-compartidos-usequery: done
+  5-04-code-splitting-react-lazy: done
+  5-05-migrar-paginas-auth: done
+  5-06-migrar-dashboard-admin-wizard: done
+  5-07-migrar-paginas-admin-restantes: done
+  5-08-migrar-paginas-docente: done
+  5-09-migrar-pagina-estudiante: done
+  5-10-navbar-unificado-con-aria: done
+  5-11-memoizacion-filas-de-tabla: done
   epic-5-retrospective: optional
 
   # ── Epic 6: Paginación y Carga Masiva Optimizada ──
