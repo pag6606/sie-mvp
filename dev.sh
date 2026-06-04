@@ -40,7 +40,11 @@ start() {
     echo "   Mailpit:    localhost:1025 (web UI: :8025)"
     echo ""
     echo "   Backend:    cd backend && ./mvnw spring-boot:run"
-    echo "   Frontend:   cd frontend && npm run dev"
+    echo "   Frontend:   cd frontend && npm run dev -- --host"
+    echo ""
+    echo "   📱 Para probar desde el móvil en la misma WiFi:"
+    echo "      Backend expuesto en http://$(hostname -I | awk '{print $1}'):8080"
+    echo "      Frontend expuesto en http://$(hostname -I | awk '{print $1}'):5173"
 }
 
 stop() {

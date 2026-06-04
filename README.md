@@ -200,10 +200,15 @@ cd backend
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev -- --host
 
-# App: http://localhost:5173
+# Desktop: http://localhost:5173
+# Móvil (misma WiFi): http://<IP-DE-TU-MÁQUINA>:5173
 ```
+
+> **📱 Probar desde el móvil:** Ejecutá `hostname -I | awk '{print $1}'` para obtener tu IP local.
+> Asegurate de que el backend también use `server.address=0.0.0.0` (ya configurado en `application-dev.properties`).
+> Abrí esa IP en el navegador del móvil conectado a la misma red WiFi.
 
 ### Detener
 

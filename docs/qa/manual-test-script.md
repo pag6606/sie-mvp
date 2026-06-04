@@ -53,23 +53,23 @@
 - [X] **AC:** Vuelve a ocultarse
 
 ### UA-01.6 Recuperar contraseña (flujo completo)
-- [ ] Clic en "¿Olvidaste tu contraseña?"
-- [ ] **AC:** Navega a `/reset-password`, formulario pide email
-- [ ] Ingresar `admin@sie.edu.ec`, clic en "Enviar enlace"
-- [ ] **AC:** Mensaje "Revisa tu correo" con instrucciones
-- [ ] Abrir Mailpit en `http://localhost:8025`, verificar que llegó el correo
-- [ ] Copiar el link del correo (`/reset-password?token=...`)
-- [ ] Pegar en el navegador y abrir
-- [ ] **AC:** Muestra formulario "Nueva contraseña" con 2 campos
-- [ ] Ingresar contraseña de menos de 10 caracteres
-- [ ] **AC:** Error "La contraseña debe tener al menos 10 caracteres"
-- [ ] Ingresar contraseñas que no coinciden
-- [ ] **AC:** Error "Las contraseñas no coinciden"
-- [ ] Ingresar `NuevaClave123!` en ambos campos
-- [ ] Clic en "Restablecer contraseña"
-- [ ] **AC:** Mensaje "Contraseña restablecida" con botón al login
-- [ ] Clic en "Ir al inicio de sesión", hacer login con la nueva contraseña
-- [ ] **AC:** Login exitoso con la nueva contraseña
+- [X] Clic en "¿Olvidaste tu contraseña?"
+- [X] **AC:** Navega a `/reset-password`, formulario pide email
+- [X] Ingresar `admin@sie.edu.ec`, clic en "Enviar enlace"
+- [X] **AC:** Mensaje "Revisa tu correo" con instrucciones
+- [X] Abrir Mailpit en `http://localhost:8025`, verificar que llegó el correo
+- [X] Copiar el link del correo (`/reset-password?token=...`)
+- [X] Pegar en el navegador y abrir
+- [X] **AC:** Muestra formulario "Nueva contraseña" con 2 campos
+- [X] Ingresar contraseña de menos de 10 caracteres
+- [X] **AC:** Error "La contraseña debe tener al menos 10 caracteres"
+- [X] Ingresar contraseñas que no coinciden
+- [X] **AC:** Error "Las contraseñas no coinciden"
+- [X] Ingresar `NuevaClave123!` en ambos campos
+- [X] Clic en "Restablecer contraseña"
+- [X] **AC:** Mensaje "Contraseña restablecida" con botón al login
+- [X] Clic en "Ir al inicio de sesión", hacer login con la nueva contraseña
+- [X] **AC:** Login exitoso con la nueva contraseña
 
 ---
 
