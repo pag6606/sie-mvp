@@ -23,7 +23,7 @@
 - [ ] Navegar a `http://localhost:5173/login`
 - [ ] Verificar que aparece el panel izquierdo con degradado índigo (SIE branding)
 - [ ] Verificar que dice "Bienvenido de vuelta"
-- [ ] Verificar el botón "Continuar con Microsoft (SSO)"
+- [ ] Verificar que aparece el logo de SIE
 - [ ] Ingresar `admin@sie.edu.ec` / `Admin123!`
 - [ ] Clic en "Iniciar sesión"
 - [ ] **AC:** Redirige a `/admin`, se ve el sidebar con Dashboard, Usuarios, Académico, Matrícula
@@ -432,7 +432,7 @@
 - [ ] **AC:** Panel izquierdo con degradado índigo (escritorio, ≥1024px)
 - [ ] **AC:** Panel izquierdo muestra logo SIE, mockup decorativo, features list, footer
 - [ ] **AC:** Panel derecho con formulario centrado sobre fondo gris claro
-- [ ] **AC:** Separador "o ingresa con" y botón Microsoft SSO
+- [ ] **AC:** Link de soporte "¿Problemas para acceder? Contactar soporte"
 
 ### UA-16.5 Estados de carga y error
 - [ ] Provocar un error (ej. apagar el backend)

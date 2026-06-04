@@ -179,29 +179,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-muted px-2 text-muted-foreground">o ingresa con</span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="flex w-full items-center justify-center gap-3 rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-            onClick={() => alert('[SSO] Inicio de sesión con Microsoft Azure AD')}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <rect x="0" y="0" width="7.5" height="7.5" fill="#F25022"/>
-              <rect x="8.5" y="0" width="7.5" height="7.5" fill="#7FBA00"/>
-              <rect x="0" y="8.5" width="7.5" height="7.5" fill="#00A4EF"/>
-              <rect x="8.5" y="8.5" width="7.5" height="7.5" fill="#FFB900"/>
-            </svg>
-            Continuar con Microsoft (SSO)
-          </button>
-
           <p className="mt-8 text-center text-xs text-muted-foreground">
             ¿Problemas para acceder?{' '}
             <button className="font-medium text-primary hover:underline">

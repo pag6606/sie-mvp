@@ -30,11 +30,11 @@ test('S07: Login with wrong password shows error', async ({ page }) => {
   await expect(page.locator('[role="alert"]').first()).toBeVisible({ timeout: 5000 })
 })
 
-test('S09: Login page has split layout with SSO', async ({ page }) => {
+test('S09: Login page has split layout', async ({ page }) => {
   await page.goto('/login')
   await expect(page.locator('text=Bienvenido de vuelta')).toBeVisible()
-  await expect(page.locator('text=Continuar con Microsoft')).toBeVisible()
   await expect(page.locator('text=¿Olvidaste tu contraseña?')).toBeVisible()
+  await expect(page.locator('text=Contactar soporte')).toBeVisible()
 })
 
 // ── Scenario 2: Sidebar Navigation ──
