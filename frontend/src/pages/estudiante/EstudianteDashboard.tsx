@@ -50,7 +50,7 @@ export default function EstudianteDashboard() {
             <h2 className="text-lg font-semibold text-foreground mb-4">Mi Horario</h2>
             {matriculas.length === 0 ? (
               <div className="rounded-lg border bg-card p-12 text-center">
-                <p className="text-muted-foreground">No tienes paralelos matriculados</p>
+                <p className="text-muted-foreground">No tienes secciones (paralelos) matriculadas</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -64,7 +64,7 @@ export default function EstudianteDashboard() {
                       <p className="text-xs font-medium text-muted-foreground mb-1">{DIAS_LABEL[dia]}</p>
                       {delDia.map((m: MatriculaData, i: number) => (
                         <div key={i} className="rounded-lg border bg-card p-3 mb-2">
-                          <p className="font-medium text-sm text-foreground">{m.cursoNombre || 'Seccion'}</p>
+                          <p className="font-medium text-sm text-foreground">{m.cursoNombre || 'Sección (paralelo)'}</p>
                           <p className="text-xs text-muted-foreground">ID: {m.seccionId?.slice(0,8)}</p>
                         </div>
                       ))}
@@ -80,14 +80,14 @@ export default function EstudianteDashboard() {
             {notasData.length === 0 ? (
               <div className="rounded-lg border bg-card p-12 text-center">
                 <p className="text-lg text-muted-foreground">Aun no hay notas publicadas</p>
-                <p className="text-sm text-muted-foreground mt-1">Tus calificaciones apareceran cuando el docente cierre el paralelo</p>
+                <p className="text-sm text-muted-foreground mt-1">Tus calificaciones apareceran cuando el docente cierre la sección (paralelo)</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {notasData.map((n: NotaResp, i: number) => (
                   <div key={i} className="rounded-lg border bg-card p-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-foreground">Paralelo</h3>
+                      <h3 className="font-medium text-foreground">Sección (paralelo)</h3>
                       <span className={`text-2xl font-bold ${n.notaFinal >= 14 ? 'text-emerald-600' : n.notaFinal >= 10 ? 'text-amber-600' : 'text-destructive'}`}>
                         {n.notaFinal}
                       </span>
