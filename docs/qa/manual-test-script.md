@@ -76,39 +76,39 @@
 ## UA-02 — Sidebar y Navegación
 
 ### UA-02.1 Navegación Admin por sidebar
-- [ ] Login como Admin
-- [ ] Clic en "Usuarios" en el sidebar
-- [ ] **AC:** Navega a `/admin/usuarios`, el ítem queda activo (fondo índigo claro)
-- [ ] Clic en "Académico"
-- [ ] **AC:** Navega a `/admin/secciones`
-- [ ] Clic en "Matrícula"
-- [ ] **AC:** Navega a `/admin/matricula`
-- [ ] Clic en "Dashboard"
-- [ ] **AC:** Vuelve a `/admin`
+- [X] Login como Admin
+- [X] Clic en "Usuarios" en el sidebar
+- [X] **AC:** Navega a `/admin/usuarios`, el ítem queda activo (fondo índigo claro)
+- [X] Clic en "Secciones (paralelos)" en el sidebar
+- [X] **AC:** Navega a `/admin/secciones`
+- [X] Clic en "Matrícula"
+- [X] **AC:** Navega a `/admin/matricula`
+- [X] Clic en "Dashboard"
+- [X] **AC:** Vuelve a `/admin`
 
 ### UA-02.2 Menú de usuario
-- [ ] En el sidebar, clic en el avatar del admin (parte inferior)
-- [ ] **AC:** Se abre popup con nombre, rol y botón "Cerrar sesión"
-- [ ] Clic fuera del popup
-- [ ] **AC:** El popup se cierra
+- [X] En el sidebar, clic en el avatar del admin (parte inferior)
+- [X] **AC:** Se abre popup con nombre, rol y botón "Cerrar sesión"
+- [X] Clic fuera del popup
+- [X] **AC:** El popup se cierra
 
 ### UA-02.3 Cerrar sesión con confirmación
-- [ ] Abrir menú de usuario → clic en "Cerrar sesión"
-- [ ] **AC:** Aparece modal "¿Estás seguro de que deseas cerrar tu sesión?"
-- [ ] Clic en "Cancelar"
-- [ ] **AC:** El modal se cierra, sigue en el dashboard
-- [ ] Repetir → clic en "Cerrar sesión"
-- [ ] **AC:** Redirige a `/login`
+- [X] Abrir menú de usuario → clic en "Cerrar sesión"
+- [X] **AC:** Aparece modal "¿Estás seguro de que deseas cerrar tu sesión?"
+- [X] Clic en "Cancelar"
+- [X] **AC:** El modal se cierra, sigue en el dashboard
+- [X] Repetir → clic en "Cerrar sesión"
+- [X] **AC:** Redirige a `/login`
 
 ### UA-02.4 Responsive mobile
-- [ ] Login como Admin
-- [ ] Reducir ventana a ~480px de ancho
-- [ ] **AC:** El sidebar colapsa, aparece hamburger ☰ en la barra superior
-- [ ] Clic en ☰
-- [ ] **AC:** Se abre el sidebar como overlay con fondo oscuro
-- [ ] Clic en "Usuarios"
-- [ ] **AC:** Navega y el overlay se cierra
-- [ ] Volver a tamaño normal
+- [X] Login como Admin
+- [X] Reducir ventana a ~480px de ancho
+- [X] **AC:** El sidebar colapsa, aparece hamburger ☰ en la barra superior
+- [X] Clic en ☰
+- [X] **AC:** Se abre el sidebar como overlay con fondo oscuro
+- [X] Clic en "Usuarios"
+- [X] **AC:** Navega y el overlay se cierra
+- [X] Volver a tamaño normal
 
 ---
 
@@ -467,10 +467,10 @@
 | UA-01.4 | Login fallido | ✅ Pass | |
 | UA-01.5 | Toggle contraseña | ✅ Pass | |
 | UA-01.6 | Reset password (flujo completo) | ⬜ Pass / ⬜ Fail | |
-| UA-02.1 | Nav Admin por sidebar | ⬜ Pass / ⬜ Fail | |
-| UA-02.2 | Menú de usuario | ⬜ Pass / ⬜ Fail | |
-| UA-02.3 | Cerrar sesión | ⬜ Pass / ⬜ Fail | |
-| UA-02.4 | Responsive mobile | ⬜ Pass / ⬜ Fail | |
+| UA-02.1 | Nav Admin por sidebar | ✅ Pass | |
+| UA-02.2 | Menú de usuario | ✅ Pass | |
+| UA-02.3 | Cerrar sesión | ✅ Pass | |
+| UA-02.4 | Responsive mobile | ✅ Pass | |
 | UA-03.1 | KPI Cards | ⬜ Pass / ⬜ Fail | |
 | UA-03.2 | Gráfico evolución | ⬜ Pass / ⬜ Fail | |
 | UA-03.3 | Actividad reciente | ⬜ Pass / ⬜ Fail | |
