@@ -203,13 +203,22 @@ Los códigos siguen el estándar del Ministerio de Educación: `{número}EGB-{pa
 
 ### 5.2 Crear los 200 usuarios estudiante
 
-Actualmente SIE no tiene import masivo de usuarios — los 200 estudiantes deben crearse uno por uno o mediante un script de seeding. Para esta demo:
+Usar el endpoint batch de creación masiva. Enviar un `POST` con los 200 usuarios:
 
-1. Sidebar → Usuarios → "+ Nuevo usuario"
-2. Crear manualmente `est-001` a `est-010` (los 10 manuales)
-3. Los 190 restantes se crearán vía script de base de datos
+```bash
+curl -X POST http://localhost:8080/api/usuarios/batch/crear \
+  -H "Content-Type: application/json" \
+  -H "X-Colegio-Id: <colegio-id>" \
+  -d '{
+    "usuarios": [
+      {"email": "est-001@academiapacifico.edu.ec", "nombre": "Estudiante 001", "roles": ["ESTUDIANTE"]},
+      ...
+      {"email": "est-200@academiapacifico.edu.ec", "nombre": "Estudiante 200", "roles": ["ESTUDIANTE"]}
+    ]
+  }'
+```
 
-> **Nota técnica:** Para producción, se necesita un endpoint `POST /api/usuarios/batch` que cree múltiples usuarios en una sola llamada. El endpoint batch actual (`POST /api/usuarios/batch/desactivar`) solo desactiva, no crea.
+El endpoint `POST /api/usuarios/batch/crear` acepta una lista de `{email, nombre, roles}` y devuelve los 200 usuarios creados con sus IDs. Cada usuario recibe email de activación automáticamente.
 
 ### 5.3 Matricular vía CSV (190 estudiantes)
 

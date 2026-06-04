@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -110,6 +111,15 @@ public class UsuarioService {
             usuario.softDelete();
             usuarioRepository.save(usuario);
         }
+    }
+
+    @Transactional
+    public List<UsuarioResponse> crearUsuarios(List<CrearUsuarioRequest> requests, UUID colegioId) {
+        List<UsuarioResponse> responses = new ArrayList<>();
+        for (CrearUsuarioRequest request : requests) {
+            responses.add(crearUsuario(request, colegioId));
+        }
+        return responses;
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {

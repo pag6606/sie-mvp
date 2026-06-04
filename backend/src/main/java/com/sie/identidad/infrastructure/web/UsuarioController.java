@@ -1,6 +1,7 @@
 package com.sie.identidad.infrastructure.web;
 
 import com.sie.identidad.application.UsuarioService;
+import com.sie.identidad.application.dto.BatchCrearUsuarioRequest;
 import com.sie.identidad.application.dto.BatchRequest;
 import com.sie.identidad.application.dto.CrearUsuarioRequest;
 import com.sie.identidad.application.dto.UsuarioResponse;
@@ -72,5 +73,13 @@ public class UsuarioController {
     public ResponseEntity<Map<String, String>> eliminarUsuarios(@Valid @RequestBody BatchRequest request) {
         usuarioService.eliminarUsuarios(request.ids());
         return ResponseEntity.ok(Map.of("mensaje", request.ids().size() + " usuarios eliminados"));
+    }
+
+    @PostMapping("/batch/crear")
+    public ResponseEntity<List<UsuarioResponse>> crearUsuarios(
+            @Valid @RequestBody BatchCrearUsuarioRequest request,
+            @RequestHeader("X-Colegio-Id") UUID colegioId) {
+        List<UsuarioResponse> responses = usuarioService.crearUsuarios(request.usuarios(), colegioId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 }
