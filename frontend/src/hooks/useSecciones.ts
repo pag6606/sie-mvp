@@ -23,7 +23,10 @@ interface PaginatedResponse<T> {
 export function useSecciones(periodoId: string) {
   return useQuery<Seccion[]>({
     queryKey: ['secciones', periodoId],
-    queryFn: () => api.get(`/secciones?periodoId=${periodoId}`).then(r => r.data),
+    queryFn: () => api.get(`/secciones?periodoId=${periodoId}&size=200`).then(r => {
+      const data = r.data
+      return Array.isArray(data) ? data : (data.content || [])
+    }),
     staleTime: 5 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     enabled: !!periodoId,

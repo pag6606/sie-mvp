@@ -21,7 +21,10 @@ interface PaginatedResponse<T> {
 export function useUsuarios() {
   return useQuery<Usuario[]>({
     queryKey: ['usuarios'],
-    queryFn: () => api.get('/usuarios').then(r => r.data),
+    queryFn: () => api.get('/usuarios?size=200').then(r => {
+      const data = r.data
+      return Array.isArray(data) ? data : (data.content || [])
+    }),
     staleTime: 2 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
   })
