@@ -13,6 +13,7 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
   admin: [
     { label: 'Dashboard', icon: '◫', href: '/admin' },
     { label: 'Usuarios', icon: '👥', href: '/admin/usuarios' },
+    { label: 'Cursos', icon: '📘', href: '/admin/cursos' },
     { label: 'Secciones (paralelos)', icon: '📚', href: '/admin/secciones' },
     { label: 'Matrícula', icon: '📋', href: '/admin/matricula' },
   ],

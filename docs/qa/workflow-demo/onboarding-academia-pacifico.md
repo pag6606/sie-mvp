@@ -116,7 +116,38 @@ Art. 42-43: La estructura de niveles EGB (1ro a 10mo) está definida por ley. Nu
 
 ---
 
-## Fase 2 — Crear Secciones (paralelos)
+## Fase 2 — Crear Cursos
+
+**Responsable:** Admin  
+**Duración:** 3 minutos  
+**Ruta:** Sidebar → "Cursos" (o botón "📚 Cursos" en dashboard)
+
+> ⚠️ Los cursos son prerequisito de las secciones. Sin curso creado, no se puede crear una sección (paralelo).
+
+### Paso a paso
+
+1. Sidebar → **Cursos** (o `/admin/cursos`)
+2. Clic en **"+ Nuevo"**
+3. Crear cada uno de los 5 cursos:
+
+| # | Código | Nombre |
+|---|--------|--------|
+| 1 | `1EGB` | Primero EGB |
+| 2 | `2EGB` | Segundo EGB |
+| 3 | `3EGB` | Tercero EGB |
+| 4 | `4EGB` | Cuarto EGB |
+| 5 | `5EGB` | Quinto EGB |
+
+### Validación
+- [ ] 5 cursos aparecen en la tabla
+- [ ] Los códigos siguen el estándar del Ministerio de Educación: `{número}EGB`
+
+### LOEI relevante
+Art. 42-43: La estructura de niveles EGB está definida por ley. Nuestro colegio cubre el subnivel de Básica Elemental (2do-4to) y Media (5to-7mo), adaptado a 1ro-5to.
+
+---
+
+## Fase 3 — Crear Secciones (paralelos)
 
 **Responsable:** Admin  
 **Duración:** 10 minutos  
@@ -148,7 +179,7 @@ Los códigos siguen el estándar del Ministerio de Educación: `{número}EGB-{pa
 
 ---
 
-## Fase 3 — Crear Docentes
+## Fase 4 — Crear Docentes
 
 **Responsable:** Admin  
 **Duración:** 2 minutos (vía batch)  
@@ -189,7 +220,7 @@ curl -X POST http://localhost:8080/api/usuarios/batch/crear \
 
 ---
 
-## Fase 4 — Asignar Docentes a Secciones (paralelos)
+## Fase 5 — Asignar Docentes a Secciones (paralelos)
 
 **Responsable:** Admin  
 **Duración:** 10 minutos  
@@ -224,7 +255,7 @@ curl -X POST http://localhost:8080/api/usuarios/batch/crear \
 
 ---
 
-## Fase 5 — Crear Estudiantes y Matricular
+## Fase 6 — Crear Estudiantes y Matricular
 
 **Responsable:** Admin  
 **Duración:** 5 min (batch) + 5 min (consentimientos) + 5 min (matrícula)  
@@ -308,7 +339,7 @@ GET /api/consentimientos/{estudianteId} → { existe: true, id: "...", fecha: ".
 
 ---
 
-## Fase 6 — Abrir Período
+## Fase 7 — Abrir Período
 
 **Responsable:** Admin  
 **Duración:** 1 minuto  
@@ -328,7 +359,7 @@ GET /api/consentimientos/{estudianteId} → { existe: true, id: "...", fecha: ".
 
 ---
 
-## Fase 7 — Operación Diaria (Docentes)
+## Fase 8 — Operación Diaria (Docentes)
 
 Cada docente inicia sesión con su email y la contraseña del correo de activación.
 
@@ -388,7 +419,7 @@ Docente Dashboard → Sección → "Cerrar"
 
 ---
 
-## Fase 8 — Experiencia del Titular de Datos
+## Fase 9 — Experiencia del Titular de Datos
 
 **NUEVO** — Funcionalidades LOPDP disponibles durante todo el ciclo.
 
@@ -413,7 +444,7 @@ Menú de usuario (sidebar, avatar abajo) → **🛡 Privacidad (LOPDP)**
 
 ---
 
-## Fase 9 — Cierre de Período (Admin)
+## Fase 10 — Cierre de Período (Admin)
 
 **Responsable:** Admin  
 **Ruta:** Dashboard → "📊 Cierres"
@@ -442,18 +473,19 @@ Muestra el estado de cada sección:
 |------|--------|--------|-----------|
 | 0 | Documentos legales + verificar RAT endpoint | 1-2 días | LOPDP Art. 10k, 21 |
 | 1 | Crear período COSTA-2026 | 2 min | LOEI Art. 42-43 |
-| 2 | Crear 10 secciones (paralelos) | 10 min | — |
-| 3 | Crear 10 docentes (batch) | 2 min | — |
-| 4 | Asignar docentes a secciones | 10 min | — |
-| 5.1 | Crear 200 estudiantes (batch) | 5 min | — |
-| 5.2 | Registrar 200 consentimientos | 5 min | LOPDP Art. 21, 25 |
-| 5.3 | Matricular 190 (CSV) + 10 (manual) | 5 min | LOPDP Art. 21 (bloqueo) |
-| 6 | Abrir período | 1 min | — |
-| 7 | Operación diaria (4-5 meses) | — | LOEI, ADR-006, ADR-007 |
-| 8 | Privacidad y derechos ARCO | continuo | LOPDP Art. 12-17 |
-| 9 | Cierre de período | 15 min | — |
+| 2 | Crear 5 cursos (1EGB-5EGB) | 3 min | LOEI Art. 42-43 |
+| 3 | Crear 10 secciones (paralelos) | 10 min | — |
+| 4 | Crear 10 docentes (batch) | 2 min | — |
+| 5 | Asignar docentes a secciones | 10 min | — |
+| 6.1 | Crear 200 estudiantes (batch) | 5 min | — |
+| 6.2 | Registrar 200 consentimientos | 5 min | LOPDP Art. 21, 25 |
+| 6.3 | Matricular 190 (CSV) + 10 (manual) | 5 min | LOPDP Art. 21 (bloqueo) |
+| 7 | Abrir período | 1 min | — |
+| 8 | Operación diaria (4-5 meses) | — | LOEI, ADR-006, ADR-007 |
+| 9 | Privacidad y derechos ARCO | continuo | LOPDP Art. 12-17 |
+| 10 | Cierre de período | 15 min | — |
 
-**Total en SIE:** ~40 minutos de configuración (vs 1.5h antes del batch endpoint)  
+**Total en SIE:** ~45 minutos de configuración  
 **Total del ciclo:** 1 año lectivo completo
 
 ---
