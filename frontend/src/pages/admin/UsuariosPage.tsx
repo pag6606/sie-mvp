@@ -30,6 +30,10 @@ export default function UsuariosPage() {
   const handleCrear = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormError('')
+    if (formRoles.length === 0) {
+      setFormError('Debe seleccionar al menos un rol')
+      return
+    }
     setFormSaving(true)
     try {
       await api.post('/usuarios', { email: formEmail, nombre: capitalizeWords(formNombre), roles: formRoles })
@@ -88,7 +92,7 @@ export default function UsuariosPage() {
                   ))}
                 </div>
               </div>
-              <button type="submit" disabled={formSaving}
+              <button type="submit" disabled={formSaving || formRoles.length === 0}
                 className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-50">
                 {formSaving ? 'Creando...' : 'Crear usuario'}
               </button>
