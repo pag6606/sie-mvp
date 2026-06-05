@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from '@/pages/auth/LoginPage'
+import PrivacyPage from '@/pages/auth/PrivacyPage'
 import { LoadingSkeleton } from '@/components/UIPatterns'
 
 const PasswordResetPage = lazy(() => import('@/pages/auth/PasswordResetPage'))
@@ -27,6 +28,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/privacidad" element={<PrivacyPage />} />
       <Route path="/reset-password" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><PasswordResetPage /></Suspense>} />
       <Route path="/admin" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AdminDashboard /></Suspense>} />
       <Route path="/admin/periodos/nuevo" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><CrearPeriodo /></Suspense>} />

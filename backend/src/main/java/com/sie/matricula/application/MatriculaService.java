@@ -4,16 +4,20 @@ import com.sie.academico.infrastructure.SeccionRepository;
 import com.sie.identidad.domain.RolCodigo;
 import com.sie.identidad.domain.Usuario;
 import com.sie.identidad.domain.UsuarioRol;
+import com.sie.identidad.infrastructure.ConsentimientoRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.matricula.application.dto.*;
 import com.sie.matricula.domain.*;
 import com.sie.matricula.infrastructure.MatriculaRepository;
+import com.sie.shared.kernel.AuditLog;
+import com.fasterxml.uuid.Generators;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,12 +28,19 @@ public class MatriculaService {
     private final MatriculaRepository matriculaRepository;
     private final SeccionRepository seccionRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ConsentimientoRepository consentimientoRepository;
+    private final EntityManager em;
 
     @Transactional
     public MatriculaResponse matricular(UUID colegioId, MatricularRequest req) {
         var estudiante = usuarioRepository.findById(req.estudianteId())
                 .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado"));
         if (!estudiante.isActivo()) throw new IllegalArgumentException("Estudiante inactivo");
+
+        if (!consentimientoRepository.existsByEstudianteIdAndAceptadoTrue(req.estudianteId())) {
+            throw new IllegalArgumentException(
+                "No se puede matricular: el estudiante no tiene consentimiento parental registrado (LOPDP Art. 21).");
+        }
 
         var seccion = seccionRepository.findById(req.seccionId())
                 .orElseThrow(() -> new IllegalArgumentException("Sección no encontrada"));
@@ -41,7 +52,12 @@ public class MatriculaService {
         m.setEstudianteId(req.estudianteId());
         m.setSeccionId(req.seccionId());
         m.setColegioId(colegioId);
-        return toResponse(matriculaRepository.save(m), estudiante.getNombre(), seccion.getCurso().getNombre());
+        m = matriculaRepository.save(m);
+
+        auditLog("MATRICULA", m.getId(), "CREAR", req.estudianteId(), colegioId,
+                String.format("Estudiante %s matriculado en sección %s", req.estudianteId(), req.seccionId()));
+
+        return toResponse(m, estudiante.getNombre(), seccion.getCurso().getNombre());
     }
 
     @Transactional
@@ -102,6 +118,20 @@ public class MatriculaService {
 
     private MatriculaResponse toResponse(Matricula m, String nombre, String curso) {
         return new MatriculaResponse(m.getId(), m.getEstudianteId(), m.getSeccionId(), m.getEstado(), m.getFecha(), nombre, curso);
+    }
+
+    private void auditLog(String entidad, UUID entidadId, String accion, UUID autorId, UUID colegioId, String detalle) {
+        AuditLog log = new AuditLog();
+        log.setId(Generators.timeBasedEpochGenerator().generate());
+        log.setEntidad(entidad);
+        log.setEntidadId(entidadId);
+        log.setAccion(accion);
+        log.setAutorId(autorId);
+        log.setColegioId(colegioId);
+        log.setFecha(LocalDateTime.now());
+        log.setDetalleJson(detalle);
+        log.setIp("127.0.0.1");
+        em.persist(log);
     }
 
     public static class ImportResult {

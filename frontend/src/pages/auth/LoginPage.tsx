@@ -92,7 +92,13 @@ export default function LoginPage() {
         </div>
 
         <p className="relative text-xs text-indigo-300">
-          &copy; 2025 SIE — Todos los derechos reservados
+          &copy; 2025 SIE &middot;{' '}
+          <button
+            onClick={() => navigate('/privacidad')}
+            className="underline hover:text-white transition-colors"
+          >
+            Política de Privacidad
+          </button>
         </p>
       </div>
 
@@ -179,11 +185,16 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-xs text-muted-foreground">
+          <p className="mt-6 text-center text-xs text-muted-foreground">
             ¿Problemas para acceder?{' '}
             <button className="font-medium text-primary hover:underline">
               Contactar soporte
             </button>
+          </p>
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            <Link to="/privacidad" className="hover:underline">
+              Política de Privacidad
+            </Link>
           </p>
         </div>
       </div>
