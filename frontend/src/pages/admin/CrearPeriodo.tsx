@@ -107,6 +107,16 @@ export default function CrearPeriodo() {
             </div>
           </form>
 
+          <div className="mt-8 rounded-lg border border-border bg-muted/30 p-4 text-sm">
+            <p className="font-medium text-foreground mb-2">📋 Próximos pasos:</p>
+            <ol className="list-decimal pl-5 space-y-1 text-muted-foreground">
+              <li>Crear los <strong>cursos</strong> en el menú 📘 Cursos (1EGB, 2EGB, ...)</li>
+              <li>Configurar las <strong>secciones (paralelos)</strong> para cada curso</li>
+              <li>Crear <strong>docentes</strong> y asignarlos a las secciones</li>
+              <li>Revisar y <strong>abrir el período</strong></li>
+            </ol>
+          </div>
+
           <p className="mt-4 text-center">
             <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">
               ← Volver al dashboard
