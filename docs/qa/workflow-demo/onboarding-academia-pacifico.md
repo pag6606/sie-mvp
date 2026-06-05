@@ -217,6 +217,20 @@ curl -X POST http://localhost:8080/api/usuarios/batch/crear \
 ### Validación
 - [ ] 10 usuarios creados con rol DOCENTE
 - [ ] 10 correos de activación visibles en Mailpit (`http://localhost:8025`)
+- [ ] Cada docente debe abrir su link y establecer su contraseña (ver **Primer Acceso** abajo)
+
+### Primer Acceso del Docente
+
+Cada docente recibe un email con asunto "Activa tu cuenta en SIE". El flujo es:
+
+1. Abrir Mailpit en `http://localhost:8025`
+2. Buscar el email del docente (ej. `laura.roman@academiapacifico.edu.ec`)
+3. Abrir el link: `http://localhost:5173/activate?token=...`
+4. Establecer una contraseña (mín. 10 caracteres)
+5. Confirmar → "Cuenta activada. Ya puedes iniciar sesión."
+6. Login con su email y la nueva contraseña
+
+> 💡 **Para agilizar la demo:** El admin puede activar todas las cuentas con la misma contraseña temporal (ej. `Docente123!`) abriendo cada link de Mailpit. En producción, cada docente recibe su propio token único.
 
 ---
 
@@ -276,9 +290,19 @@ curl -X POST http://localhost:8080/api/usuarios/batch/crear \
   }'
 ```
 
-El endpoint `POST /api/usuarios/batch/crear` acepta una lista de `{email, nombre, roles}` y devuelve los IDs creados. Cada usuario recibe email de activación.
+El endpoint `POST /api/usuarios/batch/crear` acepta una lista de `{email, nombre, roles}` y devuelve los IDs creados. Cada usuario recibe email de activación automáticamente.
 
-### 5.2 Registrar consentimientos parentales (LOPDP Art. 21, 25)
+### 6.2 Activar cuentas de estudiantes
+
+Los 200 estudiantes reciben un email de activación (asunto: "Activa tu cuenta en SIE"). Para la demo:
+
+1. Abrir Mailpit en `http://localhost:8025` y verificar que los 200 correos llegaron
+2. Para testing, activar algunas cuentas abriendo los links y estableciendo contraseña
+3. Alternativa rápida: usar `Estudiante1!` como contraseña estándar para todas las cuentas
+
+> 💡 **En producción real**, cada estudiante (o su representante legal) recibe su propio email y establece su contraseña. El sistema fuerza el cambio en el primer login.
+
+### 6.3 Registrar consentimientos parentales (LOPDP Art. 21, 25)
 
 **NUEVO** — Antes de matricular, cada estudiante necesita consentimiento registrado. Los 200 estudiantes son menores de 15 años.
 
@@ -302,7 +326,7 @@ Verificar consentimiento:
 GET /api/consentimientos/{estudianteId} → { existe: true, id: "...", fecha: "..." }
 ```
 
-### 5.3 Matricular vía CSV (190 estudiantes)
+### 6.4 Matricular vía CSV (190 estudiantes)
 
 **Archivo:** `docs/qa/workflow-demo/matricula-190.csv`  
 **Formato:** `email,codigoSeccion`
@@ -314,7 +338,7 @@ GET /api/consentimientos/{estudianteId} → { existe: true, id: "...", fecha: ".
 
 > Cada matrícula genera automáticamente un registro de auditoría en `log_auditoria` (P6 — Art. 10j).
 
-### 5.4 Matricular manualmente (10 estudiantes)
+### 6.5 Matricular manualmente (10 estudiantes)
 
 1. Sidebar → Matrícula
 2. Seleccionar período `COSTA-2026`
@@ -478,14 +502,16 @@ Muestra el estado de cada sección:
 | 4 | Crear 10 docentes (batch) | 2 min | — |
 | 5 | Asignar docentes a secciones | 10 min | — |
 | 6.1 | Crear 200 estudiantes (batch) | 5 min | — |
-| 6.2 | Registrar 200 consentimientos | 5 min | LOPDP Art. 21, 25 |
-| 6.3 | Matricular 190 (CSV) + 10 (manual) | 5 min | LOPDP Art. 21 (bloqueo) |
+| 6.2 | Activar cuentas (vía email/Mailpit) | 5 min | — |
+| 6.3 | Registrar 200 consentimientos | 5 min | LOPDP Art. 21, 25 |
+| 6.4 | Matricular 190 (CSV) | 3 min | LOPDP Art. 21 (bloqueo) |
+| 6.5 | Matricular 10 (manual) | 2 min | LOPDP Art. 21 (bloqueo) |
 | 7 | Abrir período | 1 min | — |
 | 8 | Operación diaria (4-5 meses) | — | LOEI, ADR-006, ADR-007 |
 | 9 | Privacidad y derechos ARCO | continuo | LOPDP Art. 12-17 |
 | 10 | Cierre de período | 15 min | — |
 
-**Total en SIE:** ~45 minutos de configuración  
+**Total en SIE:** ~50 minutos de configuración  
 **Total del ciclo:** 1 año lectivo completo
 
 ---
