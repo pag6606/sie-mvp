@@ -28,13 +28,27 @@
 
 Estos documentos deben existir **antes** de crear el primer usuario estudiante. Son requisito de la LOPDP.
 
-- [ ] **RAT** (Registro de Actividades del Tratamiento) — documento que lista qué datos personales se recolectan y con qué finalidad
-- [ ] **EIPD** (Evaluación de Impacto en Protección de Datos) — obligatorio por tratar datos de menores de edad (LOPDP Art. 21)
-- [ ] **Consentimiento parental** — formulario firmado por el representante legal de cada uno de los 200 estudiantes. Todos son menores de 15 años
-- [ ] **Política de privacidad** — documento accesible desde la UI para cumplir con LOPDP Art. 12
-- [ ] **Designación de DPD** (Delegado de Protección de Datos) — persona responsable del cumplimiento
+| # | Documento | Estado | Detalle |
+|---|-----------|--------|---------|
+| 1 | **RAT** (Registro de Actividades del Tratamiento) | ✅ Disponible vía API | `GET /api/admin/rat` devuelve JSON estructurado (Art. 10k) |
+| 2 | **EIPD** (Evaluación de Impacto) | ⬜ Pendiente | Obligatorio por tratar datos de NNA (Art. 21). Documento externo |
+| 3 | **Consentimiento parental** | ✅ Registrable en sistema | `POST /api/consentimientos` + V8 migration. 200 formularios firmados |
+| 4 | **Política de privacidad** | ✅ Visible en UI | `/privacidad` accesible desde login y menú de usuario (Art. 12) |
+| 5 | **Designación de DPD** | ⬜ Pendiente | Persona responsable del cumplimiento. Documento externo |
 
 > 📁 **Referencias:** `docs/reference/normativas-aplicables-sie.md` — checklist completo de cumplimiento
+
+### Novedades LOPDP implementadas en SIE
+
+| Feature | Endpoint / UI | Artículo |
+|---------|--------------|----------|
+| Página de privacidad | `GET /privacidad` | Art. 12 |
+| Registro de consentimiento | `POST /api/consentimientos` | Art. 21, 25 |
+| Verificación de consentimiento | `GET /api/consentimientos/{id}` | Art. 21 |
+| Bloqueo matrícula sin consentimiento | `MatriculaService.matricular()` | Art. 21 |
+| Endpoint RAT para DPD | `GET /api/admin/rat` | Art. 10(k) |
+| Integración portal LOPDP | `POST /api/auth/lopdp-token` + botón UI | JWT compartido |
+| Auditoría de matrícula | `log_auditoria` en cada matrícula | Art. 10(j) |
 
 ---
 
@@ -105,8 +119,8 @@ Los códigos siguen el estándar del Ministerio de Educación: `{número}EGB-{pa
 ## Fase 3 — Crear Docentes
 
 **Responsable:** Admin  
-**Duración:** 15 minutos  
-**Ruta:** Sidebar → Usuarios → "+ Nuevo usuario"
+**Duración:** 2 minutos (vía batch)  
+**Ruta:** `POST /api/usuarios/batch/crear`
 
 ### Modelo mixto
 
@@ -117,37 +131,29 @@ Los códigos siguen el estándar del Ministerio de Educación: `{número}EGB-{pa
 
 ### Docentes a crear
 
-#### Titulares de aula (1ro EGB)
-
-| # | Email | Nombre | Rol |
-|---|-------|--------|-----|
-| 1 | `laura.roman@academiapacifico.edu.ec` | Laura Román | DOCENTE |
-| 2 | `marco.tulio@academiapacifico.edu.ec` | Marco Tulio | DOCENTE |
-
-#### Por asignatura (2do a 5to EGB)
-
-| # | Email | Nombre | Asignatura | Rol |
-|---|-------|--------|-----------|-----|
-| 3 | `carmen.salas@academiapacifico.edu.ec` | Carmen Salas | Lengua (2do-3ro) | DOCENTE |
-| 4 | `julio.ponce@academiapacifico.edu.ec` | Julio Ponce | Lengua (4to-5to) | DOCENTE |
-| 5 | `ana.rendon@academiapacifico.edu.ec` | Ana Rendón | Matemáticas (2do-5to) | DOCENTE |
-| 6 | `diego.cuesta@academiapacifico.edu.ec` | Diego Cuesta | Ciencias Naturales (2do-5to) | DOCENTE |
-| 7 | `sofia.lara@academiapacifico.edu.ec` | Sofía Lara | Estudios Sociales (2do-5to) | DOCENTE |
-| 8 | `raul.izquierdo@academiapacifico.edu.ec` | Raúl Izquierdo | Inglés (2do-5to) | DOCENTE |
-| 9 | `katty.navas@academiapacifico.edu.ec` | Katty Navas | Ed. Física (todos) | DOCENTE |
-| 10 | `omar.delgado@academiapacifico.edu.ec` | Omar Delgado | Ed. Cultural y Artística (2do-5to) | DOCENTE |
-
-### Paso a paso (por cada docente)
-
-1. Sidebar → **Usuarios**
-2. Clic en **"+ Nuevo usuario"**
-3. Llenar email, nombre, seleccionar rol `DOCENTE`
-4. Clic en **"Crear usuario"**
-5. El sistema envía email de activación automáticamente (verificar en Mailpit `http://localhost:8025`)
+```bash
+curl -X POST http://localhost:8080/api/usuarios/batch/crear \
+  -H "Content-Type: application/json" \
+  -H "X-Colegio-Id: <colegio-id>" \
+  -d '{
+    "usuarios": [
+      {"email": "laura.roman@academiapacifico.edu.ec", "nombre": "Laura Román", "roles": ["DOCENTE"]},
+      {"email": "marco.tulio@academiapacifico.edu.ec", "nombre": "Marco Tulio", "roles": ["DOCENTE"]},
+      {"email": "carmen.salas@academiapacifico.edu.ec", "nombre": "Carmen Salas", "roles": ["DOCENTE"]},
+      {"email": "julio.ponce@academiapacifico.edu.ec", "nombre": "Julio Ponce", "roles": ["DOCENTE"]},
+      {"email": "ana.rendon@academiapacifico.edu.ec", "nombre": "Ana Rendón", "roles": ["DOCENTE"]},
+      {"email": "diego.cuesta@academiapacifico.edu.ec", "nombre": "Diego Cuesta", "roles": ["DOCENTE"]},
+      {"email": "sofia.lara@academiapacifico.edu.ec", "nombre": "Sofía Lara", "roles": ["DOCENTE"]},
+      {"email": "raul.izquierdo@academiapacifico.edu.ec", "nombre": "Raúl Izquierdo", "roles": ["DOCENTE"]},
+      {"email": "katty.navas@academiapacifico.edu.ec", "nombre": "Katty Navas", "roles": ["DOCENTE"]},
+      {"email": "omar.delgado@academiapacifico.edu.ec", "nombre": "Omar Delgado", "roles": ["DOCENTE"]}
+    ]
+  }'
+```
 
 ### Validación
-- [ ] 10 usuarios aparecen en la tabla de Usuarios con rol DOCENTE
-- [ ] 10 correos de activación visibles en Mailpit
+- [ ] 10 usuarios creados con rol DOCENTE
+- [ ] 10 correos de activación visibles en Mailpit (`http://localhost:8025`)
 
 ---
 
@@ -186,24 +192,13 @@ Los códigos siguen el estándar del Ministerio de Educación: `{número}EGB-{pa
 
 ---
 
-## Fase 5 — Crear Estudiantes
+## Fase 5 — Crear Estudiantes y Matricular
 
 **Responsable:** Admin  
-**Duración:** 30 minutos (creación masiva) + 10 minutos (matrícula)  
-**⚠️ Requisito previo:** Consentimientos parentales firmados (Fase 0)
+**Duración:** 5 min (batch) + 5 min (consentimientos) + 5 min (matrícula)  
+**⚠️ Requisito previo:** Consentimientos parentales firmados
 
-### 5.1 Reglas de generación de usuarios
-
-| Campo | Regla |
-|-------|-------|
-| Email | `est-{001-200}@academiapacifico.edu.ec` |
-| Nombre | `Estudiante {001-200}` |
-| Rol | `ESTUDIANTE` |
-| Contraseña inicial | `Estudiante1!` (todos) |
-
-### 5.2 Crear los 200 usuarios estudiante
-
-Usar el endpoint batch de creación masiva. Enviar un `POST` con los 200 usuarios:
+### 5.1 Crear los 200 usuarios estudiante (batch)
 
 ```bash
 curl -X POST http://localhost:8080/api/usuarios/batch/crear \
@@ -218,7 +213,31 @@ curl -X POST http://localhost:8080/api/usuarios/batch/crear \
   }'
 ```
 
-El endpoint `POST /api/usuarios/batch/crear` acepta una lista de `{email, nombre, roles}` y devuelve los 200 usuarios creados con sus IDs. Cada usuario recibe email de activación automáticamente.
+El endpoint `POST /api/usuarios/batch/crear` acepta una lista de `{email, nombre, roles}` y devuelve los IDs creados. Cada usuario recibe email de activación.
+
+### 5.2 Registrar consentimientos parentales (LOPDP Art. 21, 25)
+
+**NUEVO** — Antes de matricular, cada estudiante necesita consentimiento registrado. Los 200 estudiantes son menores de 15 años.
+
+```bash
+# Registrar consentimiento para cada estudiante
+curl -X POST http://localhost:8080/api/consentimientos \
+  -H "Content-Type: application/json" \
+  -H "X-Colegio-Id: <colegio-id>" \
+  -d '{
+    "estudianteId": "<uuid-del-estudiante>",
+    "representanteEmail": "padre@email.com",
+    "documentoUrl": "/docs/consentimientos/est-001.pdf"
+  }'
+```
+
+> ⚠️ Si intentás matricular sin consentimiento, el sistema bloquea con error:  
+> `"No se puede matricular: el estudiante no tiene consentimiento parental registrado (LOPDP Art. 21)."`
+
+Verificar consentimiento:
+```
+GET /api/consentimientos/{estudianteId} → { existe: true, id: "...", fecha: "..." }
+```
 
 ### 5.3 Matricular vía CSV (190 estudiantes)
 
@@ -229,6 +248,8 @@ El endpoint `POST /api/usuarios/batch/crear` acepta una lista de `{email, nombre
 2. Seleccionar archivo `matricula-190.csv`
 3. Clic en **"Importar CSV"**
 4. Verificar resultados: 190 matriculados, 0 errores
+
+> Cada matrícula genera automáticamente un registro de auditoría en `log_auditoria` (P6 — Art. 10j).
 
 ### 5.4 Matricular manualmente (10 estudiantes)
 
@@ -268,7 +289,7 @@ El endpoint `POST /api/usuarios/batch/crear` acepta una lista de `{email, nombre
 3. Clic en **"Abrir período"**
 
 ### Validación
-- [ ] Redirige al dashboard
+- [ ] Redirige al dashboard con KPI cards actualizados
 - [ ] El período cambia de BORRADOR → ABIERTO
 - [ ] Las secciones pasan a estado ABIERTA
 - [ ] Los docentes ya pueden acceder a sus secciones
@@ -335,7 +356,32 @@ Docente Dashboard → Sección → "Cerrar"
 
 ---
 
-## Fase 8 — Fin de Período (Admin)
+## Fase 8 — Experiencia del Titular de Datos
+
+**NUEVO** — Funcionalidades LOPDP disponibles durante todo el ciclo.
+
+### 8.1 Acceso a Privacidad (todos los roles)
+
+Menú de usuario (sidebar, avatar abajo) → **🛡 Privacidad (LOPDP)**
+
+- Abre el portal LOPDP en pestaña nueva con sesión de 20 minutos
+- El usuario puede ver y gestionar sus consentimientos sin volver a autenticarse
+- Token JWT compartido: `iss=sie`, `aud=lopdp`, expira 20 min
+
+### 8.2 Política de Privacidad (público)
+
+- Visible en el footer del login: "© 2025 SIE · Política de Privacidad"
+- Página completa en `/privacidad` con 8 secciones (responsable, datos, finalidad, base legal, derechos ARCO, conservación, seguridad, contacto DPD)
+
+### 8.3 Panel ARCO (admin)
+
+- `GET /api/consentimientos/{estudianteId}` — verificar si existe consentimiento
+- `POST /api/consentimientos` — registrar nuevo consentimiento
+- `POST /api/consentimientos/{id}/revocar` — revocar consentimiento existente
+
+---
+
+## Fase 9 — Cierre de Período (Admin)
 
 **Responsable:** Admin  
 **Ruta:** Dashboard → "📊 Cierres"
@@ -360,20 +406,40 @@ Muestra el estado de cada sección:
 
 ## Resumen Final
 
-| Fase | Acción | Tiempo estimado |
-|------|--------|-----------------|
-| 0 | Documentos legales (RAT, EIPD, consentimientos) | 2-3 días (fuera del sistema) |
-| 1 | Crear período COSTA-2026 | 2 min |
-| 2 | Crear 10 secciones (paralelos) | 10 min |
-| 3 | Crear 10 docentes | 15 min |
-| 4 | Asignar docentes a secciones | 10 min |
-| 5 | Crear 200 estudiantes + matricular (190 CSV + 10 manual) | 40 min |
-| 6 | Abrir período | 1 min |
-| 7 | Operación diaria (asistencia, esquemas, notas, cierre) | 3-4 meses |
-| 8 | Cierre de período | 15 min |
+| Fase | Acción | Tiempo | Normativa |
+|------|--------|--------|-----------|
+| 0 | Documentos legales + verificar RAT endpoint | 1-2 días | LOPDP Art. 10k, 21 |
+| 1 | Crear período COSTA-2026 | 2 min | LOEI Art. 42-43 |
+| 2 | Crear 10 secciones (paralelos) | 10 min | — |
+| 3 | Crear 10 docentes (batch) | 2 min | — |
+| 4 | Asignar docentes a secciones | 10 min | — |
+| 5.1 | Crear 200 estudiantes (batch) | 5 min | — |
+| 5.2 | Registrar 200 consentimientos | 5 min | LOPDP Art. 21, 25 |
+| 5.3 | Matricular 190 (CSV) + 10 (manual) | 5 min | LOPDP Art. 21 (bloqueo) |
+| 6 | Abrir período | 1 min | — |
+| 7 | Operación diaria (4-5 meses) | — | LOEI, ADR-006, ADR-007 |
+| 8 | Privacidad y derechos ARCO | continuo | LOPDP Art. 12-17 |
+| 9 | Cierre de período | 15 min | — |
 
-**Total en SIE:** ~1.5 horas de configuración inicial  
+**Total en SIE:** ~40 minutos de configuración (vs 1.5h antes del batch endpoint)  
 **Total del ciclo:** 1 año lectivo completo
+
+---
+
+## Nuevos Endpoints SIE (resumen)
+
+| Endpoint | Método | Propósito |
+|----------|--------|-----------|
+| `/api/usuarios/batch/crear` | POST | Creación masiva de usuarios |
+| `/api/usuarios/batch/desactivar` | POST | Desactivación masiva |
+| `/api/usuarios/batch` | DELETE | Eliminación masiva |
+| `/api/consentimientos` | POST | Registrar consentimiento parental |
+| `/api/consentimientos/{id}` | GET | Verificar consentimiento |
+| `/api/consentimientos/{id}/revocar` | POST | Revocar consentimiento |
+| `/api/auth/lopdp-token` | POST | Token JWT para portal LOPDP |
+| `/api/admin/rat` | GET | Registro de Actividades del Tratamiento |
+| `/api/dashboard/admin` | GET | KPIs agregados cross-context |
+| `/api/notificaciones/stream` | GET | SSE notificaciones en tiempo real |
 
 ---
 
@@ -387,26 +453,4 @@ Muestra el estado de cada sección:
 | `docs/manuales/manual-administrativo.md` | Manual de usuario administrador |
 | `docs/manuales/manual-docente.md` | Manual de usuario docente |
 | `docs/manuales/manual-estudiante.md` | Manual de usuario estudiante |
-
----
-
-## Anexo: Integración LOPDP
-
-El sistema SIE incluye integración con el portal LOPDP-EC mediante JWT compartido.
-
-### Endpoint SIE
-```
-POST /api/auth/lopdp-token
-Authorization: Bearer <token-sie>
-→ { token: "<jwt-lopdp>", expiresIn: "1200" }
-```
-
-Token JWT con claims: `iss=sie`, `aud=lopdp`, `usuarioId`, `nombre`, `colegioId`, `roles`, expiración 20 minutos.
-
-### Acceso desde la UI
-Menú de usuario (sidebar) → **🛡 Privacidad (LOPDP)** → abre portal LOPDP en pestaña nueva con el token.
-
-### Configuración
-- `app.jwt.lopdp-expiration-ms=1200000` (20 min)
-- `app.jwt.secret` debe coincidir entre SIE y LOPDP
-- URL del portal LOPDP hardcodeada (`http://localhost:3000`) — cambiar en producción
+| `_bmad-output/architecture.md` | ADRs técnicos (ADR-001 a ADR-011) |
