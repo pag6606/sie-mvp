@@ -21,8 +21,8 @@ public class Consentimiento extends BaseEntity {
     @Column(name = "estudiante_id", nullable = false)
     private UUID estudianteId;
 
-    @Column(name = "representante_email")
-    private String representanteEmail;
+    @Column(name = "representante_email", nullable = false)
+    private String representanteEmail = "";
 
     @Column(nullable = false, length = 50)
     private String tipo = "PARENTAL";

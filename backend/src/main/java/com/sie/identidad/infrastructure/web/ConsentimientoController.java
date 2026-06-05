@@ -21,9 +21,19 @@ public class ConsentimientoController {
     public ResponseEntity<Map<String, String>> registrar(
             @RequestAttribute("colegioId") UUID colegioId,
             @RequestBody Map<String, String> body) {
-        UUID estudianteId = UUID.fromString(body.get("estudianteId"));
-        if (consentimientoRepository.existsByEstudianteIdAndAceptadoTrue(estudianteId)) {
-            return ResponseEntity.ok(Map.of("mensaje", "El consentimiento ya existe"));
+        UUID estudianteId;
+        try {
+            estudianteId = UUID.fromString(body.get("estudianteId"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "estudianteId inválido — debe ser un UUID válido"));
+        }
+
+        var existente = consentimientoRepository.findByEstudianteIdAndAceptadoTrue(estudianteId);
+        if (existente.isPresent()) {
+            return ResponseEntity.ok(Map.of(
+                    "mensaje", "El consentimiento ya existe",
+                    "id", existente.get().getId().toString()));
         }
 
         Consentimiento c = new Consentimiento();
@@ -31,7 +41,7 @@ public class ConsentimientoController {
         c.setRepresentanteEmail(body.getOrDefault("representanteEmail", ""));
         c.setDocumentoUrl(body.getOrDefault("documentoUrl", ""));
         c.setColegioId(colegioId);
-        consentimientoRepository.save(c);
+        c = consentimientoRepository.save(c);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("mensaje", "Consentimiento registrado", "id", c.getId().toString()));

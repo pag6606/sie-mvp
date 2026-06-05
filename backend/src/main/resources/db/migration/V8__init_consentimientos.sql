@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS consentimientos (
     id UUID PRIMARY KEY,
     estudiante_id UUID NOT NULL,
-    representante_email VARCHAR(255),
+    representante_email VARCHAR(255) NOT NULL,
     tipo VARCHAR(50) NOT NULL DEFAULT 'PARENTAL',
     documento_url VARCHAR(500),
     aceptado BOOLEAN NOT NULL DEFAULT TRUE,
