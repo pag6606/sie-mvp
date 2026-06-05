@@ -60,6 +60,8 @@ public class UsuarioService {
         usuarioRepository.save(savedUsuario);
 
         String activationToken = UUID.randomUUID().toString();
+        savedUsuario.setActivationToken(activationToken);
+        usuarioRepository.save(savedUsuario);
         emailService.sendActivationEmail(savedUsuario.getEmail(), savedUsuario.getNombre(), activationToken);
 
         return toResponse(savedUsuario);
@@ -111,6 +113,16 @@ public class UsuarioService {
             usuario.softDelete();
             usuarioRepository.save(usuario);
         }
+    }
+
+    @Transactional
+    public void activarCuenta(String token, String nuevaPassword) {
+        Usuario usuario = usuarioRepository.findByActivationToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Token de activación inválido o ya utilizado"));
+        usuario.setHashPassword(passwordEncoder.encode(nuevaPassword));
+        usuario.setActivationToken(null);
+        usuario.setPrimerLogin(false);
+        usuarioRepository.save(usuario);
     }
 
     @Transactional

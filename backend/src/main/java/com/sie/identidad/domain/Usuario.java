@@ -31,6 +31,9 @@ public class Usuario extends BaseEntity {
     @Column(name = "primer_login", nullable = false)
     private boolean primerLogin = true;
 
+    @Column(name = "activation_token")
+    private String activationToken;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UsuarioRol> usuarioRoles = new HashSet<>();
 }

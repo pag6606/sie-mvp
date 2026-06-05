@@ -1,0 +1,1 @@
+ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS activation_token VARCHAR(255);
