@@ -7,6 +7,7 @@ import { useUsuariosPaginados } from '@/hooks/useUsuarios'
 import Pagination from '@/components/Pagination'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
 import { ApiError } from '@/types/api'
+import { capitalizeWords } from '@/utils/text'
 
 
 export default function UsuariosPage() {
@@ -31,7 +32,7 @@ export default function UsuariosPage() {
     setFormError('')
     setFormSaving(true)
     try {
-      await api.post('/usuarios', { email: formEmail, nombre: formNombre, roles: formRoles })
+      await api.post('/usuarios', { email: formEmail, nombre: capitalizeWords(formNombre), roles: formRoles })
       setShowForm(false)
       setFormEmail(''); setFormNombre(''); setFormRoles([])
       queryClient.invalidateQueries({ queryKey: ['usuarios'] })

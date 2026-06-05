@@ -6,6 +6,7 @@ import api from '@/services/api'
 import ProgressBar from '@/components/ProgressBar'
 import AppLayout from '@/components/AppLayout'
 import { useSecciones } from '@/hooks/useSecciones'
+import { capitalizeWords } from '@/utils/text'
 import { useCursos } from '@/hooks/useCursos'
 
 const STEPS = [
@@ -131,7 +132,7 @@ export default function RevisarSecciones() {
     setNuevoCursoError('')
     setNuevoCursoSaving(true)
     try {
-      await api.post('/cursos', { codigo: nuevoCursoCodigo, nombre: nuevoCursoNombre, creditos: nuevoCursoCreditos })
+      await api.post('/cursos', { codigo: nuevoCursoCodigo, nombre: capitalizeWords(nuevoCursoNombre), creditos: nuevoCursoCreditos })
       queryClient.invalidateQueries({ queryKey: ['cursos'] })
       setShowNuevoCurso(false)
       setNuevoCursoCodigo('')

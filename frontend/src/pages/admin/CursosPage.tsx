@@ -6,6 +6,7 @@ import type { ApiError } from '@/types/api'
 import AppLayout from '@/components/AppLayout'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
 import Pagination from '@/components/Pagination'
+import { capitalizeWords } from '@/utils/text'
 
 interface Curso {
   id: string
@@ -81,7 +82,7 @@ export default function CursosPage() {
   const handleCrear = (e: React.FormEvent) => {
     e.preventDefault()
     setFormError('')
-    createMutation.mutate({ codigo: formCodigo, nombre: formNombre, creditos: formCreditos })
+    createMutation.mutate({ codigo: formCodigo, nombre: capitalizeWords(formNombre), creditos: formCreditos })
   }
 
   const handleDesactivar = (curso: Curso) => {
@@ -163,7 +164,7 @@ export default function CursosPage() {
                     <td className="px-4 py-3 text-sm font-medium text-foreground">{c.codigo}</td>
                     <td className="px-4 py-3 text-sm text-muted-foreground">
                       {editingId === c.id ? (
-                        <form onSubmit={e => { e.preventDefault(); updateMutation.mutate({ id: c.id, nombre: editNombre }) }}
+                        <form onSubmit={e => { e.preventDefault(); updateMutation.mutate({ id: c.id, nombre: capitalizeWords(editNombre) }) }}
                           className="flex gap-2">
                           <input value={editNombre} onChange={e => setEditNombre(e.target.value)} autoFocus
                             className="w-full rounded border border-input px-2 py-1 text-sm" />
