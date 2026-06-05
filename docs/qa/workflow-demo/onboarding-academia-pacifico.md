@@ -24,6 +24,38 @@
 
 ---
 
+## Configuración de Entorno
+
+### Backend (Spring Boot)
+
+Copiar y editar el archivo de variables de entorno:
+
+```bash
+cp backend/.env.example backend/.env
+# Editar backend/.env con el valor real de JWT_SECRET
+# Este valor debe ser IDÉNTICO al usado por el sistema LOPDP-EC
+```
+
+El `application-dev.properties` ya referencia `${JWT_SECRET}` con fallback al valor de desarrollo.
+
+### Frontend (Vite)
+
+```bash
+cp frontend/.env.example frontend/.env
+# Editar frontend/.env con la URL real del portal LOPDP
+```
+
+Variable `VITE_LOPDP_URL` — usada por el botón 🛡 Privacidad (LOPDP) en el menú de usuario.
+
+### Coordinación con LOPDP-EC
+
+```
+JWT_SECRET:   <mismo valor en ambos sistemas>
+LOPDP URL:    http://localhost:3000 (dev) / https://lopdp.dominio.com (prod)
+```
+
+---
+
 ## Antes de Empezar — Checklist Normativo
 
 Estos documentos deben existir **antes** de crear el primer usuario estudiante. Son requisito de la LOPDP.

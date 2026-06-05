@@ -52,7 +52,7 @@ export default function AppLayout({ role, children }: AppLayoutProps) {
   const openLopdpPortal = async () => {
     try {
       const res = await api.post('/auth/lopdp-token')
-      const lopdpUrl = 'http://localhost:3000'
+      const lopdpUrl = import.meta.env.VITE_LOPDP_URL || 'http://localhost:3000'
       window.open(`${lopdpUrl}?token=${encodeURIComponent(res.data.token)}`, '_blank')
     } catch {
       // LOPDP portal not available
