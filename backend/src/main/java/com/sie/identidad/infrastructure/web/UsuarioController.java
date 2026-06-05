@@ -43,7 +43,7 @@ public class UsuarioController {
     @PostMapping
     public ResponseEntity<UsuarioResponse> crearUsuario(
             @Valid @RequestBody CrearUsuarioRequest request,
-            @RequestHeader("X-Colegio-Id") UUID colegioId) {
+            @RequestAttribute("colegioId") UUID colegioId) {
         UsuarioResponse response = usuarioService.crearUsuario(request, colegioId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -78,7 +78,7 @@ public class UsuarioController {
     @PostMapping("/batch/crear")
     public ResponseEntity<List<UsuarioResponse>> crearUsuarios(
             @Valid @RequestBody BatchCrearUsuarioRequest request,
-            @RequestHeader("X-Colegio-Id") UUID colegioId) {
+            @RequestAttribute("colegioId") UUID colegioId) {
         List<UsuarioResponse> responses = usuarioService.crearUsuarios(request.usuarios(), colegioId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
