@@ -5,11 +5,13 @@ import com.sie.academico.domain.Periodo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface PeriodoRepository extends JpaRepository<Periodo, UUID> {
     boolean existsByCodigo(String codigo);
-    Optional<Periodo> findByEstado(EstadoPeriodo estado);
+    List<Periodo> findByEstado(EstadoPeriodo estado);
+    Optional<Periodo> findFirstByEstadoOrderByCreatedAtDesc(EstadoPeriodo estado);
 }

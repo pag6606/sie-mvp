@@ -32,8 +32,8 @@ public class DashboardService {
     private final EntityManager em;
 
     public DashboardAdminResponse adminDashboard(UUID colegioId) {
-        var periodoActivo = periodoRepository.findByEstado(EstadoPeriodo.EN_CURSO)
-                .or(() -> periodoRepository.findByEstado(EstadoPeriodo.ABIERTO))
+        var periodoActivo = periodoRepository.findFirstByEstadoOrderByCreatedAtDesc(EstadoPeriodo.EN_CURSO)
+                .or(() -> periodoRepository.findFirstByEstadoOrderByCreatedAtDesc(EstadoPeriodo.ABIERTO))
                 .orElse(null);
 
         UUID periodoId = periodoActivo != null ? periodoActivo.getId() : null;
