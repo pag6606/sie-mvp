@@ -83,6 +83,11 @@ public class AuthService {
         failedAttempts.remove(email);
     }
 
+    public Map<String, String> generateLopdpSessionToken(UUID usuarioId, String email, String nombre, Set<String> roles, UUID colegioId) {
+        String token = jwtService.generateLopdpSessionToken(usuarioId, email, nombre, roles, colegioId);
+        return Map.of("token", token, "expiresIn", "1200");
+    }
+
     private record FailedAttempt(int count, LocalDateTime lastAttempt) {
         boolean isExpired() {
             return lastAttempt.plusMinutes(10).isBefore(LocalDateTime.now());

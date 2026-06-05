@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ConfirmModal } from '@/components/UIPatterns'
+import api from '@/services/api'
 
 interface NavItem {
   label: string
@@ -46,6 +47,16 @@ export default function AppLayout({ role, children }: AppLayoutProps) {
   const handleLogout = () => {
     localStorage.removeItem('token')
     navigate('/login')
+  }
+
+  const openLopdpPortal = async () => {
+    try {
+      const res = await api.post('/auth/lopdp-token')
+      const lopdpUrl = 'http://localhost:3000'
+      window.open(`${lopdpUrl}?token=${encodeURIComponent(res.data.token)}`, '_blank')
+    } catch {
+      // LOPDP portal not available
+    }
   }
 
   const sidebar = (
@@ -105,6 +116,14 @@ export default function AppLayout({ role, children }: AppLayoutProps) {
                 <p className="text-sm font-semibold text-foreground">{user.name}</p>
                 <p className="text-xs text-muted-foreground">{user.role}</p>
               </div>
+              <button
+                onClick={() => { setUserMenuOpen(false); openLopdpPortal() }}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-foreground transition-colors hover:bg-muted"
+                role="menuitem"
+              >
+                <span aria-hidden="true">🛡</span>
+                Privacidad (LOPDP)
+              </button>
               <button
                 onClick={() => { setUserMenuOpen(false); setLogoutOpen(true) }}
                 className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-destructive transition-colors hover:bg-destructive/10 font-medium"

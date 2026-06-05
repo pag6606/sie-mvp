@@ -15,12 +15,15 @@ public class JwtService {
 
     private final SecretKey key;
     private final long expirationMs;
+    private final long lopdpExpirationMs;
 
     public JwtService(
             @Value("${app.jwt.secret:dev-secret-key-change-in-production-min-256-bits}") String secret,
-            @Value("${app.jwt.expiration-ms:28800000}") long expirationMs) {
+            @Value("${app.jwt.expiration-ms:28800000}") long expirationMs,
+            @Value("${app.jwt.lopdp-expiration-ms:1200000}") long lopdpExpirationMs) {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMs;
+        this.lopdpExpirationMs = lopdpExpirationMs;
     }
 
     public String generateToken(UUID usuarioId, String email, Set<String> roles, UUID colegioId) {
@@ -63,5 +66,23 @@ public class JwtService {
 
     public UUID getColegioId(Claims claims) {
         return UUID.fromString(claims.get("colegioId", String.class));
+    }
+
+    public String generateLopdpSessionToken(UUID usuarioId, String email, String nombre, Set<String> roles, UUID colegioId) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + lopdpExpirationMs);
+
+        return Jwts.builder()
+                .issuer("sie")
+                .audience().add("lopdp").and()
+                .subject(email)
+                .claim("usuarioId", usuarioId.toString())
+                .claim("nombre", nombre)
+                .claim("colegioId", colegioId.toString())
+                .claim("roles", new ArrayList<>(roles))
+                .issuedAt(now)
+                .expiration(expiry)
+                .signWith(key)
+                .compact();
     }
 }

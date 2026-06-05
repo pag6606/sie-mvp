@@ -6,12 +6,17 @@ import com.sie.identidad.application.dto.LoginRequest;
 import com.sie.identidad.application.dto.LoginResponse;
 import com.sie.identidad.application.dto.PasswordResetConfirm;
 import com.sie.identidad.application.dto.PasswordResetRequest;
+import com.sie.identidad.domain.Usuario;
+import com.sie.identidad.infrastructure.UsuarioRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,6 +25,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final PasswordResetService passwordResetService;
+    private final UsuarioRepository usuarioRepository;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
@@ -43,5 +49,21 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> confirmReset(@Valid @RequestBody PasswordResetConfirm request) {
         passwordResetService.confirmReset(request.token(), request.nuevaPassword());
         return ResponseEntity.ok(Map.of("mensaje", "Contraseña actualizada"));
+    }
+
+    @PostMapping("/lopdp-token")
+    public ResponseEntity<Map<String, String>> getLopdpToken(
+            @RequestAttribute("usuarioId") UUID usuarioId,
+            @RequestAttribute("colegioId") UUID colegioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        Set<String> roles = usuario.getUsuarioRoles().stream()
+                .map(ur -> ur.getRol().getCodigo().name())
+                .collect(Collectors.toSet());
+
+        return ResponseEntity.ok(
+                authService.generateLopdpSessionToken(
+                        usuarioId, usuario.getEmail(), usuario.getNombre(), roles, colegioId));
     }
 }

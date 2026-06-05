@@ -387,3 +387,26 @@ Muestra el estado de cada sección:
 | `docs/manuales/manual-administrativo.md` | Manual de usuario administrador |
 | `docs/manuales/manual-docente.md` | Manual de usuario docente |
 | `docs/manuales/manual-estudiante.md` | Manual de usuario estudiante |
+
+---
+
+## Anexo: Integración LOPDP
+
+El sistema SIE incluye integración con el portal LOPDP-EC mediante JWT compartido.
+
+### Endpoint SIE
+```
+POST /api/auth/lopdp-token
+Authorization: Bearer <token-sie>
+→ { token: "<jwt-lopdp>", expiresIn: "1200" }
+```
+
+Token JWT con claims: `iss=sie`, `aud=lopdp`, `usuarioId`, `nombre`, `colegioId`, `roles`, expiración 20 minutos.
+
+### Acceso desde la UI
+Menú de usuario (sidebar) → **🛡 Privacidad (LOPDP)** → abre portal LOPDP en pestaña nueva con el token.
+
+### Configuración
+- `app.jwt.lopdp-expiration-ms=1200000` (20 min)
+- `app.jwt.secret` debe coincidir entre SIE y LOPDP
+- URL del portal LOPDP hardcodeada (`http://localhost:3000`) — cambiar en producción
