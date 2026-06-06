@@ -142,4 +142,27 @@ describe('CsvUploader', () => {
     render(<CsvUploader onArchivoCargado={vi.fn()} nombreArchivoActual="reporte-2026.csv" />)
     expect(screen.getByText(/último archivo: reporte-2026\.csv/i)).toBeInTheDocument()
   })
+
+  it('preserva el rol cuando el email es inválido (regression: edición inline)', async () => {
+    // Bug previo: validarFila seteaba roles: null cuando email era inválido,
+    // así que al arreglar el email se perdía el rol. Ahora el rol se
+    // preserva aunque el email esté roto, para que editar y re-validar
+    // funcione de verdad.
+    const onCargado = vi.fn<(filas: FilaValidada[], nombre: string) => void>()
+    render(<CsvUploader onArchivoCargado={onCargado} nombreArchivoActual="" />)
+    const input = screen.getByTestId('csv-file-input')
+
+    const file = new File(['x'], 'r.csv', { type: 'text/csv' })
+    fireEvent.change(input, { target: { files: [file] } })
+
+    await vi.waitFor(() => expect(onCargado).toHaveBeenCalled())
+    const [filas] = onCargado.mock.calls[0]
+    // Fila 3 (índice 1) en el mock: email '' (vacío) + roles 'ESTUDIANTE'
+    // Fila 4 (índice 2) en el mock: email 'malo' (inválido) + roles 'ESTUDIANTE'
+    // Ambas deben preservar el rol aunque el email esté roto.
+    expect(filas[1].email).toBe('')
+    expect(filas[1].roles).toBe('ESTUDIANTE')
+    expect(filas[2].email).toBe('malo')
+    expect(filas[2].roles).toBe('ESTUDIANTE')
+  })
 })
