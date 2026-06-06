@@ -6,6 +6,8 @@ import {
   UMBRAL_CANCEL_SUGERIDO_SEG,
   extraerMensajeError
 } from '@/hooks/useUsuariosBatchImport'
+import { buildMapaPrimerasApariciones, revalidarFila } from '@/utils/csvValidacion'
+import { capitalizeWords } from '@/utils/text'
 
 interface CsvPreviewTableProps {
   filas: FilaValidada[]
@@ -18,23 +20,7 @@ interface CsvPreviewTableProps {
   nombreArchivo: string
 }
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-function revalidarFila(fila: FilaValidada, emailPrimeraAparicion: number | undefined): FilaValidada {
-  const email = fila.email.trim().toLowerCase()
-  const nombre = fila.nombre.trim()
-  const rol = fila.roles
-
-  if (!email) return { ...fila, estado: 'invalido', motivoError: 'Email vacío' }
-  if (!EMAIL_REGEX.test(email)) return { ...fila, estado: 'invalido', motivoError: 'Formato de email inválido' }
-  if (emailPrimeraAparicion !== undefined && emailPrimeraAparicion !== fila.fila) {
-    return { ...fila, estado: 'invalido', motivoError: `Email duplicado en CSV (primera aparición en fila ${emailPrimeraAparicion})` }
-  }
-  if (!nombre || nombre.length < 2) return { ...fila, estado: 'invalido', motivoError: 'Nombre vacío o muy corto (mín 2 caracteres)' }
-  if (!rol) return { ...fila, estado: 'invalido', motivoError: 'Rol vacío' }
-
-  return { ...fila, estado: 'valido', motivoError: null }
-}
+type Filtro = 'todas' | 'validas' | 'invalidas'
 
 export default function CsvPreviewTable({
   filas,
@@ -43,7 +29,7 @@ export default function CsvPreviewTable({
   onImportar,
   nombreArchivo
 }: CsvPreviewTableProps) {
-  const [mostrarSoloInvalidas, setMostrarSoloInvalidas] = useState(false)
+  const [filtro, setFiltro] = useState<Filtro>('todas')
   const {
     importarAsync,
     isPending,
@@ -56,14 +42,7 @@ export default function CsvPreviewTable({
     reiniciar
   } = useUsuariosBatchImport()
 
-  const emailPrimeraAparicion = useMemo(() => {
-    const map = new Map<string, number>()
-    for (const f of filas) {
-      const key = f.email.trim().toLowerCase()
-      if (key && !map.has(key)) map.set(key, f.fila)
-    }
-    return map
-  }, [filas])
+  const emailPrimeraAparicion = useMemo(() => buildMapaPrimerasApariciones(filas), [filas])
 
   const resumen = useMemo(() => {
     const total = filas.length
@@ -73,15 +52,26 @@ export default function CsvPreviewTable({
     return { total, validas, invalidas, duplicadas }
   }, [filas])
 
-  const filasVisibles = useMemo(
-    () => mostrarSoloInvalidas ? filas.filter(f => f.estado === 'invalido') : filas,
-    [filas, mostrarSoloInvalidas]
-  )
+  const filasVisibles = useMemo(() => {
+    if (filtro === 'validas') return filas.filter(f => f.estado === 'valido')
+    if (filtro === 'invalidas') return filas.filter(f => f.estado === 'invalido')
+    return filas
+  }, [filas, filtro])
+
+  const toggleFiltro = (target: 'validas' | 'invalidas') => {
+    setFiltro(prev => prev === target ? 'todas' : target)
+  }
 
   const actualizarFila = (idxReal: number, cambios: Partial<FilaValidada>) => {
     const nuevasFilas = filas.map((f, i) => {
       if (i !== idxReal) return f
-      const actualizada: FilaValidada = { ...f, ...cambios, editada: true }
+      const nombreCapitalizado = cambios.nombre !== undefined ? capitalizeWords(cambios.nombre) : undefined
+      const actualizada: FilaValidada = {
+        ...f,
+        ...cambios,
+        ...(nombreCapitalizado !== undefined ? { nombre: nombreCapitalizado } : {}),
+        editada: true
+      }
       const emailLower = actualizada.email.trim().toLowerCase()
       const filaAnterior = emailLower ? emailPrimeraAparicion.get(emailLower) : undefined
       return revalidarFila(actualizada, filaAnterior === actualizada.fila ? undefined : filaAnterior)
@@ -132,11 +122,31 @@ export default function CsvPreviewTable({
             <p className="mt-2 text-sm">
               <span className="font-medium text-foreground">{resumen.total}</span> filas
               {' · '}
-              <span className="font-medium text-emerald-600">✓ {resumen.validas} válidas</span>
+              <button
+                type="button"
+                onClick={() => toggleFiltro('validas')}
+                aria-pressed={filtro === 'validas'}
+                className={`font-medium underline-offset-2 hover:underline ${
+                  filtro === 'validas' ? 'underline text-emerald-700' : 'text-emerald-600'
+                }`}
+                data-testid="filtro-validas"
+              >
+                ✓ {resumen.validas} válidas
+              </button>
               {resumen.invalidas > 0 && (
                 <>
                   {' · '}
-                  <span className="font-medium text-red-600">✗ {resumen.invalidas} con errores</span>
+                  <button
+                    type="button"
+                    onClick={() => toggleFiltro('invalidas')}
+                    aria-pressed={filtro === 'invalidas'}
+                    className={`font-medium underline-offset-2 hover:underline ${
+                      filtro === 'invalidas' ? 'underline text-red-700' : 'text-red-600'
+                    }`}
+                    data-testid="filtro-invalidas"
+                  >
+                    ✗ {resumen.invalidas} con errores
+                  </button>
                 </>
               )}
               {resumen.duplicadas > 0 && (
@@ -144,18 +154,18 @@ export default function CsvPreviewTable({
                   ({resumen.duplicadas} duplicadas)
                 </span>
               )}
+              {filtro !== 'todas' && (
+                <button
+                  type="button"
+                  onClick={() => setFiltro('todas')}
+                  className="ml-2 text-xs text-muted-foreground hover:underline"
+                >
+                  Ver todas
+                </button>
+              )}
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={mostrarSoloInvalidas}
-                onChange={e => setMostrarSoloInvalidas(e.target.checked)}
-                className="h-4 w-4 rounded border-input"
-              />
-              Solo inválidas
-            </label>
             {resumen.invalidas > 0 && (
               <button
                 onClick={descargarReporteErrores}

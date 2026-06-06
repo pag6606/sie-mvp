@@ -102,7 +102,7 @@ describe('CsvPreviewTable', () => {
     expect(btn).not.toBeDisabled()
   })
 
-  it('filtro "Solo inválidas" oculta las filas válidas', () => {
+  it('click en "X con errores" filtra a inválidas (toggle)', () => {
     render(
       <CsvPreviewTable
         filas={FILAS_BASE}
@@ -115,9 +115,30 @@ describe('CsvPreviewTable', () => {
     )
 
     expect(screen.getByDisplayValue('a@x.com')).toBeInTheDocument()
-    fireEvent.click(screen.getByLabelText(/solo inválidas/i))
+    fireEvent.click(screen.getByTestId('filtro-invalidas'))
     expect(screen.queryByDisplayValue('a@x.com')).not.toBeInTheDocument()
     expect(screen.getByDisplayValue('Sin Email')).toBeInTheDocument()
+
+    // click otra vez desactiva el filtro
+    fireEvent.click(screen.getByTestId('filtro-invalidas'))
+    expect(screen.getByDisplayValue('a@x.com')).toBeInTheDocument()
+  })
+
+  it('click en "X válidas" filtra a válidas', () => {
+    render(
+      <CsvPreviewTable
+        filas={FILAS_BASE}
+        onFilasChange={vi.fn()}
+        onVolver={vi.fn()}
+        onImportar={vi.fn()}
+        nombreArchivo="r.csv"
+      />,
+      { wrapper }
+    )
+
+    fireEvent.click(screen.getByTestId('filtro-validas'))
+    expect(screen.getByDisplayValue('a@x.com')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('Sin Email')).not.toBeInTheDocument()
   })
 
   it('banner rojo aparece cuando hay inválidas', () => {
