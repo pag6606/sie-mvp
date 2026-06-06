@@ -275,22 +275,48 @@ Cada docente recibe un email con asunto "Activa tu cuenta en SIE". El flujo es:
 **Duración:** 5 min (batch) + 5 min (consentimientos) + 5 min (matrícula)  
 **⚠️ Requisito previo:** Consentimientos parentales firmados
 
-### 5.1 Crear los 200 usuarios estudiante (batch)
+### 6.1 Crear los 200 usuarios estudiante (asistente UI de importación CSV)
 
-```bash
-curl -X POST http://localhost:8080/api/usuarios/batch/crear \
-  -H "Content-Type: application/json" \
-  -H "X-Colegio-Id: <colegio-id>" \
-  -d '{
-    "usuarios": [
-      {"email": "est-001@academiapacifico.edu.ec", "nombre": "Estudiante 001", "roles": ["ESTUDIANTE"]},
-      ...
-      {"email": "est-200@academiapacifico.edu.ec", "nombre": "Estudiante 200", "roles": ["ESTUDIANTE"]}
-    ]
-  }'
-```
+**Ruta:** `/admin/usuarios/importar`  
+**Archivo:** `docs/qa/workflow-demo/estudiantes-200.csv` (header + 200 filas, BOM UTF-8)  
+**Endpoint:** `POST /api/usuarios/batch/importar-csv` (`@Transactional` + `AFTER_COMMIT` para emails)
 
-El endpoint `POST /api/usuarios/batch/crear` acepta una lista de `{email, nombre, roles}` y devuelve los IDs creados. Cada usuario recibe email de activación automáticamente.
+**Paso a paso:**
+
+1. **Sidebar → Usuarios** y clic en **"📥 Importar CSV"** (botón junto a "+ Nuevo usuario")
+2. **Paso 1 — Subir archivo:**
+   - Arrastrar `estudiantes-200.csv` a la zona de drop (o clic → seleccionar)
+   - Verificar contador: "📄 estudiantes-200.csv · 200 filas"
+   - Headers validados: `email, nombre, roles` (case-insensitive)
+   - Clic en **"Siguiente →"**
+3. **Paso 2 — Revisar y editar:**
+   - Tabla muestra las 200 filas con badge verde ✅ Válida
+   - Verificar footer: **"200 válidas · 0 con error · 0 duplicados"**
+   - Botón primario verde: **"✓ Importar 200 válidas"** (habilitado)
+   - Clic en **"✓ Importar 200 válidas"**
+4. **Paso 3 — Procesar y resultados:**
+   - Spinner con elapsed: `"Procesando 200 usuarios... 3s"`
+   - Al recibir 201: pantalla de resultados
+     - Header: **"✅ 200 usuarios creados"**
+     - Subheader: **"📨 200 emails de activación enviados"**
+   - Clic en **"✓ Finalizar"** → cierra wizard, refresca tabla
+   - Toast: **"200 usuarios importados correctamente"**
+
+**Validación:**
+- [ ] 200 usuarios creados con rol ESTUDIANTE visibles en `UsuariosPage`
+- [ ] 200 correos de activación visibles en Mailpit (`http://localhost:8025`)
+- [ ] `GET /api/usuarios?rol=ESTUDIANTE&colegioId=<id>` retorna 200
+- [ ] En caso de error atómico (e.g. email duplicado en CSV), wizard muestra 422 y deja en paso 2 para corregir (no se crea ningún usuario)
+
+**Comparación con versión anterior:**
+
+| Aspecto | Antes (curl `batch/crear`) | Ahora (UI wizard) |
+|---------|---------------------------|-------------------|
+| Tiempo para 200 estudiantes | ~5 min (escribir JSON, ejecutar, debug) | ~2 min (drag&drop + 3 clics) |
+| Detección de errores pre-envío | No — rollback total al primer error | Sí — preview editable muestra 200 vs inválidas |
+| Atomicidad garantizada | Sí | Sí (`@Transactional` + `AFTER_COMMIT`) |
+| Auditoría para el admin | Logs del backend | Reporte descargable en paso 3 |
+| North Star Metric | 5 min | **≤ 2 min** ✅ |
 
 ### 6.2 Activar cuentas de estudiantes
 
@@ -501,7 +527,7 @@ Muestra el estado de cada sección:
 | 3 | Crear 10 secciones (paralelos) | 10 min | — |
 | 4 | Crear 10 docentes (batch) | 2 min | — |
 | 5 | Asignar docentes a secciones | 10 min | — |
-| 6.1 | Crear 200 estudiantes (batch) | 5 min | — |
+| 6.1 | Crear 200 estudiantes (UI wizard CSV) | 2 min | — |
 | 6.2 | Activar cuentas (vía email/Mailpit) | 5 min | — |
 | 6.3 | Registrar 200 consentimientos | 5 min | LOPDP Art. 21, 25 |
 | 6.4 | Matricular 190 (CSV) | 3 min | LOPDP Art. 21 (bloqueo) |
@@ -520,7 +546,8 @@ Muestra el estado de cada sección:
 
 | Endpoint | Método | Propósito |
 |----------|--------|-----------|
-| `/api/usuarios/batch/crear` | POST | Creación masiva de usuarios |
+| `/api/usuarios/batch/crear` | POST | Creación masiva de usuarios (legacy, ≥ 10 elementos) |
+| `/api/usuarios/batch/importar-csv` | POST | Importación masiva desde CSV (UI wizard) |
 | `/api/usuarios/batch/desactivar` | POST | Desactivación masiva |
 | `/api/usuarios/batch` | DELETE | Eliminación masiva |
 | `/api/consentimientos` | POST | Registrar consentimiento parental |
@@ -538,6 +565,7 @@ Muestra el estado de cada sección:
 | Archivo | Descripción |
 |---------|-------------|
 | `docs/qa/workflow-demo/matricula-190.csv` | CSV de matrícula masiva (190 estudiantes) |
+| `docs/qa/workflow-demo/estudiantes-200.csv` | CSV de creación masiva (200 estudiantes) — usado en Fase 6.1 |
 | `docs/qa/manual-test-script.md` | Script de pruebas manuales (62 casos) |
 | `docs/reference/normativas-aplicables-sie.md` | Checklist de cumplimiento normativo |
 | `docs/manuales/manual-administrativo.md` | Manual de usuario administrador |
