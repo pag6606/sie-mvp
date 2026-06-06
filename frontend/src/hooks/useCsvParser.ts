@@ -7,7 +7,6 @@ export function useCsvParser() {
       Papa.parse<Record<string, unknown>>(file, {
         header: true,
         skipEmptyLines: true,
-        transformHeader: (h) => h.toLowerCase().trim(),
         worker: true,
         complete: (results) => {
           if (results.errors.length > 0) {
@@ -17,7 +16,14 @@ export function useCsvParser() {
               return
             }
           }
-          resolve(results.data)
+          const filasNormalizadas = results.data.map((row) => {
+            const normalizado: Record<string, unknown> = {}
+            for (const [key, value] of Object.entries(row)) {
+              normalizado[key.toLowerCase().trim()] = value
+            }
+            return normalizado
+          })
+          resolve(filasNormalizadas)
         },
         error: (err) => {
           reject(new Error(`Error al parsear CSV: ${err.message}`))

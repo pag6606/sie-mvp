@@ -57,7 +57,7 @@ describe('useCsvParser', () => {
     await expect(callParsear(makeFile('a'))).rejects.toThrow(/Unclosed quote/)
   })
 
-  it('pasa worker: true para parseo no bloqueante', async () => {
+  it('pasa worker: true para parseo no bloqueante (sin transformHeader que no es clonable)', async () => {
     const Papa = (await import('papaparse')).default
     const { result } = renderHook(() => useCsvParser())
     void result.current.parsearCsv(makeFile('x'))
@@ -65,5 +65,31 @@ describe('useCsvParser', () => {
       expect.anything(),
       expect.objectContaining({ worker: true, header: true, skipEmptyLines: true })
     )
+    // El bug histórico era: transformHeader: (h) => h.toLowerCase() no se
+    // puede clonar al Web Worker. Lo normalizamos DESPUÉS del parse en su lugar.
+    const callArgs = vi.mocked(Papa.parse).mock.calls[0]
+    const config = callArgs[1] as Record<string, unknown>
+    expect(config.transformHeader).toBeUndefined()
+  })
+
+  it('normaliza headers a lowercase+trim después del parse', async () => {
+    const Papa = (await import('papaparse')).default
+    vi.mocked(Papa.parse).mockImplementation(((_file, _config) => {
+      const cfg = _config as { complete?: (r: unknown) => void }
+      setTimeout(() => cfg.complete?.({
+        data: [
+          { Email: 'a@x.com', Nombre: 'Ana', ROLES: 'DOCENTE' },
+          { Email: 'b@x.com', Nombre: 'Beto', ROLES: 'ESTUDIANTE' }
+        ],
+        errors: [],
+        meta: {}
+      }), 0)
+      return {} as never
+    }) as never)
+
+    const { result } = renderHook(() => useCsvParser())
+    const promise = result.current.parsearCsv(makeFile('x'))
+    const filas = await promise
+    expect(filas[0]).toEqual({ email: 'a@x.com', nombre: 'Ana', roles: 'DOCENTE' })
   })
 })
