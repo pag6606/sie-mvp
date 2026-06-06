@@ -3,6 +3,7 @@ import { useCsvParser } from '@/hooks/useCsvParser'
 import { InlineError } from '@/components/UIPatterns'
 import type { CsvRowRaw, FilaValidada, RolUsuario } from '@/types/csvImport'
 import { ROLES_VALIDOS } from '@/types/csvImport'
+import { descargarPlantillaCsv } from '@/utils/plantillaCsv'
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
 const MAX_ROWS = 1000
@@ -153,14 +154,7 @@ export default function CsvUploader({ onArchivoCargado, nombreArchivoActual }: C
   }
 
   const descargarPlantilla = () => {
-    const csv = 'email,nombre,roles\nlaura.roman@academiapacifico.edu.ec,Laura Román,DOCENTE\nernesto.diaz@academiapacifico.edu.ec,Ernesto Díaz,ESTUDIANTE\n'
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'plantilla-usuarios.csv'
-    a.click()
-    URL.revokeObjectURL(url)
+    void descargarPlantillaCsv()
   }
 
   return (
