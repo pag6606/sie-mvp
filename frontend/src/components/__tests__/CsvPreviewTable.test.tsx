@@ -223,7 +223,8 @@ describe('CsvPreviewTable', () => {
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith(
         '/usuarios/batch/importar-csv',
-        [{ email: 'a@x.com', nombre: 'Ana', roles: ['DOCENTE'] }]
+        [{ email: 'a@x.com', nombre: 'Ana', roles: ['DOCENTE'] }],
+        expect.objectContaining({ signal: expect.anything() })
       )
     })
     await waitFor(() => {

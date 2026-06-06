@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { useQueryClient } from '@tanstack/react-query'
-import api from '@/services/api'
-import { InlineError } from '@/components/UIPatterns'
 import type { FilaValidada, ResultadoImportacion, RolUsuario } from '@/types/csvImport'
 import { ROLES_VALIDOS } from '@/types/csvImport'
-import type { ApiError } from '@/types/api'
+import {
+  useUsuariosBatchImport,
+  UMBRAL_CANCEL_SUGERIDO_SEG,
+  extraerMensajeError
+} from '@/hooks/useUsuariosBatchImport'
 
 interface CsvPreviewTableProps {
   filas: FilaValidada[]
@@ -41,7 +41,17 @@ export default function CsvPreviewTable({
   nombreArchivo
 }: CsvPreviewTableProps) {
   const [mostrarSoloInvalidas, setMostrarSoloInvalidas] = useState(false)
-  const queryClient = useQueryClient()
+  const {
+    importarAsync,
+    isPending,
+    isError,
+    error,
+    elapsedSeg,
+    elapsedExcedeUmbral,
+    fueCancelado,
+    cancelar,
+    reiniciar
+  } = useUsuariosBatchImport()
 
   const emailPrimeraAparicion = useMemo(() => {
     const map = new Map<string, number>()
@@ -76,22 +86,19 @@ export default function CsvPreviewTable({
     onFilasChange(nuevasFilas)
   }
 
-  const importarMutation = useMutation<ResultadoImportacion, ApiError, void>({
-    mutationFn: async () => {
-      const filasValidas = filas.filter(f => f.estado === 'valido')
-      const payload = filasValidas.map(f => ({
-        email: f.email.trim().toLowerCase(),
-        nombre: f.nombre.trim(),
-        roles: [f.roles]
-      }))
-      const { data } = await api.post<ResultadoImportacion>('/usuarios/batch/importar-csv', payload)
-      return data
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['usuarios'] })
+  const handleImportar = async () => {
+    const filasValidas = filas.filter(f => f.estado === 'valido')
+    try {
+      const data = await importarAsync({ filasValidas })
       onImportar(data)
+    } catch {
+      // Error ya está expuesto vía `error` del hook
     }
-  })
+  }
+
+  const handleCancelar = () => {
+    cancelar()
+  }
 
   const descargarReporteErrores = () => {
     const invalidas = filas.filter(f => f.estado === 'invalido')
@@ -109,7 +116,7 @@ export default function CsvPreviewTable({
     URL.revokeObjectURL(url)
   }
 
-  const puedeImportar = resumen.invalidas === 0 && resumen.validas > 0 && !importarMutation.isPending
+  const puedeImportar = resumen.invalidas === 0 && resumen.validas > 0 && !isPending
 
   return (
     <div className="space-y-4">
@@ -163,10 +170,25 @@ export default function CsvPreviewTable({
         </div>
       )}
 
-      {importarMutation.isError && (
-        <InlineError
-          message={importarMutation.error?.response?.data?.mensaje ?? 'Error al importar. Intenta de nuevo.'}
-        />
+      {isError && error && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-md border border-destructive bg-destructive/10 p-4 text-sm text-destructive"
+        >
+          <span>{fueCancelado ? 'Importación cancelada' : extraerMensajeError(error)}</span>
+          <button
+            onClick={reiniciar}
+            className="text-xs font-medium hover:underline"
+          >
+            Reintentar
+          </button>
+        </div>
+      )}
+
+      {fueCancelado && !isError && (
+        <div role="status" className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          Importación cancelada. No se creó ningún usuario.
+        </div>
       )}
 
       <div className="overflow-x-auto rounded-lg border bg-card">
@@ -250,7 +272,7 @@ export default function CsvPreviewTable({
       <div className="flex items-center justify-between">
         <button
           onClick={onVolver}
-          disabled={importarMutation.isPending}
+          disabled={isPending}
           className="text-sm text-muted-foreground hover:underline disabled:opacity-50"
         >
           ← Volver a subir otro archivo
@@ -261,18 +283,47 @@ export default function CsvPreviewTable({
               Corrige las {resumen.invalidas} fila{resumen.invalidas > 1 ? 's' : ''} con error para importar
             </span>
           )}
+          {isPending && (
+            <span
+              className="text-xs text-muted-foreground tabular-nums"
+              role="status"
+              aria-live="polite"
+            >
+              ⏱ {elapsedSeg}s
+            </span>
+          )}
+          {isPending && elapsedExcedeUmbral && (
+            <button
+              onClick={handleCancelar}
+              className="rounded border border-red-300 px-3 py-1 text-xs text-red-700 hover:bg-red-50"
+              aria-label="Cancelar importación (lleva más de 15 segundos)"
+            >
+              Cancelar
+            </button>
+          )}
           <button
-            onClick={() => importarMutation.mutate()}
+            onClick={handleImportar}
             disabled={!puedeImportar}
             aria-describedby={resumen.invalidas > 0 ? 'import-help' : undefined}
+            data-testid="importar-button"
             className="rounded-md bg-primary px-6 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {importarMutation.isPending
+            {isPending
               ? 'Importando...'
               : `Importar ${resumen.validas} usuario${resumen.validas > 1 ? 's' : ''}`}
           </button>
         </div>
       </div>
+
+      {isPending && (
+        <p
+          className={`text-center text-xs ${elapsedExcedeUmbral ? 'text-amber-600' : 'text-muted-foreground'}`}
+        >
+          {elapsedExcedeUmbral
+            ? `Lleva más de ${UMBRAL_CANCEL_SUGERIDO_SEG}s. ¿Cancelamos?`
+            : 'Importando usuarios, esto puede tardar unos segundos...'}
+        </p>
+      )}
     </div>
   )
 }

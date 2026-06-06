@@ -91,15 +91,21 @@ export function useUsuariosBatchImport() {
   }
 }
 
-export function extraerMensajeError(err: AxiosError<ApiError> | Error | null): string {
+export function extraerMensajeError(err: AxiosError<ApiError> | Error | null | unknown): string {
   if (!err) return ''
-  if (axios.isAxiosError(err)) {
-    return err.response?.data?.mensaje
-      ?? err.message
-      ?? 'Error desconocido al importar'
+  const anyErr = err as {
+    response?: { data?: { mensaje?: string } }
+    name?: string
+    message?: string
   }
-  if ((err as AxiosError).name === 'CanceledError' || err.message.includes('abort')) {
+  const mensajeBackend = anyErr.response?.data?.mensaje
+  if (mensajeBackend) return mensajeBackend
+  if (anyErr.name === 'CanceledError' || anyErr.message?.includes('abort')) {
     return 'Importación cancelada por el usuario'
   }
-  return err.message
+  if (anyErr.message) return anyErr.message
+  if (axios.isAxiosError(err)) {
+    return err.message ?? 'Error desconocido al importar'
+  }
+  return 'Error desconocido al importar'
 }
