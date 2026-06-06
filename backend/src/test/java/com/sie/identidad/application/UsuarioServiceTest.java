@@ -2,6 +2,7 @@ package com.sie.identidad.application;
 
 import com.sie.identidad.application.dto.CrearUsuarioRequest;
 import com.sie.identidad.application.dto.UsuarioResponse;
+import com.sie.identidad.application.event.UsuarioCreadoEvent;
 import com.sie.identidad.domain.*;
 import com.sie.identidad.infrastructure.RolRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
@@ -9,10 +10,13 @@ import com.sie.shared.email.EmailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -31,6 +35,8 @@ class UsuarioServiceTest {
     private RolRepository rolRepository;
     @Mock
     private EmailService emailService;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     private UsuarioService usuarioService;
     private UUID colegioId;
@@ -41,7 +47,8 @@ class UsuarioServiceTest {
         usuarioService = new UsuarioService(
                 usuarioRepository, rolRepository,
                 new BCryptPasswordEncoder(4),
-                emailService);
+                emailService,
+                eventPublisher);
         colegioId = UUID.randomUUID();
         rolDocente = new Rol();
         rolDocente.setId(UUID.randomUUID());
@@ -50,13 +57,12 @@ class UsuarioServiceTest {
     }
 
     @Test
-    void crearUsuario_exitoso() {
+    void crearUsuario_exitoso_publicaEventoNoEmail() {
         var request = new CrearUsuarioRequest("diana@colegio.edu.ec", "Diana Ramírez", Set.of(RolCodigo.DOCENTE));
 
         when(usuarioRepository.existsByEmailAndColegioId(request.email(), colegioId)).thenReturn(false);
         when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
-        doNothing().when(emailService).sendActivationEmail(anyString(), anyString(), anyString());
 
         UsuarioResponse response = usuarioService.crearUsuario(request, colegioId);
 
@@ -65,7 +71,15 @@ class UsuarioServiceTest {
         assertTrue(response.roles().contains(RolCodigo.DOCENTE));
         assertTrue(response.activo());
         assertTrue(response.primerLogin());
-        verify(emailService).sendActivationEmail(eq(request.email()), eq(request.nombre()), anyString());
+
+        ArgumentCaptor<UsuarioCreadoEvent> eventCaptor = ArgumentCaptor.forClass(UsuarioCreadoEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        UsuarioCreadoEvent event = eventCaptor.getValue();
+        assertEquals(request.email(), event.email());
+        assertEquals(request.nombre(), event.nombre());
+        assertNotNull(event.activationToken());
+
+        verify(emailService, never()).sendActivationEmail(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -78,6 +92,7 @@ class UsuarioServiceTest {
                 () -> usuarioService.crearUsuario(request, colegioId));
         assertTrue(ex.getMessage().contains("ya está registrado"));
         verify(usuarioRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test
@@ -90,6 +105,66 @@ class UsuarioServiceTest {
         var ex = assertThrows(IllegalArgumentException.class,
                 () -> usuarioService.crearUsuario(request, colegioId));
         assertTrue(ex.getMessage().contains("Rol no encontrado"));
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    void crearUsuarios_atomico_siUnUsuarioFalla_ningunEventoNiEmail() {
+        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
+        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE));
+        var req3 = new CrearUsuarioRequest("c@colegio.edu.ec", "Carla Mora", Set.of(RolCodigo.DOCENTE));
+
+        when(usuarioRepository.existsByEmailAndColegioId("a@colegio.edu.ec", colegioId)).thenReturn(false);
+        when(usuarioRepository.existsByEmailAndColegioId("b@colegio.edu.ec", colegioId)).thenReturn(false);
+        when(usuarioRepository.existsByEmailAndColegioId("c@colegio.edu.ec", colegioId)).thenReturn(true);
+        when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.crearUsuarios(List.of(req1, req2, req3), colegioId));
+
+        verify(eventPublisher, never()).publishEvent(any());
+        verify(emailService, never()).sendActivationEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void crearUsuarios_atomico_emailServiceNuncaEsLlamado() {
+        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
+
+        when(usuarioRepository.existsByEmailAndColegioId(anyString(), any(UUID.class))).thenReturn(false);
+        when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        usuarioService.crearUsuarios(List.of(req1), colegioId);
+
+        verify(eventPublisher, times(1)).publishEvent(any(UsuarioCreadoEvent.class));
+        verify(emailService, never()).sendActivationEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void crearUsuarios_atomico_siSaveLanzaExcepcion_ningunEvento() {
+        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
+        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE));
+
+        when(usuarioRepository.existsByEmailAndColegioId(anyString(), any(UUID.class))).thenReturn(false);
+        when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
+        when(usuarioRepository.save(any(Usuario.class)))
+                .thenAnswer(inv -> inv.getArgument(0))
+                .thenThrow(new org.springframework.dao.DataIntegrityViolationException("FK violation"));
+
+        assertThrows(org.springframework.dao.DataIntegrityViolationException.class,
+                () -> usuarioService.crearUsuarios(List.of(req1, req2), colegioId));
+
+        verify(eventPublisher, never()).publishEvent(any());
+        verify(emailService, never()).sendActivationEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void crearUsuarios_listaVacia_noHaceNada() {
+        usuarioService.crearUsuarios(List.of(), colegioId);
+
+        verify(usuarioRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test

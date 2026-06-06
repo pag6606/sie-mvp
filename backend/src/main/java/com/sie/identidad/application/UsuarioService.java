@@ -3,11 +3,13 @@ package com.sie.identidad.application;
 import com.sie.identidad.application.dto.CrearUsuarioRequest;
 import com.sie.identidad.application.dto.UpdateProfileRequest;
 import com.sie.identidad.application.dto.UsuarioResponse;
+import com.sie.identidad.application.event.UsuarioCreadoEvent;
 import com.sie.identidad.domain.*;
 import com.sie.identidad.infrastructure.RolRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.shared.email.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +30,7 @@ public class UsuarioService {
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public UsuarioResponse crearUsuario(CrearUsuarioRequest request, UUID colegioId) {
@@ -62,7 +65,13 @@ public class UsuarioService {
         String activationToken = UUID.randomUUID().toString();
         savedUsuario.setActivationToken(activationToken);
         usuarioRepository.save(savedUsuario);
-        emailService.sendActivationEmail(savedUsuario.getEmail(), savedUsuario.getNombre(), activationToken);
+
+        eventPublisher.publishEvent(new UsuarioCreadoEvent(
+                savedUsuario.getId(),
+                savedUsuario.getEmail(),
+                savedUsuario.getNombre(),
+                activationToken
+        ));
 
         return toResponse(savedUsuario);
     }
