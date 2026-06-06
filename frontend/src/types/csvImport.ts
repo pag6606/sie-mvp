@@ -31,3 +31,14 @@ export interface ResultadoImportacion {
   creados: number
   emailsEnviados: number
 }
+
+export interface ReporteImportacion {
+  fecha: string
+  archivo: string
+  totalEnviados: number
+  creados: number
+  emailsEnviados: number
+  duracionSegundos: number
+  estado: 'exitoso' | 'parcial' | 'fallo'
+  mensaje?: string
+}
