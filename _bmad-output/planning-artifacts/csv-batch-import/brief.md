@@ -83,13 +83,37 @@ Tabla con todas las filas, badges de estado por fila:
 
 ### Integración con backend
 
-El endpoint `POST /api/usuarios/batch/crear` **ya existe y funciona** (es el que Alma usa vía curl). El frontend solo necesita:
+El backend se va a **refactorizar** para usar **Spring Batch** (no se reutiliza la implementación actual). Esto es una decisión técnica confirmada por el equipo.
 
-1. **Parsear el CSV en el cliente** (no se sube el archivo al backend — el frontend lee con `Papa.parse` o similar y hace N llamadas con los datos ya validados)
-2. **Llamar al endpoint existente** con la lista de usuarios válidos
-3. **Manejar errores parciales**: si el backend rechaza 3 de 195, el frontend debe mostrar cuáles (hoy el endpoint retorna 201 con todos los creados, o lanza excepción si falla toda la lista)
+**Stack del refactor:**
+- `spring-boot-starter-batch` (nueva dependencia)
+- Un `Job` con un `Step` que procesa los usuarios en chunks
+- `ItemReader` (lee lista validada del request), `ItemProcessor` (aplica normalizaciones + dispara email de activación), `ItemWriter` (persiste con JPA)
+- Tablas de metadatos de Spring Batch (`BATCH_JOB_INSTANCE`, `BATCH_STEP_EXECUTION`, etc.) manejadas automáticamente por Flyway + Spring Batch schema
+- **Atomicidad garantizada**: el Step corre dentro de una transacción. Si CUALQUIER item falla → rollback completo, se devuelve 4xx con detalle del primer error, y NINGÚN usuario queda persistido.
 
-**Decisión técnica a confirmar con dev:** ¿el endpoint `batch/crear` debe aceptar listas parciales (algunas válidas, algunas inválidas) y devolver `201` con `exitosos + fallidos`? Si no, el frontend valida todo antes de enviar.
+**Contrato del nuevo endpoint:**
+
+```http
+POST /api/usuarios/batch/importar-csv
+X-Colegio-Id: <uuid>
+Content-Type: application/json
+
+{
+  "usuarios": [
+    {"email": "laura@academiapacifico.edu.ec", "nombre": "Laura Román", "roles": ["DOCENTE"]},
+    ...hasta 1000 items
+  ]
+}
+```
+
+**Respuestas:**
+- `201 Created` con `{ "creados": 195, "jobId": "abc-123", "emailsEnviados": 195 }` — éxito
+- `422 Unprocessable Entity` con `{ "errores": [{fila, email, motivo}], "jobId": "abc-123" }` — fallo de validación durante el job
+- `400 Bad Request` — request mal formado (lista vacía, >1000, formato inválido)
+- `500 Internal Server Error` — error técnico
+
+**Cambio para el frontend:** en vez de hacer N requests, hace **1 sola request** con la lista ya validada. El frontend ya no necesita manejar errores parciales porque la validación 100% en cliente + atomicidad backend = garantía "todo o nada".
 
 ### Diseño visual (sistema de tokens ya establecidos)
 - Wizard header: progress indicator de 3 pasos (1 activo, 2 pending, 3 pending) — usar el patrón del wizard de `CrearPeriodo`
@@ -117,47 +141,65 @@ El endpoint `POST /api/usuarios/batch/crear` **ya existe y funciona** (es el que
 - [ ] **Idempotencia conceptual:** Si el admin ejecuta el wizard 2 veces con el mismo CSV, los duplicados se detectan en el preview antes de enviar (no en el backend)
 - [ ] **Mobile-friendly:** El botón `📥 Importar CSV` y la página de wizard son usables en tablet (no es prioritario mobile <768px, el admin usa desktop)
 
-## Riesgos y preguntas abiertas
+## Decisiones técnicas confirmadas
 
-| # | Riesgo / Pregunta | Severidad | Mitigación propuesta |
-|---|-------------------|-----------|----------------------|
-| 1 | ¿El endpoint `batch/crear` acepta listas parciales con errores? | Alta | El frontend valida 100% antes de enviar. Si el backend rechaza el batch completo, se reintenta con sublotes. Confirmar con dev. |
-| 2 | ¿200 usuarios × validación frontend en 5MB CSV? Performance del browser | Media | Papa.parse con `worker: true` (procesa en Web Worker, no bloquea UI). Mostrar skeleton durante parseo. |
-| 3 | ¿El admin tiene `X-Colegio-Id` correctamente? | Baja | Ya resuelto: el header viene del `AuthContext` (patrón usado en todo el frontend). |
-| 4 | ¿Caracteres especiales (tildes, eñes) en el CSV? | Baja | Papa.parse maneja UTF-8 por default. Especificar en plantilla que sea UTF-8. |
-| 5 | ¿El admin puede subir un CSV con miles de filas? | Baja | Cap de 1000 filas en v1 (10x lo que necesitamos). Mostrar warning si excede. |
-| 6 | ¿Accesibilidad del drag & drop? | Media | Drag & drop + botón "Seleccionar archivo" como alternativa. ARIA labels en zona de drop. |
+| # | Decisión | Implicación |
+|---|----------|-------------|
+| 1 | **Spring Batch** para el procesamiento backend | Refactor del endpoint actual `batch/crear` → nuevo `batch/importar-csv` con `Job`+`Step`+`ItemReader`+`ItemWriter`. Nueva dependencia `spring-boot-starter-batch`. Schema de metadatos auto-cargado por Spring Batch + Flyway. **Agrega 1.5 días al epic.** |
+| 2 | **Atomicidad** garantizada | Si CUALQUIER usuario falla, rollback completo. Frontend valida 100% → 0% debería llegar al backend con errores. El endpoint devuelve 422 con detalle si pasa. |
+| 3 | **Ruta** `/usuarios/importar` (no modal) | Linkeable, consistente con el patrón de `CrearPeriodo`. Bookmark-friendly. |
+| 4 | **Cap de 1000 filas** en MVP | 10x lo que Academia del Pacífico necesita (200). Suficiente para colegios pequeños-medianos. Mostrar error claro si excede. |
+
+## Riesgos restantes
+
+| # | Riesgo | Severidad | Mitigación |
+|---|--------|-----------|------------|
+| 1 | Spring Batch con 1000 filas en chunk de 50 = 20 chunks transaccionales | Baja | Cada chunk es una transacción atómica. Si uno falla, los anteriores ya commitearon. **Decisión: usar chunk=1000 = 1 sola transacción para garantizar atomicidad total.** |
+| 2 | Tiempo de respuesta del endpoint con 1000 inserts + 1000 emails | Media | Para 1000 usuarios: ~5-10s. Aceptable en una operación batch. Mostrar spinner con mensaje "Procesando 1000 usuarios..." |
+| 3 | Tablas de metadatos de Spring Batch (`BATCH_*`) en cada entorno | Baja | Flyway las crea automáticamente con `spring.batch.jdbc.initialize-schema=always` en dev, `never` en prod. Documentar en ADR. |
+| 4 | Race condition: dos admins importan CSV al mismo tiempo | Baja | `jobId` único + validación de unicidad de email en la tabla `usuarios` (constraint existente) |
+| 5 | 1000 emails simultáneos pueden saturar Mailpit | Baja | Spring Batch con `TaskExecutor` configurable, throttle si es necesario |
 
 ## Estimación preliminar (referencia, no final)
 
-**Componentes nuevos:**
-- `ImportarUsuariosWizard.tsx` (página/modal de 3 pasos) — 3 días
-- `CsvUploader.tsx` (drag & drop con validación de tipo/tamaño) — 1 día
-- `CsvPreviewTable.tsx` (tabla con badges de validación por fila) — 1.5 días
-- `useCsvParser.ts` (hook con Papa.parse + Web Worker) — 1 día
-- `useUsuariosBatchImport.ts` (mutación con manejo de errores parciales) — 0.5 día
-- `plantilla-usuarios.csv` (asset estático) — 0.25 día
-- Tests unitarios + e2e — 1.5 día
+**Backend (nuevo — refactor a Spring Batch):**
+- Agregar dependencia `spring-boot-starter-batch` — 0.1 día
+- Configurar `JobLauncher` + datasource para metadatos — 0.25 día
+- Crear `ImportarUsuariosJob`, `ImportarUsuariosStep`, `UsuarioItemReader`, `UsuarioItemProcessor`, `UsuarioItemWriter` — 1 día
+- Nuevo endpoint `POST /api/usuarios/batch/importar-csv` — 0.25 día
+- Tests de integración con TestContainers — 0.5 día
+- **Subtotal backend: 2.1 días**
 
-**Total estimado:** ~8.75 días de dev (1 sprint de 2 semanas con holgura)
+**Frontend:**
+- `ImportarUsuariosWizard.tsx` (página de 3 pasos en `/usuarios/importar`) — 1.5 días
+- `CsvUploader.tsx` (drag & drop con validación) — 0.75 día
+- `CsvPreviewTable.tsx` (tabla con badges) — 1 día
+- `useCsvParser.ts` (hook con Papa.parse + Web Worker) — 0.5 día
+- `useUsuariosBatchImport.ts` (mutación) — 0.25 día
+- `plantilla-usuarios.csv` (asset estático) — 0.25 día
+- Tests e2e + manuales — 1 día
+- **Subtotal frontend: 5.25 días**
+
+**Total estimado:** ~7.35 días de dev (1 sprint de 1.5 semanas con holgura)
 
 **Dependencias externas:**
-- Ninguna de backend (endpoint ya existe)
-- Librería: `papaparse` (50KB gzipped, MIT, ampliamente usada)
+- **Backend:** `spring-boot-starter-batch` (nueva, ~50KB)
+- **Frontend:** `papaparse` (50KB gzipped, MIT, estándar de facto)
 - Sin cambios en el sistema de diseño
 
 ## Vínculos con el proyecto
 
-- **Endpoint backend:** `POST /api/usuarios/batch/crear` (existente, validado en demo)
+- **Endpoint backend:** `POST /api/usuarios/batch/importar-csv` (nuevo, refactor con Spring Batch)
+- **Endpoint legacy:** `POST /api/usuarios/batch/crear` (existente, se mantiene para operaciones puntuales con listas pequeñas)
 - **Workflow demo afectado:** `docs/qa/workflow-demo/onboarding-academia-pacifico.md` Fase 6.1 — el admin podrá usar la UI en vez de `curl`
 - **Sistema de diseño:** Tokens Indigo+Inter, `DataTable`, `ToastProvider`, `useToast` (todos existentes)
 - **Patrón de wizard:** Reutilizar el progress bar de `CrearPeriodo` (4 pasos → adaptar a 3)
 - **Patrón de validación:** `capitalizeWords` ya implementado en `utils/text.ts`
-- **Auditoría LOPDP:** Cada usuario creado genera entrada en `AuditLog` vía el `UsuarioService.crearUsuarios` (no requiere cambios)
+- **Auditoría LOPDP:** Cada usuario creado genera entrada en `AuditLog` (no requiere cambios)
 
 ## Próximos pasos
 
 1. **PM (John):** Estimar trabajo y crear épica + historias técnicas
 2. **UX (Sally):** Wireframe de los 3 pasos del wizard y del estado vacío de la tabla de preview
-3. **Dev (Amelia):** Confirmar con backend el comportamiento del endpoint con errores parciales (Riesgo #1)
+3. **Dev (Amelia):** Empezar por Story 0 (Spring Batch refactor) en backend, en paralelo con Story 1 del frontend
 4. **Party mode:** Revisar este brief + estimación del PM + wireframe de UX antes de implementar

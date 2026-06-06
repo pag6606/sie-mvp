@@ -8,44 +8,103 @@ input_documents:
   - _bmad-output/planning-artifacts/csv-batch-import/brief.md
   - _bmad-output/A-Product-Brief/project-brief.md
   - _bmad-output/architecture.md
+decisions:
+  - 2026-06-06: Spring Batch para procesamiento backend (decisión del equipo)
+  - 2026-06-06: Atomicidad total (todo o nada)
+  - 2026-06-06: Ruta /usuarios/importar (no modal)
+  - 2026-06-06: Cap de 1000 filas en MVP
 ---
 
 # Epic & Stories: Importar Usuarios desde CSV
 
-> **TL;DR para developers:** Un epic con 5 stories. **MVD = Stories 1+2+5 (3 días)** — lo demás es pulido. El endpoint backend ya existe. Librería nueva: `papaparse`.
+> **TL;DR para developers:** Un epic con 6 stories. **MVD = Stories 0+1+2+5 (5 días)** — incluye refactor a Spring Batch. Lo demás es pulido. **Librería nueva backend:** `spring-boot-starter-batch`. **Librería nueva frontend:** `papaparse`.
 
 ---
 
 ## Epic: Importar Usuarios desde CSV (CSV-BI)
 
 **Owner:** Amelia (Dev)  
-**Stack:** React + TypeScript + Vite (frontend)  
-**Dependencias:** `POST /api/usuarios/batch/crear` (ya existe y funciona)  
-**Librería nueva:** `papaparse` (50KB gz, MIT, estándar de facto para CSV en JS)  
+**Stack:** Spring Boot 3 + JPA (backend) | React + TypeScript + Vite (frontend)  
+**Dependencias:** Ninguna externa (endpoint actual `batch/crear` se mantiene; agregamos `batch/importar-csv`)  
+**Librerías nuevas:** 
+- Backend: `spring-boot-starter-batch` (~50KB)
+- Frontend: `papaparse` (50KB gz, MIT, estándar de facto para CSV en JS)  
 **Out of scope (recordatorio):** importación de cursos/secciones, multi-rol por usuario, mapeo flexible de headers
 
 ### North Star Metric
 **Tiempo de creación de 200 usuarios:** de 25 min (manual 1×1) → **≤ 2 min** (drag&drop + click).
 
 ### Hipótesis a validar
-1. El admin prefiere **ver el preview** antes de enviar (reduce ansiedad) — ver Riesgo #1 del brief
+1. El admin prefiere **ver el preview** antes de enviar (reduce ansiedad)
 2. **Un rol por fila** en CSV es suficiente para el 95% de los casos reales (docentes O estudiantes, no ambos)
 3. La **validación 100% en frontend** con `papaparse` es más rápida y transparente que round-trips al backend
+4. **Spring Batch** es la herramienta correcta para 1000 usuarios MVP (vs. un loop simple con @Transactional) — valor: monitoring, restart capability, future scale
 
 ---
 
 ## Story Map
 
 ```
-CSV-BI-1: Uploader CSV          [MVD]   ─┐
-CSV-BI-2: Validación + Preview  [MVD]   ─┤  ← Lo mínimo publicable
-CSV-BI-5: Ejecutar importación  [MVD]   ─┘
-                                          
-CSV-BI-3: Descargar plantilla   [+1d]   ─┐ Pulido
-CSV-BI-4: Reporte de errores    [+0.5d] ─┘
+CSV-BI-0: Spring Batch refactor     [MVD]   ─┐
+CSV-BI-1: Uploader CSV              [MVD]   ─┤  ← Lo mínimo publicable
+CSV-BI-2: Validación + Preview      [MVD]   ─┤
+CSV-BI-5: Ejecutar importación      [MVD]   ─┘
+                                              
+CSV-BI-3: Descargar plantilla       [+0.25d] ─┐ Pulido
+CSV-BI-4: Reporte de errores        [+0.5d]  ─┘
 ```
 
-**MVD = CSV-BI-1 + CSV-BI-2 + CSV-BI-5** = 3 días de dev. **Lo demás se puede shippear después sin bloquear demo.**
+**MVD = CSV-BI-0 + CSV-BI-1 + CSV-BI-2 + CSV-BI-5** = 5 días de dev (incluye refactor backend). **Lo demás se puede shippear después sin bloquear demo.**
+
+---
+
+## Story 0: Refactor backend a Spring Batch (CSV-BI-0)
+
+**Estimación:** 2 días (M = Medium)  
+**Tipo:** Backend refactor  
+**Layer:** Backend (Spring Boot 3 + JPA)  
+**Bloqueante para:** CSV-BI-5 (frontend necesita el nuevo endpoint)
+
+### Acceptance Criteria
+- [ ] Agregada dependencia `spring-boot-starter-batch` en `backend/pom.xml`
+- [ ] Configuración en `application.properties`:
+  - `spring.batch.jdbc.initialize-schema=always` (en dev)
+  - `spring.batch.jdbc.initialize-schema=never` (en prod)
+  - `spring.batch.job.enabled=false` (no auto-ejecutar Jobs al startup)
+- [ ] Creada estructura en `backend/src/main/java/com/sie/identidad/infrastructure/batch/`:
+  - `ImportarUsuariosJobConfig.java` (define el Job, Step, ItemReader, ItemProcessor, ItemWriter)
+  - `ImportarUsuariosJobRequest.java` (DTO con lista de usuarios)
+  - `ImportarUsuariosJobResponse.java` (DTO de respuesta)
+  - `ImportarUsuariosListener.java` (logs + métricas)
+- [ ] El Job tiene UN Step con chunk size = `usuarios.size()` (garantiza atomicidad total)
+- [ ] `ItemReader` lee de la lista del request
+- [ ] `ItemProcessor` aplica normalizaciones (lowercase email, `capitalizeWords()`) y dispara email de activación
+- [ ] `ItemWriter` persiste con JPA en batch (no `save()` uno a uno)
+- [ ] Nuevo endpoint `POST /api/usuarios/batch/importar-csv` en `UsuarioController`:
+  - Acepta `{usuarios: List<{email, nombre, roles}>}` (máx 1000)
+  - Header `X-Colegio-Id` requerido
+  - Retorna 201 con `{creados, jobId, emailsEnviados}` en éxito
+  - Retorna 422 con `{errores: [{fila, email, motivo}], jobId}` si falla
+  - Retorna 400 si la lista está vacía o excede 1000
+- [ ] El endpoint **no** se llama desde ningún otro lugar todavía (sólo el nuevo wizard del frontend)
+- [ ] Endpoint legacy `POST /api/usuarios/batch/crear` **se mantiene** intacto (no breaking change)
+
+### Tests requeridos
+- [ ] Test integración: importar 5 usuarios válidos → 201 con `creados: 5`
+- [ ] Test integración: 1 usuario con email duplicado → 422, NINGÚN usuario persistido
+- [ ] Test integración: 1001 usuarios → 400
+- [ ] Test integración: lista vacía → 400
+- [ ] Test de atomicidad: importar 5 usuarios con el 3ro inválido → 0 usuarios en la BD
+
+### Definition of Done
+- [ ] Las 6 tablas de metadatos de Spring Batch (`BATCH_JOB_INSTANCE`, `BATCH_JOB_EXECUTION`, `BATCH_STEP_EXECUTION`, `BATCH_JOB_EXECUTION_CONTEXT`, `BATCH_STEP_EXECUTION_CONTEXT`, `BATCH_JOB_SEQ`, etc.) se crean automáticamente al startup
+- [ ] Verificación manual: 200 usuarios importados en ≤ 10s, emails visibles en Mailpit
+- [ ] ADR-012 (o siguiente número) creado: "Spring Batch para importación masiva de usuarios"
+
+### Decisiones técnicas
+- **Chunk size = total items**: garantiza atomicidad (1 sola transacción). Trade-off: si falla, se pierde todo el progreso. Para MVP con 1000 items máx es aceptable.
+- **¿Async o sync?**: Sync (bloquea hasta terminar). Justificación: UX del wizard muestra spinner y el admin espera. Async agregaría polling complexity sin beneficio.
+- **Reuso de `UsuarioService.crearUsuario`**: el `ItemWriter` lo invoca. Email de activación se dispara en el `ItemProcessor` (antes del commit).
 
 ---
 
@@ -180,42 +239,34 @@ CSV-BI-4: Reporte de errores    [+0.5d] ─┘
 
 | Story | Título | Tamaño | Días dev | MVD |
 |-------|--------|--------|----------|-----|
+| **CSV-BI-0** | **Spring Batch refactor (backend)** | **M** | **2** | **✅** |
 | CSV-BI-1 | Cargar y parsear CSV | S | 1 | ✅ |
 | CSV-BI-2 | Preview con validación | M | 1.5 | ✅ |
 | CSV-BI-3 | Plantilla descargable | XS | 0.25 | — |
 | CSV-BI-4 | Reporte de errores | S | 0.5 | — |
 | CSV-BI-5 | Ejecutar y resultados | S | 0.5 | ✅ |
-| **Total MVD** | | | **3 días** | |
-| **Total completo** | | | **3.75 días** | |
+| **Total MVD** | | | **5 días** | |
+| **Total completo** | | | **5.75 días** | |
 
-**Contexto histórico:** El equipo ya construyó `CrearPeriodo` (wizard 4 pasos) en ~3 días y `UsuariosPage` con batch operations en ~2 días. Este epic es comparable en complejidad. **1 sprint de 1 semana es holgado**, 4 días netos si se prioriza MVD.
+**Contexto histórico:** El equipo ya construyó `CrearPeriodo` (wizard 4 pasos) en ~3 días y `UsuariosPage` con batch operations en ~2 días. Este epic es comparable en complejidad pero agrega un refactor backend. **1 sprint de 1.5 semanas es holgado**, ~5.5 días netos si se prioriza MVD.
+
+**Trabajo en paralelo recomendado:** Story 0 (backend) puede arrancar junto con Story 1 (frontend CSV uploader). Story 2 y 5 dependen de Story 0.
 
 ---
 
-## Preguntas abiertas (requieren decisión antes de empezar)
+## Decisiones tomadas (resueltas el 2026-06-06)
 
-### 1. ¿El endpoint `batch/crear` soporta errores parciales?
-**Severidad:** Alta  
-**Estado actual:** El endpoint retorna `201 Created` con lista de usuarios, o lanza excepción (probable 500) si falla el batch completo.  
-**Opciones:**
-- (a) Asumir que el batch es atómico: si 1 falla, fallan todos. Frontend valida 100% antes de enviar (mi recomendación).
-- (b) Modificar el endpoint para que devuelva `{exitosos: [...], fallidos: [{fila, motivo}]}` con código 207 Multi-Status.
-- **Decisión recomendada:** (a) para v1. Reutilizamos la garantía atómica y la validación frontend. Si en el futuro hay casos de uso que requieren parcialidad, refactorizamos el endpoint.
+### 1. ¿Spring Batch o loop simple? ✅ Spring Batch
+**Decisión:** Refactor a Spring Batch. Razón: monitoring built-in, restart capability, escalabilidad futura, justifica la inversión de 2 días.
 
-### 2. ¿Ruta `/usuarios/importar` o modal sobre `/usuarios`?
-**Severidad:** Baja  
-**Recomendación:** Ruta. Razones:
-- Es linkeable (admin puede volver al wizard con un bookmark)
-- Mejor para deep-linking desde email de ayuda
-- Consistente con el patrón de `CrearPeriodo` que también es ruta
+### 2. ¿Errores parciales o atómico? ✅ Atómico
+**Decisión:** Atomicidad total. Si 1 falla, ninguno se persiste. Frontend valida 100% antes de enviar. El endpoint devuelve 422 con detalle si algo pasa durante el job.
 
-### 3. ¿Límite duro de 1000 filas o configurable?
-**Severidad:** Baja  
-**Recomendación:** 1000 hard cap en v1. Si un colegio reporta +1000 usuarios/mes, abrimos un ticket para revisar.
+### 3. ¿Ruta o modal? ✅ Ruta
+**Decisión:** `/usuarios/importar` como ruta dedicada. Linkeable, consistente con `CrearPeriodo`.
 
-### 4. ¿Atomicidad del import: o todo o nada?
-**Severidad:** Media  
-**Recomendación:** Asumir atomicidad. Si el admin quiere "saltearse" errores, los corrige en su CSV y vuelve a subir. Es lo más simple y consistente con la decisión #1.
+### 4. ¿Límite de filas? ✅ 1000 hard cap
+**Decisión:** 1000 filas en MVP. Suficiente para colegios pequeños-medianos (Academia del Pacífico usa 200). Mostrar error claro si excede.
 
 ---
 
@@ -234,19 +285,20 @@ CSV-BI-4: Reporte de errores    [+0.5d] ─┘
 
 ## Definition of Done del Epic completo
 
-- [ ] Las 5 stories mergeadas a `main` con PRs separados
+- [ ] Las 6 stories mergeadas a `main` con PRs separados
+- [ ] ADR-012 creado: "Spring Batch para importación masiva de usuarios"
 - [ ] Tests e2e actualizados: nuevo test `S16-importar-csv.spec.ts` con flujo completo
 - [ ] `docs/qa/manual-test-script.md` actualizado: nuevo caso "Importar 200 estudiantes vía CSV"
 - [ ] `docs/qa/workflow-demo/onboarding-academia-pacifico.md` actualizado: Fase 6.1 cambia de `curl` a UI
 - [ ] Demo ejecutada end-to-end: Alma importa 200 estudiantes en ≤ 2 min, 0 errores de digitación
 - [ ] Code review aprobado por al menos 1 reviewer
-- [ ] Lint + typecheck + tests unitarios + tests e2e todos en verde
+- [ ] Lint + typecheck + tests unitarios + tests e2e + tests de integración backend todos en verde
 
 ---
 
 ## Próximos pasos
 
-1. **Dev (Amelia):** Revisar Story 1 (CsvUploader) y confirmar que `papaparse` es aceptable como nueva dependencia
-2. **Dev:** Confirmar respuesta del endpoint `batch/crear` a errores parciales (Pregunta Abierta #1)
+1. **Dev (Amelia):** Empezar **Story 0 (Spring Batch refactor)** en backend — bloqueante para Story 5
+2. **Dev:** En paralelo, empezar **Story 1 (CsvUploader)** en frontend — no depende de Story 0
 3. **UX (Sally):** Wireframe de los 3 pasos (opcional — el brief ya es claro, pero ayuda para alinear)
 4. **Party mode:** Revisar este epic + brief + wireframe (si lo hay) antes de empezar Story 1
