@@ -60,6 +60,10 @@ export default function UsuariosPage() {
           <div className="flex gap-2">
             <button onClick={() => setShowForm(!showForm)}
               className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90">+ Nuevo usuario</button>
+            <button onClick={() => navigate('/admin/usuarios/importar')}
+              className="rounded-md border border-primary px-4 py-2 text-sm text-primary hover:bg-primary/5">
+              📥 Importar CSV
+            </button>
             <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
           </div>
         </div>
