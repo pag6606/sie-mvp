@@ -8,6 +8,7 @@ import {
 } from '@/hooks/useUsuariosBatchImport'
 import { buildMapaPrimerasApariciones, revalidarFila } from '@/utils/csvValidacion'
 import { capitalizeWords } from '@/utils/text'
+import { generarCsvErrores, nombreArchivoErrores } from '@/utils/reporteErrores'
 
 interface CsvPreviewTableProps {
   filas: FilaValidada[]
@@ -96,17 +97,12 @@ export default function CsvPreviewTable({
   }
 
   const descargarReporteErrores = () => {
-    const invalidas = filas.filter(f => f.estado === 'invalido')
-    const header = 'fila,email,nombre,roles,motivo_error\n'
-    const lineas = invalidas.map(f =>
-      `${f.fila},${f.email},${f.nombre},${f.roles ?? ''},"${f.motivoError ?? ''}"`
-    )
-    const csv = header + lineas.join('\n')
+    const csv = generarCsvErrores(filas)
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'reporte-errores-csv.csv'
+    a.download = nombreArchivoErrores()
     a.click()
     URL.revokeObjectURL(url)
   }
