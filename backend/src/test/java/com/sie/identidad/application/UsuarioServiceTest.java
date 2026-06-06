@@ -197,6 +197,19 @@ class UsuarioServiceTest {
                 () -> usuarioService.crearUsuariosBatch(List.of(req1, req2), colegioId));
 
         verify(eventPublisher, times(1)).publishEvent(any(UsuarioCreadoEvent.class));
+        verify(emailService, never()).sendActivationEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void crearUsuariosBatch_emailsDuplicadosIntraBatch_lanzaBatchImportException() {
+        var req1 = new CrearUsuarioRequest("dup@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
+        var req2 = new CrearUsuarioRequest("dup@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE));
+
+        assertThrows(com.sie.identidad.application.exception.BatchImportException.class,
+                () -> usuarioService.crearUsuariosBatch(List.of(req1, req2), colegioId));
+
+        verify(eventPublisher, never()).publishEvent(any(UsuarioCreadoEvent.class));
+        verify(emailService, never()).sendActivationEmail(anyString(), anyString(), anyString());
     }
 
     @Test

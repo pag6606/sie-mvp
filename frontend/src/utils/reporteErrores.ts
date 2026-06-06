@@ -1,18 +1,12 @@
 import type { FilaValidada } from '@/types/csvImport'
+import { escapeCsvCell } from './csvEscape'
 
 const CSV_HEADERS = ['fila', 'email_original', 'nombre_original', 'rol_original', 'motivo_error'] as const
-
-function escaparCsv(valor: string): string {
-  if (valor.includes(',') || valor.includes('"') || valor.includes('\n')) {
-    return `"${valor.replace(/"/g, '""')}"`
-  }
-  return valor
-}
 
 export function generarCsvErrores(filas: FilaValidada[]): string {
   const invalidas = filas.filter((f) => f.estado === 'invalido')
   const lineas = [
-    CSV_HEADERS.join(','),
+    CSV_HEADERS.map(escapeCsvCell).join(','),
     ...invalidas.map((f) =>
       [
         String(f.fila),
@@ -21,7 +15,7 @@ export function generarCsvErrores(filas: FilaValidada[]): string {
         f.roles ?? '',
         f.motivoError ?? ''
       ]
-        .map(escaparCsv)
+        .map(escapeCsvCell)
         .join(',')
     )
   ]

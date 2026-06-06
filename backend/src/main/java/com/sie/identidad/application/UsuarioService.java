@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -147,6 +148,17 @@ public class UsuarioService {
 
     @Transactional
     public int crearUsuariosBatch(List<CrearUsuarioRequest> requests, UUID colegioId) {
+        Set<String> emailsUnicos = new HashSet<>();
+        List<String> emailsNormalizados = new ArrayList<>(requests.size());
+        for (int i = 0; i < requests.size(); i++) {
+            String emailNorm = requests.get(i).email() == null ? "" : requests.get(i).email().trim().toLowerCase();
+            emailsNormalizados.add(emailNorm);
+            if (!emailNorm.isEmpty() && !emailsUnicos.add(emailNorm)) {
+                int primeraAparicion = emailsNormalizados.indexOf(emailNorm) + 1;
+                throw new BatchImportException(
+                        "Email duplicado en batch (primera aparición en posición " + primeraAparicion + ")", null);
+            }
+        }
         for (CrearUsuarioRequest request : requests) {
             try {
                 crearUsuario(request, colegioId);
