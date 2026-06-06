@@ -4,12 +4,14 @@ import com.sie.identidad.application.dto.CrearUsuarioRequest;
 import com.sie.identidad.application.dto.UpdateProfileRequest;
 import com.sie.identidad.application.dto.UsuarioResponse;
 import com.sie.identidad.application.event.UsuarioCreadoEvent;
+import com.sie.identidad.application.exception.BatchImportException;
 import com.sie.identidad.domain.*;
 import com.sie.identidad.infrastructure.RolRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.shared.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -141,6 +143,19 @@ public class UsuarioService {
             responses.add(crearUsuario(request, colegioId));
         }
         return responses;
+    }
+
+    @Transactional
+    public int crearUsuariosBatch(List<CrearUsuarioRequest> requests, UUID colegioId) {
+        for (CrearUsuarioRequest request : requests) {
+            try {
+                crearUsuario(request, colegioId);
+            } catch (IllegalArgumentException | DataIntegrityViolationException e) {
+                throw new BatchImportException(
+                        "Import atómico falló: " + e.getMessage() + " (0 usuarios creados)", e);
+            }
+        }
+        return requests.size();
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {

@@ -2,6 +2,7 @@ package com.sie.identidad.infrastructure.web;
 
 import com.sie.identidad.application.UsuarioService;
 import com.sie.identidad.application.dto.BatchCrearUsuarioRequest;
+import com.sie.identidad.application.dto.BatchImportarCsvResponse;
 import com.sie.identidad.application.dto.BatchRequest;
 import com.sie.identidad.application.dto.CrearUsuarioRequest;
 import com.sie.identidad.application.dto.UsuarioResponse;
@@ -82,4 +83,22 @@ public class UsuarioController {
         List<UsuarioResponse> responses = usuarioService.crearUsuarios(request.usuarios(), colegioId);
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
+
+    @PostMapping("/batch/importar-csv")
+    public ResponseEntity<?> importarCsv(
+            @RequestBody List<CrearUsuarioRequest> usuarios,
+            @RequestAttribute("colegioId") UUID colegioId) {
+        if (usuarios == null || usuarios.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "La lista de usuarios no puede estar vacía"));
+        }
+        if (usuarios.size() > MAX_BATCH_SIZE) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "mensaje", "El lote excede el máximo permitido (" + MAX_BATCH_SIZE + " usuarios)"));
+        }
+        int creados = usuarioService.crearUsuariosBatch(usuarios, colegioId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new BatchImportarCsvResponse(creados, creados));
+    }
+
+    private static final int MAX_BATCH_SIZE = 1000;
 }

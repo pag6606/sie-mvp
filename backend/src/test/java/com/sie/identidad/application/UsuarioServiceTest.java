@@ -168,6 +168,38 @@ class UsuarioServiceTest {
     }
 
     @Test
+    void crearUsuariosBatch_exitoso_retornaCantidadYPublicaEventos() {
+        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
+        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE));
+
+        when(usuarioRepository.existsByEmailAndColegioId(anyString(), any(UUID.class))).thenReturn(false);
+        when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        int count = usuarioService.crearUsuariosBatch(List.of(req1, req2), colegioId);
+
+        assertEquals(2, count);
+        verify(eventPublisher, times(2)).publishEvent(any(UsuarioCreadoEvent.class));
+        verify(emailService, never()).sendActivationEmail(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void crearUsuariosBatch_siFalla_lanzaBatchImportException() {
+        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
+        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE));
+
+        when(usuarioRepository.existsByEmailAndColegioId("a@colegio.edu.ec", colegioId)).thenReturn(false);
+        when(usuarioRepository.existsByEmailAndColegioId("b@colegio.edu.ec", colegioId)).thenReturn(true);
+        when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        assertThrows(com.sie.identidad.application.exception.BatchImportException.class,
+                () -> usuarioService.crearUsuariosBatch(List.of(req1, req2), colegioId));
+
+        verify(eventPublisher, times(1)).publishEvent(any(UsuarioCreadoEvent.class));
+    }
+
+    @Test
     void obtenerUsuario_exitoso() {
         UUID id = UUID.randomUUID();
         Usuario usuario = crearUsuarioDePrueba(id);
