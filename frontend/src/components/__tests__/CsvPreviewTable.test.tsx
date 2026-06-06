@@ -202,8 +202,10 @@ describe('CsvPreviewTable', () => {
     expect(onVolver).toHaveBeenCalled()
   })
 
-  it('importar llama al endpoint y propaga resultado', async () => {
-    const onImportar = vi.fn<(r: ResultadoImportacion) => void>()
+  it('importar llama al endpoint y propaga resultado con metadata', async () => {
+    const onImportar = vi.fn<
+      (r: ResultadoImportacion, meta: { duracionSegundos: number; totalEnviados: number }) => void
+    >()
     vi.mocked(api.post).mockResolvedValue({ data: { creados: 1, emailsEnviados: 1 } })
 
     const soloValidas = FILAS_BASE.filter(f => f.estado === 'valido')
@@ -228,7 +230,10 @@ describe('CsvPreviewTable', () => {
       )
     })
     await waitFor(() => {
-      expect(onImportar).toHaveBeenCalledWith({ creados: 1, emailsEnviados: 1 })
+      expect(onImportar).toHaveBeenCalledWith(
+        { creados: 1, emailsEnviados: 1 },
+        expect.objectContaining({ totalEnviados: 1, duracionSegundos: expect.any(Number) })
+      )
     })
   })
 

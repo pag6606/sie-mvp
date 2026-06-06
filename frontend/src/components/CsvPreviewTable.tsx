@@ -11,7 +11,10 @@ interface CsvPreviewTableProps {
   filas: FilaValidada[]
   onFilasChange: (filas: FilaValidada[]) => void
   onVolver: () => void
-  onImportar: (resultado: ResultadoImportacion) => void
+  onImportar: (
+    resultado: ResultadoImportacion,
+    meta: { duracionSegundos: number; totalEnviados: number }
+  ) => void
   nombreArchivo: string
 }
 
@@ -88,9 +91,11 @@ export default function CsvPreviewTable({
 
   const handleImportar = async () => {
     const filasValidas = filas.filter(f => f.estado === 'valido')
+    const inicioRef = Date.now()
     try {
       const data = await importarAsync({ filasValidas })
-      onImportar(data)
+      const duracionSegundos = Math.max(1, Math.round((Date.now() - inicioRef) / 1000))
+      onImportar(data, { duracionSegundos, totalEnviados: filasValidas.length })
     } catch {
       // Error ya está expuesto vía `error` del hook
     }
