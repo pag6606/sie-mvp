@@ -457,6 +457,93 @@
 
 ---
 
+## UA-17 — Asistente de Importación CSV (Usuarios)
+
+> **Precondición:** Servicios Docker levantados, backend en `:8080`, frontend en `:5173`.  
+> **Login:** `admin@sie.edu.ec` / `Admin123!!`  
+> **Ruta:** `/admin/usuarios/importar` (botón "📥 Importar CSV" en `UsuariosPage`)  
+> **Endpoint:** `POST /api/usuarios/batch/importar-csv` (`@Transactional` + `AFTER_COMMIT`)  
+> **Asset de prueba:** `docs/qa/workflow-demo/estudiantes-200.csv` (BOM UTF-8, 200 filas válidas)
+
+### UA-17.1 Importar 200 estudiantes vía CSV (happy path)
+- [ ] Login como admin, ir a `/admin/usuarios`
+- [ ] **AC:** Botón "📥 Importar CSV" visible junto a "+ Nuevo usuario"
+- [ ] Clic en "📥 Importar CSV" → **AC:** navega a `/admin/usuarios/importar`, stepper muestra paso 1 activo
+- [ ] Arrastrar `estudiantes-200.csv` a la dropzone (o clic → seleccionar)
+- [ ] **AC:** Pie muestra "📄 estudiantes-200.csv · 200 filas"
+- [ ] **AC:** Validación de headers OK (no aparece "Headers esperados...")
+- [ ] Clic en "Siguiente →" → **AC:** avanza a paso 2
+- [ ] **AC:** Footer dice "200 válidas · 0 con error · 0 duplicados"
+- [ ] **AC:** Botón primario dice "✓ Importar 200 válidas" (verde, habilitado)
+- [ ] Clic en "✓ Importar 200 válidas" → **AC:** avanza a paso 3 con spinner y elapsed "Procesando 200 usuarios... Xs"
+- [ ] **AC:** Al recibir 201, header dice "✅ 200 usuarios creados" + subheader "📨 200 emails de activación enviados"
+- [ ] Clic en "✓ Finalizar" → **AC:** cierra wizard, vuelve a `/admin/usuarios`, tabla muestra 200 nuevos estudiantes
+- [ ] **AC:** Toast verde "200 usuarios importados correctamente"
+- [ ] Abrir Mailpit en `http://localhost:8025` → **AC:** 200 correos visibles con asunto "Activa tu cuenta en SIE"
+- [ ] **NSM:** Tiempo total ≤ 2 minutos (cronometrar)
+
+### UA-17.2 Validación de headers inválidos
+- [ ] Crear `headers-mal.csv` con contenido `name,age,role\nJuan,30,DOCENTE`
+- [ ] Arrastrar a la dropzone en paso 1
+- [ ] **AC:** Mensaje "Headers esperados: email, nombre, roles" (no avanza a paso 2)
+- [ ] **AC:** Botón "Siguiente →" deshabilitado
+
+### UA-17.3 Detección de emails duplicados en CSV
+- [ ] Crear `con-duplicados.csv` con 3 filas: `a@x.com` válida, `a@x.com` duplicada, `b@x.com` válida
+- [ ] Subir y avanzar a paso 2
+- [ ] **AC:** Footer dice "2 válidas · 1 con error · 1 duplicado"
+- [ ] **AC:** La fila 2 tiene badge ❌ Error con motivo "Email duplicado en CSV (primera aparición en fila 1)"
+- [ ] **AC:** Botón primario dice "⚠ Revisar 1 error antes de importar" (no permite saltar)
+
+### UA-17.4 Edición inline repara una fila con error
+- [ ] Desde UA-17.3, en la fila 2 con email duplicado, hacer clic en la celda email
+- [ ] Cambiar a `nuevo-email@x.com` y presionar Enter
+- [ ] **AC:** Badge cambia a ✅ Válida
+- [ ] **AC:** Footer se actualiza a "3 válidas · 0 con error · 0 duplicados"
+- [ ] **AC:** Botón primario ahora dice "✓ Importar 3 válidas" (habilitado)
+
+### UA-17.5 Descarga de plantilla CSV
+- [ ] En paso 1, clic en "📄 Descargar plantilla"
+- [ ] **AC:** Descarga archivo `plantilla-usuarios.csv` (sin colisión con el nombre del CSV subido)
+- [ ] Abrir el archivo en Excel o LibreOffice
+- [ ] **AC:** Los tildes (Román, Díaz) se ven correctamente (verifica BOM UTF-8)
+- [ ] **AC:** Headers son `email,nombre,roles` y hay 3 filas de ejemplo (1 DOCENTE, 1 ESTUDIANTE, 1 con REEMPLAZAR)
+
+### UA-17.6 Reporte de errores descargable
+- [ ] Subir `con-duplicados.csv` (mismo de UA-17.3) y avanzar a paso 2
+- [ ] **AC:** Aparece botón "📋 Descargar reporte (CSV)"
+- [ ] Clic en el botón → **AC:** descarga `errores-importacion-YYYY-MM-DD.csv`
+- [ ] Abrir el archivo → **AC:** columnas `fila, email_original, nombre_original, rol_original, motivo_error` y 1 fila con la fila duplicada
+- [ ] **AC:** El admin puede corregir su CSV original basándose solo en el reporte (texto legible)
+
+### UA-17.7 Rechazo por tamaño > 5MB
+- [ ] Generar un CSV de 6MB (e.g. `truncate -s 6M /tmp/grand.csv` con headers y datos dummy)
+- [ ] Arrastrar a la dropzone
+- [ ] **AC:** Mensaje "El archivo excede 5MB (6.00MB)" + no avanza a paso 2
+
+### UA-17.8 Cancelar importación con elapsed > 15s
+- [ ] Crear `estudiantes-1000.csv` con 1000 filas válidas (límite del MVP)
+- [ ] Subir, avanzar a paso 2, clic en "✓ Importar 1000 válidas"
+- [ ] **AC:** Spinner con elapsed que se actualiza cada segundo
+- [ ] **AC:** Cuando elapsed > 15s, aparece botón "¿Cancelar?" al lado del spinner
+- [ ] Clic en "¿Cancelar?" → **AC:** spinner desaparece, vuelve a paso 2, muestra mensaje "Importación cancelada"
+- [ ] **AC:** En backend, NO se creó ningún usuario (verificar en `UsuariosPage` que no aparecen los 1000)
+
+### UA-17.9 Atomicidad ante error en backend
+- [ ] Crear `con-rol-invalido.csv` con 5 filas: 4 válidas + 1 con `roles: INVENTADO`
+- [ ] Subir, avanzar a paso 2, corregir la fila a `ESTUDIANTE`
+- [ ] Clic en "✓ Importar 5 válidas"
+- [ ] **AC:** Al recibir 422, wizard muestra mensaje claro + opción "Reintentar"
+- [ ] **AC:** El wizard NO se cierra, sigue en paso 2
+- [ ] **AC:** Ningún usuario fue creado (atomicidad total: rollback)
+
+### UA-17.10 Re-importación del mismo archivo (idempotencia)
+- [ ] Después de UA-17.1, intentar subir de nuevo `estudiantes-200.csv`
+- [ ] **AC:** El backend detecta emails duplicados y devuelve 422 con `BatchImportException`
+- [ ] **AC:** Wizard muestra mensaje "Estos emails ya existen" + opción de descargar reporte con los conflictos
+
+---
+
 ## Resumen de Resultados
 
 | ID | Escenario | Resultado | Observaciones |
@@ -525,7 +612,17 @@
 | UA-16.3 | Consistencia visual | ⬜ Pass / ⬜ Fail | |
 | UA-16.4 | Login Split Light | ⬜ Pass / ⬜ Fail | |
 | UA-16.5 | Estados carga/error | ⬜ Pass / ⬜ Fail | |
+| UA-17.1 | Importar 200 estudiantes CSV (NSM ≤ 2 min) | ⬜ Pass / ⬜ Fail | |
+| UA-17.2 | Validación headers inválidos | ⬜ Pass / ⬜ Fail | |
+| UA-17.3 | Detección emails duplicados | ⬜ Pass / ⬜ Fail | |
+| UA-17.4 | Edición inline repara error | ⬜ Pass / ⬜ Fail | |
+| UA-17.5 | Descarga plantilla CSV (BOM) | ⬜ Pass / ⬜ Fail | |
+| UA-17.6 | Reporte de errores descargable | ⬜ Pass / ⬜ Fail | |
+| UA-17.7 | Rechazo > 5MB | ⬜ Pass / ⬜ Fail | |
+| UA-17.8 | Cancelar con elapsed > 15s | ⬜ Pass / ⬜ Fail | |
+| UA-17.9 | Atomicidad ante 422 | ⬜ Pass / ⬜ Fail | |
+| UA-17.10 | Re-importación mismo archivo | ⬜ Pass / ⬜ Fail | |
 
-**Total:** 62 casos de prueba  
+**Total:** 72 casos de prueba (62 originales + 10 nuevos UA-17)  
 **Aprobador:** ___________  
 **Fecha:** ___________
