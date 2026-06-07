@@ -10,6 +10,9 @@ diff_file: /tmp/csv-bi-diff.patch
 spec_file: _bmad-output/planning-artifacts/csv-batch-import/epic-stories.md
 review_mode: full
 verdict: REVISION REQUIRED — 6 criticals + 8 highs + 12 mediums
+verdict_final: RELEASE READY — 0 criticals, 0 highs, 12 mediums deferred
+verdict_final_date: 2026-06-06
+verdict_final_commits: 2790f35, 7527e56, b14e2e6, 99b6d5c, f14d611, fbba5d9, d250b70, a1de467, f704ea3, fdab002
 ---
 
 # Code Review — Epic CSV-BI
@@ -261,4 +264,56 @@ Los MEDIUMs y LOWs pueden ir como tech debt en el próximo sprint.
 
 ---
 
-*Review generado por 3 capas adversariales en paralelo, triaged y mergeado en este documento. Total: 40 findings, 6 CRITICAL, 8 HIGH, 12 MEDIUM, 14 LOW.*
+## ✅ Resolución del review (2026-06-06, mismo día)
+
+**Verdict final: RELEASE READY** — 0 criticals, 0 highs, 12 mediums deferred.
+
+### CRITICAL — 6/6 cerrados
+
+| ID | Título | Resolución | Commit |
+|----|--------|------------|--------|
+| C1 | `saveAll` es mentira | AC marcado `[-]` con desviación apuntando a ADR-012 §Stack concreto. Cero código. | `f704ea3` |
+| C2 | CSV/formula injection | `escapeFormula` + `escapeCsvCell` + `escapeCsvRow` centralizados en `frontend/src/utils/csvEscape.ts`, aplicados a TODOS los Blobs. | `85def0e` |
+| C3 | `emailsEnviados` miente | **Opción (a) MVP**: campo renombrado a `emailsPendientes` en DTO + TS types + UI label + CSV reporte. El admin ahora sabe que los emails están en cola y debe verificar en Mailpit. Outbox pattern queda como historia futura. | `f704ea3` |
+| C4 | Test atómico no verifica "0 emails huérfanos" | `verify(emailService, never()).sendActivationEmail(any())` añadido. | `85def0e` |
+| C5 | Paridad test suite es teatro | Fixture JSON compartido en `docs/qa/paridad/paridadValidacion.fixture.json`. pom.xml lo copia al classpath. Ambos tests (Java + TS) lo leen. Drift imposible por construcción. | `fdab002` |
+| C6 | Backend no enforce email-unicidad intra-batch | `Set<String> emailsUnicos` pre-check en `UsuarioController` con mensaje "primera aparición en posición N". | `85def0e` |
+
+### HIGH — 8/8 cerrados
+
+| ID | Título | Commit |
+|----|--------|--------|
+| H1 | Paso 3 no muestra tabla de IDs creados | `b14e2e6` (incluye 3 bonus fixes: WebSecurityConfig `hasRole("ADMINISTRADOR")`, V10 migration drop orphan role, GlobalExceptionHandler stack trace) |
+| H2 | Reporte de creación sin columnas requeridas | `99b6d5c` |
+| H3 | `estado: 'parcial'` contradice atomicidad | `7527e56` |
+| H4 | Escape/Enter no wired en inline edit | `2790f35` |
+| H5 | No "Siguiente →" — auto-avanza | `f14d611` |
+| H6 | Click "Revisar Y errores" no navega al primer error | `fbba5d9` |
+| H7 | Click-to-edit pattern no implementado | `d250b70` |
+| H8 | Permite re-import concurrente (race condition) | `a1de467` |
+
+### MEDIUM/LOW — 12+14 diferidos
+
+No bloquean release. Son pulido de próxima iteración. Lista completa en §Recomendación priorizada (M1-M12) y §Recomendación LOW (L1-L14).
+
+### Deuda técnica conocida (post-release)
+
+- **Outbox pattern para emails** (C3 opción b): 1 sprint de trabajo. Cuando la academia llegue a 5+ colegios y la carga SMTP justifique, migrar de `emailsPendientes` (MVP honesto) a outbox real con retry/backoff y status consultable.
+
+### Tests al cierre
+
+- Backend: **68/68** (`./mvnw test`)
+- Frontend vitest: **160/160** (`npm test`)
+- Frontend e2e Playwright: **9/9** (`npx playwright test s16`)
+- Paridad Java: 21/21 desde `paridadValidacion.fixture.json`
+- Paridad TS: 21/21 desde el mismo fixture
+
+### Línea de commits del cierre
+
+`bdb4e05` (review original) → `85def0e` (C2/C4/C6) → `7527e56` (H3) → `2790f35` (H4) → `b14e2e6` (H1 + 3 bonus) → `99b6d5c` (H2) → `f14d611` (H5) → `fbba5d9` (H6) → `d250b70` (H7) → `a1de467` (H8) → `f704ea3` (C1 + C3a) → `fdab002` (C5 fixture compartido).
+
+**Tiempo total invertido:** ~4 horas en este ciclo de review + fixes.
+
+---
+
+*Review generado por 3 capas adversariales en paralelo, triaged y mergeado en este documento. Total: 40 findings, 6 CRITICAL, 8 HIGH, 12 MEDIUM, 14 LOW. Estado al cierre: 0 criticals, 0 highs, 12 mediums deferred, 14 lows deferred.*
