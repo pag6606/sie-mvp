@@ -197,3 +197,34 @@ describe('extraerMensajeError', () => {
     expect(extraerMensajeError(null)).toBe('')
   })
 })
+
+describe('useUsuariosBatchImport — H8: abort mutation previa en reintento', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('segunda llamada a importar aborta la request anterior con su AbortController', async () => {
+    const signals: AbortSignal[] = []
+    const firstPromise = new Promise<{ data: ResultadoImportacion }>(() => {
+    })
+
+    vi.mocked(api.post).mockImplementation(((_url: string, _body: unknown, config?: { signal?: AbortSignal }) => {
+      if (config?.signal) signals.push(config.signal)
+      if (signals.length === 1) return firstPromise
+      return Promise.resolve({ data: { creados: 1, emailsEnviados: 1, usuarios: [] } })
+    }) as never)
+
+    const { result } = renderHook(() => useUsuariosBatchImport(), { wrapper })
+
+    act(() => result.current.importar({ filasValidas: FILAS }))
+    await waitFor(() => expect(signals.length).toBe(1))
+
+    expect(signals[0].aborted).toBe(false)
+
+    act(() => result.current.importar({ filasValidas: FILAS }))
+    await waitFor(() => expect(signals.length).toBe(2))
+
+    expect(signals[0].aborted).toBe(true)
+    expect(signals[1].aborted).toBe(false)
+  })
+})

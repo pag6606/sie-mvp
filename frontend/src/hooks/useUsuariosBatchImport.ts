@@ -34,6 +34,9 @@ export function useUsuariosBatchImport() {
     { filasValidas: FilaValidada[] }
   >({
     mutationFn: async ({ filasValidas }) => {
+      if (abortRef.current) {
+        abortRef.current.abort()
+      }
       abortRef.current = new AbortController()
       setElapsedSeg(0)
       setFueCancelado(false)
