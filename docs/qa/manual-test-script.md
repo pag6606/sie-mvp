@@ -40,6 +40,23 @@ Antes de empezar, el tester debe verificar:
 - **Tiempos** para los casos con NSM (ej. UA-17.1: ≤ 2 min)
 - **IDs de emails** vistos en Mailpit para validar envíos
 
+### Tests automatizados que el tester debe correr ANTES de la prueba manual
+
+> **Por qué:** un bug crítico de auth (admin → /docente) se escapó porque solo se corría `npx playwright test s16` (spec del CSV) y no la suite completa. S01 en `app.spec.ts` habría atrapado el bug. Lección: **siempre correr TODA la suite, no solo el spec relevante al cambio**.
+
+```bash
+# Suite completa de frontend
+cd frontend && npx playwright test
+
+# Suite completa de backend
+cd backend && ./mvnw test
+
+# Vitest (incluye todos los archivos, no solo los nuevos)
+cd frontend && npm test
+```
+
+Resultado esperado: **24/24 e2e, 68/68 backend, 169/169 vitest**.
+
 ### Cómo reportar un fallo
 
 ```

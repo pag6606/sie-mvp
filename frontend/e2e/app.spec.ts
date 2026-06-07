@@ -39,7 +39,7 @@ test('S09: Login page has split layout', async ({ page }) => {
 
 test('S14: Password reset — confirm form with token', async ({ page }) => {
   await page.goto('/reset-password?token=test-token-123')
-  await expect(page.locator('text=Nueva contraseña')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Nueva contraseña' })).toBeVisible()
   await expect(page.locator('#new-password')).toBeVisible()
   await expect(page.locator('#confirm-password')).toBeVisible()
 

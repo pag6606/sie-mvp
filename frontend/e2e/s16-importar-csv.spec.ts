@@ -8,7 +8,7 @@ async function login(page: Page) {
   await page.fill('input[type="email"]', ADMIN.email)
   await page.fill('#login-password', ADMIN.password)
   await page.click('button[type="submit"]')
-  await page.waitForURL(u => u.pathname !== '/login', { timeout: 10000 })
+  await page.waitForURL(u => u.pathname === '/admin', { timeout: 10000 })
 }
 
 async function uploadCsv(page: Page, name: string, csv: string) {
