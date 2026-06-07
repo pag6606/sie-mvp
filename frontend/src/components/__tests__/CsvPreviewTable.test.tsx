@@ -281,4 +281,49 @@ describe('CsvPreviewTable', () => {
       expect(screen.getByText('Email ya existe')).toBeInTheDocument()
     })
   })
+
+  it('Escape revierte los cambios de la fila al valor original', async () => {
+    const onFilasChange = vi.fn()
+    render(
+      <CsvPreviewTable
+        filas={FILAS_BASE}
+        onFilasChange={onFilasChange}
+        onVolver={vi.fn()}
+        onImportar={vi.fn()}
+        nombreArchivo="x.csv"
+      />,
+      { wrapper }
+    )
+
+    const emailInput = screen.getAllByDisplayValue('a@x.com')[0] as HTMLInputElement
+    fireEvent.change(emailInput, { target: { value: 'temporal@edit.com' } })
+    fireEvent.keyDown(emailInput, { key: 'Escape' })
+
+    await waitFor(() => {
+      const lastCallArgs = onFilasChange.mock.calls[onFilasChange.mock.calls.length - 1][0]
+      const fila1 = lastCallArgs[0]
+      expect(fila1.email).toBe('a@x.com')
+      expect(fila1.editada).toBe(false)
+    })
+  })
+
+  it('Enter hace blur al input (commit implícito vía onChange)', () => {
+    render(
+      <CsvPreviewTable
+        filas={FILAS_BASE}
+        onFilasChange={vi.fn()}
+        onVolver={vi.fn()}
+        onImportar={vi.fn()}
+        nombreArchivo="x.csv"
+      />,
+      { wrapper }
+    )
+
+    const emailInput = screen.getAllByDisplayValue('a@x.com')[0] as HTMLInputElement
+    const blurSpy = vi.spyOn(emailInput, 'blur')
+
+    fireEvent.keyDown(emailInput, { key: 'Enter' })
+
+    expect(blurSpy).toHaveBeenCalled()
+  })
 })

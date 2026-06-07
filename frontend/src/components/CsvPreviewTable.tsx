@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { FilaValidada, ResultadoImportacion, RolUsuario } from '@/types/csvImport'
 import { ROLES_VALIDOS } from '@/types/csvImport'
 import {
@@ -31,6 +31,12 @@ export default function CsvPreviewTable({
   nombreArchivo
 }: CsvPreviewTableProps) {
   const [filtro, setFiltro] = useState<Filtro>('todas')
+  const originalesRef = useRef<Map<number, FilaValidada>>(new Map())
+  useEffect(() => {
+    if (originalesRef.current.size === 0 && filas.length > 0) {
+      filas.forEach(f => originalesRef.current.set(f.fila, { ...f }))
+    }
+  }, [filas])
   const {
     importarAsync,
     isPending,
@@ -61,6 +67,13 @@ export default function CsvPreviewTable({
 
   const toggleFiltro = (target: 'validas' | 'invalidas') => {
     setFiltro(prev => prev === target ? 'todas' : target)
+  }
+
+  const handleEscape = (fila: FilaValidada) => {
+    const orig = originalesRef.current.get(fila.fila)
+    if (orig) {
+      onFilasChange(filas.map(f => (f.fila === fila.fila ? { ...orig } : f)))
+    }
   }
 
   const actualizarFila = (idxReal: number, cambios: Partial<FilaValidada>) => {
@@ -224,9 +237,17 @@ export default function CsvPreviewTable({
                   <td className="px-3 py-2 text-xs text-muted-foreground">{fila.fila}</td>
                   <td className="px-3 py-2">
                     <input
-                      type="text"
+                      type="email"
                       value={fila.email}
                       onChange={e => actualizarFila(idxReal, { email: e.target.value })}
+                      onKeyDown={e => {
+                        if (e.key === 'Escape') {
+                          handleEscape(fila)
+                          ;(e.target as HTMLInputElement).blur()
+                        } else if (e.key === 'Enter') {
+                          ;(e.target as HTMLInputElement).blur()
+                        }
+                      }}
                       aria-invalid={!esValida}
                       className={`w-full rounded border bg-background px-2 py-1 text-sm ${
                         esValida ? 'border-transparent' : 'border-red-300'
@@ -238,6 +259,14 @@ export default function CsvPreviewTable({
                       type="text"
                       value={fila.nombre}
                       onChange={e => actualizarFila(idxReal, { nombre: e.target.value })}
+                      onKeyDown={e => {
+                        if (e.key === 'Escape') {
+                          handleEscape(fila)
+                          ;(e.target as HTMLInputElement).blur()
+                        } else if (e.key === 'Enter') {
+                          ;(e.target as HTMLInputElement).blur()
+                        }
+                      }}
                       aria-invalid={!esValida}
                       className={`w-full rounded border bg-background px-2 py-1 text-sm ${
                         esValida ? 'border-transparent' : 'border-red-300'
