@@ -95,9 +95,8 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body(Map.of(
                     "mensaje", "El lote excede el máximo permitido (" + MAX_BATCH_SIZE + " usuarios)"));
         }
-        int creados = usuarioService.crearUsuariosBatch(usuarios, colegioId);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new BatchImportarCsvResponse(creados, creados));
+        BatchImportarCsvResponse response = usuarioService.crearUsuariosBatch(usuarios, colegioId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     private static final int MAX_BATCH_SIZE = 1000;

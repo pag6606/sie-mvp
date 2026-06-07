@@ -19,11 +19,13 @@ export default function ImportarUsuariosPage() {
   const [filas, setFilas] = useState<FilaValidada[]>([])
   const [nombreArchivo, setNombreArchivo] = useState<string>('')
   const [reporte, setReporte] = useState<ReporteImportacion | null>(null)
+  const [usuariosCreados, setUsuariosCreados] = useState<import('@/types/csvImport').UsuarioCreado[]>([])
 
   const handleArchivoCargado = (filasParseadas: FilaValidada[], nombre: string) => {
     setFilas(filasParseadas)
     setNombreArchivo(nombre)
     setReporte(null)
+    setUsuariosCreados([])
     setPaso(2)
   }
 
@@ -46,6 +48,7 @@ export default function ImportarUsuariosPage() {
       estado: exitoso ? 'exitoso' : 'fallo',
       mensaje: exitoso ? undefined : `Se esperaban crear ${meta.totalEnviados} usuarios pero el backend reportó ${result.creados}`
     })
+    setUsuariosCreados(result.usuarios)
     setPaso(3)
   }
 
@@ -57,6 +60,7 @@ export default function ImportarUsuariosPage() {
     setFilas([])
     setNombreArchivo('')
     setReporte(null)
+    setUsuariosCreados([])
     setPaso(1)
   }
 
@@ -100,6 +104,7 @@ export default function ImportarUsuariosPage() {
         {paso === 3 && reporte && (
           <ResultadoImport
             reporte={reporte}
+            usuarios={usuariosCreados}
             onFinalizar={handleFinalizar}
             onImportarOtro={handleImportarOtro}
           />
@@ -122,10 +127,12 @@ function descargarReporteCsv(reporte: ReporteImportacion) {
 
 function ResultadoImport({
   reporte,
+  usuarios,
   onFinalizar,
   onImportarOtro
 }: {
   reporte: ReporteImportacion
+  usuarios: import('@/types/csvImport').UsuarioCreado[]
   onFinalizar: () => void
   onImportarOtro: () => void
 }) {
@@ -151,6 +158,45 @@ function ResultadoImport({
           </p>
         )}
       </div>
+
+      {usuarios.length > 0 && (
+        <div className="mt-8">
+          <h4 className="mb-3 text-sm font-semibold text-foreground">
+            Usuarios creados ({usuarios.length})
+          </h4>
+          <div className="max-h-96 overflow-y-auto rounded-md border" data-testid="tabla-usuarios-creados">
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 bg-muted">
+                <tr className="border-b text-left text-xs font-medium text-muted-foreground">
+                  <th className="px-3 py-2 w-10">#</th>
+                  <th className="px-3 py-2">Email</th>
+                  <th className="px-3 py-2">Nombre</th>
+                  <th className="px-3 py-2">Rol</th>
+                  <th className="px-3 py-2">ID</th>
+                </tr>
+              </thead>
+              <tbody>
+                {usuarios.map((u, idx) => (
+                  <tr key={u.id} className="border-b last:border-b-0 hover:bg-muted/50">
+                    <td className="px-3 py-2 text-muted-foreground">{idx + 1}</td>
+                    <td className="px-3 py-2 font-mono text-xs">{u.email}</td>
+                    <td className="px-3 py-2">{u.nombre}</td>
+                    <td className="px-3 py-2">
+                      <span className="inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        {u.roles[0]}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 font-mono text-xs text-muted-foreground" title={u.id}>
+                      {u.id.slice(0, 8)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <button
           onClick={() => descargarReporteCsv(reporte)}

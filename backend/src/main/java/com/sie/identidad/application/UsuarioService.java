@@ -1,5 +1,6 @@
 package com.sie.identidad.application;
 
+import com.sie.identidad.application.dto.BatchImportarCsvResponse;
 import com.sie.identidad.application.dto.CrearUsuarioRequest;
 import com.sie.identidad.application.dto.UpdateProfileRequest;
 import com.sie.identidad.application.dto.UsuarioResponse;
@@ -147,7 +148,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public int crearUsuariosBatch(List<CrearUsuarioRequest> requests, UUID colegioId) {
+    public BatchImportarCsvResponse crearUsuariosBatch(List<CrearUsuarioRequest> requests, UUID colegioId) {
         Set<String> emailsUnicos = new HashSet<>();
         List<String> emailsNormalizados = new ArrayList<>(requests.size());
         for (int i = 0; i < requests.size(); i++) {
@@ -159,15 +160,16 @@ public class UsuarioService {
                         "Email duplicado en batch (primera aparición en posición " + primeraAparicion + ")", null);
             }
         }
+        List<UsuarioResponse> creados = new ArrayList<>(requests.size());
         for (CrearUsuarioRequest request : requests) {
             try {
-                crearUsuario(request, colegioId);
+                creados.add(crearUsuario(request, colegioId));
             } catch (IllegalArgumentException | DataIntegrityViolationException e) {
                 throw new BatchImportException(
                         "Import atómico falló: " + e.getMessage() + " (0 usuarios creados)", e);
             }
         }
-        return requests.size();
+        return new BatchImportarCsvResponse(creados.size(), creados.size(), creados);
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {

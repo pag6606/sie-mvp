@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
-        log.warn("Bad request: {}", ex.getMessage());
+        log.warn("Bad request: {}", ex.getMessage(), ex);
         return ResponseEntity.badRequest().body(Map.of(
                 "codigo", "BAD_REQUEST",
                 "mensaje", ex.getMessage(),

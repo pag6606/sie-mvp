@@ -30,6 +30,18 @@ export interface ResumenValidacion {
 export interface ResultadoImportacion {
   creados: number
   emailsEnviados: number
+  usuarios: UsuarioCreado[]
+}
+
+export interface UsuarioCreado {
+  id: string
+  email: string
+  nombre: string
+  roles: string[]
+  activo: boolean
+  primerLogin: boolean
+  createdAt: string
+  colegioId: string
 }
 
 export interface ReporteImportacion {

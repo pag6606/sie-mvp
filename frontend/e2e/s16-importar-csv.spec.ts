@@ -101,4 +101,46 @@ test.describe('S16: Importar CSV — edición inline', () => {
     // capitalizeWords debe aplicar "Maria Jose Perez"
     await expect(nombreInput).toHaveValue('Maria Jose Perez')
   })
+
+  test('H1 — Paso 3 muestra tabla de usuarios creados con IDs', async ({ page }) => {
+    await login(page)
+    await page.goto('/admin/usuarios/importar')
+
+    // Timestamp en emails para que el test sea idempotente
+    const stamp = Date.now()
+    const CSV_3_OK = `email,nombre,roles
+ana.h1.${stamp}@academia.edu.ec,Ana Pérez,DOCENTE
+beto.h1.${stamp}@academia.edu.ec,Beto López,ESTUDIANTE
+carla.h1.${stamp}@academia.edu.ec,Carla Mora,DOCENTE
+`
+    await page.setInputFiles('[data-testid="csv-file-input"]', {
+      name: 'usuarios-h1.csv',
+      mimeType: 'text/csv',
+      buffer: Buffer.from(CSV_3_OK)
+    })
+
+    await page.click('[data-testid="importar-button"]')
+
+    const tabla = page.locator('[data-testid="tabla-usuarios-creados"]')
+    await expect(tabla).toBeVisible({ timeout: 15000 })
+
+    await expect(tabla.locator('th', { hasText: '#' })).toBeVisible()
+    await expect(tabla.locator('th', { hasText: 'Email' })).toBeVisible()
+    await expect(tabla.locator('th', { hasText: 'Nombre' })).toBeVisible()
+    await expect(tabla.locator('th', { hasText: 'Rol' })).toBeVisible()
+    await expect(tabla.locator('th', { hasText: 'ID' })).toBeVisible()
+
+    const filas = tabla.locator('tbody tr')
+    await expect(filas).toHaveCount(3)
+    await expect(filas.nth(0)).toContainText(`ana.h1.${stamp}@academia.edu.ec`)
+    await expect(filas.nth(0)).toContainText('Ana Pérez')
+    await expect(filas.nth(0)).toContainText('DOCENTE')
+    await expect(filas.nth(1)).toContainText(`beto.h1.${stamp}@academia.edu.ec`)
+    await expect(filas.nth(1)).toContainText('ESTUDIANTE')
+    await expect(filas.nth(2)).toContainText(`carla.h1.${stamp}@academia.edu.ec`)
+
+    const idCell = filas.nth(0).locator('td').nth(4)
+    const idText = await idCell.textContent()
+    expect(idText?.length).toBe(8)
+  })
 })

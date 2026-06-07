@@ -23,6 +23,21 @@ describe('useUsuariosBatchImport', () => {
     vi.clearAllMocks()
   })
 
+  it('importar devuelve la lista de usuarios creados con sus IDs (H1)', async () => {
+    const usuariosMock = [
+      { id: 'uuid-1', email: 'a@x.com', nombre: 'Ana', roles: ['DOCENTE'], activo: true, primerLogin: true, createdAt: '2026-06-06T19:00:00Z', colegioId: 'colegio-1' },
+      { id: 'uuid-2', email: 'b@x.com', nombre: 'Beto', roles: ['ESTUDIANTE'], activo: true, primerLogin: true, createdAt: '2026-06-06T19:00:00Z', colegioId: 'colegio-1' }
+    ]
+    vi.mocked(api.post).mockResolvedValue({ data: { creados: 2, emailsEnviados: 2, usuarios: usuariosMock } })
+    const { result } = renderHook(() => useUsuariosBatchImport(), { wrapper })
+
+    act(() => result.current.importar({ filasValidas: FILAS }))
+
+    await waitFor(() => {
+      expect(result.current.data?.usuarios).toEqual(usuariosMock)
+    })
+  })
+
   it('importar llama al endpoint con payload y devuelve resultado', async () => {
     vi.mocked(api.post).mockResolvedValue({ data: { creados: 2, emailsEnviados: 2 } })
     const { result } = renderHook(() => useUsuariosBatchImport(), { wrapper })

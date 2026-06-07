@@ -1,5 +1,6 @@
 package com.sie.identidad.application;
 
+import com.sie.identidad.application.dto.BatchImportarCsvResponse;
 import com.sie.identidad.application.dto.CrearUsuarioRequest;
 import com.sie.identidad.application.dto.UsuarioResponse;
 import com.sie.identidad.application.event.UsuarioCreadoEvent;
@@ -176,9 +177,13 @@ class UsuarioServiceTest {
         when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
         when(usuarioRepository.save(any(Usuario.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        int count = usuarioService.crearUsuariosBatch(List.of(req1, req2), colegioId);
+        BatchImportarCsvResponse response = usuarioService.crearUsuariosBatch(List.of(req1, req2), colegioId);
 
-        assertEquals(2, count);
+        assertEquals(2, response.creados());
+        assertEquals(2, response.emailsEnviados());
+        assertEquals(2, response.usuarios().size());
+        assertEquals("a@colegio.edu.ec", response.usuarios().get(0).email());
+        assertEquals("b@colegio.edu.ec", response.usuarios().get(1).email());
         verify(eventPublisher, times(2)).publishEvent(any(UsuarioCreadoEvent.class));
         verify(emailService, never()).sendActivationEmail(anyString(), anyString(), anyString());
     }
