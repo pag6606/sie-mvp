@@ -1,0 +1,162 @@
+[
+  {
+    "caso": 1,
+    "nombre": "email con +alias",
+    "email": "alma+admin@academia.edu.ec",
+    "nombrePersona": "Alma",
+    "rol": "DOCENTE",
+    "validoEsperado": true
+  },
+  {
+    "caso": 2,
+    "nombre": "email con puntos en la parte local",
+    "email": "alma.reyes@academia.edu.ec",
+    "nombrePersona": "Alma",
+    "rol": "DOCENTE",
+    "validoEsperado": true
+  },
+  {
+    "caso": 3,
+    "nombre": "email con subdominio",
+    "email": "admin@mail.academia.edu.ec",
+    "nombrePersona": "Admin",
+    "rol": "ADMINISTRADOR",
+    "validoEsperado": true
+  },
+  {
+    "caso": 4,
+    "nombre": "email con dominio .io",
+    "email": "dev@startup.io",
+    "nombrePersona": "Dev",
+    "rol": "ESTUDIANTE",
+    "validoEsperado": true
+  },
+  {
+    "caso": 5,
+    "nombre": "email con dominio .edu.ec",
+    "email": "ernesto.diaz@academia.edu.ec",
+    "nombrePersona": "Ernesto",
+    "rol": "ESTUDIANTE",
+    "validoEsperado": true
+  },
+  {
+    "caso": 6,
+    "nombre": "email con caracteres unicode",
+    "email": "josé@academia.edu.ec",
+    "nombrePersona": "José",
+    "rol": "DOCENTE",
+    "validoEsperado": true
+  },
+  {
+    "caso": 7,
+    "nombre": "email sin @",
+    "email": "alma-academia.edu.ec",
+    "nombrePersona": "Alma",
+    "rol": "DOCENTE",
+    "validoEsperado": false
+  },
+  {
+    "caso": 8,
+    "nombre": "email con doble @@",
+    "email": "alma@@academia.edu.ec",
+    "nombrePersona": "Alma",
+    "rol": "DOCENTE",
+    "validoEsperado": false
+  },
+  {
+    "caso": 9,
+    "nombre": "email con espacio interno",
+    "email": "alma @academia.edu.ec",
+    "nombrePersona": "Alma",
+    "rol": "DOCENTE",
+    "validoEsperado": false
+  },
+  {
+    "caso": 10,
+    "nombre": "email con TLD vacío",
+    "email": "alma@academia.",
+    "nombrePersona": "Alma",
+    "rol": "DOCENTE",
+    "validoEsperado": false
+  },
+  {
+    "caso": 11,
+    "nombre": "rol en minúsculas",
+    "email": "a@x.com",
+    "nombrePersona": "Alma",
+    "rol": "docente",
+    "validoEsperado": true
+  },
+  {
+    "caso": 12,
+    "nombre": "rol en mixed case",
+    "email": "a@x.com",
+    "nombrePersona": "Alma",
+    "rol": "Estudiante",
+    "validoEsperado": true
+  },
+  {
+    "caso": 13,
+    "nombre": "rol desconocido",
+    "email": "a@x.com",
+    "nombrePersona": "Alma",
+    "rol": "GERENTE",
+    "validoEsperado": false
+  },
+  {
+    "caso": 14,
+    "nombre": "rol vacío",
+    "email": "a@x.com",
+    "nombrePersona": "Alma",
+    "rol": "",
+    "validoEsperado": false
+  },
+  {
+    "caso": 15,
+    "nombre": "nombre con tildes",
+    "email": "a@x.com",
+    "nombrePersona": "María José",
+    "rol": "DOCENTE",
+    "validoEsperado": true
+  },
+  {
+    "caso": 16,
+    "nombre": "nombre con ñ",
+    "email": "a@x.com",
+    "nombrePersona": "Cristóbal Ñusta",
+    "rol": "ESTUDIANTE",
+    "validoEsperado": true
+  },
+  {
+    "caso": 17,
+    "nombre": "nombre con apóstrofe",
+    "email": "a@x.com",
+    "nombrePersona": "O'Brien",
+    "rol": "DOCENTE",
+    "validoEsperado": true
+  },
+  {
+    "caso": 18,
+    "nombre": "nombre con guion",
+    "email": "a@x.com",
+    "nombrePersona": "Pérez-López",
+    "rol": "DOCENTE",
+    "validoEsperado": true
+  },
+  {
+    "caso": 19,
+    "nombre": "email en uppercase",
+    "email": "ALMA@ACADEMIA.EDU.EC",
+    "nombrePersona": "Alma",
+    "rol": "DOCENTE",
+    "validoEsperado": true
+  },
+  {
+    "caso": 20,
+    "nombre": "email con parte local larga (64 chars)",
+    "email": "adminaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@academia.edu.ec",
+    "nombrePersona": "Alma Reyes",
+    "rol": "DOCENTE",
+    "validoEsperado": true
+  }
+]
