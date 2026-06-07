@@ -39,6 +39,6 @@ export interface ReporteImportacion {
   creados: number
   emailsEnviados: number
   duracionSegundos: number
-  estado: 'exitoso' | 'parcial' | 'fallo'
+  estado: 'exitoso' | 'fallo'
   mensaje?: string
 }

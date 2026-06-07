@@ -19,7 +19,7 @@ const REPORTE_PARCIAL: ReporteImportacion = {
   creados: 7,
   emailsEnviados: 7,
   duracionSegundos: 12,
-  estado: 'parcial',
+  estado: 'fallo',
   mensaje: '3 filas no se crearon'
 }
 
@@ -45,7 +45,7 @@ describe('generarCsvReporte', () => {
   it('incluye Detalle cuando hay mensaje (estado parcial)', () => {
     const csv = generarCsvReporte(REPORTE_PARCIAL)
     expect(csv).toContain('Detalle: 3 filas no se crearon')
-    expect(csv).toContain('Estado: parcial')
+    expect(csv).toContain('Estado: fallo')
   })
 
   it('produce texto que se puede parsear como texto plano', () => {

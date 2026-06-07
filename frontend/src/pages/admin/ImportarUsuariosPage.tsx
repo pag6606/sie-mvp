@@ -43,7 +43,7 @@ export default function ImportarUsuariosPage() {
       creados: result.creados,
       emailsEnviados: result.emailsEnviados,
       duracionSegundos: meta.duracionSegundos,
-      estado: exitoso ? 'exitoso' : 'parcial',
+      estado: exitoso ? 'exitoso' : 'fallo',
       mensaje: exitoso ? undefined : `Se esperaban crear ${meta.totalEnviados} usuarios pero el backend reportó ${result.creados}`
     })
     setPaso(3)
@@ -130,12 +130,11 @@ function ResultadoImport({
   onImportarOtro: () => void
 }) {
   const esExitoso = reporte.estado === 'exitoso'
-  const esParcial = reporte.estado === 'parcial'
   return (
     <div className="rounded-lg border bg-card p-8">
       <div className="text-center">
         <p className="text-5xl" aria-hidden="true">
-          {esExitoso ? '✅' : esParcial ? '⚠️' : '❌'}
+          {esExitoso ? '✅' : '❌'}
         </p>
         <h3 className="mt-4 text-xl font-semibold text-foreground">
           {reporte.creados} de {reporte.totalEnviados} usuarios creados
