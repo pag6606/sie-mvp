@@ -11,6 +11,16 @@ async function login(page: Page) {
   await page.waitForURL(u => u.pathname !== '/login', { timeout: 10000 })
 }
 
+async function uploadCsv(page: Page, name: string, csv: string) {
+  await page.setInputFiles('[data-testid="csv-file-input"]', {
+    name,
+    mimeType: 'text/csv',
+    buffer: Buffer.from(csv)
+  })
+  await page.locator('[data-testid="siguiente-button"]').waitFor({ state: 'visible' })
+  await page.click('[data-testid="siguiente-button"]')
+}
+
 const CSV_CON_ERRORES = `email,nombre,roles
 valida@academia.edu.ec,Alma Reyes,DOCENTE
 malformado,Ernesto López,ESTUDIANTE
@@ -24,12 +34,7 @@ test.describe('S16: Importar CSV — edición inline', () => {
     await login(page)
     await page.goto('/admin/usuarios/importar')
 
-    // Subir CSV
-    await page.setInputFiles('[data-testid="csv-file-input"]', {
-      name: 'usuarios.csv',
-      mimeType: 'text/csv',
-      buffer: Buffer.from(CSV_CON_ERRORES)
-    })
+    await uploadCsv(page, 'usuarios.csv', CSV_CON_ERRORES)
 
     // Estamos en paso 2
     await expect(page.getByText('Revisar y editar')).toBeVisible()
@@ -56,11 +61,7 @@ test.describe('S16: Importar CSV — edición inline', () => {
     await login(page)
     await page.goto('/admin/usuarios/importar')
 
-    await page.setInputFiles('[data-testid="csv-file-input"]', {
-      name: 'usuarios.csv',
-      mimeType: 'text/csv',
-      buffer: Buffer.from(CSV_CON_ERRORES)
-    })
+    await uploadCsv(page, 'usuarios.csv', CSV_CON_ERRORES)
 
     const btn = page.getByTestId('importar-button')
     await expect(btn).toBeDisabled()
@@ -71,11 +72,7 @@ test.describe('S16: Importar CSV — edición inline', () => {
     await login(page)
     await page.goto('/admin/usuarios/importar')
 
-    await page.setInputFiles('[data-testid="csv-file-input"]', {
-      name: 'usuarios.csv',
-      mimeType: 'text/csv',
-      buffer: Buffer.from(CSV_CON_ERRORES)
-    })
+    await uploadCsv(page, 'usuarios.csv', CSV_CON_ERRORES)
 
     await page.getByTestId('filtro-invalidas').click()
     await expect(page.locator('input[value="malformado"]')).toBeVisible()
@@ -86,11 +83,7 @@ test.describe('S16: Importar CSV — edición inline', () => {
     await login(page)
     await page.goto('/admin/usuarios/importar')
 
-    await page.setInputFiles('[data-testid="csv-file-input"]', {
-      name: 'usuarios.csv',
-      mimeType: 'text/csv',
-      buffer: Buffer.from(CSV_CON_ERRORES)
-    })
+    await uploadCsv(page, 'usuarios.csv', CSV_CON_ERRORES)
 
     // Fila 2 (válida) — nombre "Alma Reyes" - el input debería tener el valor
     const fila2 = page.locator('tr', { has: page.locator('td', { hasText: '2' }).first() })
@@ -114,11 +107,7 @@ ana.h1.${stamp}@academia.edu.ec,Ana Pérez,DOCENTE
 beto.h1.${stamp}@academia.edu.ec,Beto López,ESTUDIANTE
 carla.h1.${stamp}@academia.edu.ec,Carla Mora,DOCENTE
 `
-    await page.setInputFiles('[data-testid="csv-file-input"]', {
-      name: 'usuarios-h1.csv',
-      mimeType: 'text/csv',
-      buffer: Buffer.from(CSV_3_OK)
-    })
+    await uploadCsv(page, 'usuarios-h1.csv', CSV_3_OK)
 
     await page.click('[data-testid="importar-button"]')
 
@@ -154,11 +143,7 @@ carla.h1.${stamp}@academia.edu.ec,Carla Mora,DOCENTE
 h2uno.${stamp}@academia.edu.ec,H2 Uno,DOCENTE
 h2dos.${stamp}@academia.edu.ec,H2 Dos,ESTUDIANTE
 `
-    await page.setInputFiles('[data-testid="csv-file-input"]', {
-      name: 'usuarios-h2.csv',
-      mimeType: 'text/csv',
-      buffer: Buffer.from(CSV_2_OK)
-    })
+    await uploadCsv(page, 'usuarios-h2.csv', CSV_2_OK)
 
     const downloadPromise = page.waitForEvent('download')
     await page.click('[data-testid="importar-button"]')
@@ -178,5 +163,27 @@ h2dos.${stamp}@academia.edu.ec,H2 Dos,ESTUDIANTE
     expect(contenido).toContain('ESTUDIANTE')
 
     expect(download.suggestedFilename()).toMatch(/^reporte-importacion-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.csv$/)
+  })
+
+  test('H5 — Paso 1 no avanza automáticamente: requiere click en Siguiente', async ({ page }) => {
+    await login(page)
+    await page.goto('/admin/usuarios/importar')
+
+    await page.setInputFiles('[data-testid="csv-file-input"]', {
+      name: 'usuarios-h5.csv',
+      mimeType: 'text/csv',
+      buffer: Buffer.from(CSV_CON_ERRORES)
+    })
+
+    await page.locator('[data-testid="siguiente-button"]').waitFor({ state: 'visible' })
+
+    // Antes de Siguiente: NO debe verse la tabla de revisión
+    await expect(page.getByTestId('filtro-validas')).toHaveCount(0)
+    await expect(page.getByTestId('archivo-listo')).toBeVisible()
+
+    await page.click('[data-testid="siguiente-button"]')
+
+    // Después de Siguiente: aparece la tabla de revisión
+    await expect(page.getByTestId('filtro-validas')).toBeVisible()
   })
 })

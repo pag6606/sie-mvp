@@ -61,13 +61,18 @@ describe('CsvUploader', () => {
     expect(onCargado).not.toHaveBeenCalled()
   })
 
-  it('parsea, valida y propaga filas con clasificaciones correctas', async () => {
+  it('parsea, valida y propaga filas con clasificaciones correctas al click en Siguiente', async () => {
     const onCargado = vi.fn<(filas: FilaValidada[], nombre: string) => void>()
     render(<CsvUploader onArchivoCargado={onCargado} nombreArchivoActual="" />)
     const input = screen.getByTestId('csv-file-input')
 
     const file = new File(['email,nombre,roles\n...'], 'usuarios.csv', { type: 'text/csv' })
     fireEvent.change(input, { target: { files: [file] } })
+
+    await screen.findByTestId('archivo-listo')
+    expect(onCargado).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByTestId('siguiente-button'))
 
     await vi.waitFor(() => {
       expect(onCargado).toHaveBeenCalledTimes(1)
@@ -104,6 +109,8 @@ describe('CsvUploader', () => {
     const file = new File(['x'], 'dup.csv', { type: 'text/csv' })
     fireEvent.change(input, { target: { files: [file] } })
 
+    await screen.findByTestId('archivo-listo')
+    fireEvent.click(screen.getByTestId('siguiente-button'))
     await vi.waitFor(() => expect(onCargado).toHaveBeenCalled())
 
     const [filas] = onCargado.mock.calls[0]
@@ -155,6 +162,8 @@ describe('CsvUploader', () => {
     const file = new File(['x'], 'r.csv', { type: 'text/csv' })
     fireEvent.change(input, { target: { files: [file] } })
 
+    await screen.findByTestId('archivo-listo')
+    fireEvent.click(screen.getByTestId('siguiente-button'))
     await vi.waitFor(() => expect(onCargado).toHaveBeenCalled())
     const [filas] = onCargado.mock.calls[0]
     // Fila 3 (índice 1) en el mock: email '' (vacío) + roles 'ESTUDIANTE'
@@ -164,5 +173,40 @@ describe('CsvUploader', () => {
     expect(filas[1].roles).toBe('ESTUDIANTE')
     expect(filas[2].email).toBe('malo')
     expect(filas[2].roles).toBe('ESTUDIANTE')
+  })
+
+  it('no avanza automáticamente: el botón Siguiente solo aparece tras parseo exitoso (H5)', async () => {
+    const onCargado = vi.fn<(filas: FilaValidada[], nombre: string) => void>()
+    render(<CsvUploader onArchivoCargado={onCargado} nombreArchivoActual="" />)
+
+    expect(screen.queryByTestId('siguiente-button')).not.toBeInTheDocument()
+    expect(onCargado).not.toHaveBeenCalled()
+
+    const input = screen.getByTestId('csv-file-input')
+    const file = new File(['email,nombre,roles\nvalida@x.com,Ana,DOCENTE'], 'ok.csv', { type: 'text/csv' })
+    fireEvent.change(input, { target: { files: [file] } })
+
+    await screen.findByTestId('siguiente-button')
+    expect(onCargado).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByTestId('siguiente-button'))
+    await vi.waitFor(() => expect(onCargado).toHaveBeenCalledTimes(1))
+  })
+
+  it('botón Cambiar archivo descarta el archivo cargado y permite reintentar', async () => {
+    const onCargado = vi.fn<(filas: FilaValidada[], nombre: string) => void>()
+    render(<CsvUploader onArchivoCargado={onCargado} nombreArchivoActual="" />)
+    const input = screen.getByTestId('csv-file-input')
+
+    const file1 = new File(['email,nombre,roles\nana@x.com,Ana,DOCENTE'], 'primero.csv', { type: 'text/csv' })
+    fireEvent.change(input, { target: { files: [file1] } })
+
+    await screen.findByTestId('archivo-listo')
+    expect(screen.getByText(/primero\.csv/)).toBeInTheDocument()
+
+    fireEvent.click(screen.getByTestId('cambiar-archivo-button'))
+
+    expect(screen.queryByTestId('archivo-listo')).not.toBeInTheDocument()
+    expect(onCargado).not.toHaveBeenCalled()
   })
 })

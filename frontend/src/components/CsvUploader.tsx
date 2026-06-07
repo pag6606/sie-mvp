@@ -74,6 +74,7 @@ export default function CsvUploader({ onArchivoCargado, nombreArchivoActual }: C
   const [error, setError] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
   const [procesando, setProcesando] = useState(false)
+  const [archivoCargado, setArchivoCargado] = useState<{ filas: FilaValidada[]; nombre: string } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { parsearCsv } = useCsvParser()
 
@@ -114,13 +115,13 @@ export default function CsvUploader({ onArchivoCargado, nombreArchivoActual }: C
         return validarFila(row, filaNum, filaAnterior)
       })
 
-      onArchivoCargado(filasValidadas, file.name)
+      setArchivoCargado({ filas: filasValidadas, nombre: file.name })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error al procesar el archivo')
     } finally {
       setProcesando(false)
     }
-  }, [parsearCsv, onArchivoCargado])
+  }, [parsearCsv])
 
   const handleFile = useCallback((file: File) => {
     void validarYOExtraer(file)
@@ -151,6 +152,18 @@ export default function CsvUploader({ onArchivoCargado, nombreArchivoActual }: C
       e.preventDefault()
       fileInputRef.current?.click()
     }
+  }
+
+  const handleSiguiente = () => {
+    if (archivoCargado) {
+      onArchivoCargado(archivoCargado.filas, archivoCargado.nombre)
+      setArchivoCargado(null)
+    }
+  }
+
+  const handleCambiarArchivo = () => {
+    setArchivoCargado(null)
+    setError(null)
   }
 
   const descargarPlantilla = () => {
@@ -196,6 +209,40 @@ export default function CsvUploader({ onArchivoCargado, nombreArchivoActual }: C
           data-testid="csv-file-input"
         />
       </div>
+
+      {archivoCargado && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-primary/30 bg-primary/5 px-4 py-3"
+          data-testid="archivo-listo"
+          role="status"
+          aria-live="polite"
+        >
+          <div>
+            <p className="text-sm font-medium text-foreground">
+              ✓ Archivo cargado: <span className="font-mono">{archivoCargado.nombre}</span>
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {archivoCargado.filas.length} filas listas para revisar
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={handleCambiarArchivo}
+              className="rounded-md border px-4 py-2 text-sm hover:bg-muted"
+              data-testid="cambiar-archivo-button"
+            >
+              ← Cambiar archivo
+            </button>
+            <button
+              onClick={handleSiguiente}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              data-testid="siguiente-button"
+            >
+              Siguiente →
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center justify-between rounded-md bg-muted/30 px-4 py-3">
         <p className="text-sm text-muted-foreground">
