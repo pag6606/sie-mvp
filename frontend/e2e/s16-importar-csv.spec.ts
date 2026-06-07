@@ -186,4 +186,48 @@ h2dos.${stamp}@academia.edu.ec,H2 Dos,ESTUDIANTE
     // Después de Siguiente: aparece la tabla de revisión
     await expect(page.getByTestId('filtro-validas')).toBeVisible()
   })
+
+  test('H6 — click en "X con errores" invoca scrollIntoView en la primera fila inválida', async ({ page }) => {
+    await login(page)
+    await page.goto('/admin/usuarios/importar')
+
+    const CSV_LARGO = `email,nombre,roles
+ok1@x.com,Ana,DOCENTE
+ok2@x.com,Beto,ESTUDIANTE
+ok3@x.com,Carla,DOCENTE
+malformado1,Diego,ESTUDIANTE
+ok4@x.com,Eli,ESTUDIANTE
+malformado2,Fer,ESTUDIANTE
+`
+    await uploadCsv(page, 'largo-h6.csv', CSV_LARGO)
+
+    const primeraInvalida = page.getByTestId('fila-5')
+    await primeraInvalida.waitFor({ state: 'visible' })
+
+    await page.evaluate(el => {
+      el.dataset.scrollSpy = '0'
+      const original = el.scrollIntoView.bind(el)
+      el.scrollIntoView = function(opts) {
+        el.dataset.scrollSpy = '1'
+        el.dataset.scrollBlock = String(opts?.block ?? '')
+        el.dataset.scrollBehavior = String(opts?.behavior ?? '')
+        return original(opts)
+      }
+    }, await primeraInvalida.elementHandle())
+
+    await page.getByTestId('filtro-invalidas').click()
+
+    await page.waitForFunction(
+      el => el.dataset.scrollSpy === '1',
+      await primeraInvalida.elementHandle(),
+      { timeout: 3000 }
+    )
+
+    const attrs = await primeraInvalida.evaluate(el => ({
+      block: el.dataset.scrollBlock,
+      behavior: el.dataset.scrollBehavior
+    }))
+    expect(attrs.block).toBe('center')
+    expect(attrs.behavior).toBe('smooth')
+  })
 })

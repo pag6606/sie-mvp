@@ -32,6 +32,7 @@ export default function CsvPreviewTable({
 }: CsvPreviewTableProps) {
   const [filtro, setFiltro] = useState<Filtro>('todas')
   const originalesRef = useRef<Map<number, FilaValidada>>(new Map())
+  const filasRefs = useRef<Map<number, HTMLTableRowElement>>(new Map())
   useEffect(() => {
     if (originalesRef.current.size === 0 && filas.length > 0) {
       filas.forEach(f => originalesRef.current.set(f.fila, { ...f }))
@@ -66,7 +67,19 @@ export default function CsvPreviewTable({
   }, [filas, filtro])
 
   const toggleFiltro = (target: 'validas' | 'invalidas') => {
-    setFiltro(prev => prev === target ? 'todas' : target)
+    setFiltro(prev => {
+      const nuevoFiltro = prev === target ? 'todas' : target
+      if (nuevoFiltro === 'invalidas') {
+        const primeraInvalida = filas.find(f => f.estado === 'invalido')
+        if (primeraInvalida) {
+          const ref = filasRefs.current.get(primeraInvalida.fila)
+          if (ref && typeof ref.scrollIntoView === 'function') {
+            ref.scrollIntoView({ block: 'center', behavior: 'smooth' })
+          }
+        }
+      }
+      return nuevoFiltro
+    })
   }
 
   const handleEscape = (fila: FilaValidada) => {
@@ -233,7 +246,16 @@ export default function CsvPreviewTable({
               const esValida = fila.estado === 'valido'
               const bg = esValida ? '' : 'bg-red-50'
               return (
-                <tr key={fila.fila} className={`border-t ${bg}`}>
+                <tr
+                  key={fila.fila}
+                  ref={el => {
+                    if (el) filasRefs.current.set(fila.fila, el)
+                    else filasRefs.current.delete(fila.fila)
+                  }}
+                  data-testid={`fila-${fila.fila}`}
+                  data-estado={fila.estado}
+                  className={`border-t ${bg}`}
+                >
                   <td className="px-3 py-2 text-xs text-muted-foreground">{fila.fila}</td>
                   <td className="px-3 py-2">
                     <input

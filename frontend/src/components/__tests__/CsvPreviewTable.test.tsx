@@ -124,6 +124,56 @@ describe('CsvPreviewTable', () => {
     expect(screen.getByDisplayValue('a@x.com')).toBeInTheDocument()
   })
 
+  it('H6 — click en "X con errores" hace scrollIntoView al primer error (smooth, block center)', () => {
+    const FILAS_LARGAS: FilaValidada[] = [
+      { fila: 2, email: 'valida1@x.com', nombre: 'Ana', roles: 'DOCENTE', estado: 'valido', motivoError: null, editada: false },
+      { fila: 3, email: 'valida2@x.com', nombre: 'Beto', roles: 'ESTUDIANTE', estado: 'valido', motivoError: null, editada: false },
+      { fila: 4, email: 'valida3@x.com', nombre: 'Carla', roles: 'DOCENTE', estado: 'valido', motivoError: null, editada: false },
+      { fila: 5, email: 'malo1', nombre: 'Diego', roles: 'ESTUDIANTE', estado: 'invalido', motivoError: 'Email inválido', editada: false },
+      { fila: 6, email: 'valida4@x.com', nombre: 'Eli', roles: 'ESTUDIANTE', estado: 'valido', motivoError: null, editada: false },
+      { fila: 7, email: 'malo2', nombre: 'Fer', roles: 'ESTUDIANTE', estado: 'invalido', motivoError: 'Email inválido', editada: false }
+    ]
+    render(
+      <CsvPreviewTable
+        filas={FILAS_LARGAS}
+        onFilasChange={vi.fn()}
+        onVolver={vi.fn()}
+        onImportar={vi.fn()}
+        nombreArchivo="largo.csv"
+      />,
+      { wrapper }
+    )
+
+    const fila5 = screen.getByTestId('fila-5') as HTMLTableRowElement
+    const scrollSpy = vi.fn()
+    fila5.scrollIntoView = scrollSpy
+
+    fireEvent.click(screen.getByTestId('filtro-invalidas'))
+
+    expect(scrollSpy).toHaveBeenCalledWith({ block: 'center', behavior: 'smooth' })
+  })
+
+  it('H6 — click en "X válidas" NO hace scrollIntoView (solo aplica a errores)', () => {
+    render(
+      <CsvPreviewTable
+        filas={FILAS_BASE}
+        onFilasChange={vi.fn()}
+        onVolver={vi.fn()}
+        onImportar={vi.fn()}
+        nombreArchivo="r.csv"
+      />,
+      { wrapper }
+    )
+
+    const fila2 = screen.getByTestId('fila-2') as HTMLTableRowElement
+    const scrollSpy = vi.fn()
+    fila2.scrollIntoView = scrollSpy
+
+    fireEvent.click(screen.getByTestId('filtro-validas'))
+
+    expect(scrollSpy).not.toHaveBeenCalled()
+  })
+
   it('click en "X válidas" filtra a válidas', () => {
     render(
       <CsvPreviewTable
