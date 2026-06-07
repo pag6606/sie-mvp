@@ -43,15 +43,13 @@ public class AdminUserSeeder implements CommandLineRunner {
         admin.setPrimerLogin(false);
         admin = usuarioRepository.save(admin);
 
-        for (RolCodigo codigo : RolCodigo.values()) {
-            Rol rol = rolRepository.findByCodigo(codigo)
-                    .orElseThrow(() -> new IllegalStateException("Roles not seeded. Run RolDataInitializer first."));
-            UsuarioRol ur = new UsuarioRol();
-            ur.setId(new UsuarioRolId(admin.getId(), rol.getId()));
-            ur.setUsuario(admin);
-            ur.setRol(rol);
-            admin.getUsuarioRoles().add(ur);
-        }
+        Rol rolAdmin = rolRepository.findByCodigo(RolCodigo.ADMINISTRADOR)
+                .orElseThrow(() -> new IllegalStateException("Rol ADMINISTRADOR not seeded. Run RolDataInitializer first."));
+        UsuarioRol ur = new UsuarioRol();
+        ur.setId(new UsuarioRolId(admin.getId(), rolAdmin.getId()));
+        ur.setUsuario(admin);
+        ur.setRol(rolAdmin);
+        admin.getUsuarioRoles().add(ur);
         usuarioRepository.save(admin);
         log.info("==============================================");
         log.info("  Admin user: admin@sie.edu.ec / Admin123!!");

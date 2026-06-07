@@ -14,7 +14,7 @@ function wrapper({ children }: { children: React.ReactNode }) {
 }
 
 const mockUsuarios = [
-  { id: '1', email: 'admin@sie.edu.ec', nombre: 'Alma', roles: ['ADMIN'], activo: true },
+  { id: '1', email: 'admin@sie.edu.ec', nombre: 'Alma', roles: ['ADMINISTRADOR'], activo: true },
   { id: '2', email: 'diana@colegio.edu.ec', nombre: 'Diana', roles: ['DOCENTE'], activo: true },
 ]
 

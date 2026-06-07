@@ -88,7 +88,7 @@ export default function UsuariosPage() {
               <div>
                 <p className="block text-xs font-medium text-muted-foreground mb-2">Roles</p>
                 <div className="flex gap-4">
-                  {['ADMIN','DOCENTE','ESTUDIANTE'].map(r => (
+                  {['ADMINISTRADOR','DOCENTE','ESTUDIANTE'].map(r => (
                     <label key={r} htmlFor={`rol-${r}`} className="flex items-center gap-2 text-sm text-foreground">
                       <input id={`rol-${r}`} type="checkbox" checked={formRoles.includes(r)} onChange={() => toggleRol(r)} />
                       {r}

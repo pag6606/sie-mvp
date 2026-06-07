@@ -5,6 +5,13 @@ import api from '@/services/api'
 import { InlineError } from '@/components/UIPatterns'
 import type { ApiError } from '@/types/api'
 
+export function rutaPorRol(roles: string[] | undefined): string | null {
+  if (!roles || roles.length === 0) return null
+  if (roles.includes('ADMINISTRADOR')) return '/admin'
+  if (roles.includes('DOCENTE')) return '/docente'
+  return '/estudiante'
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -19,10 +26,8 @@ export default function LoginPage() {
     mutationFn: ({ email, password }) => api.post('/auth/login', { email, password }),
     onSuccess: ({ data }) => {
       localStorage.setItem('token', data.token)
-      if (!data.roles || data.roles.length === 0) return
-      if (data.roles.includes('ADMIN')) navigate('/admin')
-      else if (data.roles.includes('DOCENTE')) navigate('/docente')
-      else navigate('/estudiante')
+      const ruta = rutaPorRol(data.roles)
+      if (ruta) navigate(ruta)
     },
   })
 
