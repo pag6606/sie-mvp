@@ -29,7 +29,7 @@ export interface ResumenValidacion {
 
 export interface ResultadoImportacion {
   creados: number
-  emailsEnviados: number
+  emailsPendientes: number
   usuarios: UsuarioCreado[]
 }
 
@@ -49,7 +49,7 @@ export interface ReporteImportacion {
   archivo: string
   totalEnviados: number
   creados: number
-  emailsEnviados: number
+  emailsPendientes: number
   duracionSegundos: number
   estado: 'exitoso' | 'fallo'
   mensaje?: string

@@ -43,7 +43,7 @@ export default function ImportarUsuariosPage() {
       archivo: nombreArchivo,
       totalEnviados: meta.totalEnviados,
       creados: result.creados,
-      emailsEnviados: result.emailsEnviados,
+      emailsPendientes: result.emailsPendientes,
       duracionSegundos: meta.duracionSegundos,
       estado: exitoso ? 'exitoso' : 'fallo',
       mensaje: exitoso ? undefined : `Se esperaban crear ${meta.totalEnviados} usuarios pero el backend reportó ${result.creados}`,
@@ -148,7 +148,7 @@ function ResultadoImport({
           {reporte.creados} de {reporte.totalEnviados} usuarios creados
         </h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          📨 {reporte.emailsEnviados} emails de activación enviados (visibles en Mailpit en dev)
+          📨 {reporte.emailsPendientes} emails de activación en cola (verificables en Mailpit en dev)
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
           ⏱ Duración: {reporte.duracionSegundos}s · Archivo: {reporte.archivo}

@@ -8,7 +8,7 @@ export function generarCsvReporte(reporte: ReporteImportacion): string {
     `Archivo origen: ${reporte.archivo}`,
     `Total enviados: ${reporte.totalEnviados}`,
     `Usuarios creados: ${reporte.creados}`,
-    `Emails de activación enviados: ${reporte.emailsEnviados}`,
+    `Emails de activación en cola: ${reporte.emailsPendientes}`,
     `Duración: ${reporte.duracionSegundos}s`,
     `Estado: ${reporte.estado}`
   ]

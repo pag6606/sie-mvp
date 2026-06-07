@@ -83,12 +83,13 @@ CSV-BI-4: Reporte de errores              [+0.5d]  ─┘
 
 ### Acceptance Criteria
 - [x] `UsuarioService.crearUsuarios` es `@Transactional` (rollback en cualquier excepción)
-- [x] Usa `usuarioRepository.saveAll(usuarios)` con `spring.jpa.properties.hibernate.jdbc.batch_size=50` habilitado
+- [-] Usa `usuarioRepository.saveAll(usuarios)` con `spring.jpa.properties.hibernate.jdbc.batch_size=50` habilitado
+  > **Desviación intencional** — el loop llama `crearUsuario()` → `repository.save()` por iteración para preservar la granularidad de eventos de dominio (cada `UsuarioCreadoEvent` se emite y se procesa individualmente en el `AFTER_COMMIT`). Ver ADR-012 §Stack concreto.
 - [x] Email de activación se dispara vía `TransactionalEventListener(phase = AFTER_COMMIT)` — **NO se envía si hay rollback**
 - [x] Nuevo endpoint `POST /api/usuarios/batch/importar-csv` en `UsuarioController`:
   - Acepta JSON con `[{email, nombre, roles}]` (rol como string, no enum)
   - Valida: lista no-vacía, ≤ 1000 elementos, emails únicos, todos los roles válidos
-  - 201 Created con `{creados, emailsEnviados}`
+  - 201 Created con `{creados, emailsPendientes}`
   - 400 Bad Request si lista vacía o > 1000
   - 422 Unprocessable Entity si rollback atómico (BatchImportException)
 - [x] Endpoint legacy `POST /api/usuarios/batch/crear` **se mantiene** intacto (no breaking change)

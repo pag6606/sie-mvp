@@ -279,7 +279,7 @@ describe('CsvPreviewTable', () => {
     const onImportar = vi.fn<
       (r: ResultadoImportacion, meta: { duracionSegundos: number; totalEnviados: number }) => void
     >()
-    vi.mocked(api.post).mockResolvedValue({ data: { creados: 1, emailsEnviados: 1 } })
+    vi.mocked(api.post).mockResolvedValue({ data: { creados: 1, emailsPendientes: 1 } })
 
     const soloValidas = FILAS_BASE.filter(f => f.estado === 'valido')
     render(
@@ -304,7 +304,7 @@ describe('CsvPreviewTable', () => {
     })
     await waitFor(() => {
       expect(onImportar).toHaveBeenCalledWith(
-        { creados: 1, emailsEnviados: 1 },
+        { creados: 1, emailsPendientes: 1 },
         expect.objectContaining({ totalEnviados: 1, duracionSegundos: expect.any(Number) })
       )
     })

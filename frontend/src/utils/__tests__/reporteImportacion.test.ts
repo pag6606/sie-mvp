@@ -12,7 +12,7 @@ const REPORTE_EXITO: ReporteImportacion = {
   archivo: 'usuarios.csv',
   totalEnviados: 50,
   creados: 50,
-  emailsEnviados: 50,
+  emailsPendientes: 50,
   duracionSegundos: 3,
   estado: 'exitoso',
   usuarios: []
@@ -23,7 +23,7 @@ const REPORTE_FALLO: ReporteImportacion = {
   archivo: 'mixto.csv',
   totalEnviados: 10,
   creados: 7,
-  emailsEnviados: 7,
+  emailsPendientes: 7,
   duracionSegundos: 12,
   estado: 'fallo',
   mensaje: '3 filas no se crearon',
@@ -35,7 +35,7 @@ const REPORTE_CON_USUARIOS: ReporteImportacion = {
   archivo: 'usuarios.csv',
   totalEnviados: 2,
   creados: 2,
-  emailsEnviados: 2,
+  emailsPendientes: 2,
   duracionSegundos: 1,
   estado: 'exitoso',
   usuarios: USUARIOS_MOCK
@@ -50,7 +50,7 @@ describe('generarCsvReporte', () => {
     expect(csv).toContain('Archivo origen: usuarios.csv')
     expect(csv).toContain('Total enviados: 50')
     expect(csv).toContain('Usuarios creados: 50')
-    expect(csv).toContain('Emails de activación enviados: 50')
+    expect(csv).toContain('Emails de activación en cola: 50')
     expect(csv).toContain('Duración: 3s')
     expect(csv).toContain('Estado: exitoso')
   })

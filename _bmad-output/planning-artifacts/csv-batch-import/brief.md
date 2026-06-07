@@ -134,7 +134,7 @@ Content-Type: application/json
 ```
 
 **Respuestas:**
-- `201 Created` con `{ "creados": 195, "emailsEnviados": 195 }` — éxito
+- `201 Created` con `{ "creados": 195, "emailsPendientes": 195 }` — éxito
 - `422 Unprocessable Entity` con `{ "errores": [{fila, email, motivo}] }` — fallo de validación durante el commit
 - `400 Bad Request` — request mal formado (lista vacía, >1000, formato inválido)
 - `401/403` — falta `X-Colegio-Id` o es inválido

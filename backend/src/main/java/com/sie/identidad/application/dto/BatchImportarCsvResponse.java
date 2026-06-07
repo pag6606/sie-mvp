@@ -4,7 +4,7 @@ import java.util.List;
 
 public record BatchImportarCsvResponse(
         int creados,
-        int emailsEnviados,
+        int emailsPendientes,
         List<UsuarioResponse> usuarios
 ) {
 }

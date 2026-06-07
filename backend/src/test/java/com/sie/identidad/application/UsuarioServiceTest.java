@@ -180,7 +180,7 @@ class UsuarioServiceTest {
         BatchImportarCsvResponse response = usuarioService.crearUsuariosBatch(List.of(req1, req2), colegioId);
 
         assertEquals(2, response.creados());
-        assertEquals(2, response.emailsEnviados());
+        assertEquals(2, response.emailsPendientes());
         assertEquals(2, response.usuarios().size());
         assertEquals("a@colegio.edu.ec", response.usuarios().get(0).email());
         assertEquals("b@colegio.edu.ec", response.usuarios().get(1).email());

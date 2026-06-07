@@ -28,7 +28,7 @@ describe('useUsuariosBatchImport', () => {
       { id: 'uuid-1', email: 'a@x.com', nombre: 'Ana', roles: ['DOCENTE'], activo: true, primerLogin: true, createdAt: '2026-06-06T19:00:00Z', colegioId: 'colegio-1' },
       { id: 'uuid-2', email: 'b@x.com', nombre: 'Beto', roles: ['ESTUDIANTE'], activo: true, primerLogin: true, createdAt: '2026-06-06T19:00:00Z', colegioId: 'colegio-1' }
     ]
-    vi.mocked(api.post).mockResolvedValue({ data: { creados: 2, emailsEnviados: 2, usuarios: usuariosMock } })
+    vi.mocked(api.post).mockResolvedValue({ data: { creados: 2, emailsPendientes: 2, usuarios: usuariosMock } })
     const { result } = renderHook(() => useUsuariosBatchImport(), { wrapper })
 
     act(() => result.current.importar({ filasValidas: FILAS }))
@@ -39,12 +39,12 @@ describe('useUsuariosBatchImport', () => {
   })
 
   it('importar llama al endpoint con payload y devuelve resultado', async () => {
-    vi.mocked(api.post).mockResolvedValue({ data: { creados: 2, emailsEnviados: 2 } })
+    vi.mocked(api.post).mockResolvedValue({ data: { creados: 2, emailsPendientes: 2 } })
     const { result } = renderHook(() => useUsuariosBatchImport(), { wrapper })
 
     await act(async () => {
       const data = await result.current.importarAsync({ filasValidas: FILAS })
-      expect(data).toEqual({ creados: 2, emailsEnviados: 2 })
+      expect(data).toEqual({ creados: 2, emailsPendientes: 2 })
     })
 
     expect(api.post).toHaveBeenCalledWith(
@@ -79,7 +79,7 @@ describe('useUsuariosBatchImport', () => {
     expect(result.current.elapsedSeg).toBeGreaterThanOrEqual(1)
 
     await act(async () => {
-      resolvePost({ data: { creados: 2, emailsEnviados: 2 } })
+      resolvePost({ data: { creados: 2, emailsPendientes: 2 } })
     })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
@@ -102,7 +102,7 @@ describe('useUsuariosBatchImport', () => {
     expect(result.current.elapsedExcedeUmbral).toBe(false)
 
     await act(async () => {
-      resolvePost({ data: { creados: 2, emailsEnviados: 2 } })
+      resolvePost({ data: { creados: 2, emailsPendientes: 2 } })
     })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
@@ -138,7 +138,7 @@ describe('useUsuariosBatchImport', () => {
   })
 
   it('reiniciar limpia elapsed, fueCancelado y mutation state', async () => {
-    vi.mocked(api.post).mockResolvedValue({ data: { creados: 2, emailsEnviados: 2 } })
+    vi.mocked(api.post).mockResolvedValue({ data: { creados: 2, emailsPendientes: 2 } })
     const { result } = renderHook(() => useUsuariosBatchImport(), { wrapper })
 
     await act(async () => {
@@ -156,7 +156,7 @@ describe('useUsuariosBatchImport', () => {
   })
 
   it('completa exitosamente e invalida queries', async () => {
-    vi.mocked(api.post).mockResolvedValue({ data: { creados: 1, emailsEnviados: 1 } })
+    vi.mocked(api.post).mockResolvedValue({ data: { creados: 1, emailsPendientes: 1 } })
     const { result } = renderHook(() => useUsuariosBatchImport(), { wrapper })
 
     await act(async () => {
@@ -164,7 +164,7 @@ describe('useUsuariosBatchImport', () => {
     })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
-    expect(result.current.data).toEqual({ creados: 1, emailsEnviados: 1 })
+    expect(result.current.data).toEqual({ creados: 1, emailsPendientes: 1 })
   })
 })
 
@@ -211,7 +211,7 @@ describe('useUsuariosBatchImport — H8: abort mutation previa en reintento', ()
     vi.mocked(api.post).mockImplementation(((_url: string, _body: unknown, config?: { signal?: AbortSignal }) => {
       if (config?.signal) signals.push(config.signal)
       if (signals.length === 1) return firstPromise
-      return Promise.resolve({ data: { creados: 1, emailsEnviados: 1, usuarios: [] } })
+      return Promise.resolve({ data: { creados: 1, emailsPendientes: 1, usuarios: [] } })
     }) as never)
 
     const { result } = renderHook(() => useUsuariosBatchImport(), { wrapper })
