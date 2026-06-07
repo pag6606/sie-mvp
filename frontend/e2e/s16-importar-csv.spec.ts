@@ -46,8 +46,10 @@ test.describe('S16: Importar CSV — edición inline', () => {
     const fila3 = page.locator('tr', { has: page.locator('td', { hasText: '3' }).first() })
     await expect(fila3.getByText('✗ Error')).toBeVisible()
 
-    // Arreglo el email de la fila 3
-    const emailInput = fila3.locator('input').first()
+    // Arreglo el email de la fila 3 con dblclick (read-only por defecto, H7)
+    const celdaEmail3 = page.getByTestId('celda-email-3')
+    await celdaEmail3.dblclick()
+    const emailInput = celdaEmail3.locator('input').first()
     await emailInput.fill('ernesto.arreglado@academia.edu.ec')
 
     // El badge cambia a Válida
@@ -75,8 +77,9 @@ test.describe('S16: Importar CSV — edición inline', () => {
     await uploadCsv(page, 'usuarios.csv', CSV_CON_ERRORES)
 
     await page.getByTestId('filtro-invalidas').click()
-    await expect(page.locator('input[value="malformado"]')).toBeVisible()
-    await expect(page.locator('input[value="valida@academia.edu.ec"]')).toHaveCount(0)
+    // En read-only, los valores son texto, no inputs
+    await expect(page.getByText('malformado')).toBeVisible()
+    await expect(page.getByText('valida@academia.edu.ec')).toHaveCount(0)
   })
 
   test('capitalizeWords aplica al editar el nombre', async ({ page }) => {
@@ -85,9 +88,10 @@ test.describe('S16: Importar CSV — edición inline', () => {
 
     await uploadCsv(page, 'usuarios.csv', CSV_CON_ERRORES)
 
-    // Fila 2 (válida) — nombre "Alma Reyes" - el input debería tener el valor
-    const fila2 = page.locator('tr', { has: page.locator('td', { hasText: '2' }).first() })
-    const nombreInput = fila2.locator('input').nth(1)
+    // Fila 2 (válida) — dblclick sobre la celda de nombre para entrar en edit
+    const celdaNombre2 = page.getByTestId('celda-nombre-2')
+    await celdaNombre2.dblclick()
+    const nombreInput = celdaNombre2.locator('input').first()
     await expect(nombreInput).toHaveValue('Alma Reyes')
 
     // Edito a minúsculas
@@ -229,5 +233,35 @@ malformado2,Fer,ESTUDIANTE
     }))
     expect(attrs.block).toBe('center')
     expect(attrs.behavior).toBe('smooth')
+  })
+
+  test('H7 — celdas en read-only por defecto; dblclick activa edit; blur cierra', async ({ page }) => {
+    await login(page)
+    await page.goto('/admin/usuarios/importar')
+
+    await uploadCsv(page, 'h7.csv', CSV_CON_ERRORES)
+
+    // Por defecto NO hay inputs en las celdas
+    expect(await page.locator('input[type="email"]').count()).toBe(0)
+
+    // Los valores son texto
+    await expect(page.getByText('valida@academia.edu.ec')).toBeVisible()
+    await expect(page.getByText('Alma Reyes')).toBeVisible()
+
+    // dblclick en la celda email de fila 3 abre el input
+    const celdaEmail3 = page.getByTestId('celda-email-3')
+    await celdaEmail3.dblclick()
+    const inputEmail = celdaEmail3.locator('input').first()
+    await expect(inputEmail).toBeVisible()
+    await expect(inputEmail).toHaveValue('malformado')
+    // autoFocus
+    const focused = await page.evaluate(() => document.activeElement?.tagName)
+    expect(focused).toBe('INPUT')
+
+    // dblclick en otra celda cierra la primera automáticamente
+    const celdaNombre2 = page.getByTestId('celda-nombre-2')
+    await celdaNombre2.dblclick()
+    expect(await celdaEmail3.locator('input').count()).toBe(0)
+    await expect(celdaNombre2.locator('input').first()).toBeVisible()
   })
 })

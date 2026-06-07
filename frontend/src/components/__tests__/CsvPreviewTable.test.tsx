@@ -114,14 +114,14 @@ describe('CsvPreviewTable', () => {
       { wrapper }
     )
 
-    expect(screen.getByDisplayValue('a@x.com')).toBeInTheDocument()
+    expect(screen.getByText('a@x.com')).toBeInTheDocument()
     fireEvent.click(screen.getByTestId('filtro-invalidas'))
-    expect(screen.queryByDisplayValue('a@x.com')).not.toBeInTheDocument()
-    expect(screen.getByDisplayValue('Sin Email')).toBeInTheDocument()
+    expect(screen.queryByText('a@x.com')).not.toBeInTheDocument()
+    expect(screen.getByText('Sin Email')).toBeInTheDocument()
 
     // click otra vez desactiva el filtro
     fireEvent.click(screen.getByTestId('filtro-invalidas'))
-    expect(screen.getByDisplayValue('a@x.com')).toBeInTheDocument()
+    expect(screen.getByText('a@x.com')).toBeInTheDocument()
   })
 
   it('H6 — click en "X con errores" hace scrollIntoView al primer error (smooth, block center)', () => {
@@ -187,8 +187,8 @@ describe('CsvPreviewTable', () => {
     )
 
     fireEvent.click(screen.getByTestId('filtro-validas'))
-    expect(screen.getByDisplayValue('a@x.com')).toBeInTheDocument()
-    expect(screen.queryByDisplayValue('Sin Email')).not.toBeInTheDocument()
+    expect(screen.getByText('a@x.com')).toBeInTheDocument()
+    expect(screen.queryByText('Sin Email')).not.toBeInTheDocument()
   })
 
   it('banner rojo aparece cuando hay inválidas', () => {
@@ -220,8 +220,9 @@ describe('CsvPreviewTable', () => {
       { wrapper }
     )
 
-    const emailVacio = screen.getByDisplayValue('')
-    fireEvent.change(emailVacio, { target: { value: 'recuperado@x.com' } })
+    fireEvent.doubleClick(screen.getByTestId('celda-email-3'))
+    const emailInput = screen.getByTestId('celda-email-3').querySelector('input') as HTMLInputElement
+    fireEvent.change(emailInput, { target: { value: 'recuperado@x.com' } })
 
     expect(onFilasChange).toHaveBeenCalled()
     const nuevasFilas = onFilasChange.mock.calls[0][0]
@@ -247,8 +248,9 @@ describe('CsvPreviewTable', () => {
       { wrapper }
     )
 
-    const emailB = screen.getByDisplayValue('b@x.com')
-    fireEvent.change(emailB, { target: { value: 'a@x.com' } })
+    fireEvent.doubleClick(screen.getByTestId('celda-email-3'))
+    const emailInput = screen.getByTestId('celda-email-3').querySelector('input') as HTMLInputElement
+    fireEvent.change(emailInput, { target: { value: 'a@x.com' } })
 
     const nuevasFilas = onFilasChange.mock.calls[0][0]
     const filaEditada = nuevasFilas.find(f => f.fila === 3)
@@ -345,7 +347,8 @@ describe('CsvPreviewTable', () => {
       { wrapper }
     )
 
-    const emailInput = screen.getAllByDisplayValue('a@x.com')[0] as HTMLInputElement
+    fireEvent.doubleClick(screen.getByTestId('celda-email-2'))
+    const emailInput = screen.getByTestId('celda-email-2').querySelector('input') as HTMLInputElement
     fireEvent.change(emailInput, { target: { value: 'temporal@edit.com' } })
     fireEvent.keyDown(emailInput, { key: 'Escape' })
 
@@ -369,11 +372,96 @@ describe('CsvPreviewTable', () => {
       { wrapper }
     )
 
-    const emailInput = screen.getAllByDisplayValue('a@x.com')[0] as HTMLInputElement
+    fireEvent.doubleClick(screen.getByTestId('celda-email-2'))
+    const emailInput = screen.getByTestId('celda-email-2').querySelector('input') as HTMLInputElement
     const blurSpy = vi.spyOn(emailInput, 'blur')
 
     fireEvent.keyDown(emailInput, { key: 'Enter' })
 
     expect(blurSpy).toHaveBeenCalled()
+  })
+
+  it('H7 — celdas en read-only por defecto (sin inputs hasta dblclick)', () => {
+    render(
+      <CsvPreviewTable
+        filas={FILAS_BASE}
+        onFilasChange={vi.fn()}
+        onVolver={vi.fn()}
+        onImportar={vi.fn()}
+        nombreArchivo="x.csv"
+      />,
+      { wrapper }
+    )
+
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+    expect(screen.getByText('a@x.com')).toBeInTheDocument()
+    expect(screen.getByText('Ana')).toBeInTheDocument()
+    expect(screen.getByText('DOCENTE')).toBeInTheDocument()
+  })
+
+  it('H7 — dblclick en celda email abre input con autoFocus y el valor actual', () => {
+    render(
+      <CsvPreviewTable
+        filas={FILAS_BASE}
+        onFilasChange={vi.fn()}
+        onVolver={vi.fn()}
+        onImportar={vi.fn()}
+        nombreArchivo="x.csv"
+      />,
+      { wrapper }
+    )
+
+    fireEvent.doubleClick(screen.getByTestId('celda-email-2'))
+
+    const celda = screen.getByTestId('celda-email-2')
+    const input = celda.querySelector('input')
+    expect(input).not.toBeNull()
+    expect((input as HTMLInputElement).value).toBe('a@x.com')
+    expect((input as HTMLInputElement).type).toBe('email')
+    expect(document.activeElement).toBe(input)
+  })
+
+  it('H7 — dblclick en otra celda cierra la edición anterior y abre la nueva', () => {
+    render(
+      <CsvPreviewTable
+        filas={FILAS_BASE}
+        onFilasChange={vi.fn()}
+        onVolver={vi.fn()}
+        onImportar={vi.fn()}
+        nombreArchivo="x.csv"
+      />,
+      { wrapper }
+    )
+
+    fireEvent.doubleClick(screen.getByTestId('celda-email-2'))
+    expect(screen.getByTestId('celda-email-2').querySelector('input')).not.toBeNull()
+
+    fireEvent.doubleClick(screen.getByTestId('celda-nombre-3'))
+    expect(screen.getByTestId('celda-email-2').querySelector('input')).toBeNull()
+    expect(screen.getByTestId('celda-nombre-3').querySelector('input')).not.toBeNull()
+  })
+
+  it('H7 — blur cierra el modo edición y commitea el valor', () => {
+    const onFilasChange = vi.fn<(filas: FilaValidada[]) => void>()
+    render(
+      <CsvPreviewTable
+        filas={FILAS_BASE}
+        onFilasChange={onFilasChange}
+        onVolver={vi.fn()}
+        onImportar={vi.fn()}
+        nombreArchivo="x.csv"
+      />,
+      { wrapper }
+    )
+
+    fireEvent.doubleClick(screen.getByTestId('celda-email-2'))
+    const input = screen.getByTestId('celda-email-2').querySelector('input') as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'editado@x.com' } })
+    fireEvent.blur(input)
+
+    expect(screen.getByTestId('celda-email-2').querySelector('input')).toBeNull()
+    const nuevasFilas = onFilasChange.mock.calls[onFilasChange.mock.calls.length - 1][0]
+    const fila1 = nuevasFilas[0]
+    expect(fila1.email).toBe('editado@x.com')
   })
 })

@@ -22,6 +22,8 @@ interface CsvPreviewTableProps {
 }
 
 type Filtro = 'todas' | 'validas' | 'invalidas'
+type Campo = 'email' | 'nombre' | 'roles'
+type CeldaEditando = { fila: number; campo: Campo } | null
 
 export default function CsvPreviewTable({
   filas,
@@ -31,6 +33,7 @@ export default function CsvPreviewTable({
   nombreArchivo
 }: CsvPreviewTableProps) {
   const [filtro, setFiltro] = useState<Filtro>('todas')
+  const [editandoCelda, setEditandoCelda] = useState<CeldaEditando>(null)
   const originalesRef = useRef<Map<number, FilaValidada>>(new Map())
   const filasRefs = useRef<Map<number, HTMLTableRowElement>>(new Map())
   useEffect(() => {
@@ -245,6 +248,9 @@ export default function CsvPreviewTable({
               const idxReal = filas.findIndex(f => f.fila === fila.fila)
               const esValida = fila.estado === 'valido'
               const bg = esValida ? '' : 'bg-red-50'
+              const editandoEmail = editandoCelda?.fila === fila.fila && editandoCelda.campo === 'email'
+              const editandoNombre = editandoCelda?.fila === fila.fila && editandoCelda.campo === 'nombre'
+              const editandoRol = editandoCelda?.fila === fila.fila && editandoCelda.campo === 'roles'
               return (
                 <tr
                   key={fila.fila}
@@ -257,58 +263,88 @@ export default function CsvPreviewTable({
                   className={`border-t ${bg}`}
                 >
                   <td className="px-3 py-2 text-xs text-muted-foreground">{fila.fila}</td>
-                  <td className="px-3 py-2">
-                    <input
-                      type="email"
-                      value={fila.email}
-                      onChange={e => actualizarFila(idxReal, { email: e.target.value })}
-                      onKeyDown={e => {
-                        if (e.key === 'Escape') {
-                          handleEscape(fila)
-                          ;(e.target as HTMLInputElement).blur()
-                        } else if (e.key === 'Enter') {
-                          ;(e.target as HTMLInputElement).blur()
-                        }
-                      }}
-                      aria-invalid={!esValida}
-                      className={`w-full rounded border bg-background px-2 py-1 text-sm ${
-                        esValida ? 'border-transparent' : 'border-red-300'
-                      }`}
-                    />
+                  <td
+                    className="px-3 py-1 cursor-pointer hover:bg-muted/50"
+                    onDoubleClick={() => setEditandoCelda({ fila: fila.fila, campo: 'email' })}
+                    data-testid={`celda-email-${fila.fila}`}
+                  >
+                    {editandoEmail ? (
+                      <input
+                        type="email"
+                        autoFocus
+                        value={fila.email}
+                        onChange={e => actualizarFila(idxReal, { email: e.target.value })}
+                        onBlur={() => setEditandoCelda(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Escape') {
+                            handleEscape(fila)
+                            setEditandoCelda(null)
+                          } else if (e.key === 'Enter') {
+                            ;(e.target as HTMLInputElement).blur()
+                          }
+                        }}
+                        aria-invalid={!esValida}
+                        className={`w-full rounded border bg-background px-2 py-1 text-sm ${
+                          esValida ? 'border-transparent' : 'border-red-300'
+                        }`}
+                      />
+                    ) : (
+                      <span className="block px-2 py-1 text-sm">{fila.email || <span className="italic text-muted-foreground">vacío</span>}</span>
+                    )}
                   </td>
-                  <td className="px-3 py-2">
-                    <input
-                      type="text"
-                      value={fila.nombre}
-                      onChange={e => actualizarFila(idxReal, { nombre: e.target.value })}
-                      onKeyDown={e => {
-                        if (e.key === 'Escape') {
-                          handleEscape(fila)
-                          ;(e.target as HTMLInputElement).blur()
-                        } else if (e.key === 'Enter') {
-                          ;(e.target as HTMLInputElement).blur()
-                        }
-                      }}
-                      aria-invalid={!esValida}
-                      className={`w-full rounded border bg-background px-2 py-1 text-sm ${
-                        esValida ? 'border-transparent' : 'border-red-300'
-                      }`}
-                    />
+                  <td
+                    className="px-3 py-1 cursor-pointer hover:bg-muted/50"
+                    onDoubleClick={() => setEditandoCelda({ fila: fila.fila, campo: 'nombre' })}
+                    data-testid={`celda-nombre-${fila.fila}`}
+                  >
+                    {editandoNombre ? (
+                      <input
+                        type="text"
+                        autoFocus
+                        value={fila.nombre}
+                        onChange={e => actualizarFila(idxReal, { nombre: e.target.value })}
+                        onBlur={() => setEditandoCelda(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Escape') {
+                            handleEscape(fila)
+                            setEditandoCelda(null)
+                          } else if (e.key === 'Enter') {
+                            ;(e.target as HTMLInputElement).blur()
+                          }
+                        }}
+                        aria-invalid={!esValida}
+                        className={`w-full rounded border bg-background px-2 py-1 text-sm ${
+                          esValida ? 'border-transparent' : 'border-red-300'
+                        }`}
+                      />
+                    ) : (
+                      <span className="block px-2 py-1 text-sm">{fila.nombre || <span className="italic text-muted-foreground">vacío</span>}</span>
+                    )}
                   </td>
-                  <td className="px-3 py-2">
-                    <select
-                      value={fila.roles ?? ''}
-                      onChange={e => actualizarFila(idxReal, { roles: e.target.value as RolUsuario })}
-                      aria-invalid={!esValida}
-                      className={`w-full rounded border bg-background px-2 py-1 text-sm ${
-                        esValida ? 'border-transparent' : 'border-red-300'
-                      }`}
-                    >
-                      <option value="">—</option>
-                      {ROLES_VALIDOS.map(r => (
-                        <option key={r} value={r}>{r}</option>
-                      ))}
-                    </select>
+                  <td
+                    className="px-3 py-1 cursor-pointer hover:bg-muted/50"
+                    onDoubleClick={() => setEditandoCelda({ fila: fila.fila, campo: 'roles' })}
+                    data-testid={`celda-rol-${fila.fila}`}
+                  >
+                    {editandoRol ? (
+                      <select
+                        autoFocus
+                        value={fila.roles ?? ''}
+                        onChange={e => actualizarFila(idxReal, { roles: e.target.value as RolUsuario })}
+                        onBlur={() => setEditandoCelda(null)}
+                        aria-invalid={!esValida}
+                        className={`w-full rounded border bg-background px-2 py-1 text-sm ${
+                          esValida ? 'border-transparent' : 'border-red-300'
+                        }`}
+                      >
+                        <option value="">—</option>
+                        {ROLES_VALIDOS.map(r => (
+                          <option key={r} value={r}>{r}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="block px-2 py-1 text-sm">{fila.roles || <span className="italic text-muted-foreground">—</span>}</span>
+                    )}
                   </td>
                   <td className="px-3 py-2">
                     {esValida ? (
