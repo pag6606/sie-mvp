@@ -1,5 +1,5 @@
 import type { ReporteImportacion } from '@/types/csvImport'
-import { escapeCsvCell } from './csvEscape'
+import { escapeCsvCell, escapeCsvRow } from './csvEscape'
 
 export function generarCsvReporte(reporte: ReporteImportacion): string {
   const campos: string[] = [
@@ -15,7 +15,17 @@ export function generarCsvReporte(reporte: ReporteImportacion): string {
   if (reporte.mensaje) {
     campos.push(`Detalle: ${reporte.mensaje}`)
   }
-  return campos.map(escapeCsvCell).join('\n')
+  const lineasBase = campos.map(escapeCsvCell)
+  if (reporte.usuarios.length === 0) {
+    return lineasBase.join('\n')
+  }
+  const lineasTabla: string[] = [
+    '',
+    escapeCsvCell('Usuarios creados:'),
+    escapeCsvRow(['email', 'id', 'rol', 'fecha_creacion']),
+    ...reporte.usuarios.map(u => escapeCsvRow([u.email, u.id, u.roles[0] ?? '', u.createdAt]))
+  ]
+  return [...lineasBase, ...lineasTabla].join('\n')
 }
 
 export function nombreArchivoReporte(reporte: ReporteImportacion): string {

@@ -53,4 +53,5 @@ export interface ReporteImportacion {
   duracionSegundos: number
   estado: 'exitoso' | 'fallo'
   mensaje?: string
+  usuarios: UsuarioCreado[]
 }

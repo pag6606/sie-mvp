@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { generarCsvReporte, nombreArchivoReporte } from '@/utils/reporteImportacion'
-import type { ReporteImportacion } from '@/types/csvImport'
+import type { ReporteImportacion, UsuarioCreado } from '@/types/csvImport'
+
+const USUARIOS_MOCK: UsuarioCreado[] = [
+  { id: 'uuid-1-aaa', email: 'ana@x.com', nombre: 'Ana Pérez', roles: ['DOCENTE'], activo: true, primerLogin: true, createdAt: '2026-06-06T18:30:00Z', colegioId: 'c-1' },
+  { id: 'uuid-2-bbb', email: 'beto@x.com', nombre: 'Beto López', roles: ['ESTUDIANTE'], activo: true, primerLogin: true, createdAt: '2026-06-06T18:30:00Z', colegioId: 'c-1' }
+]
 
 const REPORTE_EXITO: ReporteImportacion = {
   fecha: '2026-06-06T18:30:00.000Z',
@@ -9,10 +14,11 @@ const REPORTE_EXITO: ReporteImportacion = {
   creados: 50,
   emailsEnviados: 50,
   duracionSegundos: 3,
-  estado: 'exitoso'
+  estado: 'exitoso',
+  usuarios: []
 }
 
-const REPORTE_PARCIAL: ReporteImportacion = {
+const REPORTE_FALLO: ReporteImportacion = {
   fecha: '2026-06-06T18:35:12.000Z',
   archivo: 'mixto.csv',
   totalEnviados: 10,
@@ -20,7 +26,19 @@ const REPORTE_PARCIAL: ReporteImportacion = {
   emailsEnviados: 7,
   duracionSegundos: 12,
   estado: 'fallo',
-  mensaje: '3 filas no se crearon'
+  mensaje: '3 filas no se crearon',
+  usuarios: []
+}
+
+const REPORTE_CON_USUARIOS: ReporteImportacion = {
+  fecha: '2026-06-06T18:30:00.000Z',
+  archivo: 'usuarios.csv',
+  totalEnviados: 2,
+  creados: 2,
+  emailsEnviados: 2,
+  duracionSegundos: 1,
+  estado: 'exitoso',
+  usuarios: USUARIOS_MOCK
 }
 
 describe('generarCsvReporte', () => {
@@ -42,15 +60,36 @@ describe('generarCsvReporte', () => {
     expect(csv).not.toContain('Detalle:')
   })
 
-  it('incluye Detalle cuando hay mensaje (estado parcial)', () => {
-    const csv = generarCsvReporte(REPORTE_PARCIAL)
+  it('incluye Detalle cuando hay mensaje (estado fallo)', () => {
+    const csv = generarCsvReporte(REPORTE_FALLO)
     expect(csv).toContain('Detalle: 3 filas no se crearon')
     expect(csv).toContain('Estado: fallo')
   })
 
-  it('produce texto que se puede parsear como texto plano', () => {
+  it('omite sección de usuarios cuando la lista está vacía', () => {
     const csv = generarCsvReporte(REPORTE_EXITO)
+    expect(csv).not.toContain('email,id,rol,fecha_creacion')
     expect(csv.split('\n')).toHaveLength(8)
+  })
+
+  it('incluye tabla per-row con columnas email,id,rol,fecha_creacion cuando hay usuarios (H2)', () => {
+    const csv = generarCsvReporte(REPORTE_CON_USUARIOS)
+
+    expect(csv).toContain('email,id,rol,fecha_creacion')
+    expect(csv).toContain('ana@x.com,uuid-1-aaa,DOCENTE,2026-06-06T18:30:00Z')
+    expect(csv).toContain('beto@x.com,uuid-2-bbb,ESTUDIANTE,2026-06-06T18:30:00Z')
+  })
+
+  it('escapa emails con caracteres peligrosos (CSV injection) en la tabla', () => {
+    const csv = generarCsvReporte({
+      ...REPORTE_CON_USUARIOS,
+      usuarios: [
+        { ...USUARIOS_MOCK[0], email: '=cmd|"/c calc"!A1' }
+      ]
+    })
+
+    expect(csv).toContain('"\'=cmd|\"\"/c calc\"\"!A1"')
+    expect(csv).not.toContain('=cmd|"/c calc"!A1,')
   })
 })
 

@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test'
+import { readFile } from 'fs/promises'
 
 const ADMIN = { email: 'admin@sie.edu.ec', password: 'Admin123!!' }
 
@@ -142,5 +143,40 @@ carla.h1.${stamp}@academia.edu.ec,Carla Mora,DOCENTE
     const idCell = filas.nth(0).locator('td').nth(4)
     const idText = await idCell.textContent()
     expect(idText?.length).toBe(8)
+  })
+
+  test('H2 — Reporte CSV descargado incluye tabla per-row con email,id,rol,fecha_creacion', async ({ page }) => {
+    await login(page)
+    await page.goto('/admin/usuarios/importar')
+
+    const stamp = Date.now()
+    const CSV_2_OK = `email,nombre,roles
+h2uno.${stamp}@academia.edu.ec,H2 Uno,DOCENTE
+h2dos.${stamp}@academia.edu.ec,H2 Dos,ESTUDIANTE
+`
+    await page.setInputFiles('[data-testid="csv-file-input"]', {
+      name: 'usuarios-h2.csv',
+      mimeType: 'text/csv',
+      buffer: Buffer.from(CSV_2_OK)
+    })
+
+    const downloadPromise = page.waitForEvent('download')
+    await page.click('[data-testid="importar-button"]')
+    await page.locator('[data-testid="tabla-usuarios-creados"]').waitFor({ timeout: 15000 })
+    await page.click('[data-testid="descargar-reporte"]')
+    const download = await downloadPromise
+
+    const path = await download.path()
+    const contenido = await readFile(path, 'utf-8')
+
+    expect(contenido).toContain('Reporte de importación de usuarios')
+    expect(contenido).toContain('Usuarios creados:')
+    expect(contenido).toContain('email,id,rol,fecha_creacion')
+    expect(contenido).toContain(`h2uno.${stamp}@academia.edu.ec`)
+    expect(contenido).toContain(`h2dos.${stamp}@academia.edu.ec`)
+    expect(contenido).toContain('DOCENTE')
+    expect(contenido).toContain('ESTUDIANTE')
+
+    expect(download.suggestedFilename()).toMatch(/^reporte-importacion-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}\.csv$/)
   })
 })

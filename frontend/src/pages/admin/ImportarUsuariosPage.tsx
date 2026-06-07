@@ -46,7 +46,8 @@ export default function ImportarUsuariosPage() {
       emailsEnviados: result.emailsEnviados,
       duracionSegundos: meta.duracionSegundos,
       estado: exitoso ? 'exitoso' : 'fallo',
-      mensaje: exitoso ? undefined : `Se esperaban crear ${meta.totalEnviados} usuarios pero el backend reportó ${result.creados}`
+      mensaje: exitoso ? undefined : `Se esperaban crear ${meta.totalEnviados} usuarios pero el backend reportó ${result.creados}`,
+      usuarios: result.usuarios
     })
     setUsuariosCreados(result.usuarios)
     setPaso(3)
