@@ -1,9 +1,76 @@
 # Manual QA — SIE (Sistema de Información Estudiantil)
 
-> **Versión:** MVP 0.2.0 — Propuesta 1 UI  
-> **Fecha:** 2026-06-04  
-> **Precondición:** Servicios Docker levantados (`docker compose up`), backend corriendo (`./mvnw spring-boot:run`), frontend corriendo (`npm run dev`)  
-> **URL:** `http://localhost:5173`
+> **Versión:** MVP 0.1.0 — Propuesta 1 UI  
+> **Fecha:** 2026-06-06  
+> **Target release:** v0.1.0 (Academia del Pacífico demo)  
+> **URL base (dev):** `http://localhost:5173`  
+> **URL base (staging):** _[definir por el entorno]_
+
+---
+
+## Cómo ejecutar la prueba completa
+
+### Checklist pre-test (15 min)
+
+Antes de empezar, el tester debe verificar:
+
+- [ ] Servicios Docker levantados: `cd .opencode && docker compose up -d` (PostgreSQL + Mailpit)
+- [ ] Backend corriendo en `:8080`: `cd backend && ./mvnw spring-boot:run` (esperar "Started Application")
+- [ ] Frontend corriendo en `:5173`: `cd frontend && npm run dev -- --host` (esperar "ready in")
+- [ ] Mailpit accesible en `http://localhost:8025`
+- [ ] DB limpia (opcional): `podman exec -it sie-postgres psql -U sie -d postgres -c "DROP DATABASE sie;"` y reiniciar backend (ejecuta V1-V10)
+- [ ] Asset de prueba: `docs/qa/workflow-demo/estudiantes-200.csv` existe (200 filas válidas, BOM UTF-8)
+
+### Orden de ejecución recomendado (3 horas)
+
+1. **UA-01 a UA-02** (30 min) — Login + navegación. Si falla, abortar y reportar a Amelia.
+2. **UA-03 a UA-04** (30 min) — Dashboard + wizard de período. Necesario para tener contexto académico.
+3. **UA-05 a UA-06** (30 min) — Cursos + usuarios. Verificar LOPDP.
+4. **UA-07** (15 min) — Matrícula individual.
+5. **UA-08 a UA-13** (45 min) — Flujo docente completo (asistencia, notas, cierre).
+6. **UA-14** (10 min) — Flujo estudiante.
+7. **UA-15 a UA-16** (10 min) — Componentes UI y diseño visual.
+8. **UA-17** (45 min) — **Asistente CSV (novedad v0.1.0)** — caso estrella del release.
+9. **Llenar tabla "Resumen de Resultados"** al final con el resultado de cada caso.
+
+### Datos a capturar durante la prueba
+
+- **Screenshots** de los pasos críticos (5-10 por caso)
+- **Logs del backend** (`/tmp/sie-backend.log`) ante cualquier error
+- **Tiempos** para los casos con NSM (ej. UA-17.1: ≤ 2 min)
+- **IDs de emails** vistos en Mailpit para validar envíos
+
+### Cómo reportar un fallo
+
+```
+ID: UA-XX.Y
+Pasos: 1. ... 2. ... 3. ...
+Esperado: ...
+Obtenido: ...
+Screenshot: [adjuntar]
+Log: [ruta al /tmp/sie-backend.log]
+Severidad: Bloqueante | Mayor | Menor | Cosmético
+```
+
+---
+
+## Normativa aplicable por sección
+
+Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para auditores legales y para que el tester entienda el "por qué" de cada caso.
+
+| Sección | Normativa | Artículos relevantes |
+|---------|-----------|----------------------|
+| UA-01 Login | LOPDP | Art. 33 (consentimiento informado) |
+| UA-02 Sidebar/Nav | LOPDP | Art. 5 (principios de protección) |
+| UA-03-04 Período académico | LOEI + Reglamento | Art. 25 (régimen escolar), Art. 91 (matrícula) |
+| UA-05 Cursos | LOEI | Art. 11 (currículo nacional) |
+| UA-06 Usuarios | LOPDP + CNIA | Arts. 8-15 (derechos del titular), Art. 49 (protección NNA) |
+| UA-07 Matrícula | LOEI + Reg. | Arts. 86-91 (proceso de matrícula) |
+| UA-08 Cierres | LOEI + Reg. | Art. 195 (régimen académico), Acuerdo MINEDUC |
+| UA-09-13 Flujo docente | LOEI + Reg. | Art. 11 (deberes), Reg. evaluación |
+| UA-14 Estudiante | LOPDP + CNIA | Art. 8 (derecho de acceso), Art. 49 (NNA) |
+| UA-15-16 UI | _No aplica_ | _Componentes reutilizables_ |
+| UA-17 CSV | LOPDP | Arts. 9-10 (responsable del tratamiento), Arts. 25-26 (seguridad) |
 
 ---
 
@@ -19,100 +86,106 @@
 
 ## UA-01 — Login
 
+> **Normativa:** LOPDP Art. 33 (consentimiento informado al tratamiento de datos).
+
 ### UA-01.1 Login exitoso Admin
-- [X] Navegar a `http://localhost:5173/login`
-- [X] Verificar que aparece el panel izquierdo con degradado índigo (SIE branding)
-- [X] Verificar que dice "Bienvenido de vuelta"
-- [X] Verificar que aparece el logo de SIE
-- [X] Ingresar `admin@sie.edu.ec` / `Admin123!!`
-- [X] Clic en "Iniciar sesión"
-- [X] **AC:** Redirige a `/admin`, se ve el sidebar con Dashboard, Usuarios, Académico, Matrícula
-- [X] **AC:** El sidebar muestra avatar del admin en la parte inferior
-- [X] **AC:** Sidebar muestra: Dashboard, Usuarios, Secciones (paralelos), Matrícula
+- [ ] Navegar a `http://localhost:5173/login`
+- [ ] Verificar que aparece el panel izquierdo con degradado índigo (SIE branding)
+- [ ] Verificar que dice "Bienvenido de vuelta"
+- [ ] Verificar que aparece el logo de SIE
+- [ ] Ingresar `admin@sie.edu.ec` / `Admin123!!`
+- [ ] Clic en "Iniciar sesión"
+- [ ] **AC:** Redirige a `/admin`, se ve el sidebar con Dashboard, Usuarios, Académico, Matrícula
+- [ ] **AC:** El sidebar muestra avatar del admin en la parte inferior
+- [ ] **AC:** Sidebar muestra: Dashboard, Usuarios, Secciones (paralelos), Matrícula
 
 ### UA-01.2 Login exitoso Docente
-- [X] Cerrar sesión (clic en avatar → Cerrar sesión → Confirmar)
-- [X] Ingresar `diana@colegio.edu.ec` / `Docente1!`
-- [X] **AC:** Redirige a `/docente`, sidebar muestra solo "Mis Secciones (paralelos)"
+- [ ] Cerrar sesión (clic en avatar → Cerrar sesión → Confirmar)
+- [ ] Ingresar `diana@colegio.edu.ec` / `Docente1!`
+- [ ] **AC:** Redirige a `/docente`, sidebar muestra solo "Mis Secciones (paralelos)"
 
 ### UA-01.3 Login exitoso Estudiante
-- [X] Cerrar sesión
-- [X] Ingresar `ernesto@colegio.edu.ec` / `Estudiante1!`
-- [X] **AC:** Redirige a `/estudiante`, sidebar muestra solo "Mi Panel"
+- [ ] Cerrar sesión
+- [ ] Ingresar `ernesto@colegio.edu.ec` / `Estudiante1!`
+- [ ] **AC:** Redirige a `/estudiante`, sidebar muestra solo "Mi Panel"
 
 ### UA-01.4 Login fallido
-- [X] Cerrar sesión
-- [X] Ingresar email válido pero contraseña incorrecta
-- [X] **AC:** Aparece error en rojo con `role="alert"`
-- [X] **AC:** El campo email/password no pierden el foco
+- [ ] Cerrar sesión
+- [ ] Ingresar email válido pero contraseña incorrecta
+- [ ] **AC:** Aparece error en rojo con `role="alert"`
+- [ ] **AC:** El campo email/password no pierden el foco
 
 ### UA-01.5 Toggle visibilidad contraseña
-- [X] Clic en el ícono del ojo 👁 junto al campo contraseña
-- [X] **AC:** La contraseña se muestra en texto claro
-- [X] Clic de nuevo
-- [X] **AC:** Vuelve a ocultarse
+- [ ] Clic en el ícono del ojo 👁 junto al campo contraseña
+- [ ] **AC:** La contraseña se muestra en texto claro
+- [ ] Clic de nuevo
+- [ ] **AC:** Vuelve a ocultarse
 
 ### UA-01.6 Recuperar contraseña (flujo completo)
-- [X] Clic en "¿Olvidaste tu contraseña?"
-- [X] **AC:** Navega a `/reset-password`, formulario pide email
-- [X] Ingresar `admin@sie.edu.ec`, clic en "Enviar enlace"
-- [X] **AC:** Mensaje "Revisa tu correo" con instrucciones
-- [X] Abrir Mailpit en `http://localhost:8025`, verificar que llegó el correo
-- [X] Copiar el link del correo (`/reset-password?token=...`)
-- [X] Pegar en el navegador y abrir
-- [X] **AC:** Muestra formulario "Nueva contraseña" con 2 campos
-- [X] Ingresar contraseña de menos de 10 caracteres
-- [X] **AC:** Error "La contraseña debe tener al menos 10 caracteres"
-- [X] Ingresar contraseñas que no coinciden
-- [X] **AC:** Error "Las contraseñas no coinciden"
-- [X] Ingresar `NuevaClave123!` en ambos campos
-- [X] Clic en "Restablecer contraseña"
-- [X] **AC:** Mensaje "Contraseña restablecida" con botón al login
-- [X] Clic en "Ir al inicio de sesión", hacer login con la nueva contraseña
-- [X] **AC:** Login exitoso con la nueva contraseña
+- [ ] Clic en "¿Olvidaste tu contraseña?"
+- [ ] **AC:** Navega a `/reset-password`, formulario pide email
+- [ ] Ingresar `admin@sie.edu.ec`, clic en "Enviar enlace"
+- [ ] **AC:** Mensaje "Revisa tu correo" con instrucciones
+- [ ] Abrir Mailpit en `http://localhost:8025`, verificar que llegó el correo
+- [ ] Copiar el link del correo (`/reset-password?token=...`)
+- [ ] Pegar en el navegador y abrir
+- [ ] **AC:** Muestra formulario "Nueva contraseña" con 2 campos
+- [ ] Ingresar contraseña de menos de 10 caracteres
+- [ ] **AC:** Error "La contraseña debe tener al menos 10 caracteres"
+- [ ] Ingresar contraseñas que no coinciden
+- [ ] **AC:** Error "Las contraseñas no coinciden"
+- [ ] Ingresar `NuevaClave123!` en ambos campos
+- [ ] Clic en "Restablecer contraseña"
+- [ ] **AC:** Mensaje "Contraseña restablecida" con botón al login
+- [ ] Clic en "Ir al inicio de sesión", hacer login con la nueva contraseña
+- [ ] **AC:** Login exitoso con la nueva contraseña
 
 ---
 
 ## UA-02 — Sidebar y Navegación
 
+> **Normativa:** LOPDP Art. 5 (principios de protección — minimización, finalidad, transparencia).
+
 ### UA-02.1 Navegación Admin por sidebar
-- [X] Login como Admin
-- [X] Clic en "Usuarios" en el sidebar
-- [X] **AC:** Navega a `/admin/usuarios`, el ítem queda activo (fondo índigo claro)
-- [X] Clic en "Secciones (paralelos)" en el sidebar
-- [X] **AC:** Navega a `/admin/secciones`
-- [X] Clic en "Matrícula"
-- [X] **AC:** Navega a `/admin/matricula`
-- [X] Clic en "Dashboard"
-- [X] **AC:** Vuelve a `/admin`
+- [ ] Login como Admin
+- [ ] Clic en "Usuarios" en el sidebar
+- [ ] **AC:** Navega a `/admin/usuarios`, el ítem queda activo (fondo índigo claro)
+- [ ] Clic en "Secciones (paralelos)" en el sidebar
+- [ ] **AC:** Navega a `/admin/secciones`
+- [ ] Clic en "Matrícula"
+- [ ] **AC:** Navega a `/admin/matricula`
+- [ ] Clic en "Dashboard"
+- [ ] **AC:** Vuelve a `/admin`
 
 ### UA-02.2 Menú de usuario
-- [X] En el sidebar, clic en el avatar del admin (parte inferior)
-- [X] **AC:** Se abre popup con nombre, rol y botón "Cerrar sesión"
-- [X] Clic fuera del popup
-- [X] **AC:** El popup se cierra
+- [ ] En el sidebar, clic en el avatar del admin (parte inferior)
+- [ ] **AC:** Se abre popup con nombre, rol y botón "Cerrar sesión"
+- [ ] Clic fuera del popup
+- [ ] **AC:** El popup se cierra
 
 ### UA-02.3 Cerrar sesión con confirmación
-- [X] Abrir menú de usuario → clic en "Cerrar sesión"
-- [X] **AC:** Aparece modal "¿Estás seguro de que deseas cerrar tu sesión?"
-- [X] Clic en "Cancelar"
-- [X] **AC:** El modal se cierra, sigue en el dashboard
-- [X] Repetir → clic en "Cerrar sesión"
-- [X] **AC:** Redirige a `/login`
+- [ ] Abrir menú de usuario → clic en "Cerrar sesión"
+- [ ] **AC:** Aparece modal "¿Estás seguro de que deseas cerrar tu sesión?"
+- [ ] Clic en "Cancelar"
+- [ ] **AC:** El modal se cierra, sigue en el dashboard
+- [ ] Repetir → clic en "Cerrar sesión"
+- [ ] **AC:** Redirige a `/login`
 
 ### UA-02.4 Responsive mobile
-- [X] Login como Admin
-- [X] Reducir ventana a ~480px de ancho
-- [X] **AC:** El sidebar colapsa, aparece hamburger ☰ en la barra superior
-- [X] Clic en ☰
-- [X] **AC:** Se abre el sidebar como overlay con fondo oscuro
-- [X] Clic en "Usuarios"
-- [X] **AC:** Navega y el overlay se cierra
-- [X] Volver a tamaño normal
+- [ ] Login como Admin
+- [ ] Reducir ventana a ~480px de ancho
+- [ ] **AC:** El sidebar colapsa, aparece hamburger ☰ en la barra superior
+- [ ] Clic en ☰
+- [ ] **AC:** Se abre el sidebar como overlay con fondo oscuro
+- [ ] Clic en "Usuarios"
+- [ ] **AC:** Navega y el overlay se cierra
+- [ ] Volver a tamaño normal
 
 ---
 
 ## UA-03 — Dashboard Admin
+
+> **Normativa:** LOEI Art. 25 (régimen escolar) + Acuerdo Ministerial MINEDUC (Costa 2026-2027).
 
 ### UA-03.1 KPI Cards
 - [ ] Login como Admin
@@ -144,6 +217,8 @@
 
 ## UA-04 — Wizard de Período
 
+> **Normativa:** LOEI Art. 25 (régimen escolar) + Acuerdo Ministerial MINEDUC.
+
 ### UA-04.1 Paso 1 — Crear período
 - [ ] Dashboard Admin → "Configurar nuevo período"
 - [ ] **AC:** URL contiene `/nuevo`
@@ -170,6 +245,8 @@
 
 ## UA-05 — Gestión de Cursos
 
+> **Normativa:** LOEI Art. 11 (currículo nacional) + lineamientos MINEDUC.
+
 ### UA-05.1 Crear curso
 - [ ] Dashboard Admin → "📚 Cursos" (o sidebar Académico)
 - [ ] **AC:** URL contiene `/cursos`
@@ -191,6 +268,8 @@
 ---
 
 ## UA-06 — Gestión de Usuarios
+
+> **Normativa:** LOPDP Arts. 8-15 (derechos del titular: acceso, rectificación, supresión, oposición) + CNIA Art. 49 (protección de datos de NNA — consentimiento parental para menores de edad).
 
 ### UA-06.1 Listar usuarios
 - [ ] Sidebar → Usuarios
@@ -232,6 +311,8 @@
 
 ## UA-07 — Matrícula
 
+> **Normativa:** LOEI Arts. 86-91 (proceso de matrícula) + Reglamento General a la LOEI.
+
 ### UA-07.1 Listar secciones para matrícula
 - [ ] Sidebar → Matrícula (o botón "📝 Matrícula")
 - [ ] **AC:** URL `/admin/matricula`
@@ -260,6 +341,8 @@
 
 ## UA-08 — Dashboard de Cierres
 
+> **Normativa:** LOEI Art. 195 (régimen académico) + Reglamento de evaluación.
+
 ### UA-08.1 Ver cierres
 - [ ] Dashboard Admin → "📊 Cierres" (o sidebar)
 - [ ] **AC:** URL `/admin/cierres`
@@ -270,6 +353,8 @@
 ---
 
 ## UA-09 — Docente: Dashboard
+
+> **Normativa:** LOEI Art. 11 (deberes de los docentes) + Reglamento General a la LOEI.
 
 ### UA-09.1 Ver mis secciones
 - [ ] Login como Docente
@@ -288,6 +373,8 @@
 ---
 
 ## UA-10 — Docente: Asistencia
+
+> **Normativa:** LOEI Art. 11 (deberes docentes) + Reglamento de asistencia obligatoria.
 
 ### UA-10.1 Ver lista de estudiantes
 - [ ] **AC:** Tabla con estudiantes: Nombre, Estado (dropdown), % Asistencia
@@ -311,6 +398,8 @@
 ---
 
 ## UA-11 — Docente: Esquema de Evaluación
+
+> **Normativa:** LOEI + Reglamento de evaluación (Acuerdo Ministerial vigente).
 
 ### UA-11.1 Configurar esquema
 - [ ] Desde dashboard docente, clic en "Esquema" de una sección
@@ -337,6 +426,8 @@
 
 ## UA-12 — Docente: Ingreso de Notas
 
+> **Normativa:** LOEI + Reglamento de evaluación (rúbrica oficial MINEDUC).
+
 ### UA-12.1 Ver tabla de notas
 - [ ] Desde dashboard docente, clic en "Ver notas" de una sección
 - [ ] **AC:** URL `/docente/{id}/notas`
@@ -361,6 +452,8 @@
 
 ## UA-13 — Docente: Cierre de Sección
 
+> **Normativa:** LOEI Art. 195 (régimen académico) + Acuerdo MINEDUC sobre cierre de períodos lectivos.
+
 ### UA-13.1 Confirmar cierre
 - [ ] **AC:** Página centrada con título "Cerrar sección"
 - [ ] **AC:** Advertencia: "Las notas serán definitivas", "No podrán modificarse", "Se publicarán para los estudiantes"
@@ -374,6 +467,8 @@
 ---
 
 ## UA-14 — Estudiante
+
+> **Normativa:** LOPDP Art. 8 (derecho de acceso del titular) + CNIA Art. 49 (protección de NNA — datos de menores tratados con consentimiento parental).
 
 ### UA-14.1 Dashboard
 - [ ] Login como Estudiante
@@ -391,6 +486,8 @@
 ---
 
 ## UA-15 — Componentes UI Nuevos
+
+> **Normativa:** _No aplica_. Componentes de UI reutilizables (shadcn/ui sobre Tailwind).
 
 ### UA-15.1 Toast de notificación
 - [ ] Realizar cualquier acción exitosa (guardar asistencia, crear usuario, matricular)
@@ -427,6 +524,8 @@
 
 ## UA-16 — Diseño Visual (Propuesta 1)
 
+> **Normativa:** _No aplica_. Verificación de consistencia visual con Propuesta 1 (tema Coconut, índigo `#4F46E5`, tipografía Inter).
+
 ### UA-16.1 Paleta de colores
 - [ ] **AC:** Color primario es índigo (#4F46E5) en botones, links, y sidebar activo
 - [ ] **AC:** Fondo principal es gris muy claro (#F8F9FB)
@@ -459,6 +558,7 @@
 
 ## UA-17 — Asistente de Importación CSV (Usuarios)
 
+> **Normativa:** LOPDP Arts. 9-10 (responsable del tratamiento), Arts. 25-26 (seguridad), Art. 33 (consentimiento).  
 > **Precondición:** Servicios Docker levantados, backend en `:8080`, frontend en `:5173`.  
 > **Login:** `admin@sie.edu.ec` / `Admin123!!`  
 > **Ruta:** `/admin/usuarios/importar` (botón "📥 Importar CSV" en `UsuariosPage`)  
@@ -476,7 +576,8 @@
 - [ ] **AC:** Footer dice "200 válidas · 0 con error · 0 duplicados"
 - [ ] **AC:** Botón primario dice "✓ Importar 200 válidas" (verde, habilitado)
 - [ ] Clic en "✓ Importar 200 válidas" → **AC:** avanza a paso 3 con spinner y elapsed "Procesando 200 usuarios... Xs"
-- [ ] **AC:** Al recibir 201, header dice "✅ 200 usuarios creados" + subheader "📨 200 emails de activación enviados"
+- [ ] **AC:** Al recibir 201, header dice "✅ 200 usuarios creados" + subheader "📨 200 emails de activación en cola (verificables en Mailpit en dev)"
+- [ ] **AC:** Aparece tabla con 200 filas: columnas #, Email, Nombre, Rol (chip), ID truncado a 8 chars (hover muestra UUID completo)
 - [ ] Clic en "✓ Finalizar" → **AC:** cierra wizard, vuelve a `/admin/usuarios`, tabla muestra 200 nuevos estudiantes
 - [ ] **AC:** Toast verde "200 usuarios importados correctamente"
 - [ ] Abrir Mailpit en `http://localhost:8025` → **AC:** 200 correos visibles con asunto "Activa tu cuenta en SIE"
@@ -496,8 +597,10 @@
 - [ ] **AC:** Botón primario dice "⚠ Revisar 1 error antes de importar" (no permite saltar)
 
 ### UA-17.4 Edición inline repara una fila con error
-- [ ] Desde UA-17.3, en la fila 2 con email duplicado, hacer clic en la celda email
+- [ ] Desde UA-17.3, en la fila 2 con email duplicado, hacer **doble-click** en la celda email (H7: read-only por defecto)
+- [ ] **AC:** Solo esa celda se vuelve input con autoFocus; el resto de la tabla permanece read-only
 - [ ] Cambiar a `nuevo-email@x.com` y presionar Enter
+- [ ] **AC:** La celda vuelve a texto plano con el nuevo valor
 - [ ] **AC:** Badge cambia a ✅ Válida
 - [ ] **AC:** Footer se actualiza a "3 válidas · 0 con error · 0 duplicados"
 - [ ] **AC:** Botón primario ahora dice "✓ Importar 3 válidas" (habilitado)
@@ -542,87 +645,205 @@
 - [ ] **AC:** El backend detecta emails duplicados y devuelve 422 con `BatchImportException`
 - [ ] **AC:** Wizard muestra mensaje "Estos emails ya existen" + opción de descargar reporte con los conflictos
 
+### UA-17.11 (H5) Siguiente requiere click explícito — NO auto-advance
+- [ ] Ir a `/admin/usuarios/importar`, paso 1
+- [ ] Arrastrar `estudiantes-200.csv` a la dropzone
+- [ ] **AC:** Aparece panel "archivo-listo" con resumen "📄 estudiantes-200.csv · 200 filas"
+- [ ] **AC:** Botón "Siguiente →" visible, pero el paso NO cambia automáticamente
+- [ ] Esperar 5 segundos sin hacer click
+- [ ] **AC:** Sigue en paso 1, no avanzó
+- [ ] Clic en "Cambiar archivo" → **AC:** vuelve a la dropzone vacía
+- [ ] Volver a subir y ahora sí clic en "Siguiente →" → **AC:** avanza a paso 2
+
+### UA-17.12 (H6) Click en "X con errores" scrollea al primer error
+- [ ] Crear `con-errores-distribuidos.csv` con 50 filas: filas 1-30 válidas, fila 31 inválida (email malformado), filas 32-49 válidas, fila 50 inválida (rol INVENTADO)
+- [ ] Subir, avanzar a paso 2
+- [ ] Scroll la tabla hasta el final (fila 50 visible)
+- [ ] **AC:** Footer dice "48 válidas · 2 con error · 0 duplicados"
+- [ ] Clic en "2 con errores" del footer (filtro inválidas)
+- [ ] **AC:** La vista hace scroll suave (`behavior: 'smooth'`) hasta la **primera** fila inválida (fila 31), centrada en la pantalla
+- [ ] **NSM:** Scroll completa en ≤ 1 segundo
+
+### UA-17.13 (H8) Doble-click en "Importar" no genera 2 requests
+- [ ] Crear `estudiantes-50.csv` con 50 filas válidas
+- [ ] Subir, avanzar a paso 2
+- [ ] **AC:** Botón dice "✓ Importar 50 válidas" (habilitado)
+- [ ] Doble-click rápido en el botón (2 clicks en ≤ 200ms)
+- [ ] **AC:** Solo se ve UN spinner (no dos)
+- [ ] **AC:** Backend recibe UNA sola request (verificar en log: `POST /api/usuarios/batch/importar-csv` aparece 1 vez, no 2)
+- [ ] **AC:** Resultado final: 50 usuarios creados (no 100)
+- [ ] Verificar en `UsuariosPage` que la tabla muestra exactamente 50 nuevos estudiantes
+
+### UA-17.14 (C3a) UI dice "emails pendientes" — no "enviados"
+- [ ] Ejecutar UA-17.1 (importar 200 estudiantes)
+- [ ] En paso 3, **AC:** subheader dice "📨 200 emails de activación en cola (verificables en Mailpit en dev)"
+- [ ] **AC:** NO dice "enviados" en ningún lugar del paso 3
+- [ ] Clic en "📋 Descargar reporte (CSV)" → abrir el archivo descargado
+- [ ] **AC:** Dentro del reporte, sección "Resumen" dice "Emails de activación en cola: 200" (no "enviados")
+- [ ] **Razón normativa:** refleja la realidad MVP. El admin debe verificar en Mailpit; el sistema no garantiza entrega.
+
+### UA-17.15 (C5) Paridad frontend↔backend — cambiar fixture rompe ambos tests
+- [ ] Abrir `docs/qa/paridad/paridadValidacion.fixture.json`
+- [ ] **AC:** Tiene 20 entradas numeradas del 1 al 20
+- [ ] Cambiar `validoEsperado: true` a `false` en la entrada 1 (email con +alias)
+- [ ] Correr `cd backend && ./mvnw test -Dtest=ParidadValidacionTest` → **AC:** FALLA (esperaba true, recibió false)
+- [ ] Correr `cd frontend && npm test -- paridad` → **AC:** FALLA (mismo motivo)
+- [ ] Revertir el cambio → ambos tests vuelven a pasar
+- [ ] **Razón:** ambos tests leen el mismo archivo. Drift imposible por construcción.
+
+### UA-17.16 (H1) Tabla Paso 3 muestra IDs truncados con tooltip
+- [ ] Ejecutar UA-17.1 (importar 200)
+- [ ] En paso 3, **AC:** aparece tabla con 200 filas
+- [ ] **AC:** Cada fila tiene columna "ID" mostrando solo los primeros 8 caracteres del UUID
+- [ ] Hover sobre cualquier ID → **AC:** tooltip muestra el UUID completo (32 chars)
+- [ ] **AC:** Orden de columnas: #, Email, Nombre, Rol (chip de color), ID (truncado)
+
+### UA-17.17 (H2) Reporte CSV incluye tabla per-row con IDs
+- [ ] Ejecutar UA-17.1 (importar 200)
+- [ ] En paso 3, clic en "📋 Descargar reporte (CSV)"
+- [ ] Abrir el archivo descargado en Excel/LibreOffice
+- [ ] **AC:** Encabezados del archivo: líneas de resumen + línea vacía + `email,id,rol,fecha_creacion`
+- [ ] **AC:** 200 filas con esos 4 campos
+- [ ] **AC:** Los IDs coinciden con los de la tabla del paso 3
+- [ ] **AC:** Las tildes de los nombres se ven bien (BOM UTF-8 presente)
+
+### UA-17.18 (C2) CSV injection en reporte de errores se escapa
+- [ ] Crear `inyection.csv` con contenido:
+  ```
+  email,nombre,roles
+  =cmd|'/c calc'!A1@x.com,Juan,DOCENTE
+  +HYPERLINK("http://evil.com","click")@x.com,Maria,ESTUDIANTE
+  -2+5@x.com,Pedro,ESTUDIANTE
+  @sum(A1:A10)@x.com,Ana,DOCENTE
+  ```
+- [ ] Subir, avanzar a paso 2
+- [ ] **AC:** Las 4 filas aparecen con badge ❌ Error (email inválido)
+- [ ] Clic en "📋 Descargar reporte (CSV)" → abrir el archivo
+- [ ] **AC:** Los valores de email aparecen con prefijo `'` (apóstrofe): `'=cmd|...`, `'+HYPERLINK(...)`, `'-2+5`, `'@sum(...)`
+- [ ] **AC:** Al abrir en Excel, las celdas NO se ejecutan como fórmulas (son texto literal)
+- [ ] **Razón de seguridad:** CSV injection (CWE-1236) es vector de RCE si el admin abre el reporte en Excel.
+
 ---
 
 ## Resumen de Resultados
 
+> Llenar al final de la ejecución. Una fila por caso. Resultado: `✅ Pass` / `❌ Fail` / `⏭ Skipped` (con motivo).  
+> En "Observaciones" anotar el tiempo (si aplica NSM) o el ID del fallo reportado.
+
 | ID | Escenario | Resultado | Observaciones |
 |----|-----------|-----------|---------------|
-| UA-01.1 | Login exitoso Admin | ✅ Pass | |
-| UA-01.2 | Login exitoso Docente | ✅ Pass | |
-| UA-01.3 | Login exitoso Estudiante | ✅ Pass | |
-| UA-01.4 | Login fallido | ✅ Pass | |
-| UA-01.5 | Toggle contraseña | ✅ Pass | |
-| UA-01.6 | Reset password (flujo completo) | ⬜ Pass / ⬜ Fail | |
-| UA-02.1 | Nav Admin por sidebar | ✅ Pass | |
-| UA-02.2 | Menú de usuario | ✅ Pass | |
-| UA-02.3 | Cerrar sesión | ✅ Pass | |
-| UA-02.4 | Responsive mobile | ✅ Pass | |
-| UA-03.1 | KPI Cards | ⬜ Pass / ⬜ Fail | |
-| UA-03.2 | Gráfico evolución | ⬜ Pass / ⬜ Fail | |
-| UA-03.3 | Actividad reciente | ⬜ Pass / ⬜ Fail | |
-| UA-03.4 | Banner progreso | ⬜ Pass / ⬜ Fail | |
-| UA-03.5 | Configurar período | ⬜ Pass / ⬜ Fail | |
-| UA-03.6 | Accesos rápidos | ⬜ Pass / ⬜ Fail | |
-| UA-04.1 | Crear período | ⬜ Pass / ⬜ Fail | |
-| UA-04.2 | Clonar secciones | ⬜ Pass / ⬜ Fail | |
-| UA-04.3 | Revisar secciones | ⬜ Pass / ⬜ Fail | |
-| UA-04.4 | Confirmar apertura | ⬜ Pass / ⬜ Fail | |
-| UA-05.1 | Crear curso | ⬜ Pass / ⬜ Fail | |
-| UA-05.2 | Editar curso | ⬜ Pass / ⬜ Fail | |
-| UA-05.3 | Estado vacío cursos | ⬜ Pass / ⬜ Fail | |
-| UA-06.1 | Listar usuarios | ⬜ Pass / ⬜ Fail | |
-| UA-06.2 | Crear usuario | ⬜ Pass / ⬜ Fail | |
-| UA-06.3 | Búsqueda en tabla | ⬜ Pass / ⬜ Fail | |
-| UA-06.4 | Ordenamiento | ⬜ Pass / ⬜ Fail | |
-| UA-06.5 | Selección múltiple | ⬜ Pass / ⬜ Fail | |
-| UA-06.6 | Desactivar usuario | ⬜ Pass / ⬜ Fail | |
-| UA-07.1 | Listar matrícula | ⬜ Pass / ⬜ Fail | |
-| UA-07.2 | Matricular estudiante | ⬜ Pass / ⬜ Fail | |
-| UA-07.3 | Importar CSV | ⬜ Pass / ⬜ Fail | |
-| UA-07.4 | Estado vacío matrícula | ⬜ Pass / ⬜ Fail | |
-| UA-08.1 | Dashboard cierres | ⬜ Pass / ⬜ Fail | |
-| UA-09.1 | Dashboard docente | ⬜ Pass / ⬜ Fail | |
-| UA-09.2 | Tarjetas sección | ⬜ Pass / ⬜ Fail | |
-| UA-09.3 | Navegar asistencia | ⬜ Pass / ⬜ Fail | |
-| UA-10.1 | Lista estudiantes | ⬜ Pass / ⬜ Fail | |
-| UA-10.2 | Marcar asistencia | ⬜ Pass / ⬜ Fail | |
-| UA-10.3 | Guardar asistencia | ⬜ Pass / ⬜ Fail | |
-| UA-10.4 | Volver secciones | ⬜ Pass / ⬜ Fail | |
-| UA-11.1 | Configurar esquema | ⬜ Pass / ⬜ Fail | |
-| UA-11.2 | Agregar/quitar componente | ⬜ Pass / ⬜ Fail | |
-| UA-11.3 | Validación 100% | ⬜ Pass / ⬜ Fail | |
-| UA-11.4 | Guardar esquema | ⬜ Pass / ⬜ Fail | |
-| UA-12.1 | Tabla de notas | ⬜ Pass / ⬜ Fail | |
-| UA-12.2 | Ingresar notas | ⬜ Pass / ⬜ Fail | |
-| UA-12.3 | Guardar notas | ⬜ Pass / ⬜ Fail | |
-| UA-12.4 | Navegar cierre | ⬜ Pass / ⬜ Fail | |
-| UA-13.1 | Confirmar cierre | ⬜ Pass / ⬜ Fail | |
-| UA-13.2 | Ejecutar cierre | ⬜ Pass / ⬜ Fail | |
-| UA-14.1 | Dashboard estudiante | ⬜ Pass / ⬜ Fail | |
-| UA-14.2 | Ver horario | ⬜ Pass / ⬜ Fail | |
-| UA-14.3 | Ver notas | ⬜ Pass / ⬜ Fail | |
-| UA-15.1 | Toast notificación | ⬜ Pass / ⬜ Fail | |
-| UA-15.2 | Skeleton loaders | ⬜ Pass / ⬜ Fail | |
-| UA-15.3 | Empty states | ⬜ Pass / ⬜ Fail | |
-| UA-15.4 | Modal confirmación | ⬜ Pass / ⬜ Fail | |
-| UA-15.5 | Confirmación logout | ⬜ Pass / ⬜ Fail | |
-| UA-16.1 | Paleta colores | ⬜ Pass / ⬜ Fail | |
-| UA-16.2 | Tipografía Inter | ⬜ Pass / ⬜ Fail | |
-| UA-16.3 | Consistencia visual | ⬜ Pass / ⬜ Fail | |
-| UA-16.4 | Login Split Light | ⬜ Pass / ⬜ Fail | |
-| UA-16.5 | Estados carga/error | ⬜ Pass / ⬜ Fail | |
-| UA-17.1 | Importar 200 estudiantes CSV (NSM ≤ 2 min) | ⬜ Pass / ⬜ Fail | |
-| UA-17.2 | Validación headers inválidos | ⬜ Pass / ⬜ Fail | |
-| UA-17.3 | Detección emails duplicados | ⬜ Pass / ⬜ Fail | |
-| UA-17.4 | Edición inline repara error | ⬜ Pass / ⬜ Fail | |
-| UA-17.5 | Descarga plantilla CSV (BOM) | ⬜ Pass / ⬜ Fail | |
-| UA-17.6 | Reporte de errores descargable | ⬜ Pass / ⬜ Fail | |
-| UA-17.7 | Rechazo > 5MB | ⬜ Pass / ⬜ Fail | |
-| UA-17.8 | Cancelar con elapsed > 15s | ⬜ Pass / ⬜ Fail | |
-| UA-17.9 | Atomicidad ante 422 | ⬜ Pass / ⬜ Fail | |
-| UA-17.10 | Re-importación mismo archivo | ⬜ Pass / ⬜ Fail | |
+| UA-01.1 | Login exitoso Admin | | |
+| UA-01.2 | Login exitoso Docente | | |
+| UA-01.3 | Login exitoso Estudiante | | |
+| UA-01.4 | Login fallido | | |
+| UA-01.5 | Toggle contraseña | | |
+| UA-01.6 | Reset password (flujo completo) | | |
+| UA-02.1 | Nav Admin por sidebar | | |
+| UA-02.2 | Menú de usuario | | |
+| UA-02.3 | Cerrar sesión | | |
+| UA-02.4 | Responsive mobile | | |
+| UA-03.1 | KPI Cards | | |
+| UA-03.2 | Gráfico evolución | | |
+| UA-03.3 | Actividad reciente | | |
+| UA-03.4 | Banner progreso | | |
+| UA-03.5 | Configurar período | | |
+| UA-03.6 | Accesos rápidos | | |
+| UA-04.1 | Crear período | | |
+| UA-04.2 | Clonar secciones | | |
+| UA-04.3 | Revisar secciones | | |
+| UA-04.4 | Confirmar apertura | | |
+| UA-05.1 | Crear curso | | |
+| UA-05.2 | Editar curso | | |
+| UA-05.3 | Estado vacío cursos | | |
+| UA-06.1 | Listar usuarios | | |
+| UA-06.2 | Crear usuario | | |
+| UA-06.3 | Búsqueda en tabla | | |
+| UA-06.4 | Ordenamiento | | |
+| UA-06.5 | Selección múltiple | | |
+| UA-06.6 | Desactivar usuario | | |
+| UA-07.1 | Listar matrícula | | |
+| UA-07.2 | Matricular estudiante | | |
+| UA-07.3 | Importar CSV | | |
+| UA-07.4 | Estado vacío matrícula | | |
+| UA-08.1 | Dashboard cierres | | |
+| UA-09.1 | Dashboard docente | | |
+| UA-09.2 | Tarjetas sección | | |
+| UA-09.3 | Navegar asistencia | | |
+| UA-10.1 | Lista estudiantes | | |
+| UA-10.2 | Marcar asistencia | | |
+| UA-10.3 | Guardar asistencia | | |
+| UA-10.4 | Volver secciones | | |
+| UA-11.1 | Configurar esquema | | |
+| UA-11.2 | Agregar/quitar componente | | |
+| UA-11.3 | Validación 100% | | |
+| UA-11.4 | Guardar esquema | | |
+| UA-12.1 | Tabla de notas | | |
+| UA-12.2 | Ingresar notas | | |
+| UA-12.3 | Guardar notas | | |
+| UA-12.4 | Navegar cierre | | |
+| UA-13.1 | Confirmar cierre | | |
+| UA-13.2 | Ejecutar cierre | | |
+| UA-14.1 | Dashboard estudiante | | |
+| UA-14.2 | Ver horario | | |
+| UA-14.3 | Ver notas | | |
+| UA-15.1 | Toast notificación | | |
+| UA-15.2 | Skeleton loaders | | |
+| UA-15.3 | Empty states | | |
+| UA-15.4 | Modal confirmación | | |
+| UA-15.5 | Confirmación logout | | |
+| UA-16.1 | Paleta colores | | |
+| UA-16.2 | Tipografía Inter | | |
+| UA-16.3 | Consistencia visual | | |
+| UA-16.4 | Login Split Light | | |
+| UA-16.5 | Estados carga/error | | |
+| UA-17.1 | Importar 200 estudiantes CSV (NSM ≤ 2 min) | | |
+| UA-17.2 | Validación headers inválidos | | |
+| UA-17.3 | Detección emails duplicados | | |
+| UA-17.4 | Edición inline repara error (H7 dblclick) | | |
+| UA-17.5 | Descarga plantilla CSV (BOM) | | |
+| UA-17.6 | Reporte de errores descargable | | |
+| UA-17.7 | Rechazo > 5MB | | |
+| UA-17.8 | Cancelar con elapsed > 15s | | |
+| UA-17.9 | Atomicidad ante 422 | | |
+| UA-17.10 | Re-importación mismo archivo | | |
+| UA-17.11 | (H5) Siguiente requiere click explícito | | |
+| UA-17.12 | (H6) Click "X con errores" scrollea a primer error | | |
+| UA-17.13 | (H8) Doble-click Importar no genera 2 requests | | |
+| UA-17.14 | (C3a) UI dice "emails pendientes" no "enviados" | | |
+| UA-17.15 | (C5) Paridad: cambiar fixture rompe ambos tests | | |
+| UA-17.16 | (H1) Tabla Paso 3 muestra IDs truncados con tooltip | | |
+| UA-17.17 | (H2) Reporte CSV incluye tabla per-row con IDs | | |
+| UA-17.18 | (C2) CSV injection en reporte de errores se escapa | | |
 
-**Total:** 72 casos de prueba (62 originales + 10 nuevos UA-17)  
+**Total:** 82 casos de prueba (62 originales + 10 UA-17 originales + 8 nuevos UA-17.11 a 17.18 que cubren fixes del code review CSV-BI + 2 casos extra en UA-10 / UA-11 recontados)  
 **Aprobador:** ___________  
 **Fecha:** ___________
+
+---
+
+## Cambios respecto a v0.2.0 (manual anterior)
+
+Este manual fue actualizado el 2026-06-06 con los fixes del code review del épica CSV-BI. Cambios:
+
+- **UA-17.1**: agregado "tabla con 200 filas" (era H1)
+- **UA-17.4**: cambio `clic` → `doble-click` (era H7, read-only por defecto)
+- **UA-17.11 a 17.18**: 8 sub-cases nuevos que verifican los fixes H1, H2, H5, H6, H7, H8, C2, C3a, C5
+- **Todos los checkboxes** reseteados a `[ ]` para ejecución limpia
+- **Tabla de resultados** vacía (sin datos pre-cargados)
+- **Sección "Cómo ejecutar la prueba completa"** con checklist pre-test y orden recomendado
+- **Sección "Normativa aplicable"** con LOPDP/LOEI/CNIA por sección
+- **Versión** bumped de 0.2.0 → 0.1.0 (alineado con el primer release oficial)
+
+## Trazabilidad fixes → casos
+
+| Fix del review | Sub-case que lo verifica |
+|----------------|---------------------------|
+| H1 — Tabla IDs Paso 3 | UA-17.1 + UA-17.16 |
+| H2 — Reporte per-row | UA-17.17 |
+| H5 — Siguiente explícito | UA-17.11 |
+| H6 — ScrollIntoView | UA-17.12 |
+| H7 — Click-to-edit | UA-17.4 |
+| H8 — Abort reintento | UA-17.13 |
+| C2 — CSV injection | UA-17.18 |
+| C3a — emailsPendientes | UA-17.14 |
+| C5 — Fixture compartido | UA-17.15 |
