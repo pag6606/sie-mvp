@@ -51,6 +51,7 @@ public class LopdpConsentClient {
                     "titularId", estudianteId.toString(),
                     "studentEmail", studentEmail != null ? studentEmail : "",
                     "purposeCode", "CONSENTIMIENTO_PARENTAL",
+                    "granted", true,
                     "parentName", representanteNombre != null ? representanteNombre : "",
                     "parentDocument", representanteCedula != null ? representanteCedula : "",
                     "parentEmail", representanteEmail != null ? representanteEmail : "",
