@@ -49,10 +49,10 @@ public class LopdpConsentClient {
                     "colegioId", colegioId.toString(),
                     "titularId", estudianteId.toString(),
                     "purpose", "CONSENTIMIENTO_PARENTAL",
-                    "representanteNombre", representanteNombre != null ? representanteNombre : "",
-                    "representanteCedula", representanteCedula != null ? representanteCedula : "",
-                    "representanteEmail", representanteEmail != null ? representanteEmail : "",
-                    "documentoUrl", documentoUrl != null ? documentoUrl : ""
+                    "parentName", representanteNombre != null ? representanteNombre : "",
+                    "parentDocument", representanteCedula != null ? representanteCedula : "",
+                    "parentEmail", representanteEmail != null ? representanteEmail : "",
+                    "documentUrl", documentoUrl != null ? documentoUrl : ""
             );
             restTemplate.postForEntity(lopdpUrl + "/admin/sync/consent",
                     new HttpEntity<>(body, authHeaders()), Map.class);
