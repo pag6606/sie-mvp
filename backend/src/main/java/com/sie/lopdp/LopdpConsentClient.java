@@ -42,12 +42,14 @@ public class LopdpConsentClient {
     }
 
     public LopdpConsentResponse syncConsent(UUID colegioId, UUID estudianteId,
+                                             String studentEmail,
                                              String representanteNombre, String representanteCedula,
                                              String representanteEmail, String documentoUrl) {
         try {
             var body = Map.of(
                     "colegioId", colegioId.toString(),
                     "titularId", estudianteId.toString(),
+                    "studentEmail", studentEmail != null ? studentEmail : "",
                     "purpose", "CONSENTIMIENTO_PARENTAL",
                     "parentName", representanteNombre != null ? representanteNombre : "",
                     "parentDocument", representanteCedula != null ? representanteCedula : "",

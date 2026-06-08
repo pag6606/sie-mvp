@@ -49,7 +49,9 @@ public class ConsentimientoService {
         }
 
         if (lopdpEnabled && lopdpClient.isPresent()) {
-            var result = lopdpClient.get().syncConsent(colegioId, estudianteId,
+            var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
+            var studentEmail = estudiante != null ? estudiante.getEmail() : "";
+            var result = lopdpClient.get().syncConsent(colegioId, estudianteId, studentEmail,
                     representanteNombre, representanteCedula, representanteEmail, documentoUrl);
             cacheConsent(estudianteId, colegioId, representanteNombre, representanteCedula,
                     representanteEmail, documentoUrl, "LOPDP");
