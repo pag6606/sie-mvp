@@ -79,6 +79,7 @@ Estos documentos deben existir **antes** de crear el primer usuario estudiante. 
 |---------|--------------|----------|
 | Página de privacidad | `GET /privacidad` | Art. 12 |
 | Registro de consentimiento | `POST /api/consentimientos` | Art. 21, 25 |
+| Listado de consentimientos (UI) | `GET /api/consentimientos` + `/admin/consentimientos` | Art. 21, 25 |
 | Verificación de consentimiento | `GET /api/consentimientos/{id}` | Art. 21 |
 | Trazabilidad documental | `representanteNombre` + `representanteCedula` | Art. 21, 25 |
 | Registro de fuente de verdad | `fuente` = LOPDP | SIE_LOCAL (V12) | Art. 21, 25 |
@@ -350,9 +351,18 @@ Los 200 estudiantes reciben un email de activación (asunto: "Activa tu cuenta e
 
 **NUEVO v0.1.1** — Antes de matricular, cada estudiante necesita consentimiento registrado. Los 200 estudiantes son menores de 15 años.
 
-**UI disponible:** Sidebar → **Consentimientos** (`/admin/consentimientos`). Permite registrar consentimiento individual con formulario (nombre, cédula, email del representante + documento escaneado). Dos vistas: "Registrados" y "Pendientes".
+#### Flujo con UI (individual o pocos estudiantes)
 
-El consentimiento ahora incluye trazabilidad documental completa:
+1. Sidebar admin → **Consentimientos** (`/admin/consentimientos`)
+2. Pestaña **"Pendientes"** muestra los estudiantes sin consentimiento
+3. Clic en **"Registrar"** junto al estudiante → abre el formulario pre-seleccionado
+4. Llenar: **Nombre del representante\***, Cédula, Email, Documento (URL del formulario firmado)
+5. Clic en **"Registrar consentimiento"**
+6. El consentimiento aparece en la pestaña **"Registrados"** con badge de fuente (LOPDP o SIE_LOCAL)
+
+> También se puede usar **"+ Registrar consentimiento"** para abrir el formulario vacío y seleccionar cualquier estudiante del dropdown.
+
+#### Flujo masivo (script para los 200)
 
 ```bash
 # Registrar consentimiento individual con trazabilidad completa
@@ -590,7 +600,7 @@ Muestra el estado de cada sección:
 | 5 | Asignar docentes a secciones | 10 min | — |
 | 6.1 | Crear 200 estudiantes (UI wizard CSV) | 2 min | — |
 | 6.2 | Activar cuentas (vía email/Mailpit) | 5 min | — |
-| 6.3 | Registrar 200 consentimientos (API con trazabilidad) | 5 min | LOPDP Art. 21, 25 |
+| 6.3 | Registrar 200 consentimientos (UI + script masivo) | 5 min | LOPDP Art. 21, 25 |
 | 6.4 | Matricular 190 (CSV) | 3 min | LOPDP Art. 21 (bloqueo) |
 | 6.5 | Matricular 10 (manual) | 2 min | LOPDP Art. 21 (bloqueo) |
 | 7 | Abrir período | 1 min | — |
@@ -611,6 +621,7 @@ Muestra el estado de cada sección:
 | `/api/usuarios/batch/importar-csv` | POST | Importación masiva desde CSV (UI wizard) |
 | `/api/usuarios/batch/desactivar` | POST | Desactivación masiva |
 | `/api/usuarios/batch` | DELETE | Eliminación masiva |
+| `/api/consentimientos` | GET | Listar todos los consentimientos (con datos del estudiante) |
 | `/api/consentimientos` | POST | Registrar consentimiento parental (con `representanteNombre` + `representanteCedula`) |
 | `/api/consentimientos/{estudianteId}` | GET | Verificar consentimiento |
 | `/api/consentimientos/{estudianteId}/revocar` | POST | Revocar consentimiento |
