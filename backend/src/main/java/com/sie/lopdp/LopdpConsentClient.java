@@ -36,7 +36,7 @@ public class LopdpConsentClient {
     private HttpHeaders authHeaders() {
         HttpHeaders headers = new HttpHeaders();
         if (lopdpApiKey != null && !lopdpApiKey.isBlank()) {
-            headers.set("X-Api-Key", lopdpApiKey);
+            headers.set("X-Sync-API-Key", lopdpApiKey);
         }
         return headers;
     }
