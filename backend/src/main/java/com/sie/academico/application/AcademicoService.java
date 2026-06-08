@@ -112,10 +112,26 @@ public class AcademicoService {
 
     @Transactional
     public SeccionResponse asignarDocente(UUID seccionId, UUID docenteId, String rol) {
-        Seccion s = seccionRepository.findById(seccionId).orElseThrow(() -> new IllegalArgumentException("Sección no encontrada"));
-        DocenteSeccion ds = new DocenteSeccion();
-        ds.setSeccion(s); ds.setDocenteId(docenteId); ds.setRol(rol);
-        s.getDocentes().add(ds);
+        Seccion s = seccionRepository.findById(seccionId)
+                .orElseThrow(() -> new IllegalArgumentException("Sección no encontrada"));
+        s.getDocentes().stream()
+                .filter(d -> d.getDocenteId().equals(docenteId))
+                .findFirst()
+                .ifPresentOrElse(
+                        d -> d.setRol(rol),
+                        () -> {
+                            DocenteSeccion ds = new DocenteSeccion();
+                            ds.setSeccion(s); ds.setDocenteId(docenteId); ds.setRol(rol);
+                            s.getDocentes().add(ds);
+                        });
+        return toResponse(seccionRepository.save(s));
+    }
+
+    @Transactional
+    public SeccionResponse removerDocente(UUID seccionId, UUID docenteId) {
+        Seccion s = seccionRepository.findById(seccionId)
+                .orElseThrow(() -> new IllegalArgumentException("Sección no encontrada"));
+        s.getDocentes().removeIf(d -> d.getDocenteId().equals(docenteId));
         return toResponse(seccionRepository.save(s));
     }
 

@@ -1,10 +1,8 @@
 package com.sie.matricula.application;
 
 import com.sie.academico.infrastructure.SeccionRepository;
-import com.sie.identidad.domain.RolCodigo;
+import com.sie.identidad.application.ConsentimientoService;
 import com.sie.identidad.domain.Usuario;
-import com.sie.identidad.domain.UsuarioRol;
-import com.sie.identidad.infrastructure.ConsentimientoRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.matricula.application.dto.*;
 import com.sie.matricula.domain.*;
@@ -28,7 +26,7 @@ public class MatriculaService {
     private final MatriculaRepository matriculaRepository;
     private final SeccionRepository seccionRepository;
     private final UsuarioRepository usuarioRepository;
-    private final ConsentimientoRepository consentimientoRepository;
+    private final ConsentimientoService consentimientoService;
     private final EntityManager em;
 
     @Transactional
@@ -37,7 +35,7 @@ public class MatriculaService {
                 .orElseThrow(() -> new IllegalArgumentException("Estudiante no encontrado"));
         if (!estudiante.isActivo()) throw new IllegalArgumentException("Estudiante inactivo");
 
-        if (!consentimientoRepository.existsByEstudianteIdAndAceptadoTrue(req.estudianteId())) {
+        if (!consentimientoService.existeConsentimiento(req.estudianteId())) {
             throw new IllegalArgumentException(
                 "No se puede matricular: el estudiante no tiene consentimiento parental registrado (LOPDP Art. 21).");
         }

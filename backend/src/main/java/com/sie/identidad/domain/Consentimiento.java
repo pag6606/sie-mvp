@@ -21,6 +21,12 @@ public class Consentimiento extends BaseEntity {
     @Column(name = "estudiante_id", nullable = false)
     private UUID estudianteId;
 
+    @Column(name = "representante_nombre", length = 200)
+    private String representanteNombre;
+
+    @Column(name = "representante_cedula", length = 20)
+    private String representanteCedula;
+
     @Column(name = "representante_email", nullable = false)
     private String representanteEmail = "";
 
@@ -38,6 +44,9 @@ public class Consentimiento extends BaseEntity {
 
     @Column(name = "fecha_revocacion")
     private LocalDateTime fechaRevocacion;
+
+    @Column(length = 20)
+    private String fuente = "SIE_LOCAL";
 
     public void revocar() {
         this.aceptado = false;

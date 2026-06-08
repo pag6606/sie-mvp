@@ -1,7 +1,6 @@
 package com.sie.identidad.infrastructure.web;
 
-import com.sie.identidad.domain.Consentimiento;
-import com.sie.identidad.infrastructure.ConsentimientoRepository;
+import com.sie.identidad.application.ConsentimientoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ConsentimientoController {
 
-    private final ConsentimientoRepository consentimientoRepository;
+    private final ConsentimientoService consentimientoService;
 
     @PostMapping
     public ResponseEntity<Map<String, String>> registrar(
@@ -29,41 +28,43 @@ public class ConsentimientoController {
                     .body(Map.of("error", "estudianteId inválido — debe ser un UUID válido"));
         }
 
-        var existente = consentimientoRepository.findByEstudianteIdAndAceptadoTrue(estudianteId);
-        if (existente.isPresent()) {
+        var existente = consentimientoService.verificar(estudianteId);
+        if (existente.existe()) {
             return ResponseEntity.ok(Map.of(
                     "mensaje", "El consentimiento ya existe",
-                    "id", existente.get().getId().toString()));
+                    "id", existente.id()));
         }
 
-        Consentimiento c = new Consentimiento();
-        c.setEstudianteId(estudianteId);
-        c.setRepresentanteEmail(body.getOrDefault("representanteEmail", ""));
-        c.setDocumentoUrl(body.getOrDefault("documentoUrl", ""));
-        c.setColegioId(colegioId);
-        c = consentimientoRepository.save(c);
+        var result = consentimientoService.registrar(
+                colegioId,
+                estudianteId,
+                body.getOrDefault("representanteNombre", ""),
+                body.getOrDefault("representanteCedula", ""),
+                body.getOrDefault("representanteEmail", ""),
+                body.getOrDefault("documentoUrl", ""));
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("mensaje", "Consentimiento registrado", "id", c.getId().toString()));
+                .body(Map.of("mensaje", "Consentimiento registrado", "id", result.id()));
     }
 
     @GetMapping("/{estudianteId}")
     public ResponseEntity<?> verificar(@PathVariable UUID estudianteId) {
-        var c = consentimientoRepository.findByEstudianteIdAndAceptadoTrue(estudianteId);
-        return c.<ResponseEntity<?>>map(consentimiento ->
-                ResponseEntity.ok(Map.of(
-                        "existe", true,
-                        "id", consentimiento.getId().toString(),
-                        "fecha", consentimiento.getFechaOtorgamiento().toString())))
-                .orElseGet(() -> ResponseEntity.ok(Map.of("existe", false)));
+        var result = consentimientoService.verificar(estudianteId);
+        if (result.existe()) {
+            return ResponseEntity.ok(Map.of(
+                    "existe", true,
+                    "id", result.id(),
+                    "fecha", result.fecha() != null ? result.fecha().toString() : "",
+                    "representanteNombre", result.representanteNombre() != null ? result.representanteNombre() : "",
+                    "representanteCedula", result.representanteCedula() != null ? result.representanteCedula() : ""
+            ));
+        }
+        return ResponseEntity.ok(Map.of("existe", false));
     }
 
     @PostMapping("/{estudianteId}/revocar")
     public ResponseEntity<Map<String, String>> revocar(@PathVariable UUID estudianteId) {
-        var c = consentimientoRepository.findByEstudianteIdAndAceptadoTrue(estudianteId)
-                .orElseThrow(() -> new IllegalArgumentException("Consentimiento no encontrado"));
-        c.revocar();
-        consentimientoRepository.save(c);
+        consentimientoService.revocar(estudianteId);
         return ResponseEntity.ok(Map.of("mensaje", "Consentimiento revocado"));
     }
 }

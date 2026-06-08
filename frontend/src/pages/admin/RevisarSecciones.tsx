@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
@@ -32,21 +32,33 @@ function AsignarDocenteDropdown({ seccionId, onAssigned }: { seccionId: string; 
   const { data: usuarios = [] } = useUsuarios()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [rol, setRol] = useState('TITULAR')
+  const [pos, setPos] = useState({ top: 0, right: 0 })
+  const btnRef = useRef<HTMLButtonElement>(null)
   const docentes = usuarios.filter(u => u.roles.includes('DOCENTE'))
+
+  const handleOpen = () => {
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right })
+    }
+    setOpen(!open)
+  }
 
   const handleAssign = async (docenteId: string) => {
     setLoading(true)
     try {
-      await api.post(`/secciones/${seccionId}/docentes`, { docenteId, rol: 'TITULAR' })
+      await api.post(`/secciones/${seccionId}/docentes`, { docenteId, rol })
       onAssigned()
     } catch { /* ignore */ }
     finally { setLoading(false); setOpen(false) }
   }
 
   return (
-    <div className="relative">
+    <div>
       <button
-        onClick={() => setOpen(!open)}
+        ref={btnRef}
+        onClick={handleOpen}
         disabled={loading}
         className="rounded-md border border-border bg-card px-2 py-1 text-xs text-primary hover:bg-muted transition-colors"
       >
@@ -55,7 +67,27 @@ function AsignarDocenteDropdown({ seccionId, onAssigned }: { seccionId: string; 
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-1 w-56 rounded-xl border border-border bg-card shadow-lg py-1 max-h-48 overflow-y-auto">
+          <div
+            className="fixed z-50 w-64 rounded-xl border border-border bg-card shadow-lg py-2 max-h-56 overflow-y-auto"
+            style={{ top: `${pos.top}px`, right: `${pos.right}px` }}
+          >
+            <div className="px-4 pb-2 border-b border-border mb-1">
+              <label className="text-xs font-medium text-muted-foreground">Rol:</label>
+              <div className="flex gap-2 mt-1">
+                <label className="flex items-center gap-1 text-xs cursor-pointer">
+                  <input type="radio" name={`rol-${seccionId}`} value="TITULAR" checked={rol === 'TITULAR'} onChange={() => setRol('TITULAR')} className="accent-primary" />
+                  Titular
+                </label>
+                <label className="flex items-center gap-1 text-xs cursor-pointer">
+                  <input type="radio" name={`rol-${seccionId}`} value="AUXILIAR" checked={rol === 'AUXILIAR'} onChange={() => setRol('AUXILIAR')} className="accent-primary" />
+                  Auxiliar
+                </label>
+                <label className="flex items-center gap-1 text-xs cursor-pointer">
+                  <input type="radio" name={`rol-${seccionId}`} value="POR_MATERIA" checked={rol === 'POR_MATERIA'} onChange={() => setRol('POR_MATERIA')} className="accent-primary" />
+                  Por materia
+                </label>
+              </div>
+            </div>
             {docentes.length === 0 ? (
               <p className="px-4 py-2 text-xs text-muted-foreground">No hay docentes creados</p>
             ) : (
@@ -76,24 +108,56 @@ function AsignarDocenteDropdown({ seccionId, onAssigned }: { seccionId: string; 
   )
 }
 
+function nombreDocente(usuarios: { id: string; nombre: string }[], docenteId: string): string {
+  return usuarios.find(u => u.id === docenteId)?.nombre ?? '(desconocido)'
+}
+
 const SeccionRow = memo(function SeccionRow({
   s,
   revisada,
   onToggle,
   onRefresh,
+  usuarios,
 }: {
   s: SeccionItem
   revisada: boolean
   onToggle: (id: string) => void
   onRefresh: () => void
+  usuarios: { id: string; nombre: string }[]
 }) {
+  const [removing, setRemoving] = useState<string | null>(null)
+
+  const handleRemove = async (docenteId: string) => {
+    setRemoving(docenteId)
+    try {
+      await api.delete(`/secciones/${s.id}/docentes/${docenteId}`)
+      onRefresh()
+    } catch { /* ignore */ }
+    finally { setRemoving(null) }
+  }
+
   return (
     <tr className="border-b">
       <td className="px-4 py-3 text-sm font-medium text-foreground">{s.codigo}</td>
       <td className="px-4 py-3 text-sm text-muted-foreground">{s.capacidad}</td>
       <td className="px-4 py-3">
         {s.docentes?.length ? (
-          <span className="text-sm text-foreground">{s.docentes.map(d => d.rol).join(', ')}</span>
+          <div className="flex flex-wrap gap-1">
+            {s.docentes.map(d => (
+              <span key={d.docenteId} className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs text-foreground">
+                {nombreDocente(usuarios, d.docenteId)}
+                <span className="text-muted-foreground">({d.rol === 'TITULAR' ? 'Titular' : d.rol === 'AUXILIAR' ? 'Auxiliar' : 'Por materia'})</span>
+                <button
+                  onClick={() => handleRemove(d.docenteId)}
+                  disabled={removing === d.docenteId}
+                  className="ml-0.5 text-muted-foreground hover:text-destructive transition-colors"
+                  title="Quitar docente"
+                >
+                  {removing === d.docenteId ? '...' : '×'}
+                </button>
+              </span>
+            ))}
+          </div>
         ) : (
           <span className="text-sm text-warning">Sin asignar</span>
         )}
@@ -119,6 +183,7 @@ export default function RevisarSecciones() {
   const { periodoId } = useParams()
   const { data: secciones = [], isLoading } = useSecciones(periodoId!)
   const { data: cursos = [] } = useCursos()
+  const { data: usuarios = [] } = useUsuarios()
   const queryClient = useQueryClient()
 
   const [revisadas, setRevisadas] = useState<Set<string>>(new Set())
@@ -333,7 +398,7 @@ export default function RevisarSecciones() {
               </thead>
               <tbody>
                 {secciones.map((s: SeccionItem) => (
-                  <SeccionRow key={s.id} s={s} revisada={revisadas.has(s.id)} onToggle={toggleRevisada} onRefresh={refreshSecciones} />
+                  <SeccionRow key={s.id} s={s} revisada={revisadas.has(s.id)} onToggle={toggleRevisada} onRefresh={refreshSecciones} usuarios={usuarios} />
                 ))}
               </tbody>
             </table>

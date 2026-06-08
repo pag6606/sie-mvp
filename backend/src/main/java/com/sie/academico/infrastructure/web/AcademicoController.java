@@ -88,6 +88,11 @@ public class AcademicoController {
         return service.asignarDocente(id, req.docenteId(), req.rol());
     }
 
+    @DeleteMapping("/secciones/{seccionId}/docentes/{docenteId}")
+    public SeccionResponse removerDocente(@PathVariable UUID seccionId, @PathVariable UUID docenteId) {
+        return service.removerDocente(seccionId, docenteId);
+    }
+
     @PostMapping("/periodos/{origenId}/clonar-a/{destinoId}")
     public List<SeccionResponse> clonarPeriodo(@PathVariable UUID origenId, @PathVariable UUID destinoId) {
         return service.clonarPeriodo(origenId, destinoId);

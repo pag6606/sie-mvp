@@ -3,6 +3,7 @@
 > **Objetivo:** Registrar una institución educativa completa desde cero en SIE  
 > **Régimen:** Costa 2026-2027 (mayo 2026 — febrero 2027)  
 > **Perfil:** Admin del colegio realizando la configuración inicial asistido por el sistema  
+> **Última actualización:** 2026-06-08 (consentimiento v0.1.1: `representanteNombre` + `representanteCedula`, roles TITULAR/AUXILIAR/POR_MATERIA, endpoint DELETE docentes)  
 > **Cuenta admin:** `admin@sie.edu.ec` / `Admin123!!`
 
 ---
@@ -64,7 +65,7 @@ Estos documentos deben existir **antes** de crear el primer usuario estudiante. 
 |---|-----------|--------|---------|
 | 1 | **RAT** (Registro de Actividades del Tratamiento) | ✅ Disponible vía API | `GET /api/admin/rat` devuelve JSON estructurado (Art. 10k) |
 | 2 | **EIPD** (Evaluación de Impacto) | ⬜ Pendiente | Obligatorio por tratar datos de NNA (Art. 21). Documento externo |
-| 3 | **Consentimiento parental** | ✅ Registrable en sistema | `POST /api/consentimientos` + V8 migration. 200 formularios firmados |
+| 3 | **Consentimiento parental** | ✅ Registrable en sistema | `POST /api/consentimientos` con `representanteNombre` + `representanteCedula`. 200 formularios firmados |
 | 4 | **Política de privacidad** | ✅ Visible en UI | `/privacidad` accesible desde login y menú de usuario (Art. 12) |
 | 5 | **Designación de DPD** | ⬜ Pendiente | Persona responsable del cumplimiento. Documento externo |
 
@@ -77,6 +78,7 @@ Estos documentos deben existir **antes** de crear el primer usuario estudiante. 
 | Página de privacidad | `GET /privacidad` | Art. 12 |
 | Registro de consentimiento | `POST /api/consentimientos` | Art. 21, 25 |
 | Verificación de consentimiento | `GET /api/consentimientos/{id}` | Art. 21 |
+| Trazabilidad documental | `representanteNombre` + `representanteCedula` | Art. 21, 25 |
 | Bloqueo matrícula sin consentimiento | `MatriculaService.matricular()` | Art. 21 |
 | Endpoint RAT para DPD | `GET /api/admin/rat` | Art. 10(k) |
 | Integración portal LOPDP | `POST /api/auth/lopdp-token` + botón UI | JWT compartido |
@@ -187,10 +189,11 @@ Los códigos siguen el estándar del Ministerio de Educación: `{número}EGB-{pa
 
 ### Modelo mixto
 
-| Tipo | Niveles | ¿Cómo funciona? |
-|------|---------|-----------------|
-| Titular de aula | 1ro EGB | Un solo profesor da todas las materias a su paralelo |
-| Por asignatura | 2do a 5to EGB | Profesores especialistas rotan entre paralelos |
+| Tipo | Rol SIE | Niveles | ¿Cómo funciona? |
+|------|---------|---------|-----------------|
+| Titular de aula | `TITULAR` | 1ro EGB | Un solo profesor da todas las materias a su paralelo |
+| Apoyo en aula | `AUXILIAR` | 1ro EGB | Co-docente que asiste al titular (ej. prácticas pre-profesionales) |
+| Por asignatura | `POR_MATERIA` | 2do a 5to EGB | Profesores especialistas que rotan entre paralelos dictando su materia |
 
 ### Docentes a crear
 
@@ -245,25 +248,32 @@ Cada docente recibe un email con asunto "Activa tu cuenta en SIE". El flujo es:
 | Sección | Docentes | Rol |
 |---------|----------|-----|
 | 1EGB-A | Laura Román | TITULAR |
-| 1EGB-A | Katty Navas | — |
+| 1EGB-A | Katty Navas | AUXILIAR |
 | 1EGB-B | Marco Tulio | TITULAR |
-| 1EGB-B | Katty Navas | — |
-| 2EGB-A | Carmen Salas, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | — |
-| 2EGB-B | Carmen Salas, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | — |
-| 3EGB-A | Carmen Salas, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | — |
-| 3EGB-B | Carmen Salas, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | — |
-| 4EGB-A | Julio Ponce, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | — |
-| 4EGB-B | Julio Ponce, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | — |
-| 5EGB-A | Julio Ponce, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | — |
-| 5EGB-B | Julio Ponce, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | — |
+| 1EGB-B | Katty Navas | AUXILIAR |
+| 2EGB-A | Carmen Salas | POR_MATERIA |
+| 2EGB-A | Ana Rendón | POR_MATERIA |
+| 2EGB-A | Diego Cuesta | POR_MATERIA |
+| 2EGB-A | Sofía Lara | POR_MATERIA |
+| 2EGB-A | Raúl Izquierdo | POR_MATERIA |
+| 2EGB-A | Katty Navas | POR_MATERIA |
+| 2EGB-A | Omar Delgado | POR_MATERIA |
+| 2EGB-B | Carmen Salas, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | POR_MATERIA |
+| 3EGB-A | Carmen Salas, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | POR_MATERIA |
+| 3EGB-B | Carmen Salas, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | POR_MATERIA |
+| 4EGB-A | Julio Ponce, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | POR_MATERIA |
+| 4EGB-B | Julio Ponce, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | POR_MATERIA |
+| 5EGB-A | Julio Ponce, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | POR_MATERIA |
+| 5EGB-B | Julio Ponce, Ana Rendón, Diego Cuesta, Sofía Lara, Raúl Izquierdo, Katty Navas, Omar Delgado | POR_MATERIA |
 
 ### Paso a paso
 
 1. En la tabla del paso 3, para cada sección:
-   - Clic en botón de asignar docente
+   - Clic en botón **"+ Asignar docente"**
+   - Seleccionar rol: **Titular**, **Auxiliar** o **Por materia** (radio buttons en el dropdown)
    - Seleccionar docente de la lista desplegable
-   - Si es titular, marcar rol `TITULAR`
-   - Confirmar
+   - Para remover un docente, clic en **×** junto al nombre en la columna Docentes
+   - Si un docente ya está asignado y se le re-asigna con otro rol, el sistema actualiza el rol (no duplica)
 2. Marcar ✓ cada sección como revisada
 3. Clic en **Continuar**
 
@@ -330,18 +340,52 @@ Los 200 estudiantes reciben un email de activación (asunto: "Activa tu cuenta e
 
 ### 6.3 Registrar consentimientos parentales (LOPDP Art. 21, 25)
 
-**NUEVO** — Antes de matricular, cada estudiante necesita consentimiento registrado. Los 200 estudiantes son menores de 15 años.
+**NUEVO v0.1.1** — Antes de matricular, cada estudiante necesita consentimiento registrado. Los 200 estudiantes son menores de 15 años.
+
+El consentimiento ahora incluye trazabilidad documental completa:
 
 ```bash
-# Registrar consentimiento para cada estudiante
+# Registrar consentimiento individual con trazabilidad completa
 curl -X POST http://localhost:8080/api/consentimientos \
   -H "Content-Type: application/json" \
-  -H "X-Colegio-Id: <colegio-id>" \
+  -H "Authorization: Bearer $TOKEN" \
   -d '{
     "estudianteId": "<uuid-del-estudiante>",
-    "representanteEmail": "padre@email.com",
-    "documentoUrl": "/docs/consentimientos/est-001.pdf"
+    "representanteNombre": "María García López",
+    "representanteCedula": "0912345678",
+    "representanteEmail": "maria.garcia@padres.edu.ec",
+    "documentoUrl": "/docs/consentimientos/formulario-firmado-001.pdf"
   }'
+```
+
+**Campos del consentimiento:**
+
+| Campo | Tipo | Obligatorio | Propósito LOPDP |
+|-------|------|-------------|-----------------|
+| `estudianteId` | UUID | Sí | Vincular al menor (NNA) |
+| `representanteNombre` | String | No | **Trazabilidad** — quién firmó (Art. 21) |
+| `representanteCedula` | String | No | **Trazabilidad** — documento de identidad del representante (Art. 25) |
+| `representanteEmail` | String | No | Contacto del representante |
+| `documentoUrl` | String | No | Evidencia escaneada del formulario firmado |
+
+> **Modelo de verificación:** El SIE no verifica la identidad del representante. Eso lo hace secretaría con la cédula física en la matrícula presencial. Los campos `representanteNombre` y `representanteCedula` quedan como **registro trazable** para auditoría de la Autoridad de Protección de Datos.
+
+**Registro masivo para 200 estudiantes (script):**
+
+```bash
+TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"admin@sie.edu.ec","password":"Admin123!!"}' | jq -r '.token')
+
+curl -s 'http://localhost:8080/api/usuarios?size=200&rol=ESTUDIANTE' \
+  -H "Authorization: Bearer $TOKEN" | \
+  jq -r '.content[].id' | while read EST_ID; do
+    curl -s -X POST http://localhost:8080/api/consentimientos \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Content-Type: application/json" \
+      -d "{\"estudianteId\":\"$EST_ID\",\"representanteNombre\":\"Representante Legal\",\"representanteCedula\":\"0911111111\",\"representanteEmail\":\"padre@familia.edu.ec\"}"
+  done | grep -c '"mensaje":"Consentimiento registrado"'
+# Esperado: 200
 ```
 
 > ⚠️ Si intentás matricular sin consentimiento, el sistema bloquea con error:  
@@ -350,6 +394,11 @@ curl -X POST http://localhost:8080/api/consentimientos \
 Verificar consentimiento:
 ```
 GET /api/consentimientos/{estudianteId} → { existe: true, id: "...", fecha: "..." }
+```
+
+Revocar consentimiento:
+```
+POST /api/consentimientos/{estudianteId}/revocar → { mensaje: "Consentimiento revocado" }
 ```
 
 ### 6.4 Matricular vía CSV (190 estudiantes)
@@ -489,8 +538,9 @@ Menú de usuario (sidebar, avatar abajo) → **🛡 Privacidad (LOPDP)**
 ### 8.3 Panel ARCO (admin)
 
 - `GET /api/consentimientos/{estudianteId}` — verificar si existe consentimiento
-- `POST /api/consentimientos` — registrar nuevo consentimiento
+- `POST /api/consentimientos` — registrar nuevo consentimiento (con `representanteNombre` + `representanteCedula`)
 - `POST /api/consentimientos/{id}/revocar` — revocar consentimiento existente
+- `DELETE /api/secciones/{seccionId}/docentes/{docenteId}` — remover docente de sección (nuevo)
 
 ---
 
@@ -529,7 +579,7 @@ Muestra el estado de cada sección:
 | 5 | Asignar docentes a secciones | 10 min | — |
 | 6.1 | Crear 200 estudiantes (UI wizard CSV) | 2 min | — |
 | 6.2 | Activar cuentas (vía email/Mailpit) | 5 min | — |
-| 6.3 | Registrar 200 consentimientos | 5 min | LOPDP Art. 21, 25 |
+| 6.3 | Registrar 200 consentimientos (API con trazabilidad) | 5 min | LOPDP Art. 21, 25 |
 | 6.4 | Matricular 190 (CSV) | 3 min | LOPDP Art. 21 (bloqueo) |
 | 6.5 | Matricular 10 (manual) | 2 min | LOPDP Art. 21 (bloqueo) |
 | 7 | Abrir período | 1 min | — |
@@ -550,9 +600,11 @@ Muestra el estado de cada sección:
 | `/api/usuarios/batch/importar-csv` | POST | Importación masiva desde CSV (UI wizard) |
 | `/api/usuarios/batch/desactivar` | POST | Desactivación masiva |
 | `/api/usuarios/batch` | DELETE | Eliminación masiva |
-| `/api/consentimientos` | POST | Registrar consentimiento parental |
+| `/api/consentimientos` | POST | Registrar consentimiento parental (con `representanteNombre` + `representanteCedula`) |
 | `/api/consentimientos/{id}` | GET | Verificar consentimiento |
 | `/api/consentimientos/{id}/revocar` | POST | Revocar consentimiento |
+| `/api/secciones/{id}/docentes` | POST | Asignar docente a sección (upsert: actualiza rol si ya existe) |
+| `/api/secciones/{seccionId}/docentes/{docenteId}` | DELETE | Remover docente de sección |
 | `/api/auth/lopdp-token` | POST | Token JWT para portal LOPDP |
 | `/api/admin/rat` | GET | Registro de Actividades del Tratamiento |
 | `/api/dashboard/admin` | GET | KPIs agregados cross-context |
@@ -566,7 +618,7 @@ Muestra el estado de cada sección:
 |---------|-------------|
 | `docs/qa/workflow-demo/matricula-190.csv` | CSV de matrícula masiva (190 estudiantes) |
 | `docs/qa/workflow-demo/estudiantes-200.csv` | CSV de creación masiva (200 estudiantes) — usado en Fase 6.1 |
-| `docs/qa/manual-test-script.md` | Script de pruebas manuales (62 casos) |
+| `docs/qa/manual-test-script.md` | Script de pruebas manuales (88 casos, incluye UA-18 consentimiento) |
 | `docs/reference/normativas-aplicables-sie.md` | Checklist de cumplimiento normativo |
 | `docs/manuales/manual-administrativo.md` | Manual de usuario administrador |
 | `docs/manuales/manual-docente.md` | Manual de usuario docente |

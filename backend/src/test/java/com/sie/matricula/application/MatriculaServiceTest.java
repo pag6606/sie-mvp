@@ -3,8 +3,8 @@ package com.sie.matricula.application;
 import com.sie.academico.domain.Curso;
 import com.sie.academico.domain.Seccion;
 import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.identidad.application.ConsentimientoService;
 import com.sie.identidad.domain.Usuario;
-import com.sie.identidad.infrastructure.ConsentimientoRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.matricula.application.dto.MatricularRequest;
 import com.sie.matricula.application.dto.MatriculaResponse;
@@ -29,11 +29,11 @@ class MatriculaServiceTest {
     @Mock MatriculaRepository matriculaRepository;
     @Mock SeccionRepository seccionRepository;
     @Mock UsuarioRepository usuarioRepository;
-    @Mock ConsentimientoRepository consentimientoRepository;
+    @Mock ConsentimientoService consentimientoService;
     @Mock EntityManager em;
 
     private MatriculaService svc() {
-        return new MatriculaService(matriculaRepository, seccionRepository, usuarioRepository, consentimientoRepository, em);
+        return new MatriculaService(matriculaRepository, seccionRepository, usuarioRepository, consentimientoService, em);
     }
 
     @Test
@@ -50,7 +50,7 @@ class MatriculaServiceTest {
         Seccion seccion = new Seccion(); seccion.setCurso(curso);
 
         when(usuarioRepository.findById(estudianteId)).thenReturn(Optional.of(estudiante));
-        when(consentimientoRepository.existsByEstudianteIdAndAceptadoTrue(estudianteId)).thenReturn(true);
+        when(consentimientoService.existeConsentimiento(estudianteId)).thenReturn(true);
         when(seccionRepository.findById(seccionId)).thenReturn(Optional.of(seccion));
         when(matriculaRepository.existsByEstudianteIdAndSeccionId(estudianteId, seccionId)).thenReturn(false);
         when(matriculaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -80,7 +80,7 @@ class MatriculaServiceTest {
         Seccion seccion = new Seccion(); seccion.setCurso(curso);
 
         when(usuarioRepository.findById(estudianteId)).thenReturn(Optional.of(estudiante));
-        lenient().when(consentimientoRepository.existsByEstudianteIdAndAceptadoTrue(any())).thenReturn(true);
+        lenient().when(consentimientoService.existeConsentimiento(any())).thenReturn(true);
         lenient().when(seccionRepository.findById(any())).thenReturn(Optional.of(seccion));
         when(matriculaRepository.existsByEstudianteIdAndSeccionId(any(), any())).thenReturn(true);
 
@@ -126,7 +126,7 @@ class MatriculaServiceTest {
         var svc = svc();
         Usuario estudiante = new Usuario(); estudiante.setActivo(true);
         when(usuarioRepository.findById(any())).thenReturn(Optional.of(estudiante));
-        lenient().when(consentimientoRepository.existsByEstudianteIdAndAceptadoTrue(any())).thenReturn(true);
+        lenient().when(consentimientoService.existeConsentimiento(any())).thenReturn(true);
         lenient().when(seccionRepository.findById(any())).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class,
                 () -> svc.matricular(UUID.randomUUID(), new MatricularRequest(UUID.randomUUID(), UUID.randomUUID())));

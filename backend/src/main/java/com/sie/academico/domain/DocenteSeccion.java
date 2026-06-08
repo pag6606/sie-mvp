@@ -25,5 +25,5 @@ public class DocenteSeccion {
     private java.util.UUID docenteId;
 
     @Column(nullable = false)
-    private String rol; // TITULAR, AUXILIAR
+    private String rol; // TITULAR, AUXILIAR, POR_MATERIA
 }

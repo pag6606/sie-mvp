@@ -31,7 +31,8 @@ Antes de empezar, el tester debe verificar:
 6. **UA-14** (10 min) — Flujo estudiante.
 7. **UA-15 a UA-16** (10 min) — Componentes UI y diseño visual.
 8. **UA-17** (45 min) — **Asistente CSV (novedad v0.1.0)** — caso estrella del release.
-9. **Llenar tabla "Resumen de Resultados"** al final con el resultado de cada caso.
+9. **UA-18** (15 min) — **Consentimiento parental (nuevo v0.1.1)** — LOPDP Art. 21, 25.
+10. **Llenar tabla "Resumen de Resultados"** al final con el resultado de cada caso.
 
 ### Datos a capturar durante la prueba
 
@@ -88,6 +89,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 | UA-14 Estudiante | LOPDP + CNIA | Art. 8 (derecho de acceso), Art. 49 (NNA) |
 | UA-15-16 UI | _No aplica_ | _Componentes reutilizables_ |
 | UA-17 CSV | LOPDP | Arts. 9-10 (responsable del tratamiento), Arts. 25-26 (seguridad) |
+| UA-18 Consentimiento parental | LOPDP + CNIA | Arts. 21, 25 (consentimiento parental para NNA), Art. 49 CNIA |
 
 ---
 
@@ -742,6 +744,112 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 
 ---
 
+## UA-18 — Consentimiento Parental (LOPDP)
+
+> **Normativa:** LOPDP Arts. 21, 25 (consentimiento parental para NNA — menores de 15 años) + CNIA Art. 49 (protección de datos de NNA).  
+> **Precondición:** DB limpia, al menos 2 usuarios con rol ESTUDIANTE creados (pueden importarse vía UA-17.1).  
+> **Login:** `admin@sie.edu.ec` / `Admin123!!`  
+> **Endpoint:** `POST /api/consentimientos`, `GET /api/consentimientos/{estudianteId}`, `POST /api/consentimientos/{estudianteId}/revocar`
+
+### UA-18.1 Registrar consentimiento parental (API)
+- [ ] Login como Admin. Si no hay estudiantes, ejecutar UA-17.1 (importar 200) o crear 2 manuales en UA-06.2.
+- [ ] Abrir DevTools → Network y ejecutar:
+  ```bash
+  TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
+    -H 'Content-Type: application/json' \
+    -d '{"email":"admin@sie.edu.ec","password":"Admin123!!"}' | jq -r '.token')
+  
+  # Obtener ID del primer estudiante
+  EST_ID=$(curl -s http://localhost:8080/api/usuarios?size=5 \
+    -H "Authorization: Bearer $TOKEN" | jq -r '.content[0].id')
+  
+  # Registrar consentimiento
+  curl -s -X POST http://localhost:8080/api/consentimientos \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{\"estudianteId\":\"$EST_ID\",\"representanteNombre\":\"María García\",\"representanteCedula\":\"0912345678\",\"representanteEmail\":\"maria@padres.edu.ec\",\"documentoUrl\":\"formulario-firmado.pdf\"}"
+  ```
+- [ ] **AC:** Respuesta HTTP 201 con `"mensaje": "Consentimiento registrado"` y campo `"id"` (UUID)
+- [ ] **AC:** No hay error en consola
+
+### UA-18.2 Verificar consentimiento existente (API)
+- [ ] Con el mismo `EST_ID` del caso anterior:
+  ```bash
+  curl -s http://localhost:8080/api/consentimientos/$EST_ID \
+    -H "Authorization: Bearer $TOKEN"
+  ```
+- [ ] **AC:** Respuesta `{"existe": true, "id": "...", "fecha": "2026-..."}`
+- [ ] Intentar registrar el mismo estudiante otra vez:
+  ```bash
+  curl -s -X POST http://localhost:8080/api/consentimientos \
+    -H "Authorization: Bearer $TOKEN" \
+    -H "Content-Type: application/json" \
+    -d "{\"estudianteId\":\"$EST_ID\",\"representanteNombre\":\"Otro\",\"representanteCedula\":\"0999999999\",\"representanteEmail\":\"otro@padres.edu.ec\"}"
+  ```
+- [ ] **AC:** HTTP 200 con `"mensaje": "El consentimiento ya existe"` y `"id"` del existente (NO crea duplicado)
+
+### UA-18.3 Bloqueo de matrícula sin consentimiento
+- [ ] Tomar un `EST_ID` de un estudiante SIN consentimiento (o crear uno nuevo en UA-06.2)
+- [ ] Intentar matricularlo manualmente (UA-07.2)
+- [ ] **AC:** El backend rechaza la matrícula con mensaje:
+  ```
+  "No se puede matricular: el estudiante no tiene consentimiento parental registrado (LOPDP Art. 21)."
+  ```
+- [ ] Registrar consentimiento para ese estudiante (UA-18.1)
+- [ ] Reintentar matrícula → **AC:** exitosa, sin error
+
+### UA-18.4 Revocar consentimiento
+- [ ] Usar un estudiante con consentimiento activo:
+  ```bash
+  curl -s -X POST http://localhost:8080/api/consentimientos/$EST_ID/revocar \
+    -H "Authorization: Bearer $TOKEN"
+  ```
+- [ ] **AC:** HTTP 200 con `"mensaje": "Consentimiento revocado"`
+- [ ] Verificar revocación:
+  ```bash
+  curl -s http://localhost:8080/api/consentimientos/$EST_ID \
+    -H "Authorization: Bearer $TOKEN"
+  ```
+- [ ] **AC:** `{"existe": false}`
+- [ ] Intentar matricularlo de nuevo → **AC:** rechazado (mismo mensaje de Art. 21)
+
+### UA-18.5 Verificar trazabilidad documental (representanteNombre + representanteCedula)
+- [ ] Usar el `id` del consentimiento creado en UA-18.1
+- [ ] Consultar directamente en la DB:
+  ```bash
+  podman exec sie-postgres psql -U sie -d sie -c \
+    "SELECT representante_nombre, representante_cedula, representante_email, tipo, aceptado, fecha_otorgamiento FROM consentimientos WHERE estudiante_id = '$EST_ID';"
+  ```
+- [ ] **AC:** `representante_nombre = 'María García'`
+- [ ] **AC:** `representante_cedula = '0912345678'`
+- [ ] **AC:** `representante_email = 'maria@padres.edu.ec'`
+- [ ] **AC:** `tipo = 'PARENTAL'`, `aceptado = true`
+- [ ] **AC:** `fecha_otorgamiento` es la fecha/hora actual (timestamp con zona horaria)
+- [ ] **Razón normativa:** LOPDP Art. 21 exige que el responsable pueda demostrar que quien consintió es el representante legal. Los campos `representanteNombre` y `representanteCedula` proveen trazabilidad documental para auditoría, sin que el SIE tenga que verificar la identidad (eso lo hace secretaría con la cédula física).
+
+### UA-18.6 Flujo Academia del Pacífico — Registrar 200 consentimientos masivos
+- [ ] **Precondición:** UA-17.1 ejecutado (200 estudiantes en DB)
+- [ ] Ejecutar script de registro masivo:
+  ```bash
+  TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
+    -H 'Content-Type: application/json' \
+    -d '{"email":"admin@sie.edu.ec","password":"Admin123!!"}' | jq -r '.token')
+  
+  # Obtener 200 IDs de estudiantes
+  curl -s 'http://localhost:8080/api/usuarios?size=200&rol=ESTUDIANTE' \
+    -H "Authorization: Bearer $TOKEN" | \
+    jq -r '.content[].id' | while read EST_ID; do
+      curl -s -X POST http://localhost:8080/api/consentimientos \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Content-Type: application/json" \
+        -d "{\"estudianteId\":\"$EST_ID\",\"representanteNombre\":\"Representante Legal\",\"representanteCedula\":\"0911111111\",\"representanteEmail\":\"padre@familia.edu.ec\"}"
+    done | grep -c '"mensaje":"Consentimiento registrado"'
+  ```
+- [ ] **AC:** El contador final = 200 (o el número de estudiantes sin consentimiento previo)
+- [ ] Verificar en DB: `podman exec sie-postgres psql -U sie -d sie -c "SELECT count(*) FROM consentimientos WHERE aceptado = true;"`
+- [ ] **AC:** count = 200
+- [ ] **NSM:** Tiempo total ≤ 5 minutos (según estimado en onboarding doc)
+
 ## Resumen de Resultados
 
 > Llenar al final de la ejecución. Una fila por caso. Resultado: `✅ Pass` / `❌ Fail` / `⏭ Skipped` (con motivo).  
@@ -831,8 +939,14 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 | UA-17.16 | (H1) Tabla Paso 3 muestra IDs truncados con tooltip | | |
 | UA-17.17 | (H2) Reporte CSV incluye tabla per-row con IDs | | |
 | UA-17.18 | (C2) CSV injection en reporte de errores se escapa | | |
+| UA-18.1 | Registrar consentimiento parental | | |
+| UA-18.2 | Verificar consentimiento existente | | |
+| UA-18.3 | Bloqueo matrícula sin consentimiento | | |
+| UA-18.4 | Revocar consentimiento | | |
+| UA-18.5 | Trazabilidad documental (nombre+cédula) | | |
+| UA-18.6 | Registrar 200 consentimientos masivos (NSM ≤ 5 min) | | |
 
-**Total:** 82 casos de prueba (62 originales + 10 UA-17 originales + 8 nuevos UA-17.11 a 17.18 que cubren fixes del code review CSV-BI + 2 casos extra en UA-10 / UA-11 recontados)  
+**Total:** 88 casos de prueba (62 originales + 10 UA-17 originales + 8 nuevos UA-17.11 a 17.18 + 6 nuevos UA-18.1 a 18.6 para consentimiento parental)  
 **Aprobador:** ___________  
 **Fecha:** ___________
 
@@ -840,11 +954,12 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 
 ## Cambios respecto a v0.2.0 (manual anterior)
 
-Este manual fue actualizado el 2026-06-06 con los fixes del code review del épica CSV-BI. Cambios:
+Este manual fue actualizado el 2026-06-08 con consentimiento parental. Cambios:
 
 - **UA-17.1**: agregado "tabla con 200 filas" (era H1)
 - **UA-17.4**: cambio `clic` → `doble-click` (era H7, read-only por defecto)
 - **UA-17.11 a 17.18**: 8 sub-cases nuevos que verifican los fixes H1, H2, H5, H6, H7, H8, C2, C3a, C5
+- **UA-18.1 a 18.6**: **6 casos nuevos** de consentimiento parental (LOPDP Art. 21, 25) — registro, verificación, bloqueo de matrícula, revocación, trazabilidad con `representanteNombre`/`representanteCedula`, y flujo masivo para 200 estudiantes
 - **Todos los checkboxes** reseteados a `[ ]` para ejecución limpia
 - **Tabla de resultados** vacía (sin datos pre-cargados)
 - **Sección "Cómo ejecutar la prueba completa"** con checklist pre-test y orden recomendado
