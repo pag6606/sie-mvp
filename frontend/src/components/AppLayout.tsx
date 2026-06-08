@@ -16,6 +16,7 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
     { label: 'Cursos', icon: '📘', href: '/admin/cursos' },
     { label: 'Secciones (paralelos)', icon: '📚', href: '/admin/secciones' },
     { label: 'Matrícula', icon: '📋', href: '/admin/matricula' },
+    { label: 'Consentimientos', icon: '🛡', href: '/admin/consentimientos' },
   ],
   docente: [
     { label: 'Mis Secciones (paralelos)', icon: '📖', href: '/docente' },

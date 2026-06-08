@@ -1,7 +1,9 @@
 package com.sie.identidad.application;
 
 import com.sie.identidad.domain.Consentimiento;
+import com.sie.identidad.domain.Usuario;
 import com.sie.identidad.infrastructure.ConsentimientoRepository;
+import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.lopdp.LopdpConsentClient;
 import com.sie.lopdp.LopdpUnavailableException;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,6 +23,7 @@ import java.util.UUID;
 public class ConsentimientoService {
 
     private final ConsentimientoRepository consentimientoRepository;
+    private final UsuarioRepository usuarioRepository;
     private final Optional<LopdpConsentClient> lopdpClient;
 
     @Value("${lopdp.enabled:false}")
@@ -92,6 +96,30 @@ public class ConsentimientoService {
     public boolean existeConsentimiento(UUID estudianteId) {
         var result = verificar(estudianteId);
         return result.existe();
+    }
+
+    public record ListaItem(UUID id, UUID estudianteId, String estudianteNombre, String estudianteEmail,
+                             String representanteNombre, String representanteCedula, String representanteEmail,
+                             String tipo, boolean aceptado, LocalDateTime fechaOtorgamiento,
+                             String documentoUrl, String fuente) {}
+
+    public List<ListaItem> listarTodos() {
+        var usuarios = usuarioRepository.findAll();
+        return consentimientoRepository.findAll().stream()
+                .map(c -> {
+                    var u = usuarios.stream()
+                            .filter(us -> us.getId().equals(c.getEstudianteId()))
+                            .findFirst();
+                    return new ListaItem(
+                            c.getId(), c.getEstudianteId(),
+                            u.map(Usuario::getNombre).orElse(""),
+                            u.map(Usuario::getEmail).orElse(""),
+                            c.getRepresentanteNombre(), c.getRepresentanteCedula(),
+                            c.getRepresentanteEmail(), c.getTipo(),
+                            c.isAceptado(), c.getFechaOtorgamiento(),
+                            c.getDocumentoUrl(), c.getFuente()
+                    );
+                }).toList();
     }
 
     private void cacheConsent(UUID estudianteId, UUID colegioId,

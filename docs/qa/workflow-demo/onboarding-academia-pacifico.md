@@ -350,6 +350,8 @@ Los 200 estudiantes reciben un email de activación (asunto: "Activa tu cuenta e
 
 **NUEVO v0.1.1** — Antes de matricular, cada estudiante necesita consentimiento registrado. Los 200 estudiantes son menores de 15 años.
 
+**UI disponible:** Sidebar → **Consentimientos** (`/admin/consentimientos`). Permite registrar consentimiento individual con formulario (nombre, cédula, email del representante + documento escaneado). Dos vistas: "Registrados" y "Pendientes".
+
 El consentimiento ahora incluye trazabilidad documental completa:
 
 ```bash
