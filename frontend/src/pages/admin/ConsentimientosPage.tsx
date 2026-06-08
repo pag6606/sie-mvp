@@ -35,47 +35,53 @@ export default function ConsentimientosPage() {
   const [formCedula, setFormCedula] = useState('')
   const [formEmail, setFormEmail] = useState('')
   const [formDocumento, setFormDocumento] = useState('')
+  const [formFile, setFormFile] = useState<File | null>(null)
   const [formError, setFormError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const [tab, setTab] = useState<'registrados' | 'pendientes'>('registrados')
 
   const estudiantes = usuarios.filter(u => u.roles.includes('ESTUDIANTE'))
   const idsConConsentimiento = new Set(consentimientos.filter(c => c.aceptado).map(c => c.estudianteId))
   const pendientes = estudiantes.filter(e => !idsConConsentimiento.has(e.id))
 
-  const register = useMutation({
-    mutationFn: (data: {
-      estudianteId: string; representanteNombre: string; representanteCedula: string
-      representanteEmail: string; documentoUrl: string
-    }) => api.post('/consentimientos', data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['consentimientos'] })
-      setShowForm(false)
-      setFormEstudianteId('')
-      setFormDocumento('')
-    },
-    onError: (err: unknown) => {
-      const apiErr = err as import('@/types/api').ApiError
-      setFormError(apiErr.message || apiErr.response?.data?.mensaje || 'Error al registrar')
-    },
-  })
-
   const revocar = useMutation({
     mutationFn: (estudianteId: string) => api.post(`/consentimientos/${estudianteId}/revocar`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['consentimientos'] }),
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormError('')
     if (!formEstudianteId) { setFormError('Selecciona un estudiante'); return }
     if (!formNombre.trim()) { setFormError('El nombre del representante es obligatorio'); return }
-    register.mutate({
-      estudianteId: formEstudianteId,
-      representanteNombre: capitalizeWords(formNombre.trim()),
-      representanteCedula: formCedula.trim(),
-      representanteEmail: formEmail.trim(),
-      documentoUrl: formDocumento.trim(),
-    })
+
+    setSubmitting(true)
+    try {
+      await api.post('/consentimientos', {
+        estudianteId: formEstudianteId,
+        representanteNombre: capitalizeWords(formNombre.trim()),
+        representanteCedula: formCedula.trim(),
+        representanteEmail: formEmail.trim(),
+        documentoUrl: formDocumento.trim(),
+      })
+      if (formFile) {
+        const formData = new FormData()
+        formData.append('file', formFile)
+        await api.post(`/consentimientos/${formEstudianteId}/documento`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+      }
+      queryClient.invalidateQueries({ queryKey: ['consentimientos'] })
+      setShowForm(false)
+      setFormEstudianteId('')
+      setFormDocumento('')
+      setFormFile(null)
+    } catch (err: unknown) {
+      const apiErr = err as import('@/types/api').ApiError
+      setFormError(apiErr.message || apiErr.response?.data?.mensaje || 'Error al registrar')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (isLoading) return <LoadingSkeleton rows={6} />
@@ -158,11 +164,18 @@ export default function ConsentimientosPage() {
                     placeholder="/docs/consentimientos/formulario-001.pdf"
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
                 </div>
+                <div className="md:col-span-2">
+                  <label htmlFor="consFile" className="block text-xs font-medium text-muted-foreground">Subir archivo (PDF del formulario firmado)</label>
+                  <input id="consFile" type="file" accept=".pdf,image/*"
+                    onChange={e => setFormFile(e.target.files?.[0] || null)}
+                    className="mt-1 block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:text-primary-foreground hover:file:bg-primary/90" />
+                  {formFile && <p className="mt-1 text-xs text-muted-foreground">Archivo: {formFile.name} ({(formFile.size / 1024).toFixed(1)} KB)</p>}
+                </div>
               </div>
               <div className="flex gap-3">
-                <button type="submit" disabled={register.isPending}
+                <button type="submit" disabled={submitting}
                   className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
-                  {register.isPending ? 'Registrando...' : 'Registrar consentimiento'}
+                  {submitting ? 'Registrando...' : 'Registrar consentimiento'}
                 </button>
                 <button type="button" onClick={() => { setShowForm(false); setFormError('') }}
                   className="rounded-md border border-input px-4 py-2 text-sm text-muted-foreground hover:bg-muted">

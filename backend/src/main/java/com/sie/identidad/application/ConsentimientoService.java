@@ -12,6 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +32,9 @@ public class ConsentimientoService {
 
     @Value("${lopdp.enabled:false}")
     private boolean lopdpEnabled;
+
+    @Value("${app.uploads.dir:uploads}")
+    private String uploadsDir;
 
     public record ConsentimientoResult(boolean existe, String id, LocalDateTime fecha,
                                        String representanteNombre, String representanteCedula) {}
@@ -120,6 +127,25 @@ public class ConsentimientoService {
                             c.getDocumentoUrl(), c.getFuente()
                     );
                 }).toList();
+    }
+
+    @Transactional
+    public ConsentimientoResult uploadDocumento(UUID estudianteId, byte[] fileBytes, String originalFilename) throws IOException {
+        var c = consentimientoRepository.findByEstudianteIdAndAceptadoTrue(estudianteId)
+                .orElseThrow(() -> new IllegalArgumentException("Consentimiento no encontrado para este estudiante"));
+
+        Path dir = Paths.get(uploadsDir, "consentimientos");
+        Files.createDirectories(dir);
+
+        String filename = estudianteId + "_" + System.currentTimeMillis() + "_" + originalFilename;
+        Path filePath = dir.resolve(filename);
+        Files.write(filePath, fileBytes);
+
+        String documentoUrl = "/" + uploadsDir + "/consentimientos/" + filename;
+        c.setDocumentoUrl(documentoUrl);
+        consentimientoRepository.save(c);
+
+        return toResult(c);
     }
 
     private void cacheConsent(UUID estudianteId, UUID colegioId,

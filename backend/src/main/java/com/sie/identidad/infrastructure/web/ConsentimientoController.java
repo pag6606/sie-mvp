@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -72,5 +74,23 @@ public class ConsentimientoController {
     public ResponseEntity<Map<String, String>> revocar(@PathVariable UUID estudianteId) {
         consentimientoService.revocar(estudianteId);
         return ResponseEntity.ok(Map.of("mensaje", "Consentimiento revocado"));
+    }
+
+    @PostMapping("/{estudianteId}/documento")
+    public ResponseEntity<Map<String, String>> uploadDocumento(
+            @PathVariable UUID estudianteId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            var result = consentimientoService.uploadDocumento(estudianteId, file.getBytes(), file.getOriginalFilename());
+            return ResponseEntity.ok(Map.of(
+                    "mensaje", "Documento subido",
+                    "id", result.id(),
+                    "documentoUrl", result.id() != null ? "" : ""));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Error al guardar el archivo"));
+        }
     }
 }
