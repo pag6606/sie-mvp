@@ -835,10 +835,10 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
     -H 'Content-Type: application/json' \
     -d '{"email":"admin@sie.edu.ec","password":"Admin123!!"}' | jq -r '.token')
   
-  # Obtener 200 IDs de estudiantes
-  curl -s 'http://localhost:8080/api/usuarios?size=200&rol=ESTUDIANTE' \
-    -H "Authorization: Bearer $TOKEN" | \
-    jq -r '.content[].id' | while read EST_ID; do
+  # Obtener IDs de estudiantes desde la DB
+  podman exec sie-postgres psql -U sie -d sie -t -A -c \
+    "SELECT u.id FROM usuarios u JOIN usuario_roles ur ON u.id = ur.usuario_id JOIN roles r ON ur.rol_id = r.id WHERE r.codigo = 'ESTUDIANTE' LIMIT 200" \
+    | while read EST_ID; do
       curl -s -X POST http://localhost:8080/api/consentimientos \
         -H "Authorization: Bearer $TOKEN" \
         -H "Content-Type: application/json" \

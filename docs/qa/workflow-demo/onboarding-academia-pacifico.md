@@ -39,6 +39,8 @@ cp backend/.env.example backend/.env
 
 El `application-dev.properties` ya referencia `${JWT_SECRET}` con fallback al valor de desarrollo.
 
+**Variable `lopdp.enabled`** (consentimiento): `true` delega a LOPDP-EC como fuente canónica; `false` usa la DB local como fuente (modo standalone para dev sin LOPDP corriendo). En producción siempre debe ser `true`.
+
 ### Frontend (Vite)
 
 ```bash
@@ -52,7 +54,7 @@ Variable `VITE_LOPDP_URL` — usada por el botón 🛡 Privacidad (LOPDP) en el 
 
 ```
 JWT_SECRET:   <mismo valor en ambos sistemas>
-LOPDP URL:    http://localhost:3000 (dev) / https://lopdp.dominio.com (prod)
+LOPDP URL:    http://localhost:3000/api/v1 (dev) / https://lopdp.dominio.com/api/v1 (prod)
 ```
 
 ---
@@ -65,7 +67,7 @@ Estos documentos deben existir **antes** de crear el primer usuario estudiante. 
 |---|-----------|--------|---------|
 | 1 | **RAT** (Registro de Actividades del Tratamiento) | ✅ Disponible vía API | `GET /api/admin/rat` devuelve JSON estructurado (Art. 10k) |
 | 2 | **EIPD** (Evaluación de Impacto) | ⬜ Pendiente | Obligatorio por tratar datos de NNA (Art. 21). Documento externo |
-| 3 | **Consentimiento parental** | ✅ Registrable en sistema | `POST /api/consentimientos` con `representanteNombre` + `representanteCedula`. 200 formularios firmados |
+| 3 | **Consentimiento parental** | ✅ Registrable en sistema | `POST /api/consentimientos` con `representanteNombre` + `representanteCedula`. 200 formularios firmados. Migraciones V11 (columnas representante) + V12 (columna fuente) |
 | 4 | **Política de privacidad** | ✅ Visible en UI | `/privacidad` accesible desde login y menú de usuario (Art. 12) |
 | 5 | **Designación de DPD** | ⬜ Pendiente | Persona responsable del cumplimiento. Documento externo |
 
@@ -79,6 +81,7 @@ Estos documentos deben existir **antes** de crear el primer usuario estudiante. 
 | Registro de consentimiento | `POST /api/consentimientos` | Art. 21, 25 |
 | Verificación de consentimiento | `GET /api/consentimientos/{id}` | Art. 21 |
 | Trazabilidad documental | `representanteNombre` + `representanteCedula` | Art. 21, 25 |
+| Registro de fuente de verdad | `fuente` = LOPDP | SIE_LOCAL (V12) | Art. 21, 25 |
 | Bloqueo matrícula sin consentimiento | `MatriculaService.matricular()` | Art. 21 |
 | Endpoint RAT para DPD | `GET /api/admin/rat` | Art. 10(k) |
 | Integración portal LOPDP | `POST /api/auth/lopdp-token` + botón UI | JWT compartido |
@@ -198,9 +201,15 @@ Los códigos siguen el estándar del Ministerio de Educación: `{número}EGB-{pa
 ### Docentes a crear
 
 ```bash
-curl -X POST http://localhost:8080/api/usuarios/batch/crear \
+# Obtener token de admin
+TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
-  -H "X-Colegio-Id: <colegio-id>" \
+  -d '{"email":"admin@sie.edu.ec","password":"Admin123!!"}' | jq -r '.token')
+
+# Crear 10 docentes vía batch
+curl -X POST http://localhost:8080/api/usuarios/batch/crear \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
   -d '{
     "usuarios": [
       {"email": "laura.roman@academiapacifico.edu.ec", "nombre": "Laura Román", "roles": ["DOCENTE"]},
@@ -315,7 +324,6 @@ Cada docente recibe un email con asunto "Activa tu cuenta en SIE". El flujo es:
 **Validación:**
 - [ ] 200 usuarios creados con rol ESTUDIANTE visibles en `UsuariosPage`
 - [ ] 200 correos de activación visibles en Mailpit (`http://localhost:8025`)
-- [ ] `GET /api/usuarios?rol=ESTUDIANTE&colegioId=<id>` retorna 200
 - [ ] En caso de error atómico (e.g. email duplicado en CSV), wizard muestra 422 y deja en paso 2 para corregir (no se crea ningún usuario)
 
 **Comparación con versión anterior:**
@@ -377,9 +385,10 @@ TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"admin@sie.edu.ec","password":"Admin123!!"}' | jq -r '.token')
 
-curl -s 'http://localhost:8080/api/usuarios?size=200&rol=ESTUDIANTE' \
-  -H "Authorization: Bearer $TOKEN" | \
-  jq -r '.content[].id' | while read EST_ID; do
+# Obtener IDs de estudiantes desde la DB
+podman exec sie-postgres psql -U sie -d sie -t -A -c \
+  "SELECT u.id FROM usuarios u JOIN usuario_roles ur ON u.id = ur.usuario_id JOIN roles r ON ur.rol_id = r.id WHERE r.codigo = 'ESTUDIANTE' LIMIT 200" \
+  | while read EST_ID; do
     curl -s -X POST http://localhost:8080/api/consentimientos \
       -H "Authorization: Bearer $TOKEN" \
       -H "Content-Type: application/json" \
@@ -462,7 +471,7 @@ POST /api/consentimientos/{estudianteId}/revocar → { mensaje: "Consentimiento 
 
 Cada docente inicia sesión con su email y la contraseña del correo de activación.
 
-### 7.1 Configurar Esquema de Evaluación
+### 8.1 Configurar Esquema de Evaluación
 
 ```
 Docente Dashboard → Sección → "Esquema"
@@ -480,7 +489,7 @@ Ejemplo para 1EGB-A (Laura Román):
 
 > El sistema valida que la suma sea exactamente 100%. Escala de notas: 0-20 (ADR-006).
 
-### 7.2 Tomar Asistencia
+### 8.2 Tomar Asistencia
 
 ```
 Docente Dashboard → Sección → "Tomar asistencia"
@@ -493,7 +502,7 @@ Docente Dashboard → Sección → "Tomar asistencia"
 
 > **LOEI:** El reglamento exige un mínimo de asistencia para promoción. El sistema calcula el porcentaje automáticamente.
 
-### 7.3 Ingresar Notas
+### 8.3 Ingresar Notas
 
 ```
 Docente Dashboard → Sección → "Ver notas"
@@ -505,7 +514,7 @@ Docente Dashboard → Sección → "Ver notas"
 - **La nota final solo aparece cuando TODOS los componentes tienen calificación**
 - Guardar → Toast verde "Notas guardadas"
 
-### 7.4 Cerrar Sección (paralelo)
+### 8.4 Cerrar Sección (paralelo)
 
 ```
 Docente Dashboard → Sección → "Cerrar"
@@ -522,7 +531,7 @@ Docente Dashboard → Sección → "Cerrar"
 
 **NUEVO** — Funcionalidades LOPDP disponibles durante todo el ciclo.
 
-### 8.1 Acceso a Privacidad (todos los roles)
+### 9.1 Acceso a Privacidad (todos los roles)
 
 Menú de usuario (sidebar, avatar abajo) → **🛡 Privacidad (LOPDP)**
 
@@ -530,12 +539,12 @@ Menú de usuario (sidebar, avatar abajo) → **🛡 Privacidad (LOPDP)**
 - El usuario puede ver y gestionar sus consentimientos sin volver a autenticarse
 - Token JWT compartido: `iss=sie`, `aud=lopdp`, expira 20 min
 
-### 8.2 Política de Privacidad (público)
+### 9.2 Política de Privacidad (público)
 
 - Visible en el footer del login: "© 2025 SIE · Política de Privacidad"
 - Página completa en `/privacidad` con 8 secciones (responsable, datos, finalidad, base legal, derechos ARCO, conservación, seguridad, contacto DPD)
 
-### 8.3 Panel ARCO (admin)
+### 9.3 Panel ARCO (admin)
 
 - `GET /api/consentimientos/{estudianteId}` — verificar si existe consentimiento
 - `POST /api/consentimientos` — registrar nuevo consentimiento (con `representanteNombre` + `representanteCedula`)
@@ -601,8 +610,8 @@ Muestra el estado de cada sección:
 | `/api/usuarios/batch/desactivar` | POST | Desactivación masiva |
 | `/api/usuarios/batch` | DELETE | Eliminación masiva |
 | `/api/consentimientos` | POST | Registrar consentimiento parental (con `representanteNombre` + `representanteCedula`) |
-| `/api/consentimientos/{id}` | GET | Verificar consentimiento |
-| `/api/consentimientos/{id}/revocar` | POST | Revocar consentimiento |
+| `/api/consentimientos/{estudianteId}` | GET | Verificar consentimiento |
+| `/api/consentimientos/{estudianteId}/revocar` | POST | Revocar consentimiento |
 | `/api/secciones/{id}/docentes` | POST | Asignar docente a sección (upsert: actualiza rol si ya existe) |
 | `/api/secciones/{seccionId}/docentes/{docenteId}` | DELETE | Remover docente de sección |
 | `/api/auth/lopdp-token` | POST | Token JWT para portal LOPDP |
