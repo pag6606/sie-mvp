@@ -50,7 +50,7 @@ public class LopdpConsentClient {
                     "colegioId", colegioId.toString(),
                     "titularId", estudianteId.toString(),
                     "studentEmail", studentEmail != null ? studentEmail : "",
-                    "purpose", "CONSENTIMIENTO_PARENTAL",
+                    "purposeCode", "CONSENTIMIENTO_PARENTAL",
                     "parentName", representanteNombre != null ? representanteNombre : "",
                     "parentDocument", representanteCedula != null ? representanteCedula : "",
                     "parentEmail", representanteEmail != null ? representanteEmail : "",
@@ -96,7 +96,7 @@ public class LopdpConsentClient {
         try {
             var body = Map.of(
                     "titularId", estudianteId.toString(),
-                    "purpose", "CONSENTIMIENTO_PARENTAL",
+                    "purposeCode", "CONSENTIMIENTO_PARENTAL",
                     "granted", false
             );
             restTemplate.postForEntity(lopdpUrl + "/consents",
