@@ -48,6 +48,7 @@ public class LopdpConsentClient {
             var body = Map.of(
                     "colegioId", colegioId.toString(),
                     "titularId", estudianteId.toString(),
+                    "purpose", "CONSENTIMIENTO_PARENTAL",
                     "representanteNombre", representanteNombre != null ? representanteNombre : "",
                     "representanteCedula", representanteCedula != null ? representanteCedula : "",
                     "representanteEmail", representanteEmail != null ? representanteEmail : "",
@@ -65,7 +66,10 @@ public class LopdpConsentClient {
 
     public LopdpConsentResponse checkConsent(UUID estudianteId) {
         try {
-            var body = Map.of("titularId", estudianteId.toString());
+            var body = Map.of(
+                    "titularId", estudianteId.toString(),
+                    "purpose", "CONSENTIMIENTO_PARENTAL"
+            );
             @SuppressWarnings("unchecked")
             var response = restTemplate.postForEntity(lopdpUrl + "/consents/check",
                     new HttpEntity<>(body, authHeaders()), Map.class);
@@ -90,6 +94,7 @@ public class LopdpConsentClient {
         try {
             var body = Map.of(
                     "titularId", estudianteId.toString(),
+                    "purpose", "CONSENTIMIENTO_PARENTAL",
                     "granted", false
             );
             restTemplate.postForEntity(lopdpUrl + "/consents",
