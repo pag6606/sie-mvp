@@ -49,7 +49,7 @@ public class LopdpConsentClient {
         var student = Map.of(
                 "email", studentEmail != null ? studentEmail : "",
                 "nombre", studentName != null ? studentName : "",
-                "dateOfBirth", studentDateOfBirth != null ? studentDateOfBirth : "2014-01-01",
+                "dateOfBirth", studentDateOfBirth != null && !studentDateOfBirth.isBlank() ? studentDateOfBirth : "2014-01-01",
                 "grade", "",
                 "section", "",
                 "schoolYear", "2026"
