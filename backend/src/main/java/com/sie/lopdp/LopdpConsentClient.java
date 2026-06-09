@@ -52,6 +52,7 @@ public class LopdpConsentClient {
                     "studentEmail", studentEmail != null ? studentEmail : "",
                     "purposeCode", "CONSENTIMIENTO_PARENTAL",
                     "granted", true,
+                    "policyVersion", "v1.0",
                     "parentName", representanteNombre != null ? representanteNombre : "",
                     "parentDocument", representanteCedula != null ? representanteCedula : "",
                     "parentEmail", representanteEmail != null ? representanteEmail : "",

@@ -48,17 +48,6 @@ public class ConsentimientoService {
             return toResult(existente.get());
         }
 
-        if (lopdpEnabled && lopdpClient.isPresent()) {
-            var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
-            var studentEmail = estudiante != null ? estudiante.getEmail() : "";
-            var result = lopdpClient.get().syncConsent(colegioId, estudianteId, studentEmail,
-                    representanteNombre, representanteCedula, representanteEmail, documentoUrl);
-            cacheConsent(estudianteId, colegioId, representanteNombre, representanteCedula,
-                    representanteEmail, documentoUrl, "LOPDP");
-            return new ConsentimientoResult(true, result.id(), result.fecha(),
-                    result.representanteNombre(), result.representanteCedula());
-        }
-
         Consentimiento c = new Consentimiento();
         c.setEstudianteId(estudianteId);
         c.setRepresentanteNombre(representanteNombre);
@@ -68,6 +57,20 @@ public class ConsentimientoService {
         c.setColegioId(colegioId);
         c.setFuente("SIE_LOCAL");
         c = consentimientoRepository.save(c);
+
+        if (lopdpEnabled && lopdpClient.isPresent()) {
+            try {
+                var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
+                var studentEmail = estudiante != null ? estudiante.getEmail() : "";
+                lopdpClient.get().syncConsent(colegioId, estudianteId, studentEmail,
+                        representanteNombre, representanteCedula, representanteEmail, documentoUrl);
+                c.setFuente("LOPDP");
+                consentimientoRepository.save(c);
+            } catch (Exception e) {
+                log.warn("LOPDP sync failed for estudiante {}, saved locally: {}", estudianteId, e.getMessage());
+            }
+        }
+
         return toResult(c);
     }
 
