@@ -41,11 +41,33 @@ public class LopdpConsentClient {
         return headers;
     }
 
+    private void syncEnrollment(UUID colegioId, UUID estudianteId, String studentEmail,
+                                  String parentName, String parentDocument, String parentEmail) {
+        try {
+            var body = Map.of(
+                    "colegioId", colegioId.toString(),
+                    "titularId", estudianteId.toString(),
+                    "studentEmail", studentEmail != null ? studentEmail : "",
+                    "parentName", parentName != null ? parentName : "",
+                    "parentDocument", parentDocument != null ? parentDocument : "",
+                    "parentEmail", parentEmail != null ? parentEmail : ""
+            );
+            restTemplate.postForEntity(lopdpUrl + "/admin/sync/enrollment",
+                    new HttpEntity<>(body, authHeaders()), Map.class);
+        } catch (RestClientException e) {
+            log.error("LOPDP sync/enrollment failed for estudiante {}: {}", estudianteId, e.getMessage());
+            throw new LopdpUnavailableException("LOPDP sync/enrollment failed", e);
+        }
+    }
+
     public LopdpConsentResponse syncConsent(UUID colegioId, UUID estudianteId,
                                              String studentEmail,
                                              String representanteNombre, String representanteCedula,
                                              String representanteEmail, String documentoUrl) {
         try {
+            syncEnrollment(colegioId, estudianteId, studentEmail,
+                    representanteNombre, representanteCedula, representanteEmail);
+
             var body = Map.of(
                     "colegioId", colegioId.toString(),
                     "titularId", estudianteId.toString(),
