@@ -41,77 +41,74 @@ public class LopdpConsentClient {
         return headers;
     }
 
-    private void syncEnrollment(UUID colegioId, UUID estudianteId, String studentEmail,
-                                  String studentName, String studentDateOfBirth,
-                                  String parentName, String parentDocument, String parentEmail) {
+    public LopdpConsentResponse syncEnrollmentAndConsent(
+            UUID estudianteId, String studentEmail, String studentName, String studentDateOfBirth,
+            String representanteNombre, String representanteCedula, String representanteEmail,
+            String enrollmentRef) {
+
+        var student = Map.of(
+                "email", studentEmail != null ? studentEmail : "",
+                "nombre", studentName != null ? studentName : "",
+                "dateOfBirth", studentDateOfBirth != null ? studentDateOfBirth : "2014-01-01",
+                "grade", "",
+                "section", "",
+                "schoolYear", "2026"
+        );
+        var parent = Map.of(
+                "email", representanteEmail != null ? representanteEmail : "",
+                "nombre", representanteNombre != null ? representanteNombre : "",
+                "cedula", representanteCedula != null ? representanteCedula : ""
+        );
+        var enrollmentBody = Map.of(
+                "student", student,
+                "parent", parent,
+                "relationshipType", "LEGAL_GUARDIAN",
+                "enrollmentRef", enrollmentRef
+        );
+
         try {
-            var body = Map.of(
-                    "colegioId", colegioId.toString(),
-                    "titularId", estudianteId.toString(),
-                    "studentEmail", studentEmail != null ? studentEmail : "",
-                    "studentName", studentName != null ? studentName : "",
-                    "studentDateOfBirth", studentDateOfBirth != null ? studentDateOfBirth : "",
-                    "parentName", parentName != null ? parentName : "",
-                    "parentDocument", parentDocument != null ? parentDocument : "",
-                    "parentEmail", parentEmail != null ? parentEmail : ""
-            );
             restTemplate.postForEntity(lopdpUrl + "/admin/sync/enrollment",
-                    new HttpEntity<>(body, authHeaders()), Map.class);
+                    new HttpEntity<>(enrollmentBody, authHeaders()), Map.class);
         } catch (RestClientException e) {
             log.error("LOPDP sync/enrollment failed for estudiante {}: {}", estudianteId, e.getMessage());
             throw new LopdpUnavailableException("LOPDP sync/enrollment failed", e);
         }
-    }
 
-    public LopdpConsentResponse syncConsent(UUID colegioId, UUID estudianteId,
-                                             String studentEmail, String studentName, String studentDateOfBirth,
-                                             String representanteNombre, String representanteCedula,
-                                             String representanteEmail, String documentoUrl) {
+        var consentBody = Map.of(
+                "parentEmail", representanteEmail != null ? representanteEmail : "",
+                "studentEmail", studentEmail != null ? studentEmail : "",
+                "purposeCode", "IMAGE_PHOTO",
+                "granted", true,
+                "consentLevel", "EXPLICIT",
+                "policyVersion", "2026.1",
+                "enrollmentRef", enrollmentRef
+        );
+
         try {
-            syncEnrollment(colegioId, estudianteId, studentEmail,
-                    studentName, studentDateOfBirth,
-                    representanteNombre, representanteCedula, representanteEmail);
-
-            var body = Map.of(
-                    "colegioId", colegioId.toString(),
-                    "titularId", estudianteId.toString(),
-                    "studentEmail", studentEmail != null ? studentEmail : "",
-                    "purposeCode", "CONSENTIMIENTO_PARENTAL",
-                    "granted", true,
-                    "policyVersion", "v1.0",
-                    "parentName", representanteNombre != null ? representanteNombre : "",
-                    "parentDocument", representanteCedula != null ? representanteCedula : "",
-                    "parentEmail", representanteEmail != null ? representanteEmail : "",
-                    "documentUrl", documentoUrl != null ? documentoUrl : ""
-            );
             restTemplate.postForEntity(lopdpUrl + "/admin/sync/consent",
-                    new HttpEntity<>(body, authHeaders()), Map.class);
-            return new LopdpConsentResponse(true, null, LocalDateTime.now(),
+                    new HttpEntity<>(consentBody, authHeaders()), Map.class);
+            return new LopdpConsentResponse(true, enrollmentRef, LocalDateTime.now(),
                     representanteNombre, representanteCedula);
         } catch (RestClientException e) {
             log.error("LOPDP sync/consent failed for estudiante {}: {}", estudianteId, e.getMessage());
-            throw new LopdpUnavailableException("LOPDP service unavailable", e);
+            throw new LopdpUnavailableException("LOPDP sync/consent failed", e);
         }
     }
 
-    public LopdpConsentResponse checkConsent(UUID estudianteId) {
+    @SuppressWarnings("unchecked")
+    public LopdpConsentResponse checkConsent(UUID estudianteId, String studentEmail) {
         try {
             var body = Map.of(
-                    "titularId", estudianteId.toString(),
-                    "purpose", "CONSENTIMIENTO_PARENTAL"
+                    "titularId", studentEmail != null ? studentEmail : "",
+                    "purpose", "IMAGE_PHOTO"
             );
-            @SuppressWarnings("unchecked")
             var response = restTemplate.postForEntity(lopdpUrl + "/consents/check",
-                    new HttpEntity<>(body, authHeaders()), Map.class);
-            var data = response.getBody();
-            if (data != null && Boolean.TRUE.equals(data.get("exists"))) {
-                return new LopdpConsentResponse(
-                        true,
-                        data.get("id") != null ? data.get("id").toString() : null,
-                        null,
-                        data.get("representanteNombre") != null ? data.get("representanteNombre").toString() : null,
-                        data.get("representanteCedula") != null ? data.get("representanteCedula").toString() : null
-                );
+                    new HttpEntity<>(body), Map.class);
+            var data = (Map<String, Object>) response.getBody();
+            if (data != null && data.containsKey("data")) {
+                var inner = (Map<String, Object>) data.get("data");
+                var authorized = Boolean.TRUE.equals(inner.get("authorized"));
+                return new LopdpConsentResponse(authorized, null, null, null, null);
             }
             return new LopdpConsentResponse(false, null, null, null, null);
         } catch (RestClientException e) {
@@ -120,14 +117,19 @@ public class LopdpConsentClient {
         }
     }
 
-    public void revokeConsent(UUID estudianteId) {
+    public void revokeConsent(UUID estudianteId, String studentEmail, String parentEmail,
+                               String enrollmentRef) {
         try {
             var body = Map.of(
-                    "titularId", estudianteId.toString(),
-                    "purposeCode", "CONSENTIMIENTO_PARENTAL",
-                    "granted", false
+                    "parentEmail", parentEmail != null ? parentEmail : "",
+                    "studentEmail", studentEmail != null ? studentEmail : "",
+                    "purposeCode", "IMAGE_PHOTO",
+                    "granted", false,
+                    "consentLevel", "EXPLICIT",
+                    "policyVersion", "2026.1",
+                    "enrollmentRef", enrollmentRef
             );
-            restTemplate.postForEntity(lopdpUrl + "/consents",
+            restTemplate.postForEntity(lopdpUrl + "/admin/sync/consent",
                     new HttpEntity<>(body, authHeaders()), Map.class);
         } catch (RestClientException e) {
             log.error("LOPDP consents revoke failed for estudiante {}: {}", estudianteId, e.getMessage());

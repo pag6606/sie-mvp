@@ -63,10 +63,11 @@ public class ConsentimientoService {
                 var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
                 var studentEmail = estudiante != null ? estudiante.getEmail() : "";
                 var studentName = estudiante != null ? estudiante.getNombre() : "";
-                var studentDateOfBirth = "";
-                lopdpClient.get().syncConsent(colegioId, estudianteId, studentEmail,
-                        studentName, studentDateOfBirth,
-                        representanteNombre, representanteCedula, representanteEmail, documentoUrl);
+                var enrollmentRef = "SIE-CONS-" + System.currentTimeMillis();
+                lopdpClient.get().syncEnrollmentAndConsent(
+                        estudianteId, studentEmail, studentName, "",
+                        representanteNombre, representanteCedula, representanteEmail,
+                        enrollmentRef);
                 c.setFuente("LOPDP");
                 consentimientoRepository.save(c);
             } catch (Exception e) {
@@ -80,7 +81,9 @@ public class ConsentimientoService {
     public ConsentimientoResult verificar(UUID estudianteId) {
         if (lopdpEnabled && lopdpClient.isPresent()) {
             try {
-                var result = lopdpClient.get().checkConsent(estudianteId);
+                var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
+                var email = estudiante != null ? estudiante.getEmail() : estudianteId.toString();
+                var result = lopdpClient.get().checkConsent(estudianteId, email);
                 if (result.exists()) {
                     return new ConsentimientoResult(true, result.id(), result.fecha(),
                             result.representanteNombre(), result.representanteCedula());
@@ -101,7 +104,15 @@ public class ConsentimientoService {
                 .orElseThrow(() -> new IllegalArgumentException("Consentimiento no encontrado"));
 
         if (lopdpEnabled && lopdpClient.isPresent()) {
-            lopdpClient.get().revokeConsent(estudianteId);
+            try {
+                var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
+                var studentEmail = estudiante != null ? estudiante.getEmail() : "";
+                var enrollmentRef = "SIE-CONS-" + System.currentTimeMillis();
+                lopdpClient.get().revokeConsent(estudianteId, studentEmail,
+                        c.getRepresentanteEmail(), enrollmentRef);
+            } catch (Exception e) {
+                log.warn("LOPDP revoke failed for estudiante {}, revoking locally: {}", estudianteId, e.getMessage());
+            }
         }
 
         c.revocar();
