@@ -94,7 +94,7 @@ public class LopdpConsentClient {
         var consentBody = Map.of(
                 "parentEmail", representanteEmail != null ? representanteEmail : "",
                 "studentEmail", studentEmail != null ? studentEmail : "",
-                "purposeCode", "IMAGE_PHOTO",
+                "purposeCode", "internal_systems",
                 "granted", true,
                 "consentLevel", "EXPLICIT",
                 "policyVersion", policyVersion,
@@ -117,7 +117,7 @@ public class LopdpConsentClient {
         try {
             var body = Map.of(
                     "titularId", studentEmail != null ? studentEmail : "",
-                    "purpose", "IMAGE_PHOTO"
+                    "purpose", "internal_systems"
             );
             var response = restTemplate.postForEntity(lopdpUrl + "/consents/check",
                     new HttpEntity<>(body), Map.class);
@@ -141,7 +141,7 @@ public class LopdpConsentClient {
             var body = Map.of(
                     "parentEmail", parentEmail != null ? parentEmail : "",
                     "studentEmail", studentEmail != null ? studentEmail : "",
-                    "purposeCode", "IMAGE_PHOTO",
+                    "purposeCode", "internal_systems",
                     "granted", false,
                     "consentLevel", "EXPLICIT",
                     "policyVersion", policyVersion,
