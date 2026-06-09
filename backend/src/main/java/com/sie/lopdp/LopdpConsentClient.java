@@ -137,13 +137,14 @@ public class LopdpConsentClient {
     public void revokeConsent(UUID estudianteId, String studentEmail, String parentEmail,
                                String enrollmentRef) {
         try {
+            var policyVersion = getActivePolicyVersion();
             var body = Map.of(
                     "parentEmail", parentEmail != null ? parentEmail : "",
                     "studentEmail", studentEmail != null ? studentEmail : "",
                     "purposeCode", "IMAGE_PHOTO",
                     "granted", false,
                     "consentLevel", "EXPLICIT",
-                    "policyVersion", "2026.1",
+                    "policyVersion", policyVersion,
                     "enrollmentRef", enrollmentRef
             );
             restTemplate.postForEntity(lopdpUrl + "/admin/sync/consent",
