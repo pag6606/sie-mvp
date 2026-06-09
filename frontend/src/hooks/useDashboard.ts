@@ -23,6 +23,7 @@ interface ActividadReciente {
 interface DashboardData {
   periodoActivo: PeriodoInfo | null
   totalEstudiantes: number
+  totalMatriculados: number
   seccionesActivas: number
   porcentajeAsistencia: number
   evolucionMatriculas: EvolucionMensual[]

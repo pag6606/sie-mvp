@@ -37,7 +37,8 @@ public class DashboardService {
                 .orElse(null);
 
         UUID periodoId = periodoActivo != null ? periodoActivo.getId() : null;
-        long totalEstudiantes = contarMatriculasActivas(colegioId);
+        long totalEstudiantes = contarEstudiantes(colegioId);
+        long totalMatriculados = contarMatriculasActivas(colegioId);
         long seccionesActivas = contarSeccionesActivas(colegioId);
         double porcentajeAsistencia = calcularAsistenciaPromedio(colegioId, periodoId);
         var evolucion = evolucionMensualMatriculas(colegioId);
@@ -51,6 +52,7 @@ public class DashboardService {
                                 periodoActivo.getFechaInicio(), periodoActivo.getFechaFin())
                         : null,
                 totalEstudiantes,
+                totalMatriculados,
                 seccionesActivas,
                 Math.round(porcentajeAsistencia * 10.0) / 10.0,
                 evolucion,
@@ -58,9 +60,17 @@ public class DashboardService {
         );
     }
 
+    private long contarEstudiantes(UUID colegioId) {
+        return em.createQuery(
+                        "SELECT COUNT(u) FROM Usuario u JOIN u.roles r WHERE u.colegioId = :colegioId AND r.codigo = 'ESTUDIANTE' AND u.deletedAt IS NULL",
+                        Long.class)
+                .setParameter("colegioId", colegioId)
+                .getSingleResult();
+    }
+
     private long contarMatriculasActivas(UUID colegioId) {
         return em.createQuery(
-                        "SELECT COUNT(m) FROM Matricula m WHERE m.colegioId = :colegioId AND m.deletedAt IS NULL",
+                        "SELECT COUNT(m) FROM Matricula m WHERE m.colegioId = :colegioId AND m.estado = 'ACTIVA' AND m.deletedAt IS NULL",
                         Long.class)
                 .setParameter("colegioId", colegioId)
                 .getSingleResult();

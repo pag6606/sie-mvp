@@ -1,8 +1,6 @@
 import { useNavigate } from 'react-router-dom'
-import { usePeriodos } from '@/hooks/usePeriodos'
 import { usePeriodoEnProgreso } from '@/hooks/usePeriodoEnProgreso'
 import { useDashboard } from '@/hooks/useDashboard'
-import { LoadingSkeleton } from '@/components/UIPatterns'
 import AppLayout from '@/components/AppLayout'
 import { Line } from 'react-chartjs-2'
 import {
@@ -18,9 +16,10 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip)
 
 const KPI_CARDS = [
-  { key: 'totalEstudiantes' as const, label: 'Estudiantes', icon: '👥', color: 'text-primary' },
-  { key: 'seccionesActivas' as const, label: 'Secciones activas (paralelos)', icon: '📚', color: 'text-success' },
-  { key: 'porcentajeAsistencia' as const, label: '% Asistencia', icon: '📊', color: 'text-warning', suffix: '%' },
+  { key: 'totalEstudiantes' as const, label: 'Estudiantes', sub: 'registrados', icon: '👥', color: 'text-primary', bg: 'bg-primary/5' },
+  { key: 'totalMatriculados' as const, label: 'Matriculados', sub: 'activos', icon: '✅', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+  { key: 'seccionesActivas' as const, label: 'Secciones', sub: 'activas', icon: '📚', color: 'text-blue-600', bg: 'bg-blue-50' },
+  { key: 'porcentajeAsistencia' as const, label: 'Asistencia', sub: 'promedio', icon: '📊', color: 'text-amber-600', bg: 'bg-amber-50', suffix: '%' },
 ]
 
 function SkeletonKPI() {
@@ -33,22 +32,9 @@ function SkeletonKPI() {
 }
 
 export default function AdminDashboard() {
-  const { data: periodos, isLoading: loadingPeriodos } = usePeriodos()
   const { data: dashboard, isLoading: loadingDashboard } = useDashboard()
   const enProgreso = usePeriodoEnProgreso()
   const navigate = useNavigate()
-
-  const periodo = periodos?.find(p => p.estado !== 'CERRADO') || periodos?.[0] || null
-
-  if (loadingPeriodos) {
-    return (
-      <AppLayout role="admin">
-        <div className="mx-auto max-w-5xl space-y-6 p-6 md:p-8">
-          <LoadingSkeleton rows={2} />
-        </div>
-      </AppLayout>
-    )
-  }
 
   return (
     <AppLayout role="admin">
@@ -90,21 +76,22 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {loadingDashboard
-            ? Array.from({ length: 3 }).map((_, i) => <SkeletonKPI key={i} />)
+            ? Array.from({ length: 4 }).map((_, i) => <SkeletonKPI key={i} />)
             : KPI_CARDS.map(card => {
                 const value = dashboard ? dashboard[card.key] : 0
                 const display = card.key === 'porcentajeAsistencia'
                   ? `${value}${card.suffix || ''}`
                   : String(value)
                 return (
-                  <div key={card.key} className="rounded-xl border border-border bg-card p-5">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span aria-hidden="true">{card.icon}</span>
+                  <div key={card.key} className={`rounded-xl border border-border bg-card p-5 ${card.bg}`}>
+                    <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      <span aria-hidden="true" className="text-base">{card.icon}</span>
                       {card.label}
                     </div>
                     <p className={`mt-2 text-3xl font-bold ${card.color}`}>{display}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{card.sub}</p>
                   </div>
                 )
               })}
@@ -158,10 +145,10 @@ export default function AdminDashboard() {
         {!enProgreso && (
           <div className="rounded-lg border bg-card p-10 text-center">
             <h2 className="text-2xl font-semibold text-foreground">
-              {periodo && periodo.estado !== 'BORRADOR' ? '¿Configurar un nuevo período?' : 'Bienvenida al SIE'}
+              {dashboard?.periodoActivo ? '¿Configurar un nuevo período?' : 'Bienvenida al SIE'}
             </h2>
             <p className="mt-2 text-muted-foreground">
-              {periodo && periodo.estado !== 'BORRADOR'
+              {dashboard?.periodoActivo
                 ? 'Crea secciones (paralelos), asigna docentes y abre la matrícula en 4 pasos'
                 : 'Configura tu primer período académico en 4 pasos guiados'}
             </p>
@@ -175,21 +162,12 @@ export default function AdminDashboard() {
         )}
 
         <div className="flex flex-wrap gap-3">
-          <button onClick={() => navigate('/admin/cursos')} className="rounded-md border border-border bg-card px-4 py-2 text-sm text-foreground hover:bg-muted">
-            📚 Cursos
-          </button>
-          <button onClick={() => navigate('/admin/secciones')} className="rounded-md border border-border bg-card px-4 py-2 text-sm text-foreground hover:bg-muted">
-            📋 Secciones
-          </button>
-          <button onClick={() => navigate('/admin/usuarios')} className="rounded-md border border-border bg-card px-4 py-2 text-sm text-foreground hover:bg-muted">
-            👥 Usuarios
-          </button>
-          <button onClick={() => navigate('/admin/cierres')} className="rounded-md border border-border bg-card px-4 py-2 text-sm text-foreground hover:bg-muted">
-            📊 Cierres
-          </button>
-          <button onClick={() => navigate('/admin/matricula')} className="rounded-md border border-border bg-card px-4 py-2 text-sm text-foreground hover:bg-muted">
-            📝 Matrícula
-          </button>
+          {['/admin/cursos', '/admin/secciones', '/admin/usuarios', '/admin/cierres', '/admin/matricula'].map((path, i) => (
+            <button key={path} onClick={() => navigate(path)}
+              className="rounded-md border border-border bg-card px-4 py-2 text-sm text-foreground hover:bg-muted">
+              {['📚 Cursos', '📋 Secciones', '👥 Usuarios', '📊 Cierres', '📝 Matrícula'][i]}
+            </button>
+          ))}
         </div>
       </div>
     </AppLayout>

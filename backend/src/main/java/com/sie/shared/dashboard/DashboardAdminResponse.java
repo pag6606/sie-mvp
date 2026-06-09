@@ -7,6 +7,7 @@ import java.util.UUID;
 public record DashboardAdminResponse(
         PeriodoInfo periodoActivo,
         long totalEstudiantes,
+        long totalMatriculados,
         long seccionesActivas,
         double porcentajeAsistencia,
         List<EvolucionMensual> evolucionMatriculas,
