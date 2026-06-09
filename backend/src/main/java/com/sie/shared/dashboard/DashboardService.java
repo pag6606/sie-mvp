@@ -124,9 +124,17 @@ public class DashboardService {
                 .getResultList();
 
         return rows.stream()
-                .map(r -> new DashboardAdminResponse.EvolucionMensual(
-                        YearMonth.from(((java.sql.Timestamp) r[0]).toLocalDateTime()).toString(),
-                        (Long) r[1]))
+                .map(r -> {
+                    var truncated = r[0];
+                    LocalDateTime ldt;
+                    if (truncated instanceof java.sql.Timestamp ts) {
+                        ldt = ts.toLocalDateTime();
+                    } else {
+                        ldt = (LocalDateTime) truncated;
+                    }
+                    return new DashboardAdminResponse.EvolucionMensual(
+                            YearMonth.from(ldt).toString(), (Long) r[1]);
+                })
                 .collect(Collectors.toList());
     }
 
