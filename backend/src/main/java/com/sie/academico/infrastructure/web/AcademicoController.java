@@ -97,6 +97,11 @@ public class AcademicoController {
     public List<SeccionResponse> clonarPeriodo(@PathVariable UUID origenId, @PathVariable UUID destinoId) {
         return service.clonarPeriodo(origenId, destinoId);
     }
+
+    @GetMapping("/me/secciones")
+    public List<SeccionResponse> misSecciones(@RequestAttribute("usuarioId") UUID usuarioId) {
+        return service.listarSeccionesPorDocente(usuarioId);
+    }
 }
 
 record DocenteAssignRequest(UUID docenteId, String rol) {}

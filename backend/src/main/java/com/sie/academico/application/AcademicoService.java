@@ -172,6 +172,13 @@ public class AcademicoService {
         return seccionRepository.findByPeriodoId(periodoId).stream().map(this::toResponse).toList();
     }
 
+    public List<SeccionResponse> listarSeccionesPorDocente(UUID docenteId) {
+        return seccionRepository.findAll().stream()
+                .filter(s -> s.getDocentes().stream().anyMatch(d -> d.getDocenteId().equals(docenteId)))
+                .map(this::toResponse)
+                .toList();
+    }
+
     // ── Helpers ──
 
     private PeriodoResponse toResponse(Periodo p) {

@@ -1,8 +1,23 @@
 import { memo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSecciones } from '@/hooks/useSecciones'
+import { useQuery } from '@tanstack/react-query'
+import api from '@/services/api'
 import { LoadingSkeleton, EmptyState } from '@/components/UIPatterns'
 import AppLayout from '@/components/AppLayout'
+
+interface SeccionDocente {
+  id: string
+  codigo: string
+  capacidad: number
+  horarios?: { diaSemana: string; horaInicio: string; horaFin: string; aula: string }[]
+}
+
+function useMisSecciones() {
+  return useQuery<SeccionDocente[]>({
+    queryKey: ['me', 'secciones'],
+    queryFn: () => api.get('/me/secciones').then(r => r.data),
+  })
+}
 
 const SeccionCard = memo(function SeccionCard({
   s,
@@ -55,7 +70,7 @@ const SeccionCard = memo(function SeccionCard({
 })
 
 export default function DocenteDashboard() {
-  const { data: secciones = [], isLoading: loading } = useSecciones('all')
+  const { data: secciones = [], isLoading: loading } = useMisSecciones()
   const navigate = useNavigate()
 
   const handleNavigate = useCallback((to: string) => navigate(to), [navigate])
