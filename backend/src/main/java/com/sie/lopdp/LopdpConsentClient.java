@@ -59,7 +59,7 @@ public class LopdpConsentClient {
     public LopdpConsentResponse syncEnrollmentAndConsent(
             UUID estudianteId, String studentEmail, String studentName, String studentDateOfBirth,
             String representanteNombre, String representanteCedula, String representanteEmail,
-            String enrollmentRef) {
+            String documentoUrl, String enrollmentRef) {
 
         var student = Map.of(
                 "email", studentEmail != null ? studentEmail : "",
@@ -98,7 +98,8 @@ public class LopdpConsentClient {
                 "granted", true,
                 "consentLevel", "EXPLICIT",
                 "policyVersion", policyVersion,
-                "enrollmentRef", enrollmentRef
+                "enrollmentRef", enrollmentRef,
+                "documentUrl", documentoUrl != null ? documentoUrl : ""
         );
 
         try {

@@ -67,7 +67,7 @@ public class ConsentimientoService {
                 lopdpClient.get().syncEnrollmentAndConsent(
                         estudianteId, studentEmail, studentName, "",
                         representanteNombre, representanteCedula, representanteEmail,
-                        enrollmentRef);
+                        documentoUrl, enrollmentRef);
                 c.setFuente("LOPDP");
                 consentimientoRepository.save(c);
             } catch (Exception e) {
