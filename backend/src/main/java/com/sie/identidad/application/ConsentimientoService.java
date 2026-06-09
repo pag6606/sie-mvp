@@ -62,7 +62,11 @@ public class ConsentimientoService {
             try {
                 var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
                 var studentEmail = estudiante != null ? estudiante.getEmail() : "";
+                var studentName = estudiante != null ? estudiante.getNombre() : "";
+                var studentDateOfBirth = estudiante != null && estudiante.getFechaNacimiento() != null
+                        ? estudiante.getFechaNacimiento().toString() : "";
                 lopdpClient.get().syncConsent(colegioId, estudianteId, studentEmail,
+                        studentName, studentDateOfBirth,
                         representanteNombre, representanteCedula, representanteEmail, documentoUrl);
                 c.setFuente("LOPDP");
                 consentimientoRepository.save(c);

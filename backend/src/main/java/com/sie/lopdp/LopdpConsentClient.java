@@ -42,12 +42,15 @@ public class LopdpConsentClient {
     }
 
     private void syncEnrollment(UUID colegioId, UUID estudianteId, String studentEmail,
+                                  String studentName, String studentDateOfBirth,
                                   String parentName, String parentDocument, String parentEmail) {
         try {
             var body = Map.of(
                     "colegioId", colegioId.toString(),
                     "titularId", estudianteId.toString(),
                     "studentEmail", studentEmail != null ? studentEmail : "",
+                    "studentName", studentName != null ? studentName : "",
+                    "studentDateOfBirth", studentDateOfBirth != null ? studentDateOfBirth : "",
                     "parentName", parentName != null ? parentName : "",
                     "parentDocument", parentDocument != null ? parentDocument : "",
                     "parentEmail", parentEmail != null ? parentEmail : ""
@@ -61,11 +64,12 @@ public class LopdpConsentClient {
     }
 
     public LopdpConsentResponse syncConsent(UUID colegioId, UUID estudianteId,
-                                             String studentEmail,
+                                             String studentEmail, String studentName, String studentDateOfBirth,
                                              String representanteNombre, String representanteCedula,
                                              String representanteEmail, String documentoUrl) {
         try {
             syncEnrollment(colegioId, estudianteId, studentEmail,
+                    studentName, studentDateOfBirth,
                     representanteNombre, representanteCedula, representanteEmail);
 
             var body = Map.of(
