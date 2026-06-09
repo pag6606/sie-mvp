@@ -62,7 +62,7 @@ public class DashboardService {
 
     private long contarEstudiantes(UUID colegioId) {
         return em.createQuery(
-                        "SELECT COUNT(u) FROM Usuario u JOIN u.roles r WHERE u.colegioId = :colegioId AND r.codigo = 'ESTUDIANTE' AND u.deletedAt IS NULL",
+                        "SELECT COUNT(u) FROM Usuario u JOIN u.usuarioRoles ur JOIN ur.rol r WHERE u.colegioId = :colegioId AND r.codigo = 'ESTUDIANTE' AND u.deletedAt IS NULL",
                         Long.class)
                 .setParameter("colegioId", colegioId)
                 .getSingleResult();
