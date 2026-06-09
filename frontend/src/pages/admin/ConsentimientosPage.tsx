@@ -34,7 +34,6 @@ export default function ConsentimientosPage() {
   const [formNombre, setFormNombre] = useState('')
   const [formCedula, setFormCedula] = useState('')
   const [formEmail, setFormEmail] = useState('')
-  const [formDocumento, setFormDocumento] = useState('')
   const [formFile, setFormFile] = useState<File | null>(null)
   const [formError, setFormError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -62,7 +61,6 @@ export default function ConsentimientosPage() {
         representanteNombre: capitalizeWords(formNombre.trim()),
         representanteCedula: formCedula.trim(),
         representanteEmail: formEmail.trim(),
-        documentoUrl: formDocumento.trim(),
       })
       if (formFile) {
         const formData = new FormData()
@@ -74,7 +72,6 @@ export default function ConsentimientosPage() {
       queryClient.invalidateQueries({ queryKey: ['consentimientos'] })
       setShowForm(false)
       setFormEstudianteId('')
-      setFormDocumento('')
       setFormFile(null)
     } catch (err: unknown) {
       const apiErr = err as import('@/types/api').ApiError
@@ -159,17 +156,11 @@ export default function ConsentimientosPage() {
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
                 </div>
                 <div className="md:col-span-2">
-                  <label htmlFor="consDocumento" className="block text-xs font-medium text-muted-foreground">Documento (URL o ruta del formulario firmado)</label>
-                  <input id="consDocumento" value={formDocumento} onChange={e => setFormDocumento(e.target.value)}
-                    placeholder="/docs/consentimientos/formulario-001.pdf"
-                    className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
-                </div>
-                <div className="md:col-span-2">
-                  <label htmlFor="consFile" className="block text-xs font-medium text-muted-foreground">Subir archivo (PDF del formulario firmado)</label>
+                  <label htmlFor="consFile" className="block text-xs font-medium text-muted-foreground">Formulario firmado (PDF)</label>
                   <input id="consFile" type="file" accept=".pdf,image/*"
                     onChange={e => setFormFile(e.target.files?.[0] || null)}
                     className="mt-1 block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:text-primary-foreground hover:file:bg-primary/90" />
-                  {formFile && <p className="mt-1 text-xs text-muted-foreground">Archivo: {formFile.name} ({(formFile.size / 1024).toFixed(1)} KB)</p>}
+                  {formFile && <p className="mt-1 text-xs text-muted-foreground">{formFile.name} ({(formFile.size / 1024).toFixed(1)} KB)</p>}
                 </div>
               </div>
               <div className="flex gap-3">
@@ -256,7 +247,7 @@ export default function ConsentimientosPage() {
                       <td className="px-4 py-3 text-sm text-muted-foreground">{e.email}</td>
                       <td className="px-4 py-3 text-center">
                         <button
-                          onClick={() => { setFormEstudianteId(e.id); setFormNombre(''); setFormCedula(''); setFormEmail(''); setFormDocumento(''); setTab('registrados'); setShowForm(true) }}
+                          onClick={() => { setFormEstudianteId(e.id); setFormNombre(''); setFormCedula(''); setFormEmail(''); setFormFile(null); setTab('registrados'); setShowForm(true) }}
                           className="rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground hover:bg-primary/90"
                         >
                           Registrar
