@@ -41,6 +41,21 @@ public class LopdpConsentClient {
         return headers;
     }
 
+    @SuppressWarnings("unchecked")
+    private String getActivePolicyVersion() {
+        try {
+            var response = restTemplate.getForEntity(lopdpUrl + "/policyVersion", Map.class);
+            var body = response.getBody();
+            if (body != null && body.containsKey("data")) {
+                var data = (Map<String, Object>) body.get("data");
+                return data.getOrDefault("version", "2025-01").toString();
+            }
+        } catch (Exception e) {
+            log.warn("LOPDP policyVersion lookup failed, using default: {}", e.getMessage());
+        }
+        return "2025-01";
+    }
+
     public LopdpConsentResponse syncEnrollmentAndConsent(
             UUID estudianteId, String studentEmail, String studentName, String studentDateOfBirth,
             String representanteNombre, String representanteCedula, String representanteEmail,
@@ -74,13 +89,15 @@ public class LopdpConsentClient {
             throw new LopdpUnavailableException("LOPDP sync/enrollment failed", e);
         }
 
+        var policyVersion = getActivePolicyVersion();
+
         var consentBody = Map.of(
                 "parentEmail", representanteEmail != null ? representanteEmail : "",
                 "studentEmail", studentEmail != null ? studentEmail : "",
                 "purposeCode", "IMAGE_PHOTO",
                 "granted", true,
                 "consentLevel", "EXPLICIT",
-                "policyVersion", "2026.1",
+                "policyVersion", policyVersion,
                 "enrollmentRef", enrollmentRef
         );
 
