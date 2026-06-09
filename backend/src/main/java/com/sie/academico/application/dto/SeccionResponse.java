@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record SeccionResponse(
         UUID id, String codigo, UUID cursoId, UUID periodoId,
-        int capacidad, String estado,
+        int capacidad, int cuposOcupados, int cuposDisponibles,
+        String estado,
         List<DocenteInfo> docentes, List<HorarioInfo> horarios
 ) {}

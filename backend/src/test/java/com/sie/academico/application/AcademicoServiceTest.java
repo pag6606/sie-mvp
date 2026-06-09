@@ -5,6 +5,7 @@ import com.sie.academico.domain.*;
 import com.sie.academico.infrastructure.CursoRepository;
 import com.sie.academico.infrastructure.PeriodoRepository;
 import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.matricula.infrastructure.MatriculaRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -24,10 +25,11 @@ class AcademicoServiceTest {
     @Mock PeriodoRepository periodoRepository;
     @Mock CursoRepository cursoRepository;
     @Mock SeccionRepository seccionRepository;
+    @Mock MatriculaRepository matriculaRepository;
 
     @Test
     void crearPeriodo_exitoso() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         var req = new CrearPeriodoRequest("2026-2", "Período 2026-2", LocalDate.of(2026, 9, 1), LocalDate.of(2026, 12, 15));
         when(periodoRepository.existsByCodigo("2026-2")).thenReturn(false);
         when(periodoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -38,14 +40,14 @@ class AcademicoServiceTest {
 
     @Test
     void crearPeriodo_fechaFinAntesDeInicio_lanzaExcepcion() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         var req = new CrearPeriodoRequest("2026-2", "P", LocalDate.of(2026, 12, 15), LocalDate.of(2026, 9, 1));
         assertThrows(IllegalArgumentException.class, () -> svc.crearPeriodo(req, UUID.randomUUID()));
     }
 
     @Test
     void crearCurso_exitoso() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         var req = new CrearCursoRequest("MAT-101", "Matemáticas", "Curso básico", 5);
         when(cursoRepository.existsByCodigo("MAT-101")).thenReturn(false);
         when(cursoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -56,14 +58,14 @@ class AcademicoServiceTest {
 
     @Test
     void listarCursos() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         when(cursoRepository.findAll()).thenReturn(List.of());
         assertTrue(svc.listarCursos().isEmpty());
     }
 
     @Test
     void abrirPeriodo_exitoso() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         Periodo p = new Periodo();
         p.setCodigo("2026-2"); p.setNombre("P"); p.setEstado(EstadoPeriodo.BORRADOR);
         p.setFechaInicio(LocalDate.now()); p.setFechaFin(LocalDate.now().plusMonths(3));
@@ -76,7 +78,7 @@ class AcademicoServiceTest {
 
     @Test
     void cerrarPeriodo_exitoso() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         Periodo p = new Periodo();
         p.setCodigo("2026-2"); p.setNombre("P"); p.setEstado(EstadoPeriodo.EN_CURSO);
         p.setFechaInicio(LocalDate.now()); p.setFechaFin(LocalDate.now().plusMonths(3));
@@ -89,14 +91,14 @@ class AcademicoServiceTest {
 
     @Test
     void listarSecciones_porPeriodo() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         when(seccionRepository.findByPeriodoId(any())).thenReturn(List.of());
         assertTrue(svc.listarSecciones(UUID.randomUUID()).isEmpty());
     }
 
     @Test
     void crearCurso_codigoDuplicado_lanzaExcepcion() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         var req = new CrearCursoRequest("MAT-101", "M", "", 3);
         when(cursoRepository.existsByCodigo("MAT-101")).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> svc.crearCurso(req, UUID.randomUUID()));
@@ -104,7 +106,7 @@ class AcademicoServiceTest {
 
     @Test
     void abrirPeriodo_estadoInvalido_lanzaExcepcion() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         Periodo p = new Periodo();
         p.setCodigo("2026-2"); p.setNombre("P"); p.setEstado(EstadoPeriodo.EN_CURSO);
         p.setFechaInicio(LocalDate.now()); p.setFechaFin(LocalDate.now().plusMonths(3));
@@ -114,7 +116,7 @@ class AcademicoServiceTest {
 
     @Test
     void crearPeriodo_codigoDuplicado_lanzaExcepcion() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         var req = new CrearPeriodoRequest("2026-2", "P", LocalDate.now(), LocalDate.now().plusDays(1));
         when(periodoRepository.existsByCodigo("2026-2")).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> svc.crearPeriodo(req, UUID.randomUUID()));
@@ -122,7 +124,7 @@ class AcademicoServiceTest {
 
     @Test
     void crearSeccion_exitosa() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         UUID colegioId = UUID.randomUUID();
         Curso curso = new Curso(); curso.setCodigo("MAT-101"); curso.setNombre("M"); curso.setCreditos(3);
         Periodo periodo = new Periodo(); periodo.setCodigo("2026-2"); periodo.setNombre("P");
@@ -134,6 +136,7 @@ class AcademicoServiceTest {
         when(cursoRepository.findById(any())).thenReturn(Optional.of(curso));
         when(periodoRepository.findById(any())).thenReturn(Optional.of(periodo));
         when(seccionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        lenient().when(matriculaRepository.countBySeccionIdAndEstado(any(), any())).thenReturn(0L);
 
         var resp = svc.crearSeccion(req, colegioId);
         assertEquals("MAT-101-A", resp.codigo());
@@ -142,7 +145,7 @@ class AcademicoServiceTest {
 
     @Test
     void asignarDocente_exitoso() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         UUID colegioId = UUID.randomUUID();
         Curso curso = new Curso(); curso.setCodigo("MAT-101"); curso.setNombre("M"); curso.setCreditos(3);
         Periodo periodo = new Periodo(); periodo.setCodigo("2026-2"); periodo.setNombre("P");
@@ -153,6 +156,7 @@ class AcademicoServiceTest {
 
         when(seccionRepository.findById(any())).thenReturn(Optional.of(seccion));
         when(seccionRepository.save(any())).thenReturn(seccion);
+        lenient().when(matriculaRepository.countBySeccionIdAndEstado(any(), any())).thenReturn(0L);
 
         var resp = svc.asignarDocente(UUID.randomUUID(), UUID.randomUUID(), "TITULAR");
         assertEquals(1, resp.docentes().size());
@@ -161,7 +165,7 @@ class AcademicoServiceTest {
 
     @Test
     void clonarPeriodo_exitoso() {
-        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository);
+        var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository);
         UUID colegioId = UUID.randomUUID();
         Curso curso = new Curso(); curso.setCodigo("MAT-101"); curso.setNombre("M"); curso.setCreditos(3);
         Periodo origen = new Periodo(); origen.setCodigo("2026-1"); origen.setNombre("O");
@@ -177,6 +181,7 @@ class AcademicoServiceTest {
         when(seccionRepository.findByPeriodoId(any())).thenReturn(List.of(seccionOrig));
         when(periodoRepository.findById(any())).thenReturn(Optional.of(destino));
         when(seccionRepository.saveAll(any())).thenAnswer(inv -> inv.getArgument(0));
+        lenient().when(matriculaRepository.countBySeccionIdAndEstado(any(), any())).thenReturn(0L);
 
         var resp = svc.clonarPeriodo(UUID.randomUUID(), UUID.randomUUID());
         assertEquals(1, resp.size());

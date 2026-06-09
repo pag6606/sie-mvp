@@ -7,6 +7,8 @@ interface Seccion {
   codigo: string
   cursoId: string
   capacidad: number
+  cuposOcupados: number
+  cuposDisponibles: number
   estado: string
   horarios: { diaSemana: string; horaInicio: string; horaFin: string; aula: string }[]
   docentes?: { docenteId: string; rol: string }[]

@@ -5,6 +5,8 @@ import com.sie.academico.domain.*;
 import com.sie.academico.infrastructure.CursoRepository;
 import com.sie.academico.infrastructure.PeriodoRepository;
 import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.matricula.domain.EstadoMatricula;
+import com.sie.matricula.infrastructure.MatriculaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,7 @@ public class AcademicoService {
     private final PeriodoRepository periodoRepository;
     private final CursoRepository cursoRepository;
     private final SeccionRepository seccionRepository;
+    private final MatriculaRepository matriculaRepository;
 
     // ── Períodos ──
 
@@ -180,8 +183,10 @@ public class AcademicoService {
     }
 
     private SeccionResponse toResponse(Seccion s) {
+        int ocupados = (int) matriculaRepository.countBySeccionIdAndEstado(s.getId(), EstadoMatricula.ACTIVA);
         return new SeccionResponse(s.getId(), s.getCodigo(), s.getCurso().getId(), s.getPeriodo().getId(),
-                s.getCapacidad(), s.getEstado().name(),
+                s.getCapacidad(), ocupados, s.getCapacidad() - ocupados,
+                s.getEstado().name(),
                 s.getDocentes().stream().map(d -> new DocenteInfo(d.getDocenteId(), d.getRol())).toList(),
                 s.getHorarios().stream().map(h -> new HorarioInfo(h.getDiaSemana().name(), h.getHoraInicio().toString(), h.getHoraFin().toString(), h.getAula())).toList());
     }
