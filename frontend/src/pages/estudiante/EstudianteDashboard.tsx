@@ -1,5 +1,6 @@
 import { LoadingSkeleton } from '@/components/UIPatterns'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
@@ -10,6 +11,7 @@ interface AsistenciaResp { cursoNombre?: string; porcentaje: number; totalSesion
 
 export default function EstudianteDashboard() {
   const [tab, setTab] = useState<'horario' | 'notas'>('horario')
+  const navigate = useNavigate()
 
   const { data: matriculas = [], isLoading: loadingM } = useQuery({
     queryKey: ['me', 'matriculas'],
@@ -62,7 +64,7 @@ export default function EstudianteDashboard() {
           {tab === 'horario' ? (
             <HorarioTab matriculas={matriculas} />
           ) : (
-            <NotasTab notas={notasData} asistencia={asistencia} />
+            <NotasTab notas={notasData} asistencia={asistencia} onBoletin={() => navigate('/estudiante/boletin')} />
           )}
         </div>
       </div>
@@ -105,7 +107,7 @@ function HorarioTab({ matriculas }: { matriculas: MatriculaData[] }) {
   )
 }
 
-function NotasTab({ notas, asistencia }: { notas: NotaResp[]; asistencia: AsistenciaResp[] }) {
+function NotasTab({ notas, asistencia, onBoletin }: { notas: NotaResp[]; asistencia: AsistenciaResp[]; onBoletin: () => void }) {
   return (
     <div className="space-y-5">
       {notas.length > 0 && (
@@ -192,7 +194,7 @@ function NotasTab({ notas, asistencia }: { notas: NotaResp[]; asistencia: Asiste
         </div>
       )}
 
-      <button className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
+      <button onClick={onBoletin} className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">
         📄 Descargar boletín PDF
       </button>
     </div>

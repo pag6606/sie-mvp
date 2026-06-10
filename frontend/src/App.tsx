@@ -25,6 +25,7 @@ const NotasPage = lazy(() => import('@/pages/docente/NotasPage'))
 const CierrePage = lazy(() => import('@/pages/docente/CierrePage'))
 const EsquemaEvaluacionPage = lazy(() => import('@/pages/docente/EsquemaEvaluacionPage'))
 const EstudianteDashboard = lazy(() => import('@/pages/estudiante/EstudianteDashboard'))
+const BoletinPage = lazy(() => import('@/pages/estudiante/BoletinPage'))
 
 export default function App() {
   return (
@@ -53,6 +54,7 @@ export default function App() {
       <Route path="/docente/:seccionId/cerrar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><CierrePage /></Suspense>} />
       <Route path="/docente/:seccionId/esquema" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><EsquemaEvaluacionPage /></Suspense>} />
       <Route path="/estudiante" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><EstudianteDashboard /></Suspense>} />
+      <Route path="/estudiante/boletin" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><BoletinPage /></Suspense>} />
     </Routes>
   )
 }
