@@ -32,6 +32,13 @@ export default function NotasPage() {
     enabled: !!seccionId,
   })
 
+  const { data: secciones = [] } = useQuery<{ id: string; codigo: string }[]>({
+    queryKey: ['me', 'secciones'],
+    queryFn: () => api.get('/me/secciones').then(r => r.data),
+    enabled: !!seccionId,
+  })
+  const seccionCodigo = secciones.find(s => s.id === seccionId)?.codigo || seccionId?.slice(0, 8)
+
   const guardarMutation = useMutation({
     mutationFn: (entries: { matriculaId: string; componenteId: string; valor: number }[]) =>
       api.post(`/secciones/${seccionId}/notas`, { entries }),
@@ -97,7 +104,7 @@ export default function NotasPage() {
         )}
 
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground">Notas</h2>
+          <h2 className="text-xl font-semibold text-foreground">Notas — {seccionCodigo}</h2>
           <div className="flex gap-2">
             <button onClick={handleGuardar} disabled={guardarMutation.isPending || Object.keys(editing).length === 0}
               className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50">
@@ -173,17 +180,21 @@ export default function NotasPage() {
                     const val = editing[key] ?? c.valor ?? ''
                     return (
                       <td key={ci} className="px-3 py-3 text-center">
-                        <input
-                          aria-label={`Nota de ${n.estudianteNombre} en ${c.nombre}`}
-                          type="number" min={NOTA_MIN} max={NOTA_MAX} step="0.1"
-                          value={val}
-                          onChange={e => {
-                            const v = Number(e.target.value)
-                            if (v < NOTA_MIN || v > NOTA_MAX) return
-                            setEditing(prev => ({ ...prev, [key]: v }))
-                          }}
-                          className={`w-14 rounded border bg-card px-2 py-1.5 text-center text-sm ${editing[key] !== undefined ? 'ring-1 ring-primary border-primary' : 'border-input'} ${notaColor(editing[key] !== undefined ? editing[key] : c.valor)}`}
-                        />
+                        <div className="flex items-center justify-center gap-1">
+                          <input
+                            aria-label={`Nota de ${n.estudianteNombre} en ${c.nombre}`}
+                            type="number" min={NOTA_MIN} max={NOTA_MAX} step="0.1"
+                            placeholder="—"
+                            value={val}
+                            onChange={e => {
+                              const v = Number(e.target.value)
+                              if (v < NOTA_MIN || v > NOTA_MAX) return
+                              setEditing(prev => ({ ...prev, [key]: v }))
+                            }}
+                            className={`w-12 rounded border bg-card px-1.5 py-1.5 text-center text-sm ${editing[key] !== undefined ? 'ring-1 ring-primary border-primary' : 'border-input'} ${notaColor(editing[key] !== undefined ? editing[key] : c.valor)}`}
+                          />
+                          <span className="text-[10px] text-muted-foreground">/10</span>
+                        </div>
                       </td>
                     )
                   })}

@@ -123,15 +123,15 @@ function NotasTab({ notas, asistencia }: { notas: NotaResp[]; asistencia: Asiste
                       <div key={ci} className="text-sm flex justify-between gap-4">
                         <span className="text-muted-foreground truncate">{c.nombre}</span>
                         <span className="text-foreground font-medium shrink-0">
-                          {c.valor != null ? c.valor : '—'} / {c.peso}%
+                          {c.valor != null ? c.valor : '—'} / 10
                         </span>
                       </div>
                     ))}
                   </div>
                 </div>
                 <div className={`shrink-0 rounded-full w-14 h-14 flex items-center justify-center text-xl font-extrabold ${
-                  n.notaFinal >= 14 ? 'bg-success/10 text-success' :
-                  n.notaFinal >= 10 ? 'bg-warning/10 text-warning' :
+                  n.notaFinal >= 7 ? 'bg-success/10 text-success' :
+                  n.notaFinal >= 5 ? 'bg-warning/10 text-warning' :
                   'bg-destructive/10 text-destructive'
                 }`}>
                   {n.notaFinal}
@@ -179,6 +179,16 @@ function NotasTab({ notas, asistencia }: { notas: NotaResp[]; asistencia: Asiste
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {asistencia.length === 0 && (
+        <div className="rounded-xl bg-card border p-6 text-center">
+          <p className="text-3xl mb-2">📋</p>
+          <p className="text-foreground font-medium text-sm">Sin registros de asistencia</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Tu docente aún no ha tomado asistencia en tus secciones
+          </p>
         </div>
       )}
 
