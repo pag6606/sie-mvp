@@ -19,9 +19,15 @@ function ResetRequest() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
 
+  const [resetError, setResetError] = useState('')
+
   const { mutate: requestReset, isPending } = useMutation({
     mutationFn: (email: string) => api.post('/auth/password-reset/request', { email }),
     onSuccess: () => setSent(true),
+    onError: (err: unknown) => {
+      const apiErr = err as ApiError
+      setResetError(apiErr?.response?.data?.mensaje || apiErr?.message || 'Error al enviar el enlace')
+    },
   })
 
   if (sent) {
@@ -48,9 +54,10 @@ function ResetRequest() {
         <h1 className="text-center text-3xl font-bold text-foreground mb-2">SIE</h1>
         <h2 className="text-center text-lg text-foreground mb-6">Recuperar contraseña</h2>
         <form
-          onSubmit={e => { e.preventDefault(); requestReset(email) }}
+          onSubmit={e => { e.preventDefault(); setResetError(''); requestReset(email) }}
           className="space-y-4"
         >
+          {resetError && <InlineError message={resetError} />}
           <div>
             <label htmlFor="reset-email" className="block text-sm font-medium text-foreground">
               Email
@@ -91,6 +98,7 @@ function ResetConfirm({ token }: { token: string }) {
     mutationFn: ({ nuevaPassword }: { nuevaPassword: string }) =>
       api.post('/auth/password-reset/confirm', { token, nuevaPassword }),
     onSuccess: () => setDone(true),
+    onError: () => {},
   })
 
   const errorMsg = (error as ApiError)?.response?.data?.mensaje

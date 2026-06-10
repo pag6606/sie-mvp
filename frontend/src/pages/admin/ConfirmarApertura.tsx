@@ -1,8 +1,11 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
 import ProgressBar from '@/components/ProgressBar'
+import { InlineError } from '@/components/UIPatterns'
+import { ApiError } from '@/types/api'
 
 const STEPS = [
   { label: 'Crear período', done: true },
@@ -15,12 +18,21 @@ export default function ConfirmarApertura() {
   const { periodoId } = useParams()
   const navigate = useNavigate()
 
+  const [error, setError] = useState('')
+
   const mutation = useMutation({
     mutationFn: () => api.post(`/periodos/${periodoId}/abrir`),
     onSuccess: () => navigate('/admin'),
+    onError: (err: unknown) => {
+      const apiErr = err as ApiError
+      setError(apiErr?.response?.data?.mensaje || apiErr?.message || 'Error al abrir el período')
+    },
   })
 
-  const handleAbrir = () => mutation.mutate()
+  const handleAbrir = () => {
+    setError('')
+    mutation.mutate()
+  }
 
   return (
     <AppLayout role="admin">
@@ -31,6 +43,12 @@ export default function ConfirmarApertura() {
           <div className="mb-6 text-4xl" aria-hidden="true">✅</div>
           <h2 className="text-xl font-semibold text-foreground">Período listo</h2>
           <p className="mt-2 text-muted-foreground">Todos los pasos completados. Las secciones (paralelos) están configuradas.</p>
+
+          {error && (
+            <div className="mt-4">
+              <InlineError message={error} />
+            </div>
+          )}
 
           <div className="mt-8 rounded-lg border border-amber-200 bg-amber-50 p-4 text-left">
             <p className="text-sm font-medium text-amber-800">⚠️ Al abrir el período:</p>

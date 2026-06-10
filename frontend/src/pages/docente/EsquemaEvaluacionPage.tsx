@@ -24,6 +24,7 @@ export default function EsquemaEvaluacionPage() {
   const guardarMutation = useMutation({
     mutationFn: () => api.put(`/secciones/${seccionId}/esquema-evaluacion`, { componentes }),
     onSuccess: () => navigate('/docente'),
+    onError: () => {},
   })
 
   const [validationError, setValidationError] = useState('')

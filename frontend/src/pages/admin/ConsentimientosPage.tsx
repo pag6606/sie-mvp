@@ -43,9 +43,15 @@ export default function ConsentimientosPage() {
   const idsConConsentimiento = new Set(consentimientos.filter(c => c.aceptado).map(c => c.estudianteId))
   const pendientes = estudiantes.filter(e => !idsConConsentimiento.has(e.id))
 
+  const [revokeError, setRevokeError] = useState('')
+
   const revocar = useMutation({
     mutationFn: (estudianteId: string) => api.post(`/consentimientos/${estudianteId}/revocar`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['consentimientos'] }),
+    onError: (err: unknown) => {
+      const apiErr = err as import('@/types/api').ApiError
+      setRevokeError(apiErr?.response?.data?.mensaje || apiErr?.message || 'Error al revocar')
+    },
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -177,6 +183,12 @@ export default function ConsentimientosPage() {
           </div>
         )}
 
+        {revokeError && (
+          <div className="mb-4">
+            <InlineError message={revokeError} />
+          </div>
+        )}
+
         {tab === 'registrados' ? (
           registered.length > 0 ? (
             <div className="overflow-x-auto rounded-lg border bg-card">
@@ -211,7 +223,7 @@ export default function ConsentimientosPage() {
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button
-                          onClick={() => { if (confirm('¿Revocar este consentimiento?')) revocar.mutate(c.estudianteId) }}
+                          onClick={() => { setRevokeError(''); if (confirm('¿Revocar este consentimiento?')) revocar.mutate(c.estudianteId) }}
                           disabled={revocar.isPending}
                           className="rounded-md border border-destructive/30 px-2 py-1 text-xs text-destructive hover:bg-destructive/10 disabled:opacity-50"
                         >

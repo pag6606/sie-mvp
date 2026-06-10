@@ -12,6 +12,7 @@ export default function CierrePage() {
   const cerrarMutation = useMutation({
     mutationFn: () => api.post(`/secciones/${seccionId}/cerrar`),
     onSuccess: () => navigate('/docente'),
+    onError: () => {},
   })
 
   const handleCerrar = () => cerrarMutation.mutate()

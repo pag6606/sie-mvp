@@ -29,6 +29,7 @@ export default function LoginPage() {
       const ruta = rutaPorRol(data.roles)
       if (ruta) navigate(ruta)
     },
+    onError: () => {},
   })
 
   const handleLogin = (e: React.FormEvent) => {

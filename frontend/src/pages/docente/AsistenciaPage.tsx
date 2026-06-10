@@ -59,6 +59,7 @@ export default function AsistenciaPage() {
     mutationFn: (entries: { matriculaId: string; estado: string }[]) =>
       api.post(`/secciones/${seccionId}/asistencia`, { fecha, entries }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['asistencia', seccionId] }),
+    onError: () => {},
   })
 
   const handleGuardar = () => {

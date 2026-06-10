@@ -16,6 +16,7 @@ export default function ActivatePage() {
   const { mutate, isPending, error } = useMutation<unknown, ApiError, string>({
     mutationFn: (pwd: string) => api.post('/auth/activate', { token, password: pwd }),
     onSuccess: () => setDone(true),
+    onError: () => {},
   })
 
   const errorMsg = (error as ApiError)?.response?.data?.mensaje

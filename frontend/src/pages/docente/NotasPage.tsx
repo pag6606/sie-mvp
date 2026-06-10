@@ -46,6 +46,7 @@ export default function NotasPage() {
       setEditing({})
       queryClient.invalidateQueries({ queryKey: ['notas', seccionId] })
     },
+    onError: () => {},
   })
 
   const handleGuardar = () => {
