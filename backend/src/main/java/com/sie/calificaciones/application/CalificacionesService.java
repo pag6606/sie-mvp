@@ -53,7 +53,7 @@ public class CalificacionesService {
         var matriculas = matriculaRepository.findBySeccionId(seccionId);
         return matriculas.stream().map(m -> {
             var q = em.createQuery("SELECT a FROM Asistencia a WHERE a.matriculaId=?1 AND a.fecha BETWEEN ?2 AND ?3", Asistencia.class);
-            q.setParameter(1, m.getEstudianteId()); q.setParameter(2, desde); q.setParameter(3, hasta);
+            q.setParameter(1, m.getId()); q.setParameter(2, desde); q.setParameter(3, hasta);
             var asistencias = q.getResultList();
             long presentes = asistencias.stream().filter(a -> a.getEstado() != EstadoAsistencia.AUSENTE).count();
             double pct = asistencias.isEmpty() ? 0 : (double) presentes / asistencias.size() * 100;
