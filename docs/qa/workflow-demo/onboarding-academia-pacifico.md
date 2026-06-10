@@ -41,6 +41,8 @@ El `application-dev.properties` ya referencia `${JWT_SECRET}` con fallback al va
 
 **Variable `lopdp.enabled`** (consentimiento): `true` delega a LOPDP-EC como fuente canónica; `false` usa la DB local como fuente (modo standalone para dev sin LOPDP corriendo). En producción siempre debe ser `true`.
 
+**Variable `EVALUACION_MAX_PESO_COMPONENTE`** (esquema de evaluación): umbral máximo por componente en el esquema de evaluación (default: `40`). Definido por LOEI + Reglamento de Evaluación — ningún componente (tareas, exámenes, participación) puede exceder este porcentaje del total.
+
 ### Frontend (Vite)
 
 ```bash
@@ -488,6 +490,8 @@ Cada docente inicia sesión con su email y la contraseña del correo de activaci
 ```
 Docente Dashboard → Sección → "Esquema"
 ```
+
+**Límite institucional:** ningún componente puede exceder el 40% (`EVALUACION_MAX_PESO_COMPONENTE`). La suma total debe ser exactamente 100%.
 
 Ejemplo para 1EGB-A (Laura Román):
 

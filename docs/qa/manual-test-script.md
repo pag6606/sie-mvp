@@ -423,6 +423,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 ### UA-11.1 Configurar esquema
 - [ ] Desde dashboard docente, clic en "Esquema" de una sección
 - [ ] **AC:** URL `/docente/{id}/esquema`
+- [ ] **AC:** Muestra texto "Cada componente no puede exceder el 40%. La suma total debe ser 100%."
 - [ ] **AC:** Formulario con campos: Nombre del componente, Peso (%)
 
 ### UA-11.2 Agregar/quitar componentes
@@ -435,6 +436,13 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] Dejar pesos que no sumen 100%
 - [ ] Clic en "Guardar esquema"
 - [ ] **AC:** Error "La suma de pesos debe ser 100%"
+
+### UA-11.3b Validación de umbral máximo por componente (40%)
+- [ ] Crear un componente con peso 50%
+- [ ] Clic en "Guardar esquema"
+- [ ] **AC:** Error '"Tareas" excede el límite de 40% por componente' (o similar)
+- [ ] **Normativa:** LOEI + Reglamento de Evaluación — ningún componente de evaluación puede exceder el umbral institucional
+- [ ] **AC:** El backend también rechaza la petición con mensaje similar
 
 ### UA-11.4 Guardar esquema válido
 - [ ] Ajustar pesos para sumar 100%
@@ -901,6 +909,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 | UA-11.1 | Configurar esquema | | |
 | UA-11.2 | Agregar/quitar componente | | |
 | UA-11.3 | Validación 100% | | |
+| UA-11.3b | Validación umbral máximo 40% | | |
 | UA-11.4 | Guardar esquema | | |
 | UA-12.1 | Tabla de notas | | |
 | UA-12.2 | Ingresar notas | | |
@@ -946,7 +955,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 | UA-18.5 | Trazabilidad documental (nombre+cédula) | | |
 | UA-18.6 | Registrar 200 consentimientos masivos (NSM ≤ 5 min) | | |
 
-**Total:** 88 casos de prueba (62 originales + 10 UA-17 originales + 8 nuevos UA-17.11 a 17.18 + 6 nuevos UA-18.1 a 18.6 para consentimiento parental)  
+**Total:** 89 casos de prueba (62 originales + 10 UA-17 originales + 8 nuevos UA-17.11 a 17.18 + 6 nuevos UA-18.1 a 18.6 para consentimiento parental)  
 **Aprobador:** ___________  
 **Fecha:** ___________
 
