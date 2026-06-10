@@ -57,7 +57,7 @@ public class CalificacionesService {
             var asistencias = q.getResultList();
             long presentes = asistencias.stream().filter(a -> a.getEstado() != EstadoAsistencia.AUSENTE).count();
             double pct = asistencias.isEmpty() ? 0 : (double) presentes / asistencias.size() * 100;
-            return new AsistenciaResponse(m.getEstudianteId(), nombreEstudiante(m.getEstudianteId()), pct, asistencias.size(), (int) presentes);
+            return new AsistenciaResponse(m.getId(), m.getEstudianteId(), nombreEstudiante(m.getEstudianteId()), pct, asistencias.size(), (int) presentes);
         }).toList();
     }
 
@@ -213,7 +213,7 @@ public class CalificacionesService {
     // ── DTOs ──
 
     public record AsistenciaEntry(UUID matriculaId, EstadoAsistencia estado) {}
-    public record AsistenciaResponse(UUID estudianteId, String estudianteNombre, double porcentaje, int totalSesiones, int presentes) {}
+    public record AsistenciaResponse(UUID matriculaId, UUID estudianteId, String estudianteNombre, double porcentaje, int totalSesiones, int presentes) {}
     public record ComponenteEntry(String nombre, BigDecimal peso) { public ComponenteEntry(String n, double p) { this(n, BigDecimal.valueOf(p)); } }
     public record NotaEntry(UUID matriculaId, UUID componenteId, BigDecimal valor) {}
     public record ComponenteNota(UUID componenteId, String nombre, BigDecimal peso, BigDecimal valor) {}

@@ -12,6 +12,7 @@ interface Estudiante {
 }
 
 interface AsistenciaResponse {
+  matriculaId: string
   estudianteId: string
   porcentaje: number
   estudianteNombre: string
@@ -44,7 +45,7 @@ export default function AsistenciaPage() {
     queryKey: ['asistencia', seccionId, fecha],
     queryFn: () => api.get(`/secciones/${seccionId}/asistencia?desde=${fecha}&hasta=${fecha}`)
       .then(r => (r.data as AsistenciaResponse[]).map((a) => ({
-        matriculaId: a.estudianteId,
+        matriculaId: a.matriculaId,
         estudianteId: a.estudianteId,
         porcentaje: a.porcentaje,
         estudianteNombre: a.estudianteNombre,
