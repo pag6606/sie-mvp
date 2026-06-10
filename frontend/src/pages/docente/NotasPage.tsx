@@ -7,7 +7,7 @@ import AppLayout from '@/components/AppLayout'
 import { ApiError } from '@/types/api'
 
 interface ComponenteNota { componenteId: string; nombre: string; peso: number; valor: number | null }
-interface NotaEstudiante { estudianteId: string; estudianteNombre: string; notaFinal: number | null; componentes: ComponenteNota[] }
+interface NotaEstudiante { matriculaId: string; estudianteId: string; estudianteNombre: string; notaFinal: number | null; componentes: ComponenteNota[] }
 
 const NOTA_MAX = 10
 const NOTA_MIN = 0
@@ -52,7 +52,7 @@ export default function NotasPage() {
         alert(`La nota debe estar entre ${NOTA_MIN} y ${NOTA_MAX}`)
         return
       }
-      entries.push({ matriculaId: estudiante.estudianteId, componenteId: componente.componenteId, valor })
+      entries.push({ matriculaId: estudiante.matriculaId, componenteId: componente.componenteId, valor })
     })
     if (entries.length === 0) return
     guardarMutation.mutate(entries)
@@ -164,7 +164,7 @@ export default function NotasPage() {
             </thead>
             <tbody>
               {notas.map((n, ni) => (
-                <tr key={n.estudianteId} className="border-b hover:bg-muted/30 transition-colors">
+                <tr key={n.matriculaId} className="border-b hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 text-sm font-medium text-foreground sticky left-0 bg-card z-10">
                     {n.estudianteNombre}
                   </td>
