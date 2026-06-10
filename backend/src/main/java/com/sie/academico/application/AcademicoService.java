@@ -5,6 +5,7 @@ import com.sie.academico.domain.*;
 import com.sie.academico.infrastructure.CursoRepository;
 import com.sie.academico.infrastructure.PeriodoRepository;
 import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.calificaciones.infrastructure.EsquemaEvaluacionRepository;
 import com.sie.matricula.domain.EstadoMatricula;
 import com.sie.matricula.infrastructure.MatriculaRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class AcademicoService {
     private final CursoRepository cursoRepository;
     private final SeccionRepository seccionRepository;
     private final MatriculaRepository matriculaRepository;
+    private final EsquemaEvaluacionRepository esquemaRepository;
 
     // ── Períodos ──
 
@@ -169,13 +171,22 @@ public class AcademicoService {
     }
 
     public List<SeccionResponse> listarSecciones(UUID periodoId) {
-        return seccionRepository.findByPeriodoId(periodoId).stream().map(this::toResponse).toList();
+        List<Seccion> secciones = seccionRepository.findByPeriodoId(periodoId);
+        var idsConEsquema = new HashSet<>(esquemaRepository.findSeccionIdsWithEsquema(
+                secciones.stream().map(Seccion::getId).toList()));
+        return secciones.stream()
+                .map(s -> toResponse(s, idsConEsquema.contains(s.getId())))
+                .toList();
     }
 
     public List<SeccionResponse> listarSeccionesPorDocente(UUID docenteId) {
-        return seccionRepository.findAll().stream()
+        List<Seccion> secciones = seccionRepository.findAll().stream()
                 .filter(s -> s.getDocentes().stream().anyMatch(d -> d.getDocenteId().equals(docenteId)))
-                .map(this::toResponse)
+                .toList();
+        var idsConEsquema = new HashSet<>(esquemaRepository.findSeccionIdsWithEsquema(
+                secciones.stream().map(Seccion::getId).toList()));
+        return secciones.stream()
+                .map(s -> toResponse(s, idsConEsquema.contains(s.getId())))
                 .toList();
     }
 
@@ -189,12 +200,16 @@ public class AcademicoService {
         return new CursoResponse(c.getId(), c.getCodigo(), c.getNombre(), c.getDescripcion(), c.getCreditos(), c.isActivo());
     }
 
-    private SeccionResponse toResponse(Seccion s) {
+    private SeccionResponse toResponse(Seccion s, boolean hasEsquema) {
         int ocupados = (int) matriculaRepository.countBySeccionIdAndEstado(s.getId(), EstadoMatricula.ACTIVA);
         return new SeccionResponse(s.getId(), s.getCodigo(), s.getCurso().getId(), s.getPeriodo().getId(),
                 s.getCapacidad(), ocupados, s.getCapacidad() - ocupados,
-                s.getEstado().name(),
+                s.getEstado().name(), hasEsquema,
                 s.getDocentes().stream().map(d -> new DocenteInfo(d.getDocenteId(), d.getRol())).toList(),
                 s.getHorarios().stream().map(h -> new HorarioInfo(h.getDiaSemana().name(), h.getHoraInicio().toString(), h.getHoraFin().toString(), h.getAula())).toList());
+    }
+
+    private SeccionResponse toResponse(Seccion s) {
+        return toResponse(s, esquemaRepository.existsBySeccionId(s.getId()));
     }
 }

@@ -11,6 +11,7 @@ interface SeccionDocente {
   capacidad: number
   cuposOcupados: number
   cuposDisponibles: number
+  hasEsquema: boolean
   horarios?: { diaSemana: string; horaInicio: string; horaFin: string; aula: string }[]
 }
 
@@ -56,29 +57,47 @@ const SeccionCard = memo(function SeccionCard({
         </div>
       </div>
 
-      <div className="mt-4 flex flex-col sm:flex-row gap-2">
-        <button
-          onClick={() => onNavigate(`/docente/${s.id}/asistencia`)}
-          className="flex-1 rounded-lg bg-primary py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity min-h-[44px]"
-          aria-label={`Tomar asistencia de ${s.codigo}`}
-        >
-          Tomar asistencia
-        </button>
-        <button
-          onClick={() => onNavigate(`/docente/${s.id}/notas`)}
-          className="flex-1 rounded-lg border border-border bg-card py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors min-h-[44px]"
-          aria-label={`Ver notas de ${s.codigo}`}
-        >
-          Ver notas
-        </button>
-        <button
-          onClick={() => onNavigate(`/docente/${s.id}/esquema`)}
-          className="flex-1 rounded-lg border border-border bg-card py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors min-h-[44px]"
-          aria-label={`Ver esquema de ${s.codigo}`}
-        >
-          Esquema
-        </button>
-      </div>
+      {!s.hasEsquema ? (
+        <div className="mt-4">
+          <button
+            onClick={() => onNavigate(`/docente/${s.id}/esquema`)}
+            className="w-full rounded-lg bg-primary py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors min-h-[44px]"
+          >
+            ① Configurar esquema →
+          </button>
+          <div className="mt-3 space-y-1">
+            <p className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full border border-muted-foreground/30 text-[10px] font-medium text-muted-foreground">②</span>
+              Tomar asistencia
+            </p>
+            <p className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full border border-muted-foreground/30 text-[10px] font-medium text-muted-foreground">③</span>
+              Ingresar notas
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4 flex flex-col sm:flex-row gap-2">
+          <button
+            onClick={() => onNavigate(`/docente/${s.id}/asistencia`)}
+            className="flex-1 rounded-lg bg-primary py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity min-h-[44px]"
+          >
+            Tomar asistencia
+          </button>
+          <button
+            onClick={() => onNavigate(`/docente/${s.id}/notas`)}
+            className="flex-1 rounded-lg border border-border bg-card py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors min-h-[44px]"
+          >
+            Ver notas
+          </button>
+          <button
+            onClick={() => onNavigate(`/docente/${s.id}/esquema`)}
+            className="flex-1 rounded-lg border border-border bg-card py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors min-h-[44px]"
+          >
+            Esquema
+          </button>
+        </div>
+      )}
     </div>
   )
 })
