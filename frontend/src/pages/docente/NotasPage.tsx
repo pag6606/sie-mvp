@@ -7,8 +7,18 @@ import AppLayout from '@/components/AppLayout'
 import { ApiError } from '@/types/api'
 
 interface ComponenteNota { componenteId: string; nombre: string; peso: number; valor: number | null }
-interface NotaEstudiante { estudianteId: string; estudianteNombre?: string; notaFinal: number | null; componentes: ComponenteNota[] }
-interface NotaEntry { matriculaId: string; componenteId: string; valor: number }
+interface NotaEstudiante { estudianteId: string; estudianteNombre: string; notaFinal: number | null; componentes: ComponenteNota[] }
+
+const NOTA_MAX = 10
+const NOTA_MIN = 0
+const APROBACION = 7
+
+function notaColor(valor: number | null): string {
+  if (valor == null) return 'text-muted-foreground'
+  if (valor >= APROBACION) return 'text-emerald-600'
+  if (valor >= 5) return 'text-amber-600'
+  return 'text-destructive'
+}
 
 export default function NotasPage() {
   const { seccionId } = useParams()
@@ -32,13 +42,23 @@ export default function NotasPage() {
   })
 
   const handleGuardar = () => {
-    const entries: NotaEntry[] = []
+    const entries: { matriculaId: string; componenteId: string; valor: number }[] = []
     Object.entries(editing).forEach(([key, valor]) => {
       const [idx, compIdx] = key.split('-').map(Number)
-      entries.push({ matriculaId: notas[idx]?.estudianteId, componenteId: notas[idx]?.componentes[compIdx]?.componenteId, valor })
+      const estudiante = notas[idx]
+      const componente = estudiante?.componentes[compIdx]
+      if (!estudiante || !componente) return
+      if (valor < NOTA_MIN || valor > NOTA_MAX) {
+        alert(`La nota debe estar entre ${NOTA_MIN} y ${NOTA_MAX}`)
+        return
+      }
+      entries.push({ matriculaId: estudiante.estudianteId, componenteId: componente.componenteId, valor })
     })
+    if (entries.length === 0) return
     guardarMutation.mutate(entries)
   }
+
+  const componentes = notas[0]?.componentes || []
 
   const handleCerrar = () => navigate(`/docente/${seccionId}/cerrar`)
 
@@ -52,8 +72,6 @@ export default function NotasPage() {
     </AppLayout>
   )
 
-  const componentes = notas[0]?.componentes || []
-
   return (
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
@@ -65,10 +83,12 @@ export default function NotasPage() {
           </div>
         )}
         {guardarMutation.isSuccess && (
-          <div className="mb-4 rounded-md bg-success p-4 text-sm text-success-foreground">Notas guardadas</div>
+          <div className="mb-4 rounded-md bg-emerald-50 border border-emerald-200 p-3 text-sm text-emerald-700 flex items-center gap-2">
+            <span>✓</span> Notas guardadas correctamente
+          </div>
         )}
 
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-2 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-foreground">Notas</h2>
           <div className="flex gap-2">
             <button onClick={handleGuardar} disabled={guardarMutation.isPending || Object.keys(editing).length === 0}
@@ -76,47 +96,69 @@ export default function NotasPage() {
               {guardarMutation.isPending ? 'Guardando...' : 'Guardar cambios'}
             </button>
             <button onClick={handleCerrar}
-              className="rounded-md border border-red-600 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+              className="rounded-md border border-destructive px-4 py-2 text-sm text-destructive hover:bg-destructive/10">
               Cerrar sección (paralelo)
             </button>
           </div>
         </div>
 
+        <p className="mb-4 text-xs text-muted-foreground">
+          Escala: 0-10 · Aprobación: {APROBACION}.0 (LOEI Art. 194)
+          {componentes.length > 0 && (
+            <span className="ml-3">
+              {componentes.map((c, i) => (
+                <span key={i} className="mr-2 inline-flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 text-xs">
+                  {c.nombre} <span className="font-medium text-foreground">{c.peso}%</span>
+                </span>
+              ))}
+            </span>
+          )}
+        </p>
+
         <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full">
             <thead className="border-b bg-muted">
               <tr>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Estudiante</th>
+                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground sticky left-0 bg-muted z-10">Estudiante</th>
                 {componentes.map((c, ci) => (
-                  <th key={ci} scope="col" className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">{c.nombre} ({c.peso}%)</th>
+                  <th key={ci} scope="col" className="px-3 py-3 text-center text-xs font-medium text-muted-foreground">
+                    {c.nombre}
+                    <span className="block text-[10px] text-muted-foreground/60">{c.peso}%</span>
+                  </th>
                 ))}
-                <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-primary">Final</th>
+                <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-primary border-l">
+                  Final
+                  <span className="block text-[10px] text-primary/60">/10</span>
+                </th>
               </tr>
             </thead>
             <tbody>
               {notas.map((n, ni) => (
-                <tr key={n.estudianteId} className="border-b">
-                  <td className="px-4 py-3 text-sm text-foreground">{n.estudianteNombre || 'Estudiante'}</td>
+                <tr key={n.estudianteId} className="border-b hover:bg-muted/30 transition-colors">
+                  <td className="px-4 py-3 text-sm font-medium text-foreground sticky left-0 bg-card z-10">
+                    {n.estudianteNombre}
+                  </td>
                   {n.componentes.map((c, ci) => {
                     const key = `${ni}-${ci}`
+                    const val = editing[key] ?? c.valor ?? ''
                     return (
-                      <td key={ci} className="px-4 py-3 text-center">
+                      <td key={ci} className="px-3 py-3 text-center">
                         <input
-                          aria-label={`Nota de ${n.estudianteNombre || 'estudiante'} en ${c.nombre}`}
-                          type="number" min="0" max="20" step="0.1"
-                          value={editing[key] ?? c.valor ?? ''}
-                          onChange={e => setEditing(prev => ({ ...prev, [key]: Number(e.target.value) }))}
-                          className="w-16 rounded border border-input bg-card px-2 py-1 text-center text-sm text-foreground"
+                          aria-label={`Nota de ${n.estudianteNombre} en ${c.nombre}`}
+                          type="number" min={NOTA_MIN} max={NOTA_MAX} step="0.1"
+                          value={val}
+                          onChange={e => {
+                            const v = Number(e.target.value)
+                            if (v < NOTA_MIN || v > NOTA_MAX) return
+                            setEditing(prev => ({ ...prev, [key]: v }))
+                          }}
+                          className={`w-14 rounded border bg-card px-2 py-1.5 text-center text-sm ${editing[key] !== undefined ? 'ring-1 ring-primary border-primary' : 'border-input'} ${notaColor(editing[key] !== undefined ? editing[key] : c.valor)}`}
                         />
                       </td>
                     )
                   })}
-                  <td className="px-4 py-3 text-center text-sm font-bold">
-                    {n.notaFinal != null ? (
-                      <span className={n.notaFinal >= 14 ? 'text-emerald-600' : n.notaFinal >= 10 ? 'text-amber-600' : 'text-destructive'}>
-                        {n.notaFinal}
-                      </span>
-                    ) : <span className="text-amber-600">— ⚠</span>}
+                  <td className={`px-4 py-3 text-center text-sm font-bold border-l ${notaColor(n.notaFinal)}`}>
+                    {n.notaFinal != null ? n.notaFinal.toFixed(1) : '—'}
                   </td>
                 </tr>
               ))}

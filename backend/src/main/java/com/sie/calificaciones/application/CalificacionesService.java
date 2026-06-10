@@ -102,7 +102,12 @@ public class CalificacionesService {
 
     @Transactional
     public void ingresarNotas(UUID seccionId, List<NotaEntry> entries, UUID ingresadoPor, UUID colegioId) {
+        var maxNota = new BigDecimal("10");
+        var minNota = BigDecimal.ZERO;
         entries.forEach(e -> {
+            if (e.valor().compareTo(minNota) < 0 || e.valor().compareTo(maxNota) > 0)
+                throw new IllegalArgumentException(
+                        "La nota debe estar entre 0 y 10. Valor recibido: " + e.valor());
             var q = em.createNativeQuery(
                     "INSERT INTO notas (id, colegio_id, matricula_id, componente_id, valor, ingresado_por) " +
                     "VALUES (?1,?2,?3,?4,?5,?6) ON CONFLICT (matricula_id, componente_id) DO UPDATE SET valor=?5",

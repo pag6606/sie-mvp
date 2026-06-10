@@ -503,7 +503,7 @@ Ejemplo para 1EGB-A (Laura Román):
 | Evaluación final | 25% |
 | **Total** | **100%** |
 
-> El sistema valida que la suma sea exactamente 100%. Escala de notas: 0-20 (ADR-006).
+> El sistema valida que la suma sea exactamente 100%. Escala de notas: 0-10 (LOEI Art. 194).
 
 ### 8.2 Tomar Asistencia
 
@@ -525,7 +525,7 @@ Docente Dashboard → Sección → "Ver notas"
 ```
 
 - Tabla con estudiantes (filas) × componentes (columnas)
-- Ingresar valores numéricos (0-20)
+- Ingresar valores numéricos (0-10)
 - La nota final se calcula automáticamente: Σ(nota × peso/100)
 - **La nota final solo aparece cuando TODOS los componentes tienen calificación**
 - Guardar → Toast verde "Notas guardadas"
@@ -608,7 +608,7 @@ Muestra el estado de cada sección:
 | 6.4 | Matricular 190 (CSV) | 3 min | LOPDP Art. 21 (bloqueo) |
 | 6.5 | Matricular 10 (manual) | 2 min | LOPDP Art. 21 (bloqueo) |
 | 7 | Abrir período | 1 min | — |
-| 8 | Operación diaria (4-5 meses) | — | LOEI, ADR-006, ADR-007 |
+| 8 | Operación diaria (4-5 meses) | — | LOEI Art. 194 (escala 0-10), ADR-007 |
 | 9 | Privacidad y derechos ARCO | continuo | LOPDP Art. 12-17 |
 | 10 | Cierre de período | 15 min | — |
 

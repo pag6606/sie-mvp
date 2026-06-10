@@ -64,7 +64,7 @@ Antes de ingresar notas, define cómo se calculará la nota final:
 
 1. Ve a **"Ver notas"** en tu sección
 2. Verás una grilla: **estudiante × componente**
-3. Haz clic en cualquier celda, escribe la nota (0-20)
+3. Haz clic en cualquier celda, escribe la nota (0-10)
 4. Presiona **Tab** para pasar al siguiente estudiante
 5. **La nota final se calcula automáticamente** en tiempo real
 6. Si un estudiante no tiene todas las notas, ves **— ⚠**
