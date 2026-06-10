@@ -155,6 +155,13 @@ public class CalificacionesService {
         if (notas.stream().anyMatch(n -> n.notaFinal() == null))
             throw new IllegalStateException("Hay estudiantes sin todas las notas");
 
+        var reprobados = notas.stream()
+                .filter(n -> n.notaFinal() != null && n.notaFinal().compareTo(new BigDecimal("7")) < 0)
+                .toList();
+        if (!reprobados.isEmpty())
+            throw new IllegalStateException(
+                    reprobados.size() + " estudiante(s) no alcanzan la nota mínima de 7.0 (LOEI Art. 194)");
+
         var q = em.createNativeQuery("INSERT INTO cierre_secciones (id, colegio_id, seccion_id, cerrado_por) VALUES (?1,?2,?3,?4)");
         q.setParameter(1, UUID.randomUUID()); q.setParameter(2, colegioId);
         q.setParameter(3, seccionId); q.setParameter(4, cerradoPor);

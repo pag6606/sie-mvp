@@ -60,6 +60,14 @@ export default function NotasPage() {
 
   const componentes = notas[0]?.componentes || []
 
+  const stats = {
+    total: notas.length,
+    completos: notas.filter(n => n.notaFinal != null).length,
+    aprobados: notas.filter(n => n.notaFinal != null && n.notaFinal >= APROBACION).length,
+    reprobados: notas.filter(n => n.notaFinal != null && n.notaFinal < APROBACION).length,
+    pendientes: notas.filter(n => n.notaFinal == null).length,
+  }
+
   const handleCerrar = () => navigate(`/docente/${seccionId}/cerrar`)
 
   if (loading) return <LoadingSkeleton rows={4} />
@@ -114,6 +122,28 @@ export default function NotasPage() {
             </span>
           )}
         </p>
+
+        {stats.total > 0 && (
+          <div className="mb-4 flex flex-wrap gap-3 text-xs">
+            <span className="flex items-center gap-1 rounded-md bg-muted px-2 py-1">
+              <span className="font-medium text-foreground">{stats.total}</span> estudiantes
+            </span>
+            <span className="flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="font-medium text-emerald-700">{stats.aprobados}</span> ≥ 7.0
+            </span>
+            <span className="flex items-center gap-1 rounded-md bg-red-50 px-2 py-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+              <span className="font-medium text-red-700">{stats.reprobados}</span> &lt; 7.0
+            </span>
+            {stats.pendientes > 0 && (
+              <span className="flex items-center gap-1 rounded-md bg-amber-50 px-2 py-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                <span className="font-medium text-amber-700">{stats.pendientes}</span> sin completar
+              </span>
+            )}
+          </div>
+        )}
 
         <div className="overflow-x-auto rounded-lg border bg-card">
           <table className="w-full">
