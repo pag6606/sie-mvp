@@ -111,7 +111,7 @@ export default function NotasPage() {
         </div>
 
         <p className="mb-4 text-xs text-muted-foreground">
-          Escala: 0-10 · Aprobación: {APROBACION}.0 (LOEI Art. 194)
+          Escala: 0-10 · Aprobación: {APROBACION}.0 (LOEI Art. 194) · Período académico completo
           {componentes.length > 0 && (
             <span className="ml-3">
               {componentes.map((c, i) => (
