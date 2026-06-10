@@ -8,9 +8,16 @@ import { ApiError } from '@/types/api'
 
 interface Componente { id?: string; nombre: string; peso: number }
 
+const DEFAULT_COMPONENTES: Componente[] = [
+  { nombre: 'Tareas', peso: 30 },
+  { nombre: 'Participación en clase', peso: 20 },
+  { nombre: 'Evaluación parcial', peso: 25 },
+  { nombre: 'Evaluación final', peso: 25 },
+]
+
 export default function EsquemaEvaluacionPage() {
   const { seccionId } = useParams()
-  const [componentes, setComponentes] = useState<Componente[]>([{ nombre: '', peso: 0 }])
+  const [componentes, setComponentes] = useState<Componente[]>(DEFAULT_COMPONENTES)
   const navigate = useNavigate()
   const suma = componentes.reduce((acc, c) => acc + c.peso, 0)
 
