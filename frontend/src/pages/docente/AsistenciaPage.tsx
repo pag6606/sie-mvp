@@ -14,7 +14,9 @@ interface Estudiante {
 interface AsistenciaResponse {
   estudianteId: string
   porcentaje: number
-  estudianteNombre?: string
+  estudianteNombre: string
+  totalSesiones: number
+  presentes: number
 }
 
 export default function AsistenciaPage() {
@@ -31,7 +33,7 @@ export default function AsistenciaPage() {
         matriculaId: a.estudianteId,
         estudianteId: a.estudianteId,
         porcentaje: a.porcentaje,
-        estudianteNombre: a.estudianteNombre || 'Estudiante',
+        estudianteNombre: a.estudianteNombre,
       }))),
     enabled: !!seccionId,
   })

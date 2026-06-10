@@ -3,6 +3,7 @@ package com.sie.calificaciones.application;
 import com.sie.calificaciones.domain.*;
 import com.sie.academico.domain.Seccion;
 import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.matricula.domain.Matricula;
 import com.sie.matricula.infrastructure.MatriculaRepository;
 import jakarta.persistence.EntityManager;
@@ -24,6 +25,7 @@ public class CalificacionesService {
     private final EntityManager em;
     private final SeccionRepository seccionRepository;
     private final MatriculaRepository matriculaRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Value("${app.evaluacion.max-peso-componente:40}")
     private int maxPesoComponente;
@@ -55,7 +57,7 @@ public class CalificacionesService {
             var asistencias = q.getResultList();
             long presentes = asistencias.stream().filter(a -> a.getEstado() != EstadoAsistencia.AUSENTE).count();
             double pct = asistencias.isEmpty() ? 0 : (double) presentes / asistencias.size() * 100;
-            return new AsistenciaResponse(m.getEstudianteId(), pct, asistencias.size(), (int) presentes);
+            return new AsistenciaResponse(m.getEstudianteId(), nombreEstudiante(m.getEstudianteId()), pct, asistencias.size(), (int) presentes);
         }).toList();
     }
 
@@ -185,6 +187,12 @@ public class CalificacionesService {
                 .toList();
     }
 
+    private String nombreEstudiante(UUID estudianteId) {
+        return usuarioRepository.findById(estudianteId)
+                .map(u -> u.getNombre())
+                .orElse("Estudiante");
+    }
+
     private void congelarEsquema(UUID seccionId) {
         em.createQuery("UPDATE EsquemaEvaluacion e SET e.congelado=true WHERE e.seccionId=?1")
                 .setParameter(1, seccionId).executeUpdate();
@@ -193,7 +201,7 @@ public class CalificacionesService {
     // ── DTOs ──
 
     public record AsistenciaEntry(UUID matriculaId, EstadoAsistencia estado) {}
-    public record AsistenciaResponse(UUID estudianteId, double porcentaje, int totalSesiones, int presentes) {}
+    public record AsistenciaResponse(UUID estudianteId, String estudianteNombre, double porcentaje, int totalSesiones, int presentes) {}
     public record ComponenteEntry(String nombre, BigDecimal peso) { public ComponenteEntry(String n, double p) { this(n, BigDecimal.valueOf(p)); } }
     public record NotaEntry(UUID matriculaId, UUID componenteId, BigDecimal valor) {}
     public record ComponenteNota(UUID componenteId, String nombre, BigDecimal peso, BigDecimal valor) {}
