@@ -9,6 +9,8 @@ interface SeccionDocente {
   id: string
   codigo: string
   capacidad: number
+  cuposOcupados: number
+  cuposDisponibles: number
   horarios?: { diaSemana: string; horaInicio: string; horaFin: string; aula: string }[]
 }
 
@@ -23,23 +25,35 @@ const SeccionCard = memo(function SeccionCard({
   s,
   onNavigate,
 }: {
-  s: { id: string; codigo: string; capacidad: number; horarios?: { diaSemana: string; horaInicio: string; horaFin: string; aula: string }[] }
+  s: SeccionDocente
   onNavigate: (to: string) => void
 }) {
+  const llena = s.cuposDisponibles <= 0
   return (
     <div className="rounded-xl border bg-card p-5">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div className="min-w-0">
-          <h3 className="text-lg font-semibold text-foreground truncate">{s.codigo}</h3>
-          <p className="text-sm text-muted-foreground">
-            {s.horarios?.[0]
-              ? `${s.horarios[0].diaSemana} ${s.horarios[0].horaInicio?.slice(0, 5)}-${s.horarios[0].horaFin?.slice(0, 5)} · ${s.horarios[0].aula}`
-              : 'Sin horario'}
-          </p>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-start justify-between">
+          <div className="min-w-0">
+            <h3 className="text-lg font-semibold text-foreground truncate">{s.codigo}</h3>
+            <p className="text-sm text-muted-foreground">
+              {s.horarios?.[0]
+                ? `${s.horarios[0].diaSemana} ${s.horarios[0].horaInicio?.slice(0, 5)}-${s.horarios[0].horaFin?.slice(0, 5)} · ${s.horarios[0].aula}`
+                : 'Sin horario'}
+            </p>
+          </div>
+          <div className="text-right shrink-0">
+            <p className={`text-2xl font-bold ${llena ? 'text-destructive' : s.cuposDisponibles <= 5 ? 'text-warning' : 'text-success'}`}>
+              {s.cuposOcupados}
+            </p>
+            <p className="text-xs text-muted-foreground">de {s.capacidad} alumnos</p>
+          </div>
         </div>
-        <span className="text-sm text-muted-foreground shrink-0 sm:text-right">
-          {s.capacidad} cupos
-        </span>
+        <div className="w-full rounded-full bg-muted h-2">
+          <div
+            className={`h-2 rounded-full transition-all ${llena ? 'bg-destructive' : s.cuposDisponibles <= 5 ? 'bg-warning' : 'bg-success'}`}
+            style={{ width: `${Math.min(100, (s.cuposOcupados / s.capacidad) * 100)}%` }}
+          />
+        </div>
       </div>
 
       <div className="mt-4 flex flex-col sm:flex-row gap-2">
