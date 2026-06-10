@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ConfirmModal } from '@/components/UIPatterns'
+import { useMe } from '@/hooks/useMe'
 import api from '@/services/api'
 
 interface NavItem {
@@ -43,8 +44,13 @@ export default function AppLayout({ role, children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
+  const { data: me } = useMe()
   const items = NAV_ITEMS[role] || []
-  const user = USER_INFO[role]
+  const user = {
+    initials: me?.nombre?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || USER_INFO[role].initials,
+    name: me?.nombre || USER_INFO[role].name,
+    role: USER_INFO[role].role,
+  }
 
   const handleLogout = () => {
     localStorage.removeItem('token')
