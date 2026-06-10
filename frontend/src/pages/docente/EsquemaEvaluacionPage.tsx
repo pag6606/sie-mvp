@@ -29,6 +29,12 @@ export default function EsquemaEvaluacionPage() {
 
   const handleGuardar = () => {
     if (suma !== 100) { setValidationError('La suma de pesos debe ser 100%'); return }
+    const maxPorComponente = 40
+    const excedido = componentes.find(c => c.peso > maxPorComponente)
+    if (excedido) {
+      setValidationError(`"${excedido.nombre}" excede el límite de ${maxPorComponente}% por componente`)
+      return
+    }
     setValidationError('')
     guardarMutation.mutate()
   }
@@ -38,6 +44,7 @@ export default function EsquemaEvaluacionPage() {
       <div className="p-6 md:p-8">
         <button onClick={() => navigate('/docente')} className="text-sm text-muted-foreground hover:underline mb-4 block">← Mis secciones</button>
         <h2 className="text-xl font-semibold text-foreground mb-6">Esquema de Evaluación</h2>
+        <p className="mb-2 text-xs text-muted-foreground">Cada componente no puede exceder el 40%. La suma total debe ser 100%.</p>
 
         {validationError && (
           <div className="mb-4">

@@ -7,6 +7,7 @@ import com.sie.matricula.domain.Matricula;
 import com.sie.matricula.infrastructure.MatriculaRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,9 @@ public class CalificacionesService {
     private final EntityManager em;
     private final SeccionRepository seccionRepository;
     private final MatriculaRepository matriculaRepository;
+
+    @Value("${app.evaluacion.max-peso-componente:40}")
+    private int maxPesoComponente;
 
     // ── Asistencia ──
 
@@ -69,6 +73,13 @@ public class CalificacionesService {
         var suma = componentes.stream().map(c -> c.peso()).reduce(BigDecimal.ZERO, BigDecimal::add);
         if (suma.compareTo(new BigDecimal("100")) != 0)
             throw new IllegalArgumentException("La suma de pesos debe ser 100%");
+
+        var max = new BigDecimal(maxPesoComponente);
+        for (var c : componentes) {
+            if (c.peso().compareTo(max) > 0)
+                throw new IllegalArgumentException(
+                        "El componente '" + c.nombre() + "' excede el máximo permitido de " + maxPesoComponente + "% por componente");
+        }
 
         EsquemaEvaluacion esquema = existente.orElseGet(() -> {
             var e = new EsquemaEvaluacion(); e.setSeccionId(seccionId); e.setColegioId(colegioId); return e;
