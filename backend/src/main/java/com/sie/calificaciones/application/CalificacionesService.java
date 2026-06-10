@@ -143,7 +143,7 @@ public class CalificacionesService {
                     .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(1, RoundingMode.HALF_UP)
                     : null;
 
-            return new NotaResponse(m.getEstudianteId(), calculada, componentes);
+            return new NotaResponse(m.getEstudianteId(), nombreEstudiante(m.getEstudianteId()), calculada, componentes);
         }).toList();
     }
 
@@ -217,6 +217,6 @@ public class CalificacionesService {
     public record ComponenteEntry(String nombre, BigDecimal peso) { public ComponenteEntry(String n, double p) { this(n, BigDecimal.valueOf(p)); } }
     public record NotaEntry(UUID matriculaId, UUID componenteId, BigDecimal valor) {}
     public record ComponenteNota(UUID componenteId, String nombre, BigDecimal peso, BigDecimal valor) {}
-    public record NotaResponse(UUID estudianteId, BigDecimal notaFinal, List<ComponenteNota> componentes) {}
+    public record NotaResponse(UUID estudianteId, String estudianteNombre, BigDecimal notaFinal, List<ComponenteNota> componentes) {}
     public record CierreStatusResponse(UUID seccionId, String codigo, String curso, String estado) {}
 }
