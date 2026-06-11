@@ -237,7 +237,9 @@
 
 *[Wizard — Paso 2: Clonar secciones]*
 
-> Puede empezar desde cero o clonar la estructura del período anterior — cursos, secciones, horarios, todo.
+> Normalmente, si ya tuvieron un período anterior cerrado, con un clic copian toda la estructura: cursos, secciones, horarios, docentes. Como es la primera vez en el sistema, empezamos desde cero.
+
+*[Click en "Empezar desde cero"]*
 
 *[Click en "Siguiente"]*
 

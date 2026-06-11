@@ -19,12 +19,17 @@ export default function CrearPeriodo() {
   const [nombre, setNombre] = useState('')
   const [fechaInicio, setFechaInicio] = useState('')
   const [fechaFin, setFechaFin] = useState('')
+  const [fechaCierreQ1, setFechaCierreQ1] = useState('')
+  const [fechaCierreQ2, setFechaCierreQ2] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
   const mutation = useMutation({
-    mutationFn: (body: { codigo: string; nombre: string; fechaInicio: string; fechaFin: string }) =>
-      api.post('/periodos', body).then(r => r.data),
+    mutationFn: (body: { codigo: string; nombre: string; fechaInicio: string; fechaFin: string; fechaCierreQ1?: string; fechaCierreQ2?: string }) =>
+      api.post('/periodos', {
+        ...body,
+        pesoQuimestre: 50.0,
+      }).then(r => r.data),
     onSuccess: (data) => {
       navigate(`/admin/periodos/${data.id}/clonar`)
     },
@@ -37,7 +42,7 @@ export default function CrearPeriodo() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    mutation.mutate({ codigo, nombre, fechaInicio, fechaFin })
+    mutation.mutate({ codigo, nombre, fechaInicio, fechaFin, fechaCierreQ1: fechaCierreQ1 || undefined, fechaCierreQ2: fechaCierreQ2 || undefined })
   }
 
   return (
@@ -93,6 +98,28 @@ export default function CrearPeriodo() {
                   onChange={e => setFechaFin(e.target.value)}
                   className="mt-1 block w-full rounded-md border border-input px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   required
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="fechaCierreQ1" className="block text-sm font-medium text-foreground">Cierre Quimestre 1</label>
+                <input
+                  id="fechaCierreQ1"
+                  type="date"
+                  value={fechaCierreQ1}
+                  onChange={e => setFechaCierreQ1(e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-input px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label htmlFor="fechaCierreQ2" className="block text-sm font-medium text-foreground">Cierre Quimestre 2</label>
+                <input
+                  id="fechaCierreQ2"
+                  type="date"
+                  value={fechaCierreQ2}
+                  onChange={e => setFechaCierreQ2(e.target.value)}
+                  className="mt-1 block w-full rounded-md border border-input px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>
