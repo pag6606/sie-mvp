@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIE — Presentación Academia del Pacífico</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0F172A;
+    --teal: #0D9488;
+    --teal-light: #14B8A6;
+    --red: #EF4444;
+    --amber: #F59E0B;
+    --green: #22C55E;
+    --gray-50: #F8FAFC;
+    --gray-100: #F1F5F9;
+    --gray-200: #E2E8F0;
+    --gray-400: #94A3B8;
+    --gray-600: #475569;
+    --gray-800: #1E293B;
+    --white: #FFFFFF;
+    --slide-width: 1060px;
+    --slide-height: 660px;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #0F172A;
+    color: var(--gray-800);
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh;
+  }
+
+  .nav-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(15,23,42,0.95); backdrop-filter: blur(12px);
+    padding: 12px 24px; display: flex; align-items: center; justify-content: center; gap: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .nav-bar button {
+    background: transparent; border: 1px solid rgba(255,255,255,0.15);
+    color: var(--gray-400); padding: 8px 16px; border-radius: 8px;
+    cursor: pointer; font-family: 'Inter', sans-serif; font-size: 13px;
+    transition: all 0.15s;
+  }
+  .nav-bar button:hover { background: rgba(255,255,255,0.08); color: var(--white); border-color: rgba(255,255,255,0.3); }
+  .nav-bar button.active { background: var(--teal); color: white; border-color: var(--teal); }
+  .nav-bar .counter { color: var(--gray-400); font-size: 13px; font-variant-numeric: tabular-nums; min-width: 60px; text-align: center; }
+
+  .slides-container {
+    margin-top: 64px; padding: 24px;
+    display: flex; flex-direction: column; align-items: center; gap: 32px;
+  }
+
+  .slide {
+    width: var(--slide-width); min-height: var(--slide-height);
+    background: var(--white); border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    padding: 64px 72px; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: center;
+    transition: opacity 0.3s; scroll-margin-top: 80px;
+  }
+
+  .slide.hero { background: var(--navy); color: var(--white); }
+  .slide.dark { background: var(--gray-800); color: var(--white); }
+  .slide.accent { background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); color: var(--white); }
+
+  .slide-label {
+    position: absolute; top: 28px; left: 72px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; opacity: 0.5;
+  }
+
+  .slide-number {
+    position: absolute; bottom: 28px; right: 72px;
+    font-size: 11px; opacity: 0.35; font-variant-numeric: tabular-nums;
+  }
+
+  h1 { font-size: 48px; font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 16px; }
+  h2 { font-size: 36px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 12px; }
+  h3 { font-size: 22px; font-weight: 600; line-height: 1.3; margin-bottom: 8px; }
+  .subtitle { font-size: 20px; font-weight: 400; opacity: 0.7; line-height: 1.5; }
+  .big-number { font-size: 96px; font-weight: 900; line-height: 1; letter-spacing: -0.03em; }
+  .highlight { color: var(--teal-light); }
+  .highlight-red { color: var(--red); }
+
+  .kpi-row { display: flex; gap: 20px; margin-top: 24px; }
+  .kpi-card {
+    flex: 1; padding: 24px; border-radius: 12px;
+    text-align: center;
+  }
+  .kpi-red { background: #FEF2F2; border: 1px solid #FECACA; }
+  .kpi-yellow { background: #FFFBEB; border: 1px solid #FDE68A; }
+  .kpi-green { background: #F0FDF4; border: 1px solid #BBF7D0; }
+  .kpi-gray { background: #F8FAFC; border: 1px solid #E2E8F0; }
+  .kpi-red .kpi-val { color: #DC2626; }
+  .kpi-yellow .kpi-val { color: #D97706; }
+  .kpi-green .kpi-val { color: #16A34A; }
+  .kpi-gray .kpi-val { color: #64748B; }
+  .kpi-val { font-size: 42px; font-weight: 800; }
+  .kpi-label { font-size: 13px; font-weight: 500; margin-top: 4px; }
+
+  .student-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 15px; }
+  .student-table th { text-align: left; padding: 10px 14px; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-600); border-bottom: 2px solid var(--gray-200); }
+  .student-table td { padding: 10px 14px; border-bottom: 1px solid var(--gray-100); }
+  .student-table tr.critical { background: #FEF2F2; }
+  .student-table tr.warning { background: #FFFBEB; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  }
+  .badge-red { background: #FEE2E2; color: #DC2626; }
+  .badge-yellow { background: #FEF3C7; color: #D97706; }
+  .badge-green { background: #DCFCE7; color: #16A34A; }
+
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot-red { background: #EF4444; }
+  .dot-yellow { background: #F59E0B; }
+  .dot-green { background: #22C55E; }
+
+  .gauge-container { display: flex; align-items: center; gap: 32px; margin: 16px 0; }
+  .gauge-metrics { display: flex; flex-direction: column; gap: 12px; }
+  .gauge-metric { display: flex; justify-content: space-between; gap: 24px; font-size: 15px; }
+  .gauge-metric .label { color: var(--gray-600); }
+  .gauge-metric .value { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .value-bad { color: var(--red); }
+  .value-warn { color: var(--amber); }
+  .value-good { color: var(--green); }
+
+  .case-cards { display: flex; gap: 20px; margin-top: 20px; }
+  .case-card {
+    flex: 1; padding: 24px; border-radius: 12px;
+    border: 1px solid var(--gray-200);
+  }
+  .case-card h4 { font-size: 17px; margin-bottom: 12px; }
+  .case-card .metric { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid var(--gray-100); }
+  .case-card .metric:last-child { border-bottom: none; }
+  .case-card .metric .val { font-weight: 700; }
+
+  .two-col { display: flex; gap: 48px; align-items: center; }
+  .two-col > * { flex: 1; }
+
+  .section-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+  .section-item {
+    padding: 16px; border-radius: 10px; border: 1px solid var(--gray-200);
+    font-size: 13px; font-weight: 500;
+  }
+
+  .step-flow { display: flex; gap: 0; align-items: center; margin: 24px 0; }
+  .step {
+    flex: 1; text-align: center; padding: 20px 12px;
+    border: 2px solid var(--gray-200); border-radius: 12px;
+    position: relative;
+  }
+  .step-num { font-size: 28px; font-weight: 800; color: var(--teal); margin-bottom: 6px; }
+  .step-label { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .step-time { font-size: 11px; color: var(--gray-400); }
+  .step-arrow { color: var(--teal); font-size: 20px; margin: 0 8px; }
+
+  .quote-box {
+    border-left: 4px solid var(--teal); padding: 16px 24px;
+    background: #F0FDFA; border-radius: 0 8px 8px 0; margin: 16px 0;
+  }
+  .quote-box p { font-size: 17px; font-style: italic; color: var(--gray-800); }
+
+  .closing-question {
+    font-size: 44px; font-weight: 800; line-height: 1.2; text-align: center;
+    margin: 32px 0;
+  }
+  .closing-sub { font-size: 18px; opacity: 0.7; text-align: center; margin-top: 16px; }
+
+  .watermark {
+    position: absolute; bottom: 24px; left: 72px;
+    font-size: 12px; opacity: 0.25;
+  }
+
+  .progress-ring { transform: rotate(-90deg); }
+
+  .mini-chart { margin: 12px 0; display: flex; align-items: flex-end; gap: 4px; height: 80px; }
+  .mini-bar { flex: 1; border-radius: 4px 4px 0 0; transition: height 0.6s ease; }
+  .mini-bar.red { background: var(--red); }
+  .mini-bar.yellow { background: var(--amber); }
+  .mini-bar.green { background: var(--green); }
+  .mini-bar.gray { background: var(--gray-200); }
+
+  @media print {
+    body { background: white; }
+    .nav-bar { display: none; }
+    .slides-container { margin-top: 0; gap: 0; }
+    .slide { box-shadow: none; border-radius: 0; page-break-after: always; min-height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav-bar">
+  <button onclick="goTo(0)" id="nav-0">1</button>
+  <button onclick="goTo(1)" id="nav-1">2</button>
+  <button onclick="goTo(2)" id="nav-2">3</button>
+  <button onclick="goTo(3)" id="nav-3">4</button>
+  <button onclick="goTo(4)" id="nav-4">5</button>
+  <button onclick="goTo(5)" id="nav-5">6</button>
+  <button onclick="goTo(6)" id="nav-6">7</button>
+  <button onclick="goTo(7)" id="nav-7">8</button>
+  <button onclick="goTo(8)" id="nav-8">9</button>
+  <button onclick="goTo(9)" id="nav-9">10</button>
+  <span class="counter" id="counter">1 / 10</span>
+</nav>
+
+<div class="slides-container" id="slides">
+
+<!-- SLIDE 1: Title -->
+<div class="slide hero" id="s0">
+  <div class="slide-label">Academia del Pacífico · 2026</div>
+  <div class="watermark">SIE · Sistema de Información Estudiantil</div>
+  <h1>El estudiante<br>que nadie vio</h1>
+  <p class="subtitle" style="margin-top:12px;">Cómo detectar el riesgo académico<br>antes de que sea demasiado tarde</p>
+  <div style="margin-top:48px;font-size:14px;opacity:0.5;">SIE — Sistema de Información Estudiantil</div>
+  <div class="slide-number">1 / 10</div>
+</div>
+
+<!-- SLIDE 2: The Problem -->
+<div class="slide" id="s1">
+  <div class="slide-label">El problema</div>
+  <div style="display:flex;gap:48px;align-items:center;">
+    <div style="flex:1;">
+      <div class="big-number" style="color:var(--red);">15</div>
+      <p style="font-size:20px;font-weight:600;margin-top:4px;">semanas de silencio</p>
+      <p style="font-size:15px;color:var(--gray-600);margin-top:12px;line-height:1.6;">
+        Un profesor detecta al alumno en riesgo en la semana 15, cuando entrega notas. Para entonces, el estudiante ya está reprobado, los padres están molestos, y el colegio perdió la matrícula del próximo año.
+      </p>
+    </div>
+    <div style="flex:1;text-align:center;">
+      <svg width="260" height="260" viewBox="0 0 260 260">
+        <defs><linearGradient id="blindGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E2E8F0"/><stop offset="100%" stop-color="#94A3B8"/></linearGradient></defs>
+        <circle cx="130" cy="100" r="60" fill="url(#blindGrad)" opacity="0.3"/>
+        <circle cx="110" cy="90" r="16" fill="var(--navy)"/>
+        <circle cx="150" cy="90" r="16" fill="var(--navy)"/>
+        <text x="130" y="135" text-anchor="middle" font-size="13" font-weight="700" fill="var(--gray-600)">Semana 5</text>
+        <line x1="130" y1="170" x2="130" y2="230" stroke="var(--gray-400)" stroke-width="2" stroke-dasharray="8,4"/>
+        <line x1="110" y1="200" x2="110" y2="240" stroke="var(--gray-400)" stroke-width="1.5"/>
+        <text x="130" y="250" text-anchor="middle" font-size="11" fill="var(--gray-400)">Sin visibilidad</text>
+        <circle cx="130" cy="100" r="70" fill="none" stroke="var(--red)" stroke-width="3" opacity="0.3"/>
+        <text x="205" y="95" font-size="11" fill="var(--red)" font-weight="600">?</text>
+      </svg>
+      <p style="font-size:13px;color:var(--gray-400);margin-top:8px;">El profesor no sabe quién está en riesgo</p>
+    </div>
+  </div>
+  <div class="slide-number">2 / 10</div>
+</div>
+
+<!-- SLIDE 3: The Solution -->
+<div class="slide dark" id="s2">
+  <div class="slide-label">La solución</div>
+  <h2 style="margin-bottom:24px;">Alerta Temprana</h2>
+  <p class="subtitle" style="opacity:0.8;">El sistema analiza las notas y asistencias que los profesores YA ingresan y calcula un semáforo por estudiante.</p>
+  <div class="kpi-row" style="margin-top:32px;">
+    <div class="kpi-card kpi-red"><div class="kpi-val">1</div><div class="kpi-label">Riesgo Alto · Intervención HOY</div></div>
+    <div class="kpi-card kpi-yellow"><div class="kpi-val">3</div><div class="kpi-label">En Observación · Monitorear</div></div>
+    <div class="kpi-card kpi-green"><div class="kpi-val">11</div><div class="kpi-label">Trayectoria Estable</div></div>
+  </div>
+  <p style="font-size:14px;opacity:0.5;margin-top:24px;">Datos reales de 8vo-A Matemáticas · 15 estudiantes</p>
+  <div class="slide-number">3 / 10</div>
+</div>
+
+<!-- SLIDE 4: Fernando Castro - Critical -->
+<div class="slide" id="s3">
+  <div class="slide-label">Caso crítico</div>
+  <h2>Fernando Castro</h2>
+  <div style="display:flex;gap:48px;align-items:center;">
+    <div style="text-align:center;">
+      <svg width="200" height="120" viewBox="0 0 200 120">
+        <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="#E2E8F0" stroke-width="16" stroke-linecap="round"/>
+        <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="#EF4444" stroke-width="16" stroke-linecap="round"
+              stroke-dasharray="251.3" stroke-dashoffset="78" class="progress-ring"/>
+        <text x="100" y="108" text-anchor="middle" font-size="52" font-weight="900" fill="#DC2626">69</text>
+        <text x="100" y="128" text-anchor="middle" font-size="13" font-weight="600" fill="#DC2626">RIESGO ALTO</text>
+      </svg>
+      <span class="badge badge-red" style="margin-top:8px;"><span class="dot dot-red"></span> Intervención urgente</span>
+    </div>
+    <div style="flex:1;">
+      <div class="gauge-metrics">
+        <div class="gauge-metric"><span class="label">Proyección de nota</span><span class="value value-bad">1.2 / 10</span></div>
+        <div class="gauge-metric"><span class="label">Asistencia</span><span class="value value-bad">15%</span></div>
+        <div class="gauge-metric"><span class="label">Componentes evaluados</span><span class="value">4 / 4</span></div>
+        <div class="gauge-metric"><span class="label">Q1 cierra en</span><span class="value value-warn">19 días</span></div>
+      </div>
+      <div class="quote-box" style="margin-top:16px;">
+        <p>"Fernando está reprobando. Con el sistema actual, usted se entera en la reunión de fin de quimestre. Con SIE, lo sabe hoy."</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">4 / 10</div>
+</div>
+
+<!-- SLIDE 5: Three Cases -->
+<div class="slide" id="s4">
+  <div class="slide-label">Evidencia</div>
+  <h2>Tres estudiantes. Tres causas distintas.</h2>
+  <p class="subtitle" style="font-size:15px;margin-bottom:12px;">El sistema no solo dice QUIÉN está en riesgo — dice POR QUÉ.</p>
+  <div class="case-cards">
+    <div class="case-card" style="border-left: 4px solid #EF4444;">
+      <h4>🔴 Fernando Castro</h4>
+      <div class="metric"><span>Proyección de nota</span><span class="val" style="color:#DC2626;">1.2 / 10</span></div>
+      <div class="metric"><span>Asistencia</span><span class="val" style="color:#DC2626;">15%</span></div>
+      <div class="metric"><span>Causa</span><span style="font-weight:600;color:#DC2626;">Mal en todo</span></div>
+      <p style="font-size:12px;color:var(--gray-600);margin-top:8px;">Intervención integral urgente. Contactar padres + plan remedial.</p>
+    </div>
+    <div class="case-card" style="border-left: 4px solid #F59E0B;">
+      <h4>🟡 Ricardo Flores</h4>
+      <div class="metric"><span>Proyección de nota</span><span class="val" style="color:#D97706;">6.3 / 10</span></div>
+      <div class="metric"><span>Asistencia</span><span class="val" style="color:#DC2626;">23%</span></div>
+      <div class="metric"><span>Causa</span><span style="font-weight:600;color:#D97706;">No viene a clase</span></div>
+      <p style="font-size:12px;color:var(--gray-600);margin-top:8px;">El chico SABE la materia. Requiere llamada a los padres, no refuerzo académico.</p>
+    </div>
+    <div class="case-card" style="border-left: 4px solid #F59E0B;">
+      <h4>🟡 Daniela Vargas</h4>
+      <div class="metric"><span>Proyección de nota</span><span class="val" style="color:#DC2626;">3.6 / 10</span></div>
+      <div class="metric"><span>Asistencia</span><span class="val" style="color:#16A34A;">85%</span></div>
+      <div class="metric"><span>Causa</span><span style="font-weight:600;color:#D97706;">No entiende la materia</span></div>
+      <p style="font-size:12px;color:var(--gray-600);margin-top:8px;">Viene todos los días pero no comprende. Requiere refuerzo académico.</p>
+    </div>
+  </div>
+  <div class="slide-number">5 / 10</div>
+</div>
+
+<!-- SLIDE 6: Section Dashboard -->
+<div class="slide" id="s5">
+  <div class="slide-label">Dashboard</div>
+  <h2>Riesgo por sección</h2>
+  <p class="subtitle" style="font-size:15px;margin-bottom:16px;">Vista del director — 6 secciones, 90 estudiantes, 1 click de profundidad</p>
+  <table class="student-table">
+    <thead><tr><th>Sección</th><th>Docente</th><th style="text-align:center;">Est.</th><th>Distribución</th></tr></thead>
+    <tbody>
+      <tr><td>8vo-A Matemáticas</td><td>Diana Ramírez</td><td style="text-align:center;">15</td>
+        <td><span class="badge badge-red"><span class="dot dot-red"></span>1</span> <span class="badge badge-yellow"><span class="dot dot-yellow"></span>3</span> <span class="badge badge-green"><span class="dot dot-green"></span>11</span></td></tr>
+      <tr><td>8vo-B Lengua</td><td>Diana Ramírez</td><td style="text-align:center;">15</td>
+        <td><span class="badge badge-red"><span class="dot dot-red"></span>1</span> <span class="badge badge-yellow"><span class="dot dot-yellow"></span>3</span> <span class="badge badge-green"><span class="dot dot-green"></span>11</span></td></tr>
+      <tr><td>9no-A Ciencias</td><td>Diana Ramírez</td><td style="text-align:center;">15</td>
+        <td><span class="badge badge-red"><span class="dot dot-red"></span>1</span> <span class="badge badge-yellow"><span class="dot dot-yellow"></span>4</span> <span class="badge badge-green"><span class="dot dot-green"></span>10</span></td></tr>
+      <tr><td>9no-B Sociales</td><td>Diana Ramírez</td><td style="text-align:center;">15</td>
+        <td><span class="badge badge-red"><span class="dot dot-red"></span>1</span> <span class="badge badge-yellow"><span class="dot dot-yellow"></span>3</span> <span class="badge badge-green"><span class="dot dot-green"></span>11</span></td></tr>
+      <tr><td>10mo-A Inglés</td><td>Diana Ramírez</td><td style="text-align:center;">15</td>
+        <td><span class="badge badge-red"><span class="dot dot-red"></span>1</span> <span class="badge badge-yellow"><span class="dot dot-yellow"></span>4</span> <span class="badge badge-green"><span class="dot dot-green"></span>10</span></td></tr>
+      <tr><td>10mo-B Computación</td><td>Diana Ramírez</td><td style="text-align:center;">15</td>
+        <td><span class="badge badge-red"><span class="dot dot-red"></span>1</span> <span class="badge badge-yellow"><span class="dot dot-yellow"></span>4</span> <span class="badge badge-green"><span class="dot dot-green"></span>10</span></td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:12px;color:var(--gray-400);margin-top:12px;">Click en cualquier sección → drill-down a cada estudiante</p>
+  <div class="slide-number">6 / 10</div>
+</div>
+
+<!-- SLIDE 7: How it works - Wizard -->
+<div class="slide" id="s6">
+  <div class="slide-label">Así se construye</div>
+  <h2>Configuración en 3 minutos</h2>
+  <p class="subtitle" style="font-size:15px;margin-bottom:16px;">La Alerta Temprana no es magia — sale de un sistema que el colegio configura en 4 pasos.</p>
+  <div class="step-flow">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-label">Datos</div>
+      <div class="step-time">Código, nombre, fechas, cierre de quimestres</div>
+    </div>
+    <span class="step-arrow">→</span>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-label">Clonar</div>
+      <div class="step-time">Copiar estructura del período anterior</div>
+    </div>
+    <span class="step-arrow">→</span>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-label">Revisar</div>
+      <div class="step-time">Asignar docentes a cada sección</div>
+    </div>
+    <span class="step-arrow">→</span>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-label">Abrir</div>
+      <div class="step-time">Un clic. Período abierto.</div>
+    </div>
+  </div>
+  <p style="font-size:14px;color:var(--gray-600);margin-top:20px;text-align:center;">Sin código. Sin consultoría. Sin dependencia externa.</p>
+  <div class="slide-number">7 / 10</div>
+</div>
+
+<!-- SLIDE 8: Diana -->
+<div class="slide" id="s7">
+  <div class="slide-label">La profesora</div>
+  <div style="display:flex;gap:48px;align-items:center;">
+    <div style="flex:1;">
+      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#0D9488,#14B8A6);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:16px;">👩‍🏫</div>
+      <h3>Diana Ramírez</h3>
+      <p style="font-size:14px;color:var(--gray-600);">Profesora de Matemáticas<br>6 secciones · 90 estudiantes</p>
+    </div>
+    <div style="flex:1;">
+      <div class="quote-box">
+        <p>"Diana no es científica de datos. No tiene que correr reportes. El sistema le dice: 'estos 3 estudiantes necesitan tu ayuda esta semana'."</p>
+      </div>
+      <div style="margin-top:16px;padding:12px;background:#F8FAFC;border-radius:8px;font-size:13px;color:var(--gray-600);">
+        <strong>🎯</strong> Los profesores son el factor #1 de adopción. Si Diana no usa el sistema, el director no ve valor. La Alerta Temprana aparece automáticamente en su dashboard — sin trabajo extra.
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">8 / 10</div>
+</div>
+
+<!-- SLIDE 9: Live Update -->
+<div class="slide accent" id="s8">
+  <div class="slide-label">En vivo</div>
+  <h2>El sistema respira con el aula</h2>
+  <p class="subtitle" style="opacity:0.85;margin-bottom:24px;">Diana pone una nota → el semáforo se actualiza inmediatamente.</p>
+  <div style="display:flex;gap:32px;align-items:center;">
+    <div style="flex:1;text-align:center;">
+      <div style="background:rgba(255,255,255,0.15);border-radius:16px;padding:24px;">
+        <div style="font-size:14px;opacity:0.7;margin-bottom:8px;">ANTES</div>
+        <div style="font-size:64px;font-weight:900;color:#FCA5A5;">69</div>
+        <div style="font-size:16px;font-weight:600;">Fernando Castro</div>
+        <div style="font-size:13px;opacity:0.7;margin-top:4px;">Riesgo Alto 🔴</div>
+      </div>
+    </div>
+    <div style="font-size:48px;opacity:0.5;">→</div>
+    <div style="flex:1;text-align:center;">
+      <div style="background:rgba(255,255,255,0.15);border-radius:16px;padding:24px;">
+        <div style="font-size:14px;opacity:0.7;margin-bottom:8px;">DESPUÉS</div>
+        <div style="font-size:64px;font-weight:900;color:#FDE68A;">45</div>
+        <div style="font-size:16px;font-weight:600;">Fernando Castro</div>
+        <div style="font-size:13px;opacity:0.7;margin-top:4px;">En Observación 🟡</div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:14px;opacity:0.7;margin-top:20px;text-align:center;">Fernando entregó la tarea atrasada → Diana la calificó → el riesgo bajó. Sin generar reportes.</p>
+  <div class="slide-number">9 / 10</div>
+</div>
+
+<!-- SLIDE 10: Closing -->
+<div class="slide hero" id="s9">
+  <div class="slide-label">Cierre</div>
+  <div class="closing-question">
+    ¿Cuántos<br>Fernandos Castro<br>cree que tiene<br>en su colegio<br><span style="color:var(--red);">ahora mismo</span>?
+  </div>
+  <div class="closing-sub">
+    Sin ser detectados. Sin intervención. Sin tiempo.
+  </div>
+  <div style="margin-top:48px;font-size:14px;opacity:0.5;text-align:center;">
+    SIE — Sistema de Información Estudiantil<br>
+    contacto@sie.edu.ec
+  </div>
+  <div class="slide-number">10 / 10</div>
+</div>
+
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function goTo(n) {
+    current = Math.max(0, Math.min(total - 1, n));
+    slides.forEach((s, i) => {
+      s.style.opacity = i === current ? '1' : '0.3';
+      s.style.transform = i === current ? 'scale(1)' : 'scale(0.97)';
+    });
+    document.querySelectorAll('.nav-bar button').forEach((b, i) => {
+      b.classList.toggle('active', i === current);
+    });
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+    document.getElementById('s' + current).scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
+  });
+
+  // Init
+  goTo(0);
+</script>
+
+</body>
+</html>

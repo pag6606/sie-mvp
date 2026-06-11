@@ -41,6 +41,8 @@ public class AcademicoService {
         Periodo p = new Periodo();
         p.setCodigo(req.codigo()); p.setNombre(req.nombre());
         p.setFechaInicio(req.fechaInicio()); p.setFechaFin(req.fechaFin());
+        p.setFechaCierreQ1(req.fechaCierreQ1()); p.setFechaCierreQ2(req.fechaCierreQ2());
+        p.setPesoQuimestre(req.pesoQuimestre() != null ? req.pesoQuimestre() : new java.math.BigDecimal("50.00"));
         p.setColegioId(colegioId);
         p = periodoRepository.save(p);
         return toResponse(p);
@@ -193,7 +195,7 @@ public class AcademicoService {
     // ── Helpers ──
 
     private PeriodoResponse toResponse(Periodo p) {
-        return new PeriodoResponse(p.getId(), p.getCodigo(), p.getNombre(), p.getFechaInicio(), p.getFechaFin(), p.getEstado());
+        return new PeriodoResponse(p.getId(), p.getCodigo(), p.getNombre(), p.getFechaInicio(), p.getFechaFin(), p.getEstado(), p.getFechaCierreQ1(), p.getFechaCierreQ2(), p.getPesoQuimestre());
     }
 
     private CursoResponse toResponse(Curso c) {

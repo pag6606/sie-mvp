@@ -162,10 +162,10 @@ export default function AdminDashboard() {
         )}
 
         <div className="flex flex-wrap gap-3">
-          {['/admin/cursos', '/admin/secciones', '/admin/usuarios', '/admin/cierres', '/admin/matricula'].map((path, i) => (
+          {['/admin/cursos', '/admin/secciones', '/admin/usuarios', '/admin/cierres', '/admin/matricula', '/admin/alertas'].map((path, i) => (
             <button key={path} onClick={() => navigate(path)}
               className="rounded-md border border-border bg-card px-4 py-2 text-sm text-foreground hover:bg-muted">
-              {['📚 Cursos', '📋 Secciones', '👥 Usuarios', '📊 Cierres', '📝 Matrícula'][i]}
+              {['📚 Cursos', '📋 Secciones', '👥 Usuarios', '📊 Cierres', '📝 Matrícula', '🚨 Alertas'][i]}
             </button>
           ))}
         </div>

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -30,6 +31,15 @@ public class Periodo extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoPeriodo estado = EstadoPeriodo.BORRADOR;
+
+    @Column(name = "fecha_cierre_q1")
+    private LocalDate fechaCierreQ1;
+
+    @Column(name = "fecha_cierre_q2")
+    private LocalDate fechaCierreQ2;
+
+    @Column(name = "peso_quimestre", nullable = false)
+    private BigDecimal pesoQuimestre = new BigDecimal("50.00");
 
     public void abrir() {
         if (estado != EstadoPeriodo.BORRADOR) throw new IllegalStateException("Solo un período en BORRADOR puede abrirse");

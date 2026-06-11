@@ -3,7 +3,17 @@
 > **Objetivo:** Registrar una institución educativa completa desde cero en SIE  
 > **Régimen:** Costa 2026-2027 (mayo 2026 — febrero 2027)  
 > **Perfil:** Admin del colegio realizando la configuración inicial asistido por el sistema  
-> **Última actualización:** 2026-06-08 (consentimiento v0.1.1: `representanteNombre` + `representanteCedula`, roles TITULAR/AUXILIAR/POR_MATERIA, endpoint DELETE docentes)  
+> **Última actualización:** 2026-06-10 — cambios acumulados:
+> - Escala de notas 0-10 (LOEI Art. 194) + rediseño NotasPage con barra de stats
+> - Pre-carga de 4 componentes estándar MINEDUC en esquema de evaluación
+> - `hasEsquema` en `SeccionResponse` + wizard guiado en dashboard docente
+> - Docente ve alumnos matriculados por sección con barra de progreso (`/api/me/secciones`)
+> - Validación de nota mínima 7.0 al cerrar sección (LOEI Art. 194)
+> - Dashboard estudiante con pestañas Horario/Notas + boletín PDF imprimible
+> - Recordatorio de cierre al docente vía email
+> - Endpoints self-service: `/api/me/calificaciones`, `/api/me/asistencia`
+> - `onError` en TODAS las mutaciones del frontend
+> - Sidebar muestra nombre real del docente  
 > **Cuenta admin:** `admin@sie.edu.ec` / `Admin123!!`
 
 ---
@@ -41,7 +51,7 @@ El `application-dev.properties` ya referencia `${JWT_SECRET}` con fallback al va
 
 **Variable `lopdp.enabled`** (consentimiento): `true` delega a LOPDP-EC como fuente canónica; `false` usa la DB local como fuente (modo standalone para dev sin LOPDP corriendo). En producción siempre debe ser `true`.
 
-**Variable `EVALUACION_MAX_PESO_COMPONENTE`** (esquema de evaluación): umbral máximo por componente en el esquema de evaluación (default: `40`). Definido por LOEI + Reglamento de Evaluación — ningún componente (tareas, exámenes, participación) puede exceder este porcentaje del total.
+**Variable `EVALUACION_MAX_PESO_COMPONENTE`** (esquema de evaluación): umbral máximo por componente en el esquema de evaluación (default: `40`). Definido por LOEI + Reglamento de Evaluación — ningún componente (tareas, exámenes, participación) puede exceder este porcentaje del total. El frontend también aplica este límite en el formulario de esquema (`maxPorComponente = 40`).
 
 ### Frontend (Vite)
 
@@ -493,7 +503,9 @@ Docente Dashboard → Sección → "Esquema"
 
 **Límite institucional:** ningún componente puede exceder el 40% (`EVALUACION_MAX_PESO_COMPONENTE`). La suma total debe ser exactamente 100%.
 
-Ejemplo para 1EGB-A (Laura Román):
+#### Componentes pre-cargados por el sistema
+
+Al abrir el esquema por primera vez, el sistema pre-carga 4 componentes estándar del MINEDUC para agilizar la configuración:
 
 | Componente | Peso |
 |-----------|------|
@@ -503,7 +515,25 @@ Ejemplo para 1EGB-A (Laura Román):
 | Evaluación final | 25% |
 | **Total** | **100%** |
 
-> El sistema valida que la suma sea exactamente 100%. Escala de notas: 0-10 (LOEI Art. 194).
+El docente puede agregar, editar o eliminar componentes. El sistema valida que la suma sea exactamente 100% y que ningún componente exceda el 40%.
+
+#### Congelamiento automático del esquema
+
+> ⚠️ **Al ingresar la primera nota**, el esquema se congela automáticamente (`congelado=true`). A partir de ese momento no puede modificarse. Esto garantiza que las notas se calculen siempre con los mismos pesos.
+
+#### Escala de notas: 0-10 (LOEI Art. 194)
+
+La nota mínima de aprobación es **7.0**. La nota final se calcula automáticamente: Σ(nota × peso/100).
+
+Ejemplo para 1EGB-A (Laura Román) — usando los valores pre-cargados:
+
+| Componente | Peso |
+|-----------|------|
+| Tareas | 30% |
+| Participación en clase | 20% |
+| Evaluación parcial | 25% |
+| Evaluación final | 25% |
+| **Total** | **100%** |
 
 ### 8.2 Tomar Asistencia
 
@@ -525,29 +555,91 @@ Docente Dashboard → Sección → "Ver notas"
 ```
 
 - Tabla con estudiantes (filas) × componentes (columnas)
-- Ingresar valores numéricos (0-10)
+- Cada celda muestra el nombre del estudiante y un input numérico (0-10, paso 0.1)
+- Ingresar valores numéricos (0-10, LOEI Art. 194)
 - La nota final se calcula automáticamente: Σ(nota × peso/100)
 - **La nota final solo aparece cuando TODOS los componentes tienen calificación**
+- **Barra de estadísticas** al pie de la tabla: total de estudiantes, aprobados (≥7.0), reprobados (<7.0), sin completar
+- Colores: verde (aprobado), ámbar (≥5.0), rojo (<5.0)
 - Guardar → Toast verde "Notas guardadas"
 
 ### 8.4 Cerrar Sección (paralelo)
 
 ```
-Docente Dashboard → Sección → "Cerrar"
+Docente Dashboard → Sección → "Ver notas" → botón "Cerrar sección (paralelo)"
 ```
 
-- Verificar advertencia: notas definitivas, no modificables, se publican a estudiantes
-- Confirmar cierre
+**Validaciones del sistema al cerrar:**
+
+1. **Todos los estudiantes deben tener notas completas:** Si algún estudiante no tiene calificación en todos los componentes, el sistema rechaza el cierre con: `"Hay estudiantes sin todas las notas"`.
+2. **Nota mínima 7.0 (LOEI Art. 194):** Si algún estudiante tiene nota final menor a 7.0, el sistema rechaza el cierre con: `"X estudiante(s) no alcanzan la nota mínima de 7.0 (LOEI Art. 194)"`. **Todos los estudiantes deben aprobar para que la sección pueda cerrarse.**
+3. Una vez cerrada, las notas son **inmutables** (`cierre_secciones` registra fecha y responsable).
+
+**Pantalla de confirmación:**
+- Advertencia: "Las notas serán definitivas, no podrán modificarse, se publicarán para los estudiantes"
+- Botón rojo: "Cerrar sección (paralelo)"
+- El error del backend se muestra como `InlineError` si el cierre es rechazado
 
 > **ADR-007:** Después del cierre, las notas son inmutables. Cualquier corrección requiere rectificación.
 
+### 8.5 Dashboard Docente — Wizard Guiado
+
+El dashboard del docente (`/docente`) muestra tarjetas por sección asignada (`GET /api/me/secciones`). Cada tarjeta incluye:
+
+- **Nombre de la sección** (ej. `1EGB-A`) y período
+- **Barra de progreso** de cupos (ocupados / capacidad total)
+- **Horario** (si está configurado)
+
+**Flujo guiado por pasos (cuando `hasEsquema = false`):**
+1. ① **Configurar esquema** → botón prominente, pasos ② y ③ en gris
+2. ② **Tomar asistencia** → se habilita tras guardar el esquema
+3. ③ **Ingresar notas** → se habilita tras guardar el esquema
+
+**Cuando `hasEsquema = true`:**
+- Tres botones de acción: "Tomar asistencia", "Ver notas", "Esquema"
+- El botón "Cerrar sección" está dentro de NotasPage
+
 ---
 
-## Fase 9 — Experiencia del Titular de Datos
+## Fase 9 — Experiencia del Estudiante y Titular de Datos
 
-**NUEVO** — Funcionalidades LOPDP disponibles durante todo el ciclo.
+### 9.1 Dashboard del Estudiante
 
-### 9.1 Acceso a Privacidad (todos los roles)
+**Ruta:** `/estudiante`  
+**Endpoints:** `GET /api/me`, `GET /api/me/calificaciones`, `GET /api/me/asistencia`, `GET /api/me/matriculas`
+
+El dashboard del estudiante tiene dos pestañas:
+
+**Pestaña "Horario" (default sin notas):**
+- Muestra las secciones en las que el estudiante está matriculado
+- Cada sección muestra: código, nombre del curso, horario (día, hora inicio, hora fin, aula)
+- Badge con el nombre del curso
+
+**Pestaña "Notas" (default si ya tiene notas):**
+- Por cada sección matriculada:
+  - **Nota final** en un círculo coloreado (verde ≥7.0, rojo <7.0)
+  - Desglose por componente (nombre, peso, valor /10)
+  - **Asistencia** con barra de progreso (porcentaje, presentes/total)
+- Botón **"📄 Descargar boletín PDF"** → navega a `/estudiante/boletin`
+
+> **Nota:** Si la sección aún no ha sido cerrada por el docente, el estudiante no verá calificaciones. Las notas se publican al cerrar la sección.
+
+### 9.2 Boletín Estudiantil PDF
+
+**Ruta:** `/estudiante/boletin`  
+**Endpoints:** `GET /api/me`, `GET /api/me/calificaciones`, `GET /api/me/asistencia`
+
+El boletín es una página diseñada para impresión (`@media print`) que funciona como PDF sin dependencias externas:
+
+- **Encabezado:** Logo institucional SIE + nombre del estudiante
+- **Cinta de resumen:** Promedio general, porcentaje de asistencia, estado (`APROBADO` si ≥7.0, `REPROBADO` si <7.0)
+- **Sección Calificaciones:** Tabla por curso con desglose de componentes (nombre, peso, valor /10) y nota final. Colores: verde ≥7.0, rojo <7.0.
+- **Sección Asistencia:** Barra de progreso con porcentaje, conteo de presentes / total sesiones
+- **Pie de página:** Identificador oficial (`BOL-{uuid}`), fecha de emisión, leyenda "Documento oficial generado por SIE"
+- **Botón "Imprimir / Guardar PDF":** Usa `window.print()` del navegador → guardar como PDF (cero dependencias server-side)
+- **Botón "Volver al panel":** Regresa al dashboard del estudiante
+
+### 9.3 Acceso a Privacidad (todos los roles)
 
 Menú de usuario (sidebar, avatar abajo) → **🛡 Privacidad (LOPDP)**
 
@@ -555,12 +647,12 @@ Menú de usuario (sidebar, avatar abajo) → **🛡 Privacidad (LOPDP)**
 - El usuario puede ver y gestionar sus consentimientos sin volver a autenticarse
 - Token JWT compartido: `iss=sie`, `aud=lopdp`, expira 20 min
 
-### 9.2 Política de Privacidad (público)
+### 9.4 Política de Privacidad (público)
 
 - Visible en el footer del login: "© 2025 SIE · Política de Privacidad"
 - Página completa en `/privacidad` con 8 secciones (responsable, datos, finalidad, base legal, derechos ARCO, conservación, seguridad, contacto DPD)
 
-### 9.3 Panel ARCO (admin)
+### 9.5 Panel ARCO (admin)
 
 - `GET /api/consentimientos/{estudianteId}` — verificar si existe consentimiento
 - `POST /api/consentimientos` — registrar nuevo consentimiento (con `representanteNombre` + `representanteCedula`)
@@ -576,19 +668,27 @@ Menú de usuario (sidebar, avatar abajo) → **🛡 Privacidad (LOPDP)**
 
 ### Dashboard de Cierres
 
+**Ruta:** Dashboard → "📊 Cierres"  
+**Endpoint:** `GET /api/admin/cierres/{periodoId}`
+
 Muestra el estado de cada sección:
 
 | Estado | Significado |
 |--------|------------|
-| PENDIENTE | El docente aún no ha cerrado |
-| LISTA | Todos los componentes evaluados, listo para cerrar |
-| CERRADA | Notas definitivas publicadas |
+| PENDIENTE | El docente aún no ha ingresado todas las notas |
+| LISTA | Todos los componentes evaluados, todas las notas ≥7.0, listo para cerrar |
+| CERRADA | Notas definitivas publicadas, inmutables |
+
+### Acciones por sección
+
+- **Recordar al docente:** Botón "📧 Recordar" → `POST /api/admin/cierres/{seccionId}/recordar`. Envía un email de recordatorio al docente para que cierre su sección. No bloquea si el servicio de email falla.
+- **Cerrar período:** `POST /api/periodos/{id}/cerrar` — cierra administrativamente el período cuando todas las secciones están CERRADA.
 
 ### Paso a paso
 
-1. Revisar que todas las secciones estén CERRADA
-2. Si alguna está PENDIENTE, contactar al docente
-3. Una vez todas cerradas, el período puede cerrarse administrativamente
+1. Revisar que todas las secciones estén LISTA o CERRADA
+2. Si alguna está PENDIENTE, usar **"📧 Recordar"** para notificar al docente
+3. Una vez todas cerradas, el período puede cerrarse administrativamente (`POST /api/periodos/{id}/cerrar`)
 
 ---
 
@@ -608,33 +708,109 @@ Muestra el estado de cada sección:
 | 6.4 | Matricular 190 (CSV) | 3 min | LOPDP Art. 21 (bloqueo) |
 | 6.5 | Matricular 10 (manual) | 2 min | LOPDP Art. 21 (bloqueo) |
 | 7 | Abrir período | 1 min | — |
-| 8 | Operación diaria (4-5 meses) | — | LOEI Art. 194 (escala 0-10), ADR-007 |
-| 9 | Privacidad y derechos ARCO | continuo | LOPDP Art. 12-17 |
-| 10 | Cierre de período | 15 min | — |
+| 8.1 | Configurar esquema de evaluación (componentes pre-cargados) | 2 min | LOEI Art. 194 |
+| 8.2 | Tomar asistencia (diario, 4-5 meses) | 5 min/día | LOEI Art. 194 |
+| 8.3 | Ingresar notas (3 parciales + final, 4-5 meses) | 10 min/sesión | LOEI Art. 194 (escala 0-10) |
+| 8.4 | Cerrar sección (validación: todas notas ≥7.0) | 1 min/sección | LOEI Art. 194, ADR-007 |
+| 8.5 | Dashboard docente — wizard guiado | continuo | — |
+| 9.1 | Dashboard estudiante (Horario + Notas) | continuo | — |
+| 9.2 | Boletín PDF imprimible | instantáneo | — |
+| 9.3-9.5 | Privacidad, política LOPDP, panel ARCO | continuo | LOPDP Art. 12-17 |
+| 10 | Dashboard de cierres + recordatorios | 15 min | — |
 
-**Total en SIE:** ~50 minutos de configuración  
+**Total en SIE:** ~55 minutos de configuración  
 **Total del ciclo:** 1 año lectivo completo
 
 ---
 
-## Nuevos Endpoints SIE (resumen)
+## Nuevos Endpoints SIE (resumen completo)
+
+### Identidad y Usuarios
 
 | Endpoint | Método | Propósito |
 |----------|--------|-----------|
-| `/api/usuarios/batch/crear` | POST | Creación masiva de usuarios (legacy, ≥ 10 elementos) |
-| `/api/usuarios/batch/importar-csv` | POST | Importación masiva desde CSV (UI wizard) |
+| `/api/auth/login` | POST | Login con email/password → JWT |
+| `/api/auth/lopdp-token` | POST | Token JWT para portal LOPDP (iss=sie, aud=lopdp, 20 min) |
+| `/api/auth/activate` | POST | Activar cuenta con token de email |
+| `/api/auth/reset-password` | POST | Solicitar reseteo de contraseña |
+| `/api/auth/reset-password/{token}` | POST | Establecer nueva contraseña |
+| `/api/me` | GET | Perfil del usuario actual (id, email, nombre, roles) |
+| `/api/usuarios/batch/crear` | POST | Creación masiva de usuarios (≥ 10 elementos) |
+| `/api/usuarios/batch/importar-csv` | POST | Importación masiva desde CSV (UI wizard, @Transactional + AFTER_COMMIT) |
 | `/api/usuarios/batch/desactivar` | POST | Desactivación masiva |
 | `/api/usuarios/batch` | DELETE | Eliminación masiva |
+
+### Consentimientos (LOPDP)
+
+| Endpoint | Método | Propósito |
+|----------|--------|-----------|
 | `/api/consentimientos` | GET | Listar todos los consentimientos (con datos del estudiante) |
-| `/api/consentimientos` | POST | Registrar consentimiento parental (con `representanteNombre` + `representanteCedula`) |
-| `/api/consentimientos/{estudianteId}` | GET | Verificar consentimiento |
-| `/api/consentimientos/{estudianteId}/revocar` | POST | Revocar consentimiento |
+| `/api/consentimientos` | POST | Registrar consentimiento parental (`representanteNombre`, `representanteCedula`, `representanteEmail`) |
+| `/api/consentimientos/{estudianteId}` | GET | Verificar si existe consentimiento para un estudiante |
+| `/api/consentimientos/{estudianteId}/revocar` | POST | Revocar consentimiento existente |
+| `/api/consentimientos/{estudianteId}/documento` | POST | Subir archivo de evidencia del consentimiento firmado (multipart) |
+
+### Períodos, Cursos y Secciones
+
+| Endpoint | Método | Propósito |
+|----------|--------|-----------|
+| `/api/periodos` | GET/POST | Listar / Crear período lectivo |
+| `/api/periodos/{id}/abrir` | POST | Abrir período (BORRADOR → ABIERTO) |
+| `/api/periodos/{id}/cerrar` | POST | Cerrar período administrativamente |
+| `/api/periodos/{origenId}/clonar-a/{destinoId}` | POST | Clonar estructura de período (cursos + secciones) |
+| `/api/cursos` | GET/POST | Listar / Crear cursos |
+| `/api/cursos/{id}` | PUT | Editar nombre de curso |
+| `/api/cursos/{id}/desactivar` | POST | Desactivar curso |
+| `/api/secciones` | GET/POST | Listar / Crear secciones (paralelos) |
 | `/api/secciones/{id}/docentes` | POST | Asignar docente a sección (upsert: actualiza rol si ya existe) |
 | `/api/secciones/{seccionId}/docentes/{docenteId}` | DELETE | Remover docente de sección |
-| `/api/auth/lopdp-token` | POST | Token JWT para portal LOPDP |
-| `/api/admin/rat` | GET | Registro de Actividades del Tratamiento |
-| `/api/dashboard/admin` | GET | KPIs agregados cross-context |
-| `/api/notificaciones/stream` | GET | SSE notificaciones en tiempo real |
+| `/api/secciones/{id}/horario` | PUT | Configurar horario de sesiones |
+| `/api/secciones/{id}/horario/ical` | GET | Exportar horario a iCal (.ics) |
+
+### Matrícula
+
+| Endpoint | Método | Propósito |
+|----------|--------|-----------|
+| `/api/matriculas` | POST | Matricular estudiante en sección (con validación de cupos y consentimiento) |
+| `/api/matriculas/importar-csv` | POST | Matrícula masiva desde CSV |
+| `/api/me/matriculas` | GET | Estudiante: ver sus matrículas |
+
+### Calificaciones — Docente
+
+| Endpoint | Método | Propósito |
+|----------|--------|-----------|
+| `/api/me/secciones` | GET | Docente: listar secciones asignadas (con `hasEsquema`, horarios, cupos) |
+| `/api/secciones/{id}/esquema-evaluacion` | PUT | Definir / actualizar esquema de evaluación (componentes + pesos) |
+| `/api/secciones/{id}/asistencia` | GET | Obtener asistencia por rango de fechas |
+| `/api/secciones/{id}/asistencia` | POST | Registrar asistencia (bulk: fecha + lista de entradas) |
+| `/api/secciones/{id}/notas` | GET | Obtener notas de la sección (con nombre del estudiante) |
+| `/api/secciones/{id}/notas` | POST | Ingresar notas (bulk: lista de {matriculaId, componenteId, valor}) |
+| `/api/secciones/{id}/cerrar` | POST | Cerrar sección (validación: todas notas completas + todas ≥7.0) |
+
+### Calificaciones — Estudiante
+
+| Endpoint | Método | Propósito |
+|----------|--------|-----------|
+| `/api/me/calificaciones` | GET | Estudiante: ver sus notas (componentes + nota final) |
+| `/api/me/asistencia` | GET | Estudiante: ver su asistencia (porcentaje + conteo) |
+
+### Cierres y Administración
+
+| Endpoint | Método | Propósito |
+|----------|--------|-----------|
+| `/api/admin/cierres/{periodoId}` | GET | Dashboard de estado de cierres (PENDIENTE/LISTA/CERRADA por sección) |
+| `/api/admin/cierres/{seccionId}/recordar` | POST | Enviar email recordatorio al docente para cerrar sección |
+| `/api/admin/rat` | GET | Registro de Actividades del Tratamiento (LOPDP Art. 10k) |
+| `/api/dashboard/admin` | GET | KPIs agregados cross-context para admin |
+
+### Notificaciones
+
+| Endpoint | Método | Propósito |
+|----------|--------|-----------|
+| `/api/notificaciones` | GET | Listar notificaciones del usuario |
+| `/api/notificaciones/{id}/leida` | POST | Marcar notificación como leída |
+| `/api/notificaciones/stream` | GET | SSE — notificaciones en tiempo real |
+| `/api/notificaciones/push/{usuarioId}` | POST | Enviar notificación push a usuario específico |
 
 ---
 

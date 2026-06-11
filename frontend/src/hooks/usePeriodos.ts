@@ -8,6 +8,9 @@ export interface Periodo {
   fechaInicio: string
   fechaFin: string
   estado: string
+  fechaCierreQ1?: string
+  fechaCierreQ2?: string
+  pesoQuimestre?: number
 }
 
 export function usePeriodos() {

@@ -32,7 +32,7 @@ class AcademicoServiceTest {
     @Test
     void crearPeriodo_exitoso() {
         var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository, esquemaRepository);
-        var req = new CrearPeriodoRequest("2026-2", "Período 2026-2", LocalDate.of(2026, 9, 1), LocalDate.of(2026, 12, 15));
+        var req = new CrearPeriodoRequest("2026-2", "Período 2026-2", LocalDate.of(2026, 9, 1), LocalDate.of(2026, 12, 15), null, null, null);
         when(periodoRepository.existsByCodigo("2026-2")).thenReturn(false);
         when(periodoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -43,7 +43,7 @@ class AcademicoServiceTest {
     @Test
     void crearPeriodo_fechaFinAntesDeInicio_lanzaExcepcion() {
         var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository, esquemaRepository);
-        var req = new CrearPeriodoRequest("2026-2", "P", LocalDate.of(2026, 12, 15), LocalDate.of(2026, 9, 1));
+        var req = new CrearPeriodoRequest("2026-2", "P", LocalDate.of(2026, 12, 15), LocalDate.of(2026, 9, 1), null, null, null);
         assertThrows(IllegalArgumentException.class, () -> svc.crearPeriodo(req, UUID.randomUUID()));
     }
 
@@ -119,7 +119,7 @@ class AcademicoServiceTest {
     @Test
     void crearPeriodo_codigoDuplicado_lanzaExcepcion() {
         var svc = new AcademicoService(periodoRepository, cursoRepository, seccionRepository, matriculaRepository, esquemaRepository);
-        var req = new CrearPeriodoRequest("2026-2", "P", LocalDate.now(), LocalDate.now().plusDays(1));
+        var req = new CrearPeriodoRequest("2026-2", "P", LocalDate.now(), LocalDate.now().plusDays(1), null, null, null);
         when(periodoRepository.existsByCodigo("2026-2")).thenReturn(true);
         assertThrows(IllegalArgumentException.class, () -> svc.crearPeriodo(req, UUID.randomUUID()));
     }

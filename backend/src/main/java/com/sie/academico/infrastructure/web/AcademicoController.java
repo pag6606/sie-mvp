@@ -30,7 +30,8 @@ public class AcademicoController {
             @PageableDefault(size = 10, sort = "fechaInicio", direction = Sort.Direction.DESC) Pageable pageable) {
         return periodoRepository.findAll(pageable)
                 .map(p -> new PeriodoResponse(p.getId(), p.getCodigo(), p.getNombre(),
-                        p.getFechaInicio(), p.getFechaFin(), p.getEstado()));
+                        p.getFechaInicio(), p.getFechaFin(), p.getEstado(),
+                        p.getFechaCierreQ1(), p.getFechaCierreQ2(), p.getPesoQuimestre()));
     }
 
     @PostMapping("/periodos")
