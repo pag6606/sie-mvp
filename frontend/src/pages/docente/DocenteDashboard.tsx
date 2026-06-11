@@ -1,9 +1,11 @@
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api'
 import { LoadingSkeleton, EmptyState } from '@/components/UIPatterns'
 import AppLayout from '@/components/AppLayout'
+import { usePeriodos } from '@/hooks/usePeriodos'
+import { useRiesgoDashboard } from '@/hooks/useRiesgoAcademico'
 
 interface SeccionDocente {
   id: string
@@ -119,7 +121,8 @@ export default function DocenteDashboard() {
   return (
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
-        <h2 className="text-2xl font-bold text-foreground mb-6">Mis Secciones (paralelos)</h2>
+        <AlertaWidget />
+        <h2 className="text-2xl font-bold text-foreground mb-6 mt-6">Mis Secciones (paralelos)</h2>
 
         {secciones.length === 0 ? (
           <EmptyState
@@ -136,5 +139,54 @@ export default function DocenteDashboard() {
         )}
       </div>
     </AppLayout>
+  )
+}
+
+function AlertaWidget() {
+  const navigate = useNavigate()
+  const { data: periodos } = usePeriodos()
+  const periodo = useMemo(() => periodos?.find(p => p.estado === 'EN_CURSO'), [periodos])
+  const { data: dashboard, isLoading } = useRiesgoDashboard(periodo?.id)
+
+  const totales = useMemo(() => {
+    if (!dashboard) return { alto: 0, medio: 0, bajo: 0, total: 0 }
+    let alto = 0, medio = 0, bajo = 0
+    dashboard.forEach(s => { alto += s.enRiesgoAlto; medio += s.enRiesgoMedio; bajo += s.enRiesgoBajo })
+    return { alto, medio, bajo, total: alto + medio + bajo }
+  }, [dashboard])
+
+  if (!periodo || isLoading) return null
+
+  const q1cerrado = periodo.fechaCierreQ1 && new Date(periodo.fechaCierreQ1) < new Date()
+  const diasParaCierre = Math.max(0, Math.ceil(
+    (new Date(q1cerrado ? (periodo.fechaCierreQ2 || periodo.fechaFin) : (periodo.fechaCierreQ1 || periodo.fechaFin)).getTime() - Date.now()
+  ) / 86400000))
+
+  if (totales.total === 0) return null
+
+  return (
+    <div className="rounded-xl border-2 border-red-200 bg-red-50 p-5">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-red-800">
+            {q1cerrado ? 'Q2' : 'Q1'} cierra en {diasParaCierre} días
+          </p>
+          <p className="mt-1 text-lg font-semibold text-red-900">
+            {totales.alto > 0 && `${totales.alto} estudiantes necesitan atención urgente`}
+            {totales.alto === 0 && totales.medio > 0 && `${totales.medio} estudiantes en observación`}
+            {totales.alto === 0 && totales.medio === 0 && 'Todos tus estudiantes van bien 🎉'}
+          </p>
+          <p className="mt-1 text-sm text-red-700">
+            {totales.alto > 0 && `+ ${totales.medio} en observación · ${totales.bajo} estables`}
+          </p>
+        </div>
+        <button
+          onClick={() => navigate('/admin/alertas')}
+          className="shrink-0 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors"
+        >
+          Ver alertas →
+        </button>
+      </div>
+    </div>
   )
 }
