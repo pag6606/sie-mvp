@@ -62,7 +62,6 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
     private final Map<String, UUID> seccionIds = new LinkedHashMap<>();
     private final Map<String, UUID> estudianteIds = new LinkedHashMap<>();
     private UUID periodoId;
-    private UUID periodoDemoId;
     private UUID docenteId;
 
     @Override
@@ -83,7 +82,7 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         createEsquemasYNotas();
         createAsistencias();
 
-        log.info("DemoRiskDataSeeder: COMPLETADO. {} cursos, {} secciones, {} estudiantes. 2 períodos (EN_CURSO + BORRADOR).",
+        log.info("DemoRiskDataSeeder: COMPLETADO. {} cursos, {} secciones, {} estudiantes.",
                 CURSO_NOMBRES.length, seccionIds.size(), estudianteIds.size());
     }
 
@@ -93,35 +92,20 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         return count > 0;
     }
 
-    // ── PERIODOS (2: uno EN_CURSO para alertas, uno BORRADOR para wizard demo) ──
+    // ── PERIODO (EN_CURSO para alimentar Alerta Temprana) ──
     private void createPeriodo() {
-        // Período en curso — alimenta la Alerta Temprana
-        Periodo p1 = new Periodo();
-        p1.setColegioId(COLEGIO_ID);
-        p1.setCodigo("COSTA-2026");
-        p1.setNombre("Régimen Costa 2026-2027");
-        p1.setFechaInicio(LocalDate.of(2026, 5, 4));
-        p1.setFechaFin(LocalDate.of(2027, 2, 26));
-        p1.setFechaCierreQ1(LocalDate.of(2026, 6, 30));
-        p1.setFechaCierreQ2(LocalDate.of(2027, 2, 26));
-        p1.setPesoQuimestre(new BigDecimal("50.00"));
-        p1.setEstado(EstadoPeriodo.EN_CURSO);
-        em.persist(p1);
-        periodoId = p1.getId();
-
-        // Período en borrador — listo para el wizard de demo manual
-        Periodo p2 = new Periodo();
-        p2.setColegioId(COLEGIO_ID);
-        p2.setCodigo("DEMO-MANUAL");
-        p2.setNombre("Demostración — Configuración Manual");
-        p2.setFechaInicio(LocalDate.of(2026, 9, 1));
-        p2.setFechaFin(LocalDate.of(2027, 6, 30));
-        p2.setFechaCierreQ1(LocalDate.of(2026, 12, 15));
-        p2.setFechaCierreQ2(LocalDate.of(2027, 6, 30));
-        p2.setPesoQuimestre(new BigDecimal("50.00"));
-        p2.setEstado(EstadoPeriodo.BORRADOR);
-        em.persist(p2);
-        periodoDemoId = p2.getId();
+        Periodo p = new Periodo();
+        p.setColegioId(COLEGIO_ID);
+        p.setCodigo("COSTA-2026");
+        p.setNombre("Régimen Costa 2026-2027");
+        p.setFechaInicio(LocalDate.of(2026, 5, 4));
+        p.setFechaFin(LocalDate.of(2027, 2, 26));
+        p.setFechaCierreQ1(LocalDate.of(2026, 6, 30));
+        p.setFechaCierreQ2(LocalDate.of(2027, 2, 26));
+        p.setPesoQuimestre(new BigDecimal("50.00"));
+        p.setEstado(EstadoPeriodo.EN_CURSO);
+        em.persist(p);
+        periodoId = p.getId();
     }
 
     // ── CURSOS ──

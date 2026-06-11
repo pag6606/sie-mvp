@@ -212,13 +212,26 @@
 
 > Ahora, ¿de dónde salen estos datos? ¿Cómo se configura esto?
 
-> *(navegar al AdminDashboard → click en "Configurar nuevo período")*
+*[Navegar al AdminDashboard — como no hay ningún período en BORRADOR, el botón dice "Configurar nuevo período"]*
 
-> El sistema ya detectó que hay un período en borrador listo para configurar.
+*[Click en "Configurar nuevo período"]*
 
 *[Wizard — Paso 1: Datos del período]*
 
-> Alma, la administradora, llena 4 campos: código, nombre, fechas. También las fechas de cierre de cada quimestre — que son las que usa la Alerta Temprana para calcular la urgencia.
+**PRESENTADOR:**
+
+> Alma crea un nuevo período. 4 campos: código, nombre, fechas de inicio y fin. También las fechas de cierre de cada quimestre — que son las que usa la Alerta Temprana para calcular la urgencia.
+
+*[Llenar el formulario con datos de ejemplo]*
+
+- Código: `2027-COSTA`
+- Nombre: `Régimen Costa 2027`
+- Fecha inicio: `2027-05-03`
+- Fecha fin: `2028-02-25`
+- Cierre Q1: `2027-09-30`
+- Cierre Q2: `2028-02-25`
+
+*[Click en "Crear período"]*
 
 *[Click en "Siguiente"]*
 
