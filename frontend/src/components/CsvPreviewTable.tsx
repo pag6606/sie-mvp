@@ -22,7 +22,7 @@ interface CsvPreviewTableProps {
 }
 
 type Filtro = 'todas' | 'validas' | 'invalidas'
-type Campo = 'email' | 'nombre' | 'roles'
+type Campo = 'email' | 'nombre' | 'roles' | 'dateOfBirth'
 type CeldaEditando = { fila: number; campo: Campo } | null
 
 export default function CsvPreviewTable({
@@ -239,6 +239,7 @@ export default function CsvPreviewTable({
               <th className="px-3 py-2">Email</th>
               <th className="px-3 py-2">Nombre</th>
               <th className="px-3 py-2 w-40">Rol</th>
+              <th className="px-3 py-2 w-28">F. Nacimiento</th>
               <th className="px-3 py-2 w-16">Estado</th>
               <th className="px-3 py-2">Detalle</th>
             </tr>
@@ -345,6 +346,9 @@ export default function CsvPreviewTable({
                     ) : (
                       <span className="block px-2 py-1 text-sm">{fila.roles || <span className="italic text-muted-foreground">—</span>}</span>
                     )}
+                  </td>
+                  <td className="px-3 py-2 text-sm text-muted-foreground">
+                    {fila.dateOfBirth || <span className="italic">—</span>}
                   </td>
                   <td className="px-3 py-2">
                     {esValida ? (

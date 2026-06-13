@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import { useUsuarios } from '@/hooks/useUsuarios'
 import { InlineError, LoadingSkeleton } from '@/components/UIPatterns'
 import { capitalizeWords } from '@/utils/text'
@@ -94,20 +95,18 @@ export default function ConsentimientosPage() {
   return (
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Consentimientos parentales</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              LOPDP Art. 21, 25 — Consentimiento del representante legal para tratamiento de datos de NNA
-            </p>
-          </div>
+        <PageHead
+          eyebrow="Cumplimiento"
+          title="Consentimientos parentales"
+          subtitle="LOPDP Art. 21, 25 — Consentimiento del representante legal para tratamiento de datos de NNA"
+        >
           <button
             onClick={() => setShowForm(!showForm)}
-            className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"
+            className="bg-[#8A6A18] text-white px-4 py-2 font-mono text-[0.7rem] font-bold uppercase tracking-[0.18em] hover:bg-[#0A0A0B] transition-colors mt-4"
           >
             + Registrar consentimiento
           </button>
-        </div>
+        </PageHead>
 
         <div className="mb-4 flex gap-2">
           <button

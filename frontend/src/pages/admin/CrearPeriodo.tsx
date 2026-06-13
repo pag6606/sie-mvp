@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import ProgressBar from '@/components/ProgressBar'
 import { InlineError } from '@/components/UIPatterns'
 import { ApiError } from '@/types/api'
@@ -51,7 +52,7 @@ export default function CrearPeriodo() {
         <ProgressBar steps={STEPS} current={0} />
 
         <div className="rounded-lg border bg-card p-8">
-          <h2 className="mb-6 text-xl font-semibold text-foreground">Crear período</h2>
+          <PageHead eyebrow="Wizard" title="Crear período" subtitle="Define el código, nombre y fechas del nuevo período académico." />
 
           {error && <InlineError message={error} />}
 

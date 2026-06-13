@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import { InlineError } from '@/components/UIPatterns'
 import { ApiError } from '@/types/api'
 
@@ -43,7 +44,7 @@ export default function ImportarCSV() {
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-foreground">Importar matrícula</h2>
+          <PageHead eyebrow="Matrícula" title="Importar matrícula" subtitle="Importa matrículas masivas desde un archivo CSV." />
           <button onClick={() => navigate('/admin/matricula')} className="text-sm text-muted-foreground hover:underline">← Matrícula</button>
         </div>
 

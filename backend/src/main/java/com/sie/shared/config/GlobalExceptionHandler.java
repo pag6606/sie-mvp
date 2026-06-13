@@ -1,6 +1,7 @@
 package com.sie.shared.config;
 
 import com.sie.identidad.application.exception.BatchImportException;
+import com.sie.lopdp.LopdpUnavailableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,16 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(LopdpUnavailableException.class)
+    public ResponseEntity<Map<String, Object>> handleLopdpUnavailable(LopdpUnavailableException ex) {
+        log.warn("LOPDP service unavailable: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
+                "codigo", "LOPDP_UNAVAILABLE",
+                "mensaje", "El servicio de cumplimiento LOPDP no está disponible en este momento. Sus datos se han guardado localmente y se sincronizarán cuando el servicio se restablezca.",
+                "timestamp", LocalDateTime.now().toString()
+        ));
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {

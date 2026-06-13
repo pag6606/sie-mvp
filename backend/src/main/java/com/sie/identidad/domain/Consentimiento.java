@@ -48,6 +48,9 @@ public class Consentimiento extends BaseEntity {
     @Column(length = 20)
     private String fuente = "SIE_LOCAL";
 
+    @Column(name = "enrollment_ref", length = 36)
+    private String enrollmentRef;
+
     public void revocar() {
         this.aceptado = false;
         this.fechaRevocacion = LocalDateTime.now();

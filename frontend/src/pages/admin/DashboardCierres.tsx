@@ -2,6 +2,7 @@ import { memo, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import { usePeriodos } from '@/hooks/usePeriodos'
 import { LoadingSkeleton } from '@/components/UIPatterns'
 
@@ -48,7 +49,7 @@ export default function DashboardCierres() {
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-foreground">Dashboard de Cierres</h2>
+          <PageHead eyebrow="Académico" title="Dashboard de Cierres" subtitle="Monitorea el estado de cierre de todas las secciones." />
           <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
         </div>
         <select value={selectedPeriodo} onChange={e => { setSelectedPeriodo(e.target.value); loadCierres(e.target.value) }} className="mb-6 rounded-md border border-input px-4 py-2 text-sm">

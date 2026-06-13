@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import { useUsuariosPaginados } from '@/hooks/useUsuarios'
 import Pagination from '@/components/Pagination'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
@@ -19,6 +20,7 @@ export default function UsuariosPage() {
   const [formEmail, setFormEmail] = useState('')
   const [formNombre, setFormNombre] = useState('')
   const [formRoles, setFormRoles] = useState<string[]>([])
+  const [formDateOfBirth, setFormDateOfBirth] = useState('')
   const [formError, setFormError] = useState('')
   const [formSaving, setFormSaving] = useState(false)
   const navigate = useNavigate()
@@ -36,9 +38,14 @@ export default function UsuariosPage() {
     }
     setFormSaving(true)
     try {
-      await api.post('/usuarios', { email: formEmail, nombre: capitalizeWords(formNombre), roles: formRoles })
+      await api.post('/usuarios', {
+        email: formEmail,
+        nombre: capitalizeWords(formNombre),
+        roles: formRoles,
+        dateOfBirth: formDateOfBirth || null
+      })
       setShowForm(false)
-      setFormEmail(''); setFormNombre(''); setFormRoles([])
+      setFormEmail(''); setFormNombre(''); setFormRoles([]); setFormDateOfBirth('')
       queryClient.invalidateQueries({ queryKey: ['usuarios'] })
     } catch (err: unknown) {
       const apiErr = err as ApiError
@@ -55,18 +62,14 @@ export default function UsuariosPage() {
   return (
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-foreground">Gestión de Usuarios</h2>
-          <div className="flex gap-2">
+        <PageHead eyebrow="Administración" title="Gestión de Usuarios" subtitle="Crea, importa y administra los usuarios del sistema.">
+          <div className="flex gap-2 mt-4">
             <button onClick={() => setShowForm(!showForm)}
-              className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90">+ Nuevo usuario</button>
+              className="bg-[#8A6A18] text-white px-4 py-2 font-mono text-[0.7rem] font-bold uppercase tracking-[0.18em] hover:bg-[#0A0A0B] transition-colors">+ Nuevo usuario</button>
             <button onClick={() => navigate('/admin/usuarios/importar')}
-              className="rounded-md border border-primary px-4 py-2 text-sm text-primary hover:bg-primary/5">
-              📥 Importar CSV
-            </button>
-            <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
+              className="border border-[#8A6A18] text-[#8A6A18] px-4 py-2 font-mono text-[0.7rem] font-bold uppercase tracking-[0.18em] hover:bg-[#8A6A18] hover:text-white transition-colors">📥 Importar CSV</button>
           </div>
-        </div>
+        </PageHead>
 
         {showForm && (
           <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-6">
@@ -84,6 +87,14 @@ export default function UsuariosPage() {
                   <input id="formNombreUsuario" value={formNombre} onChange={e => setFormNombre(e.target.value)} required
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
                 </div>
+              </div>
+              <div>
+                <label htmlFor="formDateOfBirth" className="block text-xs font-medium text-muted-foreground">
+                  Fecha de nacimiento <span className="text-muted-foreground/50">(opcional)</span>
+                </label>
+                <input id="formDateOfBirth" type="date" value={formDateOfBirth}
+                  onChange={e => setFormDateOfBirth(e.target.value)}
+                  className="mt-1 block w-full max-w-xs rounded-md border border-input px-3 py-2 text-sm" />
               </div>
               <div>
                 <p className="block text-xs font-medium text-muted-foreground mb-2">Roles</p>

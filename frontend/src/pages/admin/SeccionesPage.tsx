@@ -1,6 +1,7 @@
 import { memo, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import { usePeriodos } from '@/hooks/usePeriodos'
 import { useSeccionesPaginadas } from '@/hooks/useSecciones'
 import Pagination from '@/components/Pagination'
@@ -45,7 +46,7 @@ export default function SeccionesPage() {
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-foreground">Secciones (paralelos)</h2>
+          <PageHead eyebrow="Académico" title="Secciones" subtitle="Administra los paralelos de cada curso en el período activo." />
           <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
         </div>
 

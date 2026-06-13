@@ -1,29 +1,69 @@
-import { useState, type ReactNode } from 'react'
+import { useState, type ReactNode, type FC } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ConfirmModal } from '@/components/UIPatterns'
+import { Icons } from '@/components/ghanima'
 import { useMe } from '@/hooks/useMe'
 import api from '@/services/api'
 
+interface IconProps { className?: string }
+
 interface NavItem {
   label: string
-  icon: string
+  Icon: FC<IconProps>
   href: string
 }
 
-const NAV_ITEMS: Record<string, NavItem[]> = {
+interface NavSection {
+  label?: string
+  items: NavItem[]
+}
+
+const NAV_ITEMS: Record<string, NavSection[]> = {
   admin: [
-    { label: 'Dashboard', icon: '◫', href: '/admin' },
-    { label: 'Usuarios', icon: '👥', href: '/admin/usuarios' },
-    { label: 'Cursos', icon: '📘', href: '/admin/cursos' },
-    { label: 'Secciones (paralelos)', icon: '📚', href: '/admin/secciones' },
-    { label: 'Matrícula', icon: '📋', href: '/admin/matricula' },
-    { label: 'Consentimientos', icon: '🛡', href: '/admin/consentimientos' },
+    {
+      label: 'Operación',
+      items: [
+        { label: 'Dashboard', Icon: Icons.Grid, href: '/admin' },
+        { label: 'Usuarios', Icon: Icons.Users, href: '/admin/usuarios' },
+        { label: 'Cursos', Icon: Icons.Book, href: '/admin/cursos' },
+        { label: 'Secciones', Icon: Icons.Layers, href: '/admin/secciones' },
+        { label: 'Matrícula', Icon: Icons.Clipboard, href: '/admin/matricula' },
+        { label: 'Consentimientos', Icon: Icons.Shield, href: '/admin/consentimientos' },
+      ]
+    },
+    {
+      label: 'Sistema',
+      items: [
+        { label: 'Cierres', Icon: Icons.Check, href: '/admin/cierres' },
+        { label: 'Alertas', Icon: Icons.Alert, href: '/admin/alertas' },
+      ]
+    },
   ],
   docente: [
-    { label: 'Mis Secciones (paralelos)', icon: '📖', href: '/docente' },
+    {
+      label: 'Mi docencia',
+      items: [
+        { label: 'Mis secciones', Icon: Icons.Book, href: '/docente' },
+      ]
+    },
+    {
+      label: 'Acciones',
+      items: [
+        { label: 'Asistencia', Icon: Icons.Check, href: '/docente/asistencia' },
+        { label: 'Esquema evaluación', Icon: Icons.List, href: '/docente/esquema' },
+        { label: 'Ingresar notas', Icon: Icons.Edit, href: '/docente/notas' },
+        { label: 'Cerrar sección', Icon: Icons.X, href: '/docente/cerrar' },
+      ]
+    },
   ],
   estudiante: [
-    { label: 'Mi Panel', icon: '🎓', href: '/estudiante' },
+    {
+      label: 'Mi panel',
+      items: [
+        { label: 'Mi panel', Icon: Icons.Home, href: '/estudiante' },
+        { label: 'Mi boletín', Icon: Icons.Doc, href: '/estudiante/boletin' },
+      ]
+    },
   ],
 }
 
@@ -45,9 +85,9 @@ export default function AppLayout({ role, children }: AppLayoutProps) {
   const location = useLocation()
   const navigate = useNavigate()
   const { data: me } = useMe()
-  const items = NAV_ITEMS[role] || []
+  const sections = NAV_ITEMS[role] || []
   const user = {
-    initials: me?.nombre?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || USER_INFO[role].initials,
+    initials: me?.nombre?.split(' ').filter(w => w.length > 1).map(w => w[0]).join('').slice(0, 2).toUpperCase() || USER_INFO[role].initials,
     name: me?.nombre || USER_INFO[role].name,
     role: USER_INFO[role].role,
   }
@@ -67,53 +107,70 @@ export default function AppLayout({ role, children }: AppLayoutProps) {
     }
   }
 
+  const avatarBg = role === 'docente' ? '#16724F' : role === 'estudiante' ? '#A8420A' : '#8A6A18'
+
   const sidebar = (
-    <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-card">
-      <div className="flex h-14 items-center gap-2.5 border-b border-border px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <span className="text-xs font-bold text-primary-foreground">SIE</span>
+    <aside className="flex w-[248px] shrink-0 flex-col border-r border-[rgba(10,10,11,0.1)] bg-white">
+      {/* Brand */}
+      <div className="flex items-center gap-2.5 border-b border-[rgba(10,10,11,0.1)] px-4 py-[1.1rem]">
+        <div className="flex h-[34px] w-[34px] items-center justify-center border border-[rgba(138,106,24,0.32)] text-[#8A6A18]">
+          <Icons.Lotus size={22} />
         </div>
-        <span className="text-sm font-semibold text-foreground">SIE</span>
+        <div className="flex flex-col leading-tight">
+          <span className="font-serif text-[1.1rem] font-medium text-[#0A0A0B] tracking-[-0.01em]">SIE</span>
+          <span className="font-mono text-[0.58rem] uppercase tracking-[0.22em] text-[rgba(10,10,11,0.48)] mt-0.5">{role === 'docente' ? 'Docente' : role === 'estudiante' ? 'Estudiante' : 'Ghanima Core'}</span>
+        </div>
       </div>
 
-      <nav className="flex-1 space-y-0.5 overflow-y-auto p-3" aria-label="Navegación principal">
-        {items.map(item => {
-          const active = location.pathname === item.href ||
-            (item.href !== `/${role}` && location.pathname.startsWith(item.href))
-          return (
-            <Link
-              key={item.href}
-              to={item.href}
-              onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-                active
-                  ? 'bg-accent text-accent-foreground font-medium'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              }`}
-              aria-current={active ? 'page' : undefined}
-            >
-              <span aria-hidden="true" className="text-base">{item.icon}</span>
-              {item.label}
-            </Link>
-          )
-        })}
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto py-3 px-2.5" aria-label="Navegación principal">
+        {sections.map((section, si) => (
+          <div key={si} className="mb-5">
+            {section.label && (
+              <div className="font-mono text-[0.6rem] uppercase tracking-[0.22em] text-[rgba(10,10,11,0.48)] font-semibold px-3.5 pb-2">
+                {section.label}
+              </div>
+            )}
+            {section.items.map(item => {
+              const active = location.pathname === item.href ||
+                (item.href !== `/${role}` && location.pathname.startsWith(item.href.replace(/\/$/, '')))
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex items-center gap-2.5 py-2 px-3.5 text-[0.86rem] border-l-2 transition-colors ${
+                    active
+                      ? 'text-[#8A6A18] bg-[rgba(138,106,24,0.08)] border-l-[#8A6A18] font-medium'
+                      : 'text-[rgba(10,10,11,0.72)] border-l-transparent hover:text-[#0A0A0B] hover:bg-[#F6F8FA]'
+                  }`}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  <item.Icon className="w-[18px] h-[18px] shrink-0" aria-hidden="true" />
+                  {item.label}
+                </Link>
+              )
+            })}
+          </div>
+        ))}
       </nav>
 
-      <div className="relative border-t border-border p-2">
+      {/* User card */}
+      <div className="relative border-t border-[rgba(10,10,11,0.1)] p-3">
         <button
           onClick={() => setUserMenuOpen(!userMenuOpen)}
-          className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left transition-colors hover:bg-muted"
+          className="flex w-full items-center gap-2.5 py-2 text-left transition-colors"
           aria-expanded={userMenuOpen}
           aria-haspopup="menu"
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary">
-            <span className="text-xs font-semibold text-primary-foreground">{user.initials}</span>
+          <div className="flex h-[34px] w-[34px] shrink-0 items-center justify-center text-[#EEF1F4] font-serif text-[0.95rem] font-medium" style={{ backgroundColor: avatarBg }}>
+            {user.initials}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-semibold text-foreground">{user.name}</p>
-            <p className="truncate text-xs text-muted-foreground">{user.role}</p>
+            <p className="truncate text-[0.84rem] font-medium text-[#0A0A0B] leading-tight">{user.name}</p>
+            <p className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-[rgba(10,10,11,0.48)] mt-0.5">{user.role}</p>
           </div>
-          <span className="text-xs text-muted-foreground" aria-hidden="true">▾</span>
+          <span className="text-[0.7rem] text-[rgba(10,10,11,0.48)]">▾</span>
         </button>
 
         {userMenuOpen && (
@@ -129,7 +186,7 @@ export default function AppLayout({ role, children }: AppLayoutProps) {
                 className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-foreground transition-colors hover:bg-muted"
                 role="menuitem"
               >
-                <span aria-hidden="true">🛡</span>
+                <Icons.Shield className="w-4 h-4" aria-hidden="true" />
                 Privacidad (LOPDP)
               </button>
               <button
@@ -137,7 +194,7 @@ export default function AppLayout({ role, children }: AppLayoutProps) {
                 className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-destructive transition-colors hover:bg-destructive/10 font-medium"
                 role="menuitem"
               >
-                <span aria-hidden="true">⏻</span>
+                <Icons.X className="w-4 h-4" aria-hidden="true" />
                 Cerrar sesión
               </button>
             </div>

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead, Icons } from '@/components/ghanima'
 import { usePeriodos } from '@/hooks/usePeriodos'
 import { useSecciones } from '@/hooks/useSecciones'
 import { useUsuarios } from '@/hooks/useUsuarios'
@@ -67,7 +68,7 @@ export default function MatriculaPage() {
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-foreground">Matrícula</h2>
+          <PageHead eyebrow="Gestión" title="Matrícula" subtitle="Matricula estudiantes en las secciones del período activo." />
           <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
         </div>
 
@@ -81,7 +82,7 @@ export default function MatriculaPage() {
             + Matricular estudiante
           </button>
           <button onClick={() => navigate('/admin/matricula/importar')} className="rounded-md border border-primary px-4 py-2 text-sm text-primary hover:bg-blue-50">
-            <span aria-hidden="true">📁</span> Importar CSV
+            <Icons.Doc className="w-4 h-4 inline" aria-hidden="true" /> Importar CSV
           </button>
         </div>
 

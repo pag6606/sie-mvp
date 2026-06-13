@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import { ApiError } from '@/types/api'
 
 interface ComponenteNota { componenteId: string; nombre: string; peso: number; valor: number | null }
@@ -105,7 +106,7 @@ export default function NotasPage() {
         )}
 
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground">Notas — {seccionCodigo}</h2>
+          <PageHead eyebrow="Docente" title={`Notas — ${seccionCodigo}`} className="mb-0" />
           <div className="flex gap-2">
             <button onClick={handleGuardar} disabled={guardarMutation.isPending || Object.keys(editing).length === 0}
               className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50">

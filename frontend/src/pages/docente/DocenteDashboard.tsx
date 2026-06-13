@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api'
 import { LoadingSkeleton, EmptyState } from '@/components/UIPatterns'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import { usePeriodos } from '@/hooks/usePeriodos'
 import { useRiesgoDashboard } from '@/hooks/useRiesgoAcademico'
 
@@ -122,7 +123,7 @@ export default function DocenteDashboard() {
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
         <AlertaWidget />
-        <h2 className="text-2xl font-bold text-foreground mb-6 mt-6">Mis Secciones (paralelos)</h2>
+        <PageHead eyebrow="Docente" title="Mis Secciones" subtitle="Paralelos asignados para el período actual." />
 
         {secciones.length === 0 ? (
           <EmptyState

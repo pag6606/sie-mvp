@@ -78,6 +78,10 @@ public class MatriculaService {
                 var usuario = usuarioRepository.findByEmail(email).orElse(null);
                 if (usuario == null) { result.errores.add(new ErrorLinea(result.total, "Estudiante no encontrado: " + email)); result.total++; return; }
 
+                if (!consentimientoService.existeConsentimiento(usuario.getId())) {
+                    result.errores.add(new ErrorLinea(result.total, "Sin consentimiento parental registrado (LOPDP Art. 21): " + email)); result.total++; return;
+                }
+
                 var secciones = seccionRepository.findAll().stream()
                         .filter(s -> s.getCodigo().equals(codigoSeccion)).findFirst().orElse(null);
                 if (secciones == null) { result.errores.add(new ErrorLinea(result.total, "Sección no encontrada: " + codigoSeccion)); result.total++; return; }

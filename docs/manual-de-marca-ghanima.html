@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Ghanima Core AI · Manual de Marca y Design System v1.0">
+<title>Ghanima · Manual de Marca & Design System</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* =================================================================
+   GHANIMA · MANUAL DE MARCA & DESIGN SYSTEM v1.0
+   Editorial Tech Mystique — tokens extraídos de producción
+   ================================================================= */
+:root {
+  --ink: #0A0A0B; --ink-2: #131316; --ink-3: #1C1C20;
+  --bone: #F4F1E8; --bone-2: #E8E3D3;
+  --bone-3: rgba(244,241,232,0.7); --bone-4: rgba(244,241,232,0.45);
+  --gold: #D4AF37; --gold-bright: #E5C158; --gold-deep: #9C7F22;
+  --gold-faint: rgba(212,175,55,0.18); --gold-line: rgba(212,175,55,0.32);
+  --plum: #4A2E5F; --plum-bright: #7A4FA8;
+  --green: #3CE69C; --green-deep: #1A9A60;
+  --copper: #C58D5C; --copper-deep: #8A5F3A;
+  --orange: #FF7A29; --orange-deep: #C25318;
+  --navy: #081428; --navy-2: #0F1F3D;
+  --display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --body: 'Manrope', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --s-1: .5rem; --s-2: 1rem; --s-3: 1.5rem; --s-4: 2rem;
+  --s-5: 3rem; --s-6: 4.5rem; --s-7: 6.5rem; --s-8: 9rem;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--ink);color:var(--bone);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--gold);color:var(--ink)}
+body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.94 0 0 0 0 0.91 0 0 0 0.5 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity:.06;mix-blend-mode:overlay}
+.container{width:min(1240px,100% - 3rem);margin-inline:auto}
+.mono{font-family:var(--mono)}
+
+/* ---------- NAV ---------- */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:1rem 0;
+  background:rgba(10,10,11,.85);backdrop-filter:blur(20px) saturate(140%);
+  border-bottom:1px solid var(--gold-line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;width:min(1240px,100% - 3rem);margin-inline:auto;gap:1rem}
+.nav-brand{font-family:var(--mono);font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600}
+.nav-brand span{color:var(--gold)}
+.nav-links{display:flex;gap:1.6rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;flex-wrap:wrap;justify-content:flex-end}
+.nav-links a{color:var(--bone-3);transition:color .3s}
+.nav-links a:hover{color:var(--gold)}
+
+/* ---------- COVER ---------- */
+.cover{position:relative;min-height:88vh;display:grid;place-items:center;text-align:center;
+  padding:9rem 0 6rem;isolation:isolate;overflow:hidden;
+  background:radial-gradient(circle at 50% 28%, rgba(74,46,95,.4) 0%, transparent 55%),
+             radial-gradient(circle at 50% 90%, rgba(212,175,55,.10) 0%, transparent 55%), var(--ink)}
+.cover::before{content:'';position:absolute;inset:0;z-index:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'><g fill='none' stroke='%23D4AF37' stroke-width='0.4' opacity='0.18'><circle cx='40' cy='40' r='30'/><polygon points='40,10 64,28 56,58 24,58 16,28'/><polygon points='40,18 58,32 51,53 29,53 22,32'/></g></svg>");
+  background-size:380px;opacity:.3;mix-blend-mode:screen;
+  mask-image:radial-gradient(circle at 50% 40%, black 0%, transparent 75%);
+  -webkit-mask-image:radial-gradient(circle at 50% 40%, black 0%, transparent 75%)}
+.cover-inner{position:relative;z-index:2}
+.cover .lotus{width:clamp(180px,22vw,260px);margin:0 auto 2.5rem;filter:drop-shadow(0 0 60px rgba(212,175,55,.35))}
+.cover-eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:1.75rem}
+.cover h1{font-family:var(--display);font-weight:400;font-size:clamp(2.6rem,6.5vw,5rem);line-height:1;letter-spacing:-.025em;margin-bottom:1.25rem}
+.cover h1 em{font-style:italic;font-weight:500;color:var(--gold)}
+.cover-sub{font-family:var(--display);font-style:italic;font-size:clamp(1.05rem,1.6vw,1.3rem);color:var(--bone-2);margin-bottom:2.25rem}
+.cover-meta{font-family:var(--mono);font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;color:var(--bone-4)}
+.cover-meta b{color:var(--gold-bright);font-weight:600}
+
+/* ---------- SECTION SHARED ---------- */
+.section{position:relative;padding:7rem 0;isolation:isolate;overflow:hidden}
+.section-divider{height:1px;background:var(--gold-line);opacity:.5;width:min(1240px,100% - 3rem);margin-inline:auto}
+.sec-head{display:flex;align-items:baseline;gap:1.5rem;margin-bottom:3.5rem;padding-bottom:1.75rem;border-bottom:1px solid var(--gold-line)}
+.sec-num{font-family:var(--display);font-style:italic;font-weight:500;font-size:1.4rem;color:var(--gold-bright);flex-shrink:0}
+.sec-head h2{font-family:var(--display);font-size:clamp(1.9rem,4vw,3rem);font-weight:400;line-height:1.05;letter-spacing:-.02em}
+.sec-head h2 em{font-style:italic;font-weight:500;color:var(--gold)}
+.sec-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--bone-4);margin-left:auto;text-align:right}
+.lede{font-size:clamp(1rem,1.4vw,1.12rem);line-height:1.65;color:var(--bone-3);max-width:68ch;font-weight:300;margin-bottom:3rem}
+.lede strong{color:var(--bone);font-weight:500}
+.sub-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--bone-4);margin:3.5rem 0 1.75rem;display:flex;align-items:center;gap:1rem}
+.sub-label::after{content:'';flex:1;height:1px;background:rgba(244,241,232,.1)}
+
+/* ---------- CARDS / GRIDS ---------- */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+.card{border:1px solid rgba(244,241,232,.1);padding:2rem;
+  background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,0));
+  transition:all .4s cubic-bezier(.2,.8,.2,1)}
+.card:hover{transform:translateY(-2px);border-color:var(--accent,var(--gold))}
+.card h4{font-family:var(--display);font-size:1.55rem;font-weight:500;line-height:1.1;margin-bottom:.85rem;color:var(--accent,var(--bone))}
+.card p{font-size:.92rem;line-height:1.6;color:var(--bone-3);font-weight:300}
+.card .tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;font-weight:600;color:var(--accent,var(--gold));margin-bottom:.85rem}
+
+/* ---------- BRAND TRIO ---------- */
+.brand-card{padding:2.5rem;text-align:left;border:1px solid rgba(244,241,232,.1);
+  background:linear-gradient(160deg,rgba(255,255,255,.025),rgba(255,255,255,0))}
+.brand-card.core{--accent:var(--gold);background:linear-gradient(160deg,rgba(212,175,55,.07),rgba(255,255,255,0)),var(--ink-2)}
+.brand-card.apps{--accent:var(--green);background:linear-gradient(160deg,rgba(60,230,156,.06),rgba(255,255,255,0)),var(--navy)}
+.brand-card.boost{--accent:var(--orange);background:linear-gradient(160deg,rgba(255,122,41,.07),rgba(255,255,255,0)),var(--navy)}
+.brand-card .lotus{width:110px;margin-bottom:1.5rem}
+.brand-card h4{font-family:var(--display);font-size:1.6rem;font-weight:500;margin-bottom:.35rem}
+.brand-card .roman{font-family:var(--display);font-style:italic;font-weight:500;color:var(--accent);font-size:1.1rem;margin-bottom:1rem}
+.brand-meta{margin-top:1.5rem;border-top:1px solid rgba(244,241,232,.1);padding-top:1.25rem;display:grid;gap:.55rem}
+.brand-meta div{display:flex;justify-content:space-between;gap:1rem;font-size:.82rem}
+.brand-meta dt{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--bone-4);padding-top:.15em}
+.brand-meta dd{color:var(--bone-2);text-align:right}
+.brand-meta dd .chip{display:inline-block;width:11px;height:11px;border-radius:50%;margin-left:.4rem;vertical-align:-1px;border:1px solid rgba(244,241,232,.25)}
+
+/* ---------- COLOR SWATCHES ---------- */
+.swatch{border:1px solid rgba(244,241,232,.12);overflow:hidden}
+.swatch-color{height:88px;position:relative}
+.swatch-body{padding:1rem 1.1rem;background:var(--ink-2)}
+.swatch-name{font-family:var(--display);font-size:1.1rem;font-weight:500;color:var(--bone);line-height:1.15}
+.swatch-hex{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;color:var(--gold-bright);margin:.3rem 0 .45rem}
+.swatch-use{font-size:.78rem;color:var(--bone-4);line-height:1.45;font-weight:300}
+
+/* ---------- TYPE SPECIMENS ---------- */
+.specimen{border:1px solid rgba(244,241,232,.1);padding:2.25rem;background:rgba(255,255,255,.015);margin-bottom:1.5rem}
+.specimen .label{font-family:var(--mono);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:1.25rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.specimen .label span{color:var(--bone-4)}
+.spec-display{font-family:var(--display);font-size:clamp(2rem,4.5vw,3.4rem);font-weight:400;line-height:1.02;letter-spacing:-.02em}
+.spec-display em{font-style:italic;font-weight:500;color:var(--gold)}
+.spec-body{font-size:1.05rem;font-weight:300;color:var(--bone-2);max-width:62ch;line-height:1.65}
+.spec-mono{font-family:var(--mono);font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;color:var(--green)}
+.type-scale{width:100%;border-collapse:collapse;font-size:.86rem}
+.type-scale th{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--gold-line);font-weight:600}
+.type-scale td{padding:.7rem .9rem;border-bottom:1px solid rgba(244,241,232,.07);color:var(--bone-3);vertical-align:top}
+.type-scale td:first-child{font-family:var(--mono);font-size:.74rem;color:var(--bone-2)}
+
+/* ---------- SPACING ---------- */
+.space-row{display:flex;align-items:center;gap:1.25rem;padding:.6rem 0;border-bottom:1px solid rgba(244,241,232,.06)}
+.space-token{font-family:var(--mono);font-size:.72rem;color:var(--gold-bright);width:64px;flex-shrink:0}
+.space-val{font-family:var(--mono);font-size:.68rem;color:var(--bone-4);width:108px;flex-shrink:0}
+.space-bar{height:12px;background:linear-gradient(90deg,var(--gold),var(--gold-deep));opacity:.85}
+
+/* ---------- DO / DON'T ---------- */
+.rule{padding:1.4rem 1.5rem;border:1px solid rgba(244,241,232,.1);display:flex;gap:.9rem;align-items:flex-start;font-size:.92rem;line-height:1.55;color:var(--bone-3)}
+.rule b{color:var(--bone);font-weight:600}
+.rule.ok{border-left:2px solid var(--green)}
+.rule.ok::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
+.rule.no{border-left:2px solid var(--orange)}
+.rule.no::before{content:'✕';color:var(--orange);font-weight:700;flex-shrink:0}
+
+/* ---------- COMPONENT DEMOS ---------- */
+.demo{border:1px solid rgba(244,241,232,.1);padding:2.5rem;background:var(--navy);position:relative;margin-bottom:1.5rem}
+.demo.on-ink{background:var(--ink-2)}
+.demo-label{position:absolute;top:0;left:0;background:var(--ink);border-right:1px solid rgba(244,241,232,.1);border-bottom:1px solid rgba(244,241,232,.1);
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--bone-4);padding:.45rem .8rem}
+.demo-note{margin-top:1.5rem;font-size:.8rem;color:var(--bone-4);font-weight:300;max-width:60ch}
+.btn-gold{display:inline-flex;align-items:center;gap:.75rem;background:var(--gold);color:#000;
+  font-family:var(--mono);font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  padding:.9rem 2rem;border:0;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 12px 32px -8px rgba(212,175,55,.5)}
+.btn-gold::after{content:'→';font-family:var(--body);font-size:1rem}
+.btn-ghost{border:1px solid var(--gold);color:var(--gold);background:transparent;padding:.6rem 1.25rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;cursor:pointer;transition:all .3s}
+.btn-ghost:hover{background:var(--gold);color:var(--ink)}
+.btn-accent{display:inline-flex;align-items:center;gap:1rem;font-family:var(--mono);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;font-weight:600;
+  padding:1.1rem 2.25rem;background:var(--green);color:var(--navy);border:0;cursor:pointer;transition:all .4s cubic-bezier(.2,.8,.2,1)}
+.btn-accent.boost{background:var(--orange)}
+.btn-accent::after{content:'→';font-family:var(--body);font-size:1.1rem}
+.btn-accent:hover{transform:translateY(-2px)}
+.demo-field{display:flex;flex-direction:column;max-width:340px}
+.demo-field label{font-family:var(--mono);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;color:var(--bone-4);margin-bottom:.5rem;font-weight:500}
+.demo-field input{background:transparent;border:0;border-bottom:1px solid rgba(244,241,232,.2);color:var(--bone);padding:.65rem 0;font-family:var(--body);font-size:1rem;outline:none;transition:border-color .3s}
+.demo-field input:focus{border-color:var(--green)}
+.demo-tier{max-width:360px;border:1.5px solid var(--orange);padding:2.25rem 2rem;position:relative;
+  background:linear-gradient(135deg,rgba(255,122,41,.10),transparent 60%),rgba(255,255,255,.015)}
+.demo-tier .ribbon{position:absolute;top:-1px;right:1.5rem;background:var(--orange);color:var(--navy);padding:.4rem .9rem;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;font-weight:700}
+.demo-tier .t-name{font-family:var(--display);font-size:1.5rem;font-weight:500;margin-bottom:1rem}
+.demo-tier .t-price{font-family:var(--display);font-size:3.4rem;line-height:1;letter-spacing:-.03em}
+.demo-tier .t-unit{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--bone-4)}
+.demo-step{max-width:360px;padding-top:2rem;border-top:1px solid rgba(244,241,232,.15);position:relative}
+.demo-step::before{content:'';position:absolute;top:-5px;left:0;width:9px;height:9px;background:var(--green);border-radius:50%;box-shadow:0 0 0 4px var(--ink-2)}
+.demo-step .n{font-family:var(--mono);font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;font-weight:600;color:var(--green);margin-bottom:.8rem}
+.demo-step h5{font-family:var(--display);font-size:1.3rem;font-weight:500;margin-bottom:.5rem}
+.demo-step p{font-size:.88rem;color:var(--bone-3);font-weight:300}
+
+/* ---------- VOICE TABLE ---------- */
+.voice-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.voice-table th{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;text-align:left;padding:.8rem .9rem;border-bottom:1px solid var(--gold-line);font-weight:600;color:var(--gold)}
+.voice-table td{padding:.85rem .9rem;border-bottom:1px solid rgba(244,241,232,.07);color:var(--bone-3);vertical-align:top;line-height:1.5}
+.voice-table td:first-child{font-family:var(--display);font-size:1.05rem;font-weight:500;color:var(--bone)}
+.voice-table .c-core{color:var(--gold)}.voice-table .c-apps{color:var(--green)}.voice-table .c-boost{color:var(--orange)}
+
+/* ---------- TEXTURE DEMOS ---------- */
+.texture{height:150px;border:1px solid rgba(244,241,232,.12);position:relative;isolation:isolate;display:grid;place-items:end start}
+.texture .t-tag{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--bone-3);padding:.7rem .9rem;background:rgba(10,10,11,.6);backdrop-filter:blur(6px)}
+.tx-grain{background:var(--ink-2)}
+.tx-grain::before{content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.96 0 0 0 0 0.94 0 0 0 0 0.91 0 0 0 0.5 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity:.22;mix-blend-mode:overlay}
+.tx-grid-g{background:var(--navy)}
+.tx-grid-g::before{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(60,230,156,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(60,230,156,.07) 1px,transparent 1px);
+  background-size:40px 40px}
+.tx-grid-o{background:var(--navy)}
+.tx-grid-o::before{content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,122,41,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,122,41,.08) 1px,transparent 1px);
+  background-size:40px 40px}
+.tx-geo{background:var(--ink)}
+.tx-geo::before{content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'><g fill='none' stroke='%23D4AF37' stroke-width='0.4' opacity='0.35'><circle cx='40' cy='40' r='30'/><polygon points='40,10 64,28 56,58 24,58 16,28'/><polygon points='40,18 58,32 51,53 29,53 22,32'/></g></svg>");
+  background-size:120px;mix-blend-mode:screen}
+.tx-glow{background:radial-gradient(circle at 70% 30%, rgba(74,46,95,.55) 0%, transparent 60%),
+                    radial-gradient(circle at 20% 85%, rgba(212,175,55,.18) 0%, transparent 55%), var(--ink)}
+
+/* ---------- REVEAL ---------- */
+.reveal{opacity:0;transform:translateY(24px);transition:all .9s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:translateY(0)}
+.reveal.d1{transition-delay:.1s}.reveal.d2{transition-delay:.2s}.reveal.d3{transition-delay:.3s}
+
+/* ---------- FOOTER ---------- */
+.footer{padding:5rem 0 2.5rem;border-top:1px solid var(--gold-line);text-align:center}
+.footer p{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--bone-4)}
+.footer .tagline{font-family:var(--display);font-style:italic;font-size:1.15rem;color:var(--bone-2);letter-spacing:0;text-transform:none;margin-bottom:1rem}
+
+@media (max-width:980px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr 1fr}
+  .sec-kicker{display:none}
+  .section{padding:4.5rem 0}
+}
+@media (max-width:620px){
+  .container{width:calc(100% - 2rem)}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .demo{padding:1.75rem}
+  .sec-head{flex-direction:column;gap:.5rem;align-items:flex-start}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Lotus symbol (variantes vía CSS vars) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="lotus-core-grad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="var(--core-hi,#FFD56E)"/>
+      <stop offset="35%" stop-color="var(--core-mid,#D4AF37)"/>
+      <stop offset="100%" stop-color="var(--core-deep,#4A2E5F)"/>
+    </radialGradient>
+    <symbol id="lotus" viewBox="0 0 200 200">
+      <g stroke="var(--lotus-stroke,#D4AF37)" stroke-width="1.2" fill="transparent" stroke-linejoin="round">
+        <path d="M 100 41.8 Q 128 81.4, 100 121 Q 72 81.4, 100 41.8 Z" transform="rotate(-75 100 121)"/>
+        <path d="M 100 41.8 Q 128 81.4, 100 121 Q 72 81.4, 100 41.8 Z" transform="rotate(75 100 121)"/>
+        <path d="M 100 28.6 Q 130 74.8, 100 121 Q 70 74.8, 100 28.6 Z" transform="rotate(-45 100 121)"/>
+        <path d="M 100 28.6 Q 130 74.8, 100 121 Q 70 74.8, 100 28.6 Z" transform="rotate(45 100 121)"/>
+        <path d="M 100 17.2 Q 132 69.1, 100 121 Q 68 69.1, 100 17.2 Z" transform="rotate(-22 100 121)"/>
+        <path d="M 100 17.2 Q 132 69.1, 100 121 Q 68 69.1, 100 17.2 Z" transform="rotate(22 100 121)"/>
+        <path d="M 100 8.4 Q 134 64.7, 100 121 Q 66 64.7, 100 8.4 Z"/>
+      </g>
+      <circle cx="100" cy="128" r="19" fill="none" stroke="var(--lotus-stroke,#D4AF37)" stroke-width="0.7" opacity="0.65"/>
+      <circle cx="100" cy="128" r="11" fill="url(#lotus-core-grad)" opacity="0.95"/>
+      <text x="100" y="131.5" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="11" font-weight="700" fill="var(--lotus-stroke,#D4AF37)">AI</text>
+    </symbol>
+  </defs>
+</svg>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">Ghanima · <span>Manual de Marca</span></div>
+    <div class="nav-links">
+      <a href="#identidad">Identidad</a>
+      <a href="#marcas">Marcas</a>
+      <a href="#logo">Logo</a>
+      <a href="#color">Color</a>
+      <a href="#tipo">Tipografía</a>
+      <a href="#layout">Layout</a>
+      <a href="#componentes">Componentes</a>
+      <a href="#voz">Voz</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ COVER ============ -->
+<header class="cover">
+  <div class="container cover-inner">
+    <svg class="lotus" role="img" aria-label="Ghanima lotus"><use href="#lotus"/></svg>
+    <div class="cover-eyebrow">Ghanima Core AI · Quito · Ecuador</div>
+    <h1>Manual de Marca<br>&amp; <em>Design System</em></h1>
+    <p class="cover-sub">Editorial Tech Mystique · Prosperidad, abundancia y buena fortuna</p>
+    <p class="cover-meta">Versión <b>1.0</b> · Junio 2026 · Documento de referencia interna</p>
+  </div>
+</header>
+
+<div class="section-divider"></div>
+
+<!-- ============ 01 IDENTIDAD ============ -->
+<section class="section" id="identidad">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">i.</span>
+      <h2>La <em>identidad</em></h2>
+      <span class="sec-kicker">Nombre · Símbolo · Filosofía</span>
+    </div>
+    <p class="lede reveal d1"><strong>Ghanima</strong> es una palabra árabe que significa prosperidad, abundancia y buena fortuna obtenidas a través del esfuerzo legítimo. El símbolo es una <strong>flor de loto fusionada con circuitos integrados</strong>, con una semilla de mostaza en el núcleo: las cosas más grandes nacen de algo diminuto. En tecnología, esa semilla es la <strong>especificación estructurada</strong>.</p>
+    <div class="grid-3">
+      <article class="card reveal" style="--accent:var(--gold)">
+        <div class="tag">Promesa</div>
+        <h4>Rigor de banca, velocidad de startup</h4>
+        <p>Cada pieza de comunicación debe transmitir solidez institucional y ejecución ágil al mismo tiempo. Nunca una sin la otra.</p>
+      </article>
+      <article class="card reveal d1" style="--accent:var(--gold)">
+        <div class="tag">Narrativa central</div>
+        <h4>La semilla de mostaza</h4>
+        <p>El árbol más grande del huerto nace de la semilla más diminuta. La especificación estructurada es esa semilla: código y diseño que crecen bajo rigor arquitectónico.</p>
+      </article>
+      <article class="card reveal d2" style="--accent:var(--gold)">
+        <div class="tag">Estética</div>
+        <h4>Editorial Tech Mystique</h4>
+        <p>Portada de revista institucional sobre negro profundo: serif editorial, etiquetas monoespaciadas, ornamento geométrico árabe sutil y grano analógico.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 02 ARQUITECTURA DE MARCA ============ -->
+<section class="section" id="marcas">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">ii.</span>
+      <h2>Sistema de <em>tres marcas</em></h2>
+      <span class="sec-kicker">Core AI · Apps · Boost</span>
+    </div>
+    <p class="lede reveal d1">Un mismo loto, tres encarnaciones. La geometría de pétalos y la posición del núcleo <strong>nunca cambian</strong>; solo cambian el trazo, el núcleo y el fondo según la audiencia.</p>
+    <div class="grid-3">
+      <article class="brand-card core reveal">
+        <div style="--lotus-stroke:#D4AF37;--core-hi:#FFD56E;--core-mid:#D4AF37;--core-deep:#4A2E5F">
+          <svg class="lotus" role="img" aria-label="Loto Core AI"><use href="#lotus"/></svg>
+        </div>
+        <div class="roman">I.</div>
+        <h4>Core AI</h4>
+        <p>Consultoría estratégica institucional. C-level, banca y seguros.</p>
+        <dl class="brand-meta">
+          <div><dt>Loto</dt><dd>Outline dorado<span class="chip" style="background:#D4AF37"></span></dd></div>
+          <div><dt>Núcleo</dt><dd>Púrpura + sello AI<span class="chip" style="background:#4A2E5F"></span></dd></div>
+          <div><dt>Fondo</dt><dd>Negro<span class="chip" style="background:#000"></span></dd></div>
+          <div><dt>Email</dt><dd>institucional@ghanima-ai.com</dd></div>
+        </dl>
+      </article>
+      <article class="brand-card apps reveal d1">
+        <div style="--lotus-stroke:#3CE69C;--core-hi:#FFD8B8;--core-mid:#C58D5C;--core-deep:#8A5F3A">
+          <svg class="lotus" role="img" aria-label="Loto Apps"><use href="#lotus"/></svg>
+        </div>
+        <div class="roman">II.</div>
+        <h4>Apps</h4>
+        <p>Soluciones empresariales B2B con IA. CTOs y gerencia técnica.</p>
+        <dl class="brand-meta">
+          <div><dt>Loto</dt><dd>Verde neón + glow<span class="chip" style="background:#3CE69C"></span></dd></div>
+          <div><dt>Núcleo</dt><dd>Cobre<span class="chip" style="background:#C58D5C"></span></dd></div>
+          <div><dt>Fondo</dt><dd>Navy<span class="chip" style="background:#0A1E3A"></span></dd></div>
+          <div><dt>Email</dt><dd>contacto@ghanima-ai.com</dd></div>
+        </dl>
+      </article>
+      <article class="brand-card boost reveal d2">
+        <div style="--lotus-stroke:#3CE69C;--core-hi:#FFD8B8;--core-mid:#FF7A29;--core-deep:#C25318">
+          <svg class="lotus" role="img" aria-label="Loto Boost"><use href="#lotus"/></svg>
+        </div>
+        <div class="roman">III.</div>
+        <h4>Boost</h4>
+        <p>Crecimiento con IA para PYMEs, emprendedores y emprendimientos.</p>
+        <dl class="brand-meta">
+          <div><dt>Loto</dt><dd>Verde neón + glow<span class="chip" style="background:#3CE69C"></span></dd></div>
+          <div><dt>Núcleo</dt><dd>Naranja<span class="chip" style="background:#FF7A29"></span></dd></div>
+          <div><dt>Fondo</dt><dd>Navy<span class="chip" style="background:#0A1E3A"></span></dd></div>
+          <div><dt>Email</dt><dd>hola@ghanima-ai.com</dd></div>
+        </dl>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 03 LOGO ============ -->
+<section class="section" id="logo">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">iii.</span>
+      <h2>Uso del <em>logo</em></h2>
+      <span class="sec-kicker">Variantes · Protección · Restricciones</span>
+    </div>
+    <p class="lede reveal d1">Cada marca entrega su logo en <strong>tres variantes</strong>: principal a color, monocromático y outline. Formatos: <strong>SVG editable + PNG</strong> en múltiples tamaños.</p>
+
+    <div class="sub-label reveal">Área de protección</div>
+    <div class="grid-2 reveal">
+      <div class="rule ok"><span><b>Espacio libre mínimo:</b> equivalente a la altura del núcleo del loto, en los cuatro lados. Ningún texto u objeto invade esa zona.</span></div>
+      <div class="rule ok"><span><b>Sobre fondos claros:</b> usar exclusivamente las versiones monocromáticas u outline. El loto a color vive sobre negro o navy.</span></div>
+    </div>
+
+    <div class="sub-label reveal">Restricciones absolutas</div>
+    <div class="grid-2">
+      <div class="rule no reveal"><span><b>No mezclar acentos:</b> el naranja (Boost) y el cobre (Apps) jamás conviven en un mismo logo.</span></div>
+      <div class="rule no reveal d1"><span><b>No alterar geometría:</b> los pétalos y la posición del núcleo son fijos. Sin excepciones.</span></div>
+      <div class="rule no reveal"><span><b>No aplicar efectos:</b> sin sombras, degradados ajenos al núcleo, estiramientos ni rotaciones.</span></div>
+      <div class="rule no reveal d1"><span><b>No recolorear:</b> los valores hex de cada variante son cerrados. No se improvisan tonos intermedios.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 04 COLOR ============ -->
+<section class="section" id="color">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">iv.</span>
+      <h2>Paleta de <em>color</em></h2>
+      <span class="sec-kicker">Tokens CSS de producción</span>
+    </div>
+    <p class="lede reveal d1">Toda interfaz parte de los <strong>tokens CSS</strong> definidos en producción. El oro es la voz institucional; el verde y el naranja son acentos seccionales; el púrpura es atmósfera, nunca texto.</p>
+
+    <div class="sub-label reveal">Fondos · Ink &amp; Navy</div>
+    <div class="grid-4">
+      <div class="swatch reveal"><div class="swatch-color" style="background:#0A0A0B"></div><div class="swatch-body"><div class="swatch-name">Ink</div><div class="swatch-hex">--ink · #0A0A0B</div><div class="swatch-use">Fondo base institucional. Hero, footer, Core AI.</div></div></div>
+      <div class="swatch reveal d1"><div class="swatch-color" style="background:#131316"></div><div class="swatch-body"><div class="swatch-name">Ink 2</div><div class="swatch-hex">--ink-2 · #131316</div><div class="swatch-use">Superficies elevadas sobre ink.</div></div></div>
+      <div class="swatch reveal d2"><div class="swatch-color" style="background:#081428"></div><div class="swatch-body"><div class="swatch-name">Navy</div><div class="swatch-hex">--navy · #081428</div><div class="swatch-use">Fondo de secciones Apps y Boost.</div></div></div>
+      <div class="swatch reveal d3"><div class="swatch-color" style="background:#0F1F3D"></div><div class="swatch-body"><div class="swatch-name">Navy 2</div><div class="swatch-hex">--navy-2 · #0F1F3D</div><div class="swatch-use">Superficies elevadas sobre navy.</div></div></div>
+    </div>
+
+    <div class="sub-label reveal">Texto · Bone</div>
+    <div class="grid-4">
+      <div class="swatch reveal"><div class="swatch-color" style="background:#F4F1E8"></div><div class="swatch-body"><div class="swatch-name">Bone</div><div class="swatch-hex">--bone · #F4F1E8</div><div class="swatch-use">Texto principal y títulos.</div></div></div>
+      <div class="swatch reveal d1"><div class="swatch-color" style="background:#E8E3D3"></div><div class="swatch-body"><div class="swatch-name">Bone 2</div><div class="swatch-hex">--bone-2 · #E8E3D3</div><div class="swatch-use">Citas y texto editorial destacado.</div></div></div>
+      <div class="swatch reveal d2"><div class="swatch-color" style="background:rgba(244,241,232,.7)"></div><div class="swatch-body"><div class="swatch-name">Bone 3</div><div class="swatch-hex">rgba(244,241,232,.70)</div><div class="swatch-use">Cuerpo de texto secundario.</div></div></div>
+      <div class="swatch reveal d3"><div class="swatch-color" style="background:rgba(244,241,232,.45)"></div><div class="swatch-body"><div class="swatch-name">Bone 4</div><div class="swatch-hex">rgba(244,241,232,.45)</div><div class="swatch-use">Etiquetas, metadatos, placeholders.</div></div></div>
+    </div>
+
+    <div class="sub-label reveal">Institucional · Gold &amp; Plum</div>
+    <div class="grid-4">
+      <div class="swatch reveal"><div class="swatch-color" style="background:#D4AF37"></div><div class="swatch-body"><div class="swatch-name">Gold</div><div class="swatch-hex">--gold · #D4AF37</div><div class="swatch-use">Acento institucional. Énfasis, CTAs, líneas.</div></div></div>
+      <div class="swatch reveal d1"><div class="swatch-color" style="background:#E5C158"></div><div class="swatch-body"><div class="swatch-name">Gold Bright</div><div class="swatch-hex">--gold-bright · #E5C158</div><div class="swatch-use">Hover y citas sobre fondos oscuros.</div></div></div>
+      <div class="swatch reveal d2"><div class="swatch-color" style="background:#9C7F22"></div><div class="swatch-body"><div class="swatch-name">Gold Deep</div><div class="swatch-hex">--gold-deep · #9C7F22</div><div class="swatch-use">Degradados internos del oro.</div></div></div>
+      <div class="swatch reveal d3"><div class="swatch-color" style="background:#4A2E5F"></div><div class="swatch-body"><div class="swatch-name">Plum</div><div class="swatch-hex">--plum · #4A2E5F</div><div class="swatch-use">Atmósfera radial y núcleo Core. Nunca texto.</div></div></div>
+    </div>
+
+    <div class="sub-label reveal">Acentos seccionales</div>
+    <div class="grid-4">
+      <div class="swatch reveal"><div class="swatch-color" style="background:#3CE69C"></div><div class="swatch-body"><div class="swatch-name">Green</div><div class="swatch-hex">--green · #3CE69C</div><div class="swatch-use">Acento Apps/Boost. Checks, pasos, CTAs Apps.</div></div></div>
+      <div class="swatch reveal d1"><div class="swatch-color" style="background:#C58D5C"></div><div class="swatch-body"><div class="swatch-name">Copper</div><div class="swatch-hex">--copper · #C58D5C</div><div class="swatch-use">Secundario Apps. Núcleo del loto Apps.</div></div></div>
+      <div class="swatch reveal d2"><div class="swatch-color" style="background:#FF7A29"></div><div class="swatch-body"><div class="swatch-name">Orange</div><div class="swatch-hex">--orange · #FF7A29</div><div class="swatch-use">Acento Boost. Pricing, ribbons, CTAs Boost.</div></div></div>
+      <div class="swatch reveal d3"><div class="swatch-color" style="background:#C25318"></div><div class="swatch-body"><div class="swatch-name">Orange Deep</div><div class="swatch-hex">--orange-deep · #C25318</div><div class="swatch-use">Profundidad del naranja en núcleos y degradados.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 05 TIPOGRAFÍA ============ -->
+<section class="section" id="tipo">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">v.</span>
+      <h2>Sistema <em>tipográfico</em></h2>
+      <span class="sec-kicker">3 voces + 1 interna</span>
+    </div>
+    <p class="lede reveal d1">Tres voces conviven en cada pieza: la <strong>serif editorial</strong> que da autoridad, la <strong>sans humanista</strong> que da claridad y la <strong>monoespaciada</strong> que da precisión técnica. <strong>Calibri</strong> queda reservada exclusivamente para documentos internos Word.</p>
+
+    <div class="specimen reveal">
+      <div class="label">Cormorant Garamond · Display <span>400 / 500 itálica · títulos, citas, numerales romanos</span></div>
+      <p class="spec-display">La inteligencia artificial como <em>decisión estratégica</em>.</p>
+    </div>
+    <div class="specimen reveal d1">
+      <div class="label">Manrope · Body <span>300 / 400 / 500 / 600 · cuerpo, ledes, cards</span></div>
+      <p class="spec-body">Acompañamos a organizaciones — desde comités ejecutivos de banca y seguros hasta emprendimientos locales — en el diseño, gobierno e implementación de capacidades de inteligencia artificial.</p>
+    </div>
+    <div class="specimen reveal d2">
+      <div class="label">JetBrains Mono · Técnica <span>500 / 600 · kickers, etiquetas, números, botones</span></div>
+      <p class="spec-mono">Strategic AI Practice · Quito · Ecuador → 01 · Descubrimiento</p>
+    </div>
+
+    <div class="sub-label reveal">Escala tipográfica de referencia</div>
+    <div class="reveal" style="overflow-x:auto">
+      <table class="type-scale">
+        <thead><tr><th>Rol</th><th>Familia</th><th>Tamaño</th><th>Tratamiento</th></tr></thead>
+        <tbody>
+          <tr><td>H1 Hero</td><td>Cormorant Garamond 400</td><td>clamp(2.5rem, 6.8vw, 5.5rem)</td><td>line-height .98 · tracking −.025em · em en itálica oro</td></tr>
+          <tr><td>H2 Sección</td><td>Cormorant Garamond 400</td><td>clamp(2rem, 4.5vw, 3.5rem)</td><td>line-height 1.02 · tracking −.022em</td></tr>
+          <tr><td>H4 Card</td><td>Cormorant Garamond 500</td><td>1.6–1.85rem</td><td>line-height 1.1–1.15</td></tr>
+          <tr><td>Lede</td><td>Manrope 300</td><td>clamp(1.05rem, 1.5vw, 1.18rem)</td><td>line-height 1.65 · strong en 500</td></tr>
+          <tr><td>Body card</td><td>Manrope 300–400</td><td>.92–.98rem</td><td>line-height 1.6 · bone-3</td></tr>
+          <tr><td>Kicker / Eyebrow</td><td>JetBrains Mono 500</td><td>.70–.74rem</td><td>UPPERCASE · tracking .25–.32em · color del acento</td></tr>
+          <tr><td>Botón</td><td>JetBrains Mono 600–700</td><td>.70–.78rem</td><td>UPPERCASE · tracking .15–.22em · flecha →</td></tr>
+          <tr><td>Precio</td><td>Cormorant Garamond 400</td><td>clamp(3.5rem, 6vw, 4.5rem)</td><td>tracking −.03em · unidad en mono bone-4</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 06 LAYOUT ============ -->
+<section class="section" id="layout">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">vi.</span>
+      <h2>Espaciado &amp; <em>layout</em></h2>
+      <span class="sec-kicker">Contenedor 1240px · esquinas rectas</span>
+    </div>
+    <p class="lede reveal d1">Contenedor de <strong>min(1240px, 100% − 3rem)</strong>, secciones de 8rem vertical (5rem en móvil), <strong>border-radius cero en todo el sistema</strong> y bordes hairline de 1px sobre rgba(244,241,232,.08–.15).</p>
+    <div class="grid-2">
+      <div class="reveal">
+        <div class="sub-label" style="margin-top:0">Escala de espaciado</div>
+        <div class="space-row"><span class="space-token">--s-1</span><span class="space-val">0.5rem · 8px</span><div class="space-bar" style="width:8px"></div></div>
+        <div class="space-row"><span class="space-token">--s-2</span><span class="space-val">1rem · 16px</span><div class="space-bar" style="width:16px"></div></div>
+        <div class="space-row"><span class="space-token">--s-3</span><span class="space-val">1.5rem · 24px</span><div class="space-bar" style="width:24px"></div></div>
+        <div class="space-row"><span class="space-token">--s-4</span><span class="space-val">2rem · 32px</span><div class="space-bar" style="width:32px"></div></div>
+        <div class="space-row"><span class="space-token">--s-5</span><span class="space-val">3rem · 48px</span><div class="space-bar" style="width:48px"></div></div>
+        <div class="space-row"><span class="space-token">--s-6</span><span class="space-val">4.5rem · 72px</span><div class="space-bar" style="width:72px"></div></div>
+        <div class="space-row"><span class="space-token">--s-7</span><span class="space-val">6.5rem · 104px</span><div class="space-bar" style="width:104px"></div></div>
+        <div class="space-row"><span class="space-token">--s-8</span><span class="space-val">9rem · 144px</span><div class="space-bar" style="width:144px"></div></div>
+      </div>
+      <div class="reveal d1">
+        <div class="sub-label" style="margin-top:0">Texturas y atmósfera</div>
+        <div class="grid-2" style="gap:1rem">
+          <div class="texture tx-grain"><span class="t-tag">Grain overlay · 6%</span></div>
+          <div class="texture tx-geo"><span class="t-tag">Ornamento geométrico</span></div>
+          <div class="texture tx-grid-g"><span class="t-tag">Grid 80px · Apps</span></div>
+          <div class="texture tx-grid-o"><span class="t-tag">Grid 80px · Boost</span></div>
+        </div>
+        <div class="texture tx-glow" style="margin-top:1rem"><span class="t-tag">Glows radiales · plum + gold</span></div>
+      </div>
+    </div>
+    <div class="sub-label reveal">Motion</div>
+    <div class="grid-3">
+      <div class="rule ok reveal"><span><b>Reveal on scroll:</b> translateY(24px) → 0, 0.9s, cubic-bezier(.2,.8,.2,1), delays escalonados de 0.1s vía IntersectionObserver.</span></div>
+      <div class="rule ok reveal d1"><span><b>Hover:</b> translateY(−2/−3px) con cambio de border-color al acento. Flechas → desplazan 4px.</span></div>
+      <div class="rule ok reveal d2"><span><b>Reduced motion:</b> todas las animaciones y transiciones colapsan a 0.01ms con prefers-reduced-motion.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 07 COMPONENTES ============ -->
+<section class="section" id="componentes">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">vii.</span>
+      <h2>Biblioteca de <em>componentes</em></h2>
+      <span class="sec-kicker">Patrones de producción</span>
+    </div>
+
+    <div class="demo on-ink reveal">
+      <span class="demo-label">Botones</span>
+      <div style="display:flex;gap:1.25rem;flex-wrap:wrap;align-items:center">
+        <button class="btn-gold">Agendar sesión</button>
+        <button class="btn-ghost">Agendar →</button>
+        <button class="btn-accent">Solicitar Descubrimiento</button>
+        <button class="btn-accent boost">Empezar este mes</button>
+      </div>
+      <p class="demo-note">CTA oro = institucional. Ghost = navegación. Botones sólidos verde/naranja = formularios Apps/Boost; texto siempre navy/negro sobre el acento.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="demo reveal">
+        <span class="demo-label">Form field</span>
+        <div class="demo-field">
+          <label for="dm-email">Email corporativo</label>
+          <input id="dm-email" type="email" placeholder="nombre@empresa.com">
+        </div>
+        <p class="demo-note">Inputs transparentes con solo borde inferior. Focus = borde al color del acento de la sección.</p>
+      </div>
+      <div class="demo reveal d1">
+        <span class="demo-label">Timeline step</span>
+        <div class="demo-step">
+          <div class="n">02 · Prototipo en 5 días</div>
+          <h5>Usted lo toca, valida, ajusta</h5>
+          <p>Punto de 9px con halo del fondo sobre línea hairline superior.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="demo reveal">
+        <span class="demo-label">Pricing tier · featured</span>
+        <div class="demo-tier">
+          <div class="ribbon">Más popular</div>
+          <div class="t-name">Plan Cosecha</div>
+          <div><span class="t-price">$125</span> <span class="t-unit">/ mes</span></div>
+        </div>
+      </div>
+      <div class="demo reveal d1">
+        <span class="demo-label">Card con acento</span>
+        <article class="card" style="--accent:var(--green);max-width:380px">
+          <div class="tag">Filosofía</div>
+          <h4>AI-First</h4>
+          <p>Numeral romano en itálica serif, kicker mono, título serif al color del acento, cuerpo en Manrope 300.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 08 VOZ ============ -->
+<section class="section" id="voz">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">viii.</span>
+      <h2>Voz &amp; <em>tono</em></h2>
+      <span class="sec-kicker">Español · trato de usted</span>
+    </div>
+    <p class="lede reveal d1">Una sola voz, tres registros. Siempre en español, siempre <strong>trato de usted</strong>, siempre beneficio concreto antes que jerga. Los anglicismos técnicos (AI-First, Spec-to-Demo) se reservan para Apps y Core.</p>
+    <div class="reveal" style="overflow-x:auto">
+      <table class="voice-table">
+        <thead><tr><th>Marca</th><th>Registro</th><th>Ejemplo de titular</th><th>Firma email</th></tr></thead>
+        <tbody>
+          <tr><td class="c-core">Core AI</td><td>Institucional, sobrio, editorial. Habla de riesgo, trazabilidad y retorno.</td><td>«La inteligencia artificial como decisión estratégica, no como experimento.»</td><td>institucional@</td></tr>
+          <tr><td class="c-apps">Apps</td><td>Técnico-ejecutivo, directo, orientado a validación temprana.</td><td>«Toque su producto en cinco días.»</td><td>contacto@</td></tr>
+          <tr><td class="c-boost">Boost</td><td>Cercano, concreto, alineado a resultados: ganamos cuando usted vende.</td><td>«Su negocio, vendiendo 24/7.»</td><td>hola@</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-label reveal">Checklist antes de publicar cualquier pieza</div>
+    <div class="grid-2">
+      <div class="rule ok reveal"><span>Fondo correcto por marca: negro (Core) o navy (Apps/Boost), nunca blanco con loto a color.</span></div>
+      <div class="rule ok reveal d1"><span>Un solo acento seccional por pieza, oro siempre disponible como voz institucional.</span></div>
+      <div class="rule ok reveal"><span>Serif para títulos, mono para etiquetas, Manrope para cuerpo. Sin sustituciones.</span></div>
+      <div class="rule ok reveal d1"><span>Esquinas rectas, bordes hairline, grano al 6%. Sin border-radius ni sombras blandas.</span></div>
+      <div class="rule no reveal"><span>Naranja y cobre juntos en un mismo logo o componente.</span></div>
+      <div class="rule no reveal d1"><span>Emojis, mayúsculas de grito o promesas sin métrica en comunicación comercial.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container">
+    <p class="tagline">Prosperidad · Abundancia · Buena Fortuna</p>
+    <p>© 2026 Ghanima Core AI · Adrian Cisneros Tello · Manual de Marca v1.0 · ghanima-ai.com</p>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

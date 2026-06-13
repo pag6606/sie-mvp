@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import { InlineError } from '@/components/UIPatterns'
 import { ApiError } from '@/types/api'
 
@@ -21,7 +22,7 @@ export default function CierrePage() {
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
         <div className="w-full max-w-md rounded-xl bg-card p-8 shadow-lg text-center">
-          <h2 className="text-xl font-semibold text-foreground mb-4">Cerrar sección (paralelo)</h2>
+          <PageHead eyebrow="Docente" title="Cerrar sección" subtitle="Confirma el cierre de la sección. Las notas serán inmutables." />
 
           {cerrarMutation.isError && (
             <div className="mb-4">

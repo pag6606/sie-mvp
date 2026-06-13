@@ -46,11 +46,17 @@ export function useUsuariosBatchImport() {
       }, 250)
 
       try {
-        const payload = filasValidas.map(f => ({
-          email: f.email.trim().toLowerCase(),
-          nombre: f.nombre.trim(),
-          roles: [f.roles]
-        }))
+        const payload = filasValidas.map(f => {
+          const item: Record<string, unknown> = {
+            email: f.email.trim().toLowerCase(),
+            nombre: f.nombre.trim(),
+            roles: [f.roles]
+          }
+          if (f.dateOfBirth) {
+            item.dateOfBirth = f.dateOfBirth
+          }
+          return item
+        })
         const { data } = await api.post<ResultadoImportacion>('/usuarios/batch/importar-csv', payload, {
           signal: abortRef.current.signal
         })

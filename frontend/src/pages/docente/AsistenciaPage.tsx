@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import { ApiError } from '@/types/api'
 
 interface Estudiante {
@@ -102,7 +103,7 @@ export default function AsistenciaPage() {
         )}
 
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-foreground">Registro de Asistencia</h2>
+          <PageHead eyebrow="Docente" title="Registro de Asistencia" />
           <div className="flex items-center gap-2">
             <button onClick={() => setFecha(fechaAnterior(fecha))}
               className="rounded-md border border-input px-2 py-1 text-sm hover:bg-muted" title="Día anterior">◀</button>

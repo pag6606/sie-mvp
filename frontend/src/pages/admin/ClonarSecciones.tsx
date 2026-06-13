@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import ProgressBar from '@/components/ProgressBar'
 import { usePeriodos, Periodo } from '@/hooks/usePeriodos'
 import { useSecciones } from '@/hooks/useSecciones'
@@ -48,7 +49,7 @@ export default function ClonarSecciones() {
         <ProgressBar steps={STEPS} current={1} />
 
         <div className="rounded-lg border bg-card p-8">
-          <h2 className="mb-6 text-xl font-semibold text-foreground">Configurar secciones (paralelos)</h2>
+          <PageHead eyebrow="Wizard" title="Configurar secciones" subtitle="Clona las secciones del período anterior o crea nuevas manualmente." />
 
           <div className="mb-6 rounded-lg border border-warning bg-warning/10 p-4 text-sm text-warning">
             ⚠️ Antes de continuar, asegúrate de haber creado los cursos en{' '}

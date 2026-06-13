@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import ProgressBar from '@/components/ProgressBar'
 import { InlineError } from '@/components/UIPatterns'
 import { ApiError } from '@/types/api'
@@ -41,7 +42,7 @@ export default function ConfirmarApertura() {
 
         <div className="rounded-lg border bg-card p-8 text-center">
           <div className="mb-6 text-4xl" aria-hidden="true">✅</div>
-          <h2 className="text-xl font-semibold text-foreground">Período listo</h2>
+          <PageHead eyebrow="Wizard" title="Período listo" subtitle="Revisa el resumen y confirma la apertura del período." />
           <p className="mt-2 text-muted-foreground">Todos los pasos completados. Las secciones (paralelos) están configuradas.</p>
 
           {error && (

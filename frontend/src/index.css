@@ -4,35 +4,95 @@
 
 @layer base {
   :root {
-    --background: 210 27% 98%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    /* Sobrescribir variables HSL de shadcn con tokens Ghanima */
+    --background: 210 27% 98%;         /* ≈ #EEF1F4 (paper) */
+    --foreground: 240 10% 4%;          /* ≈ #0A0A0B (ink) */
+    --card: 0 0% 100%;                 /* ≈ #FFFFFF (surface) */
+    --card-foreground: 240 10% 4%;     /* ≈ ink */
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
-    --primary: 243 75% 59%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 243 75% 95%;
-    --accent-foreground: 243 75% 40%;
-    --destructive: 0 84% 60%;
+    --popover-foreground: 240 10% 4%;
+
+    /* Acento primario → deep gold Ghanima (#8A6A18) */
+    --primary: 46 59% 34%;             /* #8A6A18 — gold-deep, base de botones */
+    --primary-foreground: 210 27% 98%; /* #EEF1F4 — paper */
+
+    --secondary: 210 20% 96%;          /* #F6F8FA (surface-2) */
+    --secondary-foreground: 240 10% 4%;
+
+    --muted: 210 20% 96%;
+    --muted-foreground: 240 5% 45%;
+
+    --accent: 46 59% 34%;              /* gold-deep */
+    --accent-foreground: 210 27% 98%;
+
+    /* Semáforo Ghanima */
+    --destructive: 0 68% 48%;          /* #C53030 (red) */
     --destructive-foreground: 0 0% 100%;
-    --success: 142 76% 36%;
+    --success: 158 64% 43%;            /* #2BB07A (green) */
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
+    --warning: 24 90% 50%;             /* #E25E10 (orange) */
     --warning-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 243 75% 59%;
-    --radius: 0.5rem;
-    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    /* Bordes y inputs — estilo Ghanima: bottom border, focus green */
+    --border: 240 5% 88%;
+    --input: 240 5% 88%;
+    --ring: 158 45% 27%;               /* #16724F — green-deep on focus */
+
+    /* Tipografía Ghanima */
+    --font-sans: 'Manrope', system-ui, sans-serif;
+    --font-serif: 'Cormorant Garamond', 'Times New Roman', serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  }
+
+  /* Fondo global con textura de grano sutil */
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Selección de texto dorada */
+  ::selection {
+    background: #D4AF37;
+    color: #EEF1F4;
+  }
+
+  /* Estilo Ghanima: inputs con solo borde inferior, focus verde */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  textarea {
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid rgba(10, 10, 11, 0.18);
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    background: transparent;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-bottom-color: #16724F;
+    box-shadow: none;
+    outline: none;
+    ring: none;
+  }
+
+  /* Estilo Ghanima: botón primario hover negro */
+  .bg-primary:hover {
+    background-color: #0A0A0B;
   }
 
   *:focus-visible {
-    outline: 2px solid hsl(var(--ring));
+    outline: 2px solid #16724F;
     outline-offset: 2px;
   }
 }

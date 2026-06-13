@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import ProgressBar from '@/components/ProgressBar'
 import { useSecciones } from '@/hooks/useSecciones'
 import { useCursos } from '@/hooks/useCursos'
@@ -286,7 +287,7 @@ export default function RevisarSecciones() {
         <ProgressBar steps={STEPS} current={2} />
 
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Secciones (paralelos) del período</h2>
+          <PageHead eyebrow="Wizard" title="Secciones del período" subtitle="Revisa y ajusta las secciones antes de confirmar la apertura." />
           <button
             onClick={() => setShowForm(!showForm)}
             className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90"

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import CsvUploader from '@/components/CsvUploader'
 import CsvPreviewTable from '@/components/CsvPreviewTable'
 import ImportarStepper from '@/components/ImportarStepper'
@@ -70,7 +71,7 @@ export default function ImportarUsuariosPage() {
       <div className="p-6 md:p-8">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-foreground">Importar Usuarios desde CSV</h2>
+            <PageHead eyebrow="Usuarios" title="Importar Usuarios desde CSV" subtitle="Crea múltiples usuarios a la vez desde un archivo CSV." />
             <p className="mt-1 text-sm text-muted-foreground">
               Crea múltiples usuarios a la vez desde un archivo CSV
             </p>

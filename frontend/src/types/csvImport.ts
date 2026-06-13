@@ -6,6 +6,7 @@ export interface CsvRowRaw {
   email: string
   nombre: string
   roles: string
+  dateOfBirth?: string
 }
 
 export type EstadoFila = 'valido' | 'invalido'
@@ -15,6 +16,7 @@ export interface FilaValidada {
   email: string
   nombre: string
   roles: RolUsuario | null
+  dateOfBirth?: string
   estado: EstadoFila
   motivoError: string | null
   editada: boolean

@@ -13,3 +13,4 @@ target/
 .DS_Store
 uploads/
 docs/qa/backup-*.sql
+docs/architecture/structurizr/.tmp/

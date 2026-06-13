@@ -31,12 +31,13 @@ function validarFila(
   const nombre = (raw.nombre ?? '').trim()
   const rolRaw = (raw.roles ?? '').trim()
   const rolNormalizado: RolUsuario | null = esRolValido(rolRaw) ? (rolRaw.toUpperCase() as RolUsuario) : null
+  const dateOfBirth = (raw.dateOfBirth ?? '').trim() || undefined
 
   if (!email) {
-    return { fila, email, nombre, roles: rolNormalizado, estado: 'invalido', motivoError: 'Email vacío', editada: false }
+    return { fila, email, nombre, roles: rolNormalizado, dateOfBirth, estado: 'invalido', motivoError: 'Email vacío', editada: false }
   }
   if (!esEmailValido(email)) {
-    return { fila, email, nombre, roles: rolNormalizado, estado: 'invalido', motivoError: 'Formato de email inválido', editada: false }
+    return { fila, email, nombre, roles: rolNormalizado, dateOfBirth, estado: 'invalido', motivoError: 'Formato de email inválido', editada: false }
   }
   if (emailDuplicadoFilaAnterior !== undefined) {
     return {
@@ -44,19 +45,20 @@ function validarFila(
       email,
       nombre,
       roles: rolNormalizado,
+      dateOfBirth,
       estado: 'invalido',
       motivoError: `Email duplicado en CSV (primera aparición en fila ${emailDuplicadoFilaAnterior})`,
       editada: false
     }
   }
   if (!nombre || nombre.length < 2) {
-    return { fila, email, nombre, roles: rolNormalizado, estado: 'invalido', motivoError: 'Nombre vacío o muy corto (mín 2 caracteres)', editada: false }
+    return { fila, email, nombre, roles: rolNormalizado, dateOfBirth, estado: 'invalido', motivoError: 'Nombre vacío o muy corto (mín 2 caracteres)', editada: false }
   }
   if (!rolRaw) {
-    return { fila, email, nombre, roles: null, estado: 'invalido', motivoError: 'Rol vacío', editada: false }
+    return { fila, email, nombre, roles: null, dateOfBirth, estado: 'invalido', motivoError: 'Rol vacío', editada: false }
   }
   if (!esRolValido(rolRaw)) {
-    return { fila, email, nombre, roles: null, estado: 'invalido', motivoError: `Rol inválido "${rolRaw}". Debe ser uno de: ${ROLES_VALIDOS.join(', ')}`, editada: false }
+    return { fila, email, nombre, roles: null, dateOfBirth, estado: 'invalido', motivoError: `Rol inválido "${rolRaw}". Debe ser uno de: ${ROLES_VALIDOS.join(', ')}`, editada: false }
   }
 
   return {
@@ -64,6 +66,7 @@ function validarFila(
     email,
     nombre,
     roles: rolNormalizado,
+    dateOfBirth,
     estado: 'valido',
     motivoError: null,
     editada: false

@@ -144,6 +144,7 @@ class MatriculaServiceTest {
         Seccion seccion = new Seccion(); seccion.setCurso(curso); seccion.setCodigo("MAT-101-A");
 
         when(usuarioRepository.findByEmail("ernesto@colegio.edu.ec")).thenReturn(java.util.Optional.of(estudiante));
+        when(consentimientoService.existeConsentimiento(any())).thenReturn(true);
         when(seccionRepository.findAll()).thenReturn(java.util.List.of(seccion));
         when(matriculaRepository.existsByEstudianteIdAndSeccionId(any(), any())).thenReturn(false);
         when(matriculaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 
 interface MatriculaData { id: string; estudianteId: string; seccionId: string; estudianteNombre: string; cursoNombre: string }
 interface NotaResp { cursoNombre?: string; notaFinal: number; componentes: { nombre: string; peso: number; valor: number }[] }
@@ -75,7 +76,7 @@ export default function EstudianteDashboard() {
 function HorarioTab({ matriculas }: { matriculas: MatriculaData[] }) {
   return (
     <>
-      <h2 className="text-lg font-bold text-foreground mb-4">Mi Horario</h2>
+      <PageHead eyebrow="Estudiante" title="Mi Horario" className="mb-4" />
       {matriculas.length === 0 ? (
         <div className="rounded-xl bg-card border p-8 text-center">
           <p className="text-5xl mb-3">📚</p>
@@ -112,7 +113,7 @@ function NotasTab({ notas, asistencia, onBoletin }: { notas: NotaResp[]; asisten
     <div className="space-y-5">
       {notas.length > 0 && (
         <div>
-          <h2 className="text-lg font-bold text-foreground mb-3">Mis Calificaciones</h2>
+          <h3 className="font-serif text-lg font-medium text-foreground mb-3 border-b border-[rgba(138,106,24,0.32)] pb-1">Mis Calificaciones</h3>
           {notas.map((n, i) => (
             <div key={i} className="rounded-xl bg-card border p-4 mb-3">
               <div className="flex items-start justify-between gap-3">
@@ -156,7 +157,7 @@ function NotasTab({ notas, asistencia, onBoletin }: { notas: NotaResp[]; asisten
 
       {asistencia.length > 0 && (
         <div>
-          <h2 className="text-lg font-bold text-foreground mb-3">Mi Asistencia</h2>
+          <h3 className="font-serif text-lg font-medium text-foreground mb-3 border-b border-[rgba(138,106,24,0.32)] pb-1">Mi Asistencia</h3>
           <div className="rounded-xl bg-card border p-4 space-y-4">
             {asistencia.map((a, i) => (
               <div key={i}>

@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import type { ApiError } from '@/types/api'
 import AppLayout from '@/components/AppLayout'
+import { PageHead } from '@/components/ghanima'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
 import Pagination from '@/components/Pagination'
 import { capitalizeWords } from '@/utils/text'
@@ -17,7 +17,6 @@ interface Curso {
 }
 
 export default function CursosPage() {
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [page, setPage] = useState(0)
   const [showForm, setShowForm] = useState(false)
@@ -100,13 +99,12 @@ export default function CursosPage() {
   return (
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-foreground">Catálogo de Cursos</h2>
-          <div className="flex gap-2">
-            <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
-            <button onClick={() => setShowForm(!showForm)} className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90">+ Nuevo</button>
+        <PageHead eyebrow="Académico" title="Catálogo de Cursos" subtitle="Administra los cursos del plan de estudios.">
+          <div className="flex gap-2 mt-4">
+            <button onClick={() => setShowForm(!showForm)}
+              className="bg-[#8A6A18] text-white px-4 py-2 font-mono text-[0.7rem] font-bold uppercase tracking-[0.18em] hover:bg-[#0A0A0B] transition-colors">+ Nuevo</button>
           </div>
-        </div>
+        </PageHead>
 
         {showForm && (
           <div className="mb-6 rounded-lg border border-primary/30 bg-primary/5 p-6">

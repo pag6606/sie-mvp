@@ -1,0 +1,78 @@
+/*
+ * Ghanima Design System — Tokens v1.0
+ * SIE — Sistema de Información Estudiantil
+ */
+
+:root {
+    /* ============================================================
+     * PALETA CROMÁTICA
+     * ============================================================ */
+
+    /* Dorado institucional (acento primario) */
+    --gold:             #D4AF37;
+    --gold-bright:      #B8941F;
+    --gold-deep:        #8A6A18;
+    --gold-faint:       rgba(138, 106, 24, 0.10);
+    --gold-line:        rgba(138, 106, 24, 0.32);
+
+    /* Ciruela (acento secundario) */
+    --plum:             #4A2E5F;
+    --plum-bright:      #7A4FA8;
+    --plum-tint:        rgba(74, 46, 95, 0.07);
+
+    /* Verde (éxito, positivo, estable) */
+    --green:            #2BB07A;
+    --green-deep:       #16724F;
+    --green-tint:       rgba(43, 176, 122, 0.10);
+
+    /* Naranja (advertencia, riesgo, atención) */
+    --orange:           #E25E10;
+    --orange-deep:      #A8420A;
+    --orange-tint:      rgba(226, 94, 16, 0.08);
+
+    /* Rojo (error, destructivo, crítico) */
+    --red:              #C53030;
+    --red-tint:         rgba(197, 48, 48, 0.08);
+
+    /* ============================================================
+     * SUPERFICIES Y FONDOS
+     * ============================================================ */
+
+    --paper:            #EEF1F4;    /* Fondo global del lienzo */
+    --bone-bg-2:        #DDE3EA;    /* Fondo secundario */
+    --surface:          #FFFFFF;    /* Tarjetas, sidebar, modales */
+    --surface-2:        #F6F8FA;    /* Hover, fondo alternativo */
+
+    /* ============================================================
+     * TINTA (jerarquía de texto)
+     * ============================================================ */
+
+    --ink-bg:           #0A0A0B;    /* Fondo oscuro (auth, footer) */
+    --ink:              #0A0A0B;    /* Texto principal */
+    --ink-2:            #1C1C20;    /* Texto secundario */
+    --ink-3:            rgba(10, 10, 11, 0.72);  /* Texto terciario */
+    --ink-4:            rgba(10, 10, 11, 0.48);  /* Labels, placeholders */
+    --ink-5:            rgba(10, 10, 11, 0.28);  /* Separadores */
+
+    /* ============================================================
+     * LÍNEAS Y BORDES
+     * ============================================================ */
+
+    --line-1:           rgba(10, 10, 11, 0.10);  /* Bordes suaves */
+    --line-2:           rgba(10, 10, 11, 0.18);  /* Bordes marcados */
+    --line-3:           rgba(10, 10, 11, 0.28);  /* Énfasis */
+
+    /* ============================================================
+     * TIPOGRAFÍA
+     * ============================================================ */
+
+    --display:          'Cormorant Garamond', 'Times New Roman', serif;
+    --body:             'Manrope', system-ui, sans-serif;
+    --mono:             'JetBrains Mono', 'SF Mono', monospace;
+
+    /* ============================================================
+     * LAYOUT
+     * ============================================================ */
+
+    --sidebar-w:        248px;
+  }

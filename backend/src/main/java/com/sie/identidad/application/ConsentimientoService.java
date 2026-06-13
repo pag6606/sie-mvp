@@ -48,6 +48,9 @@ public class ConsentimientoService {
             return toResult(existente.get());
         }
 
+        var enrollmentRef = String.format("SIE-%s-%s-%s", colegioId, estudianteId,
+                representanteCedula != null ? representanteCedula : "sin-cedula");
+
         Consentimiento c = new Consentimiento();
         c.setEstudianteId(estudianteId);
         c.setRepresentanteNombre(representanteNombre);
@@ -56,6 +59,7 @@ public class ConsentimientoService {
         c.setDocumentoUrl(documentoUrl != null ? documentoUrl : "");
         c.setColegioId(colegioId);
         c.setFuente("SIE_LOCAL");
+        c.setEnrollmentRef(enrollmentRef);
         c = consentimientoRepository.save(c);
 
         if (lopdpEnabled && lopdpClient.isPresent()) {
@@ -63,11 +67,22 @@ public class ConsentimientoService {
                 var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
                 var studentEmail = estudiante != null ? estudiante.getEmail() : "";
                 var studentName = estudiante != null ? estudiante.getNombre() : "";
-                var enrollmentRef = "SIE-CONS-" + System.currentTimeMillis();
-                lopdpClient.get().syncEnrollmentAndConsent(
-                        estudianteId, studentEmail, studentName, "",
-                        representanteNombre, representanteCedula, representanteEmail,
-                        documentoUrl, enrollmentRef);
+                var dob = estudiante != null && estudiante.getDateOfBirth() != null
+                        ? estudiante.getDateOfBirth().toString()
+                        : "2010-01-01";
+                var isMinor = estudiante != null && estudiante.getDateOfBirth() != null
+                        && java.time.Period.between(estudiante.getDateOfBirth(), java.time.LocalDate.now()).getYears() < 18;
+
+                var enrollResult = lopdpClient.get().enroll(
+                        studentEmail, studentName, dob,
+                        representanteEmail, representanteNombre,
+                        "LEGAL_GUARDIAN", enrollmentRef, isMinor);
+
+                var policyVersion = lopdpClient.get().getActivePolicyVersion();
+                lopdpClient.get().grantConsent(
+                        enrollResult.studentId(), "ACADEMIC_RECORDS", true,
+                        "EXPLICIT", policyVersion, enrollResult.parentId(), documentoUrl);
+
                 c.setFuente("LOPDP");
                 consentimientoRepository.save(c);
             } catch (Exception e) {
@@ -81,12 +96,9 @@ public class ConsentimientoService {
     public ConsentimientoResult verificar(UUID estudianteId) {
         if (lopdpEnabled && lopdpClient.isPresent()) {
             try {
-                var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
-                var email = estudiante != null ? estudiante.getEmail() : estudianteId.toString();
-                var result = lopdpClient.get().checkConsent(estudianteId, email);
-                if (result.exists()) {
-                    return new ConsentimientoResult(true, result.id(), result.fecha(),
-                            result.representanteNombre(), result.representanteCedula());
+                var result = lopdpClient.get().checkConsent(estudianteId.toString(), "ACADEMIC_RECORDS");
+                if (result.authorized()) {
+                    return new ConsentimientoResult(true, null, null, null, null);
                 }
             } catch (LopdpUnavailableException e) {
                 log.warn("LOPDP unavailable for check, falling back to local cache for estudiante {}", estudianteId);
@@ -105,11 +117,9 @@ public class ConsentimientoService {
 
         if (lopdpEnabled && lopdpClient.isPresent()) {
             try {
-                var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
-                var studentEmail = estudiante != null ? estudiante.getEmail() : "";
-                var enrollmentRef = "SIE-CONS-" + System.currentTimeMillis();
-                lopdpClient.get().revokeConsent(estudianteId, studentEmail,
-                        c.getRepresentanteEmail(), enrollmentRef);
+                var policyVersion = lopdpClient.get().getActivePolicyVersion();
+                lopdpClient.get().grantConsent(estudianteId.toString(), "ACADEMIC_RECORDS", false,
+                        "EXPLICIT", policyVersion, null, null);
             } catch (Exception e) {
                 log.warn("LOPDP revoke failed for estudiante {}, revoking locally: {}", estudianteId, e.getMessage());
             }

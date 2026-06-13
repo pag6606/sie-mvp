@@ -34,6 +34,12 @@ public class Usuario extends BaseEntity {
     @Column(name = "activation_token")
     private String activationToken;
 
+    @Column(name = "date_of_birth")
+    private java.time.LocalDate dateOfBirth;
+
+    @Column(name = "date_of_birth_estimated", nullable = false)
+    private boolean dateOfBirthEstimated = false;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UsuarioRol> usuarioRoles = new HashSet<>();
 }

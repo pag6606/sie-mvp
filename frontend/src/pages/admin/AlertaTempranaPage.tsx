@@ -2,9 +2,9 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePeriodos } from '@/hooks/usePeriodos';
 import { useRiesgoDashboard, useRiesgoSeccion, type RiesgoDashboard, type RiesgoEstudiante } from '@/hooks/useRiesgoAcademico';
-import { RiskBadge } from '@/components/RiskBadge';
-import { RiskGauge } from '@/components/RiskGauge';
-import { LoadingSkeleton } from '@/components/UIPatterns';
+import { RiskBadge } from '@/components/RiskBadge'
+import { Gauge } from '@/components/ghanima'
+import { LoadingSkeleton } from '@/components/UIPatterns'
 
 export default function AlertaTempranaPage() {
   const navigate = useNavigate();
@@ -184,7 +184,7 @@ export default function AlertaTempranaPage() {
                 <div className="rounded-lg border bg-card p-4 space-y-3">
                   <h3 className="font-medium">{selectedEstudianteData.estudianteNombre}</h3>
                   <div className="flex justify-center">
-                    <RiskGauge score={selectedEstudianteData.riesgoScore} color={selectedEstudianteData.color} size={120} />
+                    <Gauge value={selectedEstudianteData.riesgoScore} max={100} label="Riesgo" size={140} />
                   </div>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">

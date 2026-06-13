@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIE · Preview con Ghanima (modo claro)</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* =================================================================
+   SIE — PREVIEW CON GHANIMA (MODO CLARO)
+   Tokens Ghanima light-mode aplicados al dashboard admin.
+   Diferencias respecto a la propuesta:
+   - Sin nav marketing arriba (es una app)
+   - Sidebar fija a la izquierda estilo SaaS
+   - Hairlines y radio-cero respetados
+   - Acentos por KPI mapeados a la paleta institucional
+   ================================================================= */
+:root{
+  --paper:        #EEF1F4;
+  --bone-bg-2:    #DDE3EA;
+  --surface:      #FFFFFF;
+  --surface-2:    #F6F8FA;
+  --ink-bg:       #0A0A0B;
+
+  --ink:          #0A0A0B;
+  --ink-2:        #1C1C20;
+  --ink-3:        rgba(10,10,11,.72);
+  --ink-4:        rgba(10,10,11,.48);
+  --ink-5:        rgba(10,10,11,.28);
+
+  --gold:         #D4AF37;
+  --gold-bright:  #B8941F;
+  --gold-deep:    #8A6A18;
+  --gold-faint:   rgba(138,106,24,.10);
+  --gold-line:    rgba(138,106,24,.32);
+
+  --plum:         #4A2E5F;
+  --plum-bright:  #7A4FA8;
+  --plum-tint:    rgba(74,46,95,.07);
+
+  --green:        #2BB07A;
+  --green-deep:   #16724F;
+  --green-tint:   rgba(43,176,122,.10);
+  --orange:       #E25E10;
+  --orange-deep:  #A8420A;
+  --orange-tint:  rgba(226,94,16,.08);
+  --red:          #C53030;
+  --red-tint:     rgba(197,48,48,.08);
+
+  --display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --body:    'Manrope', system-ui, sans-serif;
+  --mono:    'JetBrains Mono', 'SF Mono', monospace;
+
+  --line-1: rgba(10,10,11,.10);
+  --line-2: rgba(10,10,11,.18);
+  --line-3: rgba(10,10,11,.28);
+
+  --sidebar-w: 248px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--body);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:"ss01","cv01";
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+::selection{background:var(--gold);color:var(--paper)}
+
+/* Grano sutil sobre la app completa */
+body::before{
+  content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0 0.06 0 0 0 0.6 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity:.05;mix-blend-mode:multiply;
+}
+
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh;position:relative;z-index:2}
+
+/* ===================== SIDEBAR ===================== */
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--line-1);
+  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+}
+.brand{
+  display:flex;align-items:center;gap:.7rem;
+  padding:1.1rem 1.1rem 1.1rem;
+  border-bottom:1px solid var(--line-1);
+}
+.brand-mark{
+  width:34px;height:34px;display:grid;place-items:center;
+  color:var(--gold-deep);
+  border:1px solid var(--gold-line);
+}
+.brand-mark svg{width:26px;height:26px}
+.brand-text{display:flex;flex-direction:column;line-height:1.05}
+.brand-name{font-family:var(--display);font-size:1.1rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+.brand-sub{font-family:var(--mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-4);margin-top:.2rem}
+
+.nav{padding:.8rem .7rem;flex:1;overflow-y:auto}
+.nav-section{margin-bottom:1.4rem}
+.nav-label{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-4);padding:0 .9rem .55rem;font-weight:600;
+}
+.nav-item{
+  display:flex;align-items:center;gap:.7rem;
+  padding:.55rem .9rem;font-size:.86rem;color:var(--ink-3);
+  border-left:2px solid transparent;
+  transition:all .2s;
+  position:relative;
+}
+.nav-item:hover{color:var(--ink);background:var(--surface-2)}
+.nav-item.active{
+  color:var(--gold-deep);
+  background:var(--gold-faint);
+  border-left-color:var(--gold-deep);
+  font-weight:500;
+}
+.nav-item .ico{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.nav-item .badge{
+  margin-left:auto;font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;
+  background:var(--orange-tint);color:var(--orange-deep);
+  padding:.15rem .45rem;font-weight:600;
+}
+.nav-item.active .badge{background:var(--gold-faint);color:var(--gold-deep)}
+
+.user-card{
+  border-top:1px solid var(--line-1);padding:.85rem;display:flex;align-items:center;gap:.7rem;
+  position:relative;
+}
+.user-card:hover{background:var(--surface-2)}
+.avatar{
+  width:34px;height:34px;display:grid;place-items:center;
+  background:var(--gold-deep);color:var(--paper);
+  font-family:var(--display);font-size:.95rem;font-weight:500;letter-spacing:.02em;flex-shrink:0;
+}
+.user-meta{min-width:0;flex:1}
+.user-name{font-size:.84rem;font-weight:500;color:var(--ink);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4);margin-top:.25rem}
+.user-caret{color:var(--ink-4);font-size:.7rem}
+
+/* ===================== MAIN ===================== */
+.main{display:flex;flex-direction:column;min-width:0}
+
+.topbar{
+  height:56px;background:var(--surface);
+  border-bottom:1px solid var(--line-1);
+  display:flex;align-items:center;padding:0 1.75rem;gap:1rem;
+  position:sticky;top:0;z-index:10;
+  backdrop-filter:blur(8px);
+}
+.crumb{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-4);
+}
+.crumb b{color:var(--gold-deep);font-weight:600}
+.topbar-search{
+  margin-left:auto;display:flex;align-items:center;gap:.5rem;
+  background:var(--paper);border:1px solid var(--line-1);
+  padding:.45rem .8rem;font-size:.82rem;color:var(--ink-4);
+  min-width:280px;
+}
+.topbar-search .ico{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.topbar-search kbd{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;
+  background:var(--surface);border:1px solid var(--line-1);
+  padding:.1rem .35rem;margin-left:auto;color:var(--ink-4);
+}
+.topbar-icon{
+  width:34px;height:34px;display:grid;place-items:center;
+  border:1px solid var(--line-1);background:var(--surface);
+  position:relative;
+}
+.topbar-icon .ico{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+.topbar-icon .dot{
+  position:absolute;top:6px;right:6px;width:6px;height:6px;background:var(--orange-deep);
+  border:1.5px solid var(--surface);
+}
+
+.content{padding:1.75rem 1.75rem 4rem;max-width:1200px;width:100%}
+
+/* Page header */
+.page-head{margin-bottom:1.5rem}
+.eyebrow{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--gold-deep);font-weight:600;margin-bottom:.65rem;
+  display:flex;align-items:center;gap:.6rem;
+}
+.eyebrow::before{content:'';width:18px;height:1px;background:var(--gold-deep)}
+.page-title{
+  font-family:var(--display);font-size:2.4rem;font-weight:400;line-height:1.05;
+  letter-spacing:-.02em;color:var(--ink);
+}
+.page-title em{font-style:italic;color:var(--gold-deep);font-weight:500}
+.page-meta{
+  margin-top:.55rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+  font-size:.84rem;color:var(--ink-3);
+}
+.page-meta .state{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--green-deep);font-weight:600;
+}
+.page-meta .state::before{content:'';width:6px;height:6px;background:var(--green-deep);border-radius:50%}
+.page-meta .sep{color:var(--ink-5)}
+.page-meta code{font-family:var(--mono);font-size:.78rem;color:var(--ink-2)}
+
+/* Callout: período en configuración */
+.callout{
+  background:linear-gradient(135deg,var(--gold-faint),transparent 60%),var(--surface);
+  border:1px solid var(--gold-line);
+  border-left:3px solid var(--gold-deep);
+  padding:1.1rem 1.4rem;display:flex;align-items:center;gap:1.5rem;
+  margin-bottom:1.5rem;flex-wrap:wrap;
+}
+.callout-ico{
+  width:36px;height:36px;display:grid;place-items:center;flex-shrink:0;
+  background:var(--gold-faint);color:var(--gold-deep);
+  border:1px solid var(--gold-line);
+}
+.callout-ico .ico{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.callout-body{flex:1;min-width:240px}
+.callout-eyebrow{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold-deep);font-weight:600;margin-bottom:.25rem;
+}
+.callout-title{font-family:var(--display);font-size:1.25rem;font-weight:500;color:var(--ink);line-height:1.1}
+.callout-sub{font-size:.84rem;color:var(--ink-3);margin-top:.3rem}
+.callout-sub b{color:var(--ink);font-weight:500}
+.btn-gold{
+  display:inline-flex;align-items:center;gap:.6rem;background:var(--gold-deep);color:var(--paper);
+  font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  padding:.75rem 1.4rem;transition:all .2s;
+}
+.btn-gold:hover{background:var(--ink-bg)}
+.btn-gold::after{content:'→';font-family:var(--body);font-size:.95rem}
+
+/* KPI grid */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-1);border:1px solid var(--line-1);margin-bottom:1.5rem}
+.kpi{
+  background:var(--surface);padding:1.2rem 1.25rem;position:relative;
+  display:flex;flex-direction:column;gap:.6rem;
+}
+.kpi-eyebrow{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-4);font-weight:600;
+  display:flex;align-items:center;gap:.5rem;
+}
+.kpi-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--accent,var(--ink-4))}
+.kpi-num{
+  font-family:var(--display);font-size:2.6rem;font-weight:400;line-height:1;
+  color:var(--ink);letter-spacing:-.025em;
+}
+.kpi-num .suffix{font-size:1.4rem;color:var(--ink-3);font-style:italic;margin-left:.15rem}
+.kpi-sub{font-size:.78rem;color:var(--ink-3)}
+.kpi-sub b{color:var(--ink-2);font-weight:500}
+.kpi-trend{
+  display:inline-flex;align-items:center;gap:.3rem;
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;
+  color:var(--green-deep);font-weight:600;margin-top:.1rem;
+}
+.kpi-trend.down{color:var(--orange-deep)}
+.kpi-trend::before{content:'↑'}
+.kpi-trend.down::before{content:'↓'}
+.kpi-spark{flex:1;min-height:32px;margin-top:.2rem}
+
+/* Chart card */
+.card{background:var(--surface);border:1px solid var(--line-1);padding:1.4rem;margin-bottom:1.5rem}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.card-title{font-family:var(--display);font-size:1.35rem;font-weight:500;color:var(--ink);line-height:1.1;letter-spacing:-.01em}
+.card-sub{font-size:.82rem;color:var(--ink-3);margin-top:.2rem}
+.card-tabs{display:flex;gap:0;border:1px solid var(--line-1)}
+.card-tab{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:.45rem .9rem;color:var(--ink-4);font-weight:600;
+  border-right:1px solid var(--line-1);
+}
+.card-tab:last-child{border-right:0}
+.card-tab.active{background:var(--gold-deep);color:var(--paper)}
+
+.chart-svg{width:100%;height:240px;display:block}
+
+/* Two-column section */
+.grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+
+/* Activity table */
+.tbl{width:100%;border-collapse:collapse;font-size:.84rem}
+.tbl th{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;
+  text-align:left;padding:.7rem .8rem;border-bottom:1px solid var(--gold-line);
+  color:var(--gold-deep);font-weight:600;background:var(--surface-2);
+}
+.tbl td{padding:.8rem;border-bottom:1px solid var(--line-1);color:var(--ink-3);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td:first-child{font-family:var(--mono);font-size:.72rem;color:var(--ink-4);white-space:nowrap}
+.tbl td.event{color:var(--ink-2);font-weight:500}
+.tbl td.user{font-family:var(--mono);font-size:.72rem;color:var(--ink-2);text-align:right}
+.tbl-pill{
+  display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;
+  padding:.12rem .45rem;text-transform:uppercase;font-weight:600;
+  background:var(--surface-2);color:var(--ink-3);
+  border:1px solid var(--line-1);
+}
+.tbl-pill.ok{background:var(--green-tint);color:var(--green-deep);border-color:transparent}
+.tbl-pill.warn{background:var(--orange-tint);color:var(--orange-deep);border-color:transparent}
+.tbl-pill.info{background:var(--gold-faint);color:var(--gold-deep);border-color:transparent}
+
+/* Quick actions */
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-1);border:1px solid var(--line-1)}
+.action{
+  background:var(--surface);padding:1.1rem;display:flex;align-items:flex-start;gap:.85rem;
+  text-align:left;transition:all .2s;
+}
+.action:hover{background:var(--surface-2)}
+.action-ico{
+  width:32px;height:32px;display:grid;place-items:center;flex-shrink:0;
+  background:var(--gold-faint);color:var(--gold-deep);
+  border:1px solid var(--gold-line);
+}
+.action-ico .ico{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.action-body{flex:1;min-width:0}
+.action-title{font-family:var(--display);font-size:1.05rem;font-weight:500;color:var(--ink);line-height:1.15}
+.action-sub{font-size:.76rem;color:var(--ink-3);margin-top:.25rem;line-height:1.4}
+
+/* Risk gauge / alertas tempranas */
+.risk-list{display:flex;flex-direction:column}
+.risk-row{
+  display:grid;grid-template-columns:auto 1fr auto auto auto;gap:1rem;align-items:center;
+  padding:.85rem .25rem;border-bottom:1px solid var(--line-1);
+}
+.risk-row:last-child{border-bottom:0}
+.risk-avatar{
+  width:32px;height:32px;display:grid;place-items:center;
+  background:var(--surface-2);color:var(--ink-2);
+  font-family:var(--display);font-size:.9rem;font-weight:500;
+  border:1px solid var(--line-1);
+}
+.risk-name{font-size:.88rem;color:var(--ink);font-weight:500;line-height:1.1}
+.risk-section{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-4);margin-top:.2rem}
+.risk-stat{text-align:right}
+.risk-stat-num{font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--ink);line-height:1}
+.risk-stat-lbl{font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4);margin-top:.2rem}
+.risk-badge{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:.22rem .55rem;font-weight:700;
+  border:1px solid currentColor;
+}
+.risk-badge.high{color:var(--orange-deep);background:var(--orange-tint);border-color:transparent}
+.risk-badge.med{color:var(--gold-deep);background:var(--gold-faint);border-color:transparent}
+.risk-badge.low{color:var(--green-deep);background:var(--green-tint);border-color:transparent}
+
+/* Footer */
+.foot{
+  border-top:1px solid var(--line-1);margin-top:1rem;padding-top:1.25rem;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
+}
+.foot-l{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4)}
+.foot-l b{color:var(--gold-deep);font-weight:600}
+.foot-r{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4)}
+.foot-r .ico{width:11px;height:11px;display:inline-block;vertical-align:-1px;margin-right:.4rem;color:var(--gold-deep)}
+
+/* Responsive */
+@media (max-width:1100px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  :root{--sidebar-w:0px}
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .topbar-search{display:none}
+  .kpis{grid-template-columns:1fr 1fr}
+  .actions{grid-template-columns:1fr}
+  .content{padding:1.25rem 1rem 3rem}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="lotus-ou" viewBox="0 0 200 200">
+    <g stroke="currentColor" stroke-width="1.4" fill="transparent" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M 100 41.8 Q 128 81.4, 100 121 Q 72 81.4, 100 41.8 Z" transform="rotate(-75 100 121)"/>
+      <path d="M 100 41.8 Q 128 81.4, 100 121 Q 72 81.4, 100 41.8 Z" transform="rotate(75 100 121)"/>
+      <path d="M 100 28.6 Q 130 74.8, 100 121 Q 70 74.8, 100 28.6 Z" transform="rotate(-45 100 121)"/>
+      <path d="M 100 28.6 Q 130 74.8, 100 121 Q 70 74.8, 100 28.6 Z" transform="rotate(45 100 121)"/>
+      <path d="M 100 17.2 Q 132 69.1, 100 121 Q 68 69.1, 100 17.2 Z" transform="rotate(-22 100 121)"/>
+      <path d="M 100 17.2 Q 132 69.1, 100 121 Q 68 69.1, 100 17.2 Z" transform="rotate(22 100 121)"/>
+      <path d="M 100 8.4 Q 134 64.7, 100 121 Q 66 64.7, 100 8.4 Z"/>
+    </g>
+    <circle cx="100" cy="128" r="9" fill="none" stroke="currentColor" stroke-width="1" opacity="0.7"/>
+  </symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 21a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.9.5c0 1.5-2.4 2-2.4 3.5"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M16 20a5 5 0 0 1 5.5-5"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19a1 1 0 0 1 1 1v15.5a.5.5 0 0 1-.8.4L17 18l-2.2 1.9a.5.5 0 0 1-.6 0L12 18l-2.2 1.9a.5.5 0 0 1-.6 0L7 18l-2.2 1.9a.5.5 0 0 1-.8-.4z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M2 12 12 5l10 7-10 7z"/><path d="m6 14 6 4 6-4"/><path d="m6 17 6 4 6-4"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="1"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M8 11h8M8 15h5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8.5 8 9 4.5-.5 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 21V9m0 0-4 4m4-4 4 4"/><path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.4.8a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.5a7 7 0 0 0-2 1.2l-2.4-.8-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.4-.8a7 7 0 0 0 2 1.2L10 21h4l.5-2.5a7 7 0 0 0 2-1.2l2.4.8 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-lotus-mark" viewBox="0 0 32 32"><path d="M16 26c0-3 1.5-5 4-6 0 3-1.5 5-4 6zM16 26c0-3-1.5-5-4-6 0 3 1.5 5 4 6zM16 26c0-4 2-6 5-7 0 4-2 6-5 7zM16 26c0-4-2-6-5-7 0 4 2 6 5 7z" fill="currentColor"/></symbol>
+</svg>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div>
+      <div class="brand-text">
+        <div class="brand-name">SIE</div>
+        <div class="brand-sub">Ghanima Core</div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Navegación principal">
+      <div class="nav-section">
+        <div class="nav-label">Operación</div>
+        <a class="nav-item active" href="#">
+          <svg class="ico"><use href="#i-grid"/></svg>
+          Dashboard
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="ico"><use href="#i-users"/></svg>
+          Usuarios
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="ico"><use href="#i-book"/></svg>
+          Cursos
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="ico"><use href="#i-layers"/></svg>
+          Secciones
+          <span class="badge">32</span>
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="ico"><use href="#i-clipboard"/></svg>
+          Matrícula
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="ico"><use href="#i-shield"/></svg>
+          Consentimientos
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-label">Sistema</div>
+        <a class="nav-item" href="#">
+          <svg class="ico"><use href="#i-settings"/></svg>
+          Configuración
+        </a>
+        <a class="nav-item" href="#">
+          <svg class="ico"><use href="#i-help"/></svg>
+          Ayuda
+        </a>
+      </div>
+    </nav>
+
+    <button class="user-card" type="button">
+      <div class="avatar">AA</div>
+      <div class="user-meta">
+        <div class="user-name">Alma Arboleda</div>
+        <div class="user-role">Administradora</div>
+      </div>
+      <span class="user-caret">▾</span>
+    </button>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <header class="topbar">
+      <div class="crumb">SIE · <b>Dashboard</b></div>
+      <div class="topbar-search">
+        <svg class="ico"><use href="#i-search"/></svg>
+        Buscar estudiante, sección, RUDE…
+        <kbd>⌘ K</kbd>
+      </div>
+      <button class="topbar-icon" aria-label="Notificaciones">
+        <svg class="ico"><use href="#i-bell"/></svg>
+        <span class="dot"></span>
+      </button>
+      <button class="topbar-icon" aria-label="Ayuda">
+        <svg class="ico"><use href="#i-help"/></svg>
+      </button>
+    </header>
+
+    <div class="content">
+
+      <!-- Page head -->
+      <div class="page-head">
+        <div class="eyebrow">Período activo · 2025–2026</div>
+        <h1 class="page-title">2025-2026 — <em>Período Ordinario</em></h1>
+        <div class="page-meta">
+          <span class="state">En curso</span>
+          <span class="sep">·</span>
+          <code>2025-04-14</code> <span>→</span> <code>2025-08-22</code>
+          <span class="sep">·</span>
+          <span>Unidad Educativa <b style="color:var(--ink-2)">San Agustín</b></span>
+        </div>
+      </div>
+
+      <!-- Callout: período en configuración -->
+      <div class="callout">
+        <div class="callout-ico"><svg class="ico"><use href="#i-spark"/></svg></div>
+        <div class="callout-body">
+          <div class="callout-eyebrow">Período en configuración · 2026-2027</div>
+          <div class="callout-title">Paso 3 de 4 — Crear cursos del catálogo</div>
+          <div class="callout-sub">Tienes <b>14 cursos</b> ya ingresados. Faltan <b>23 cursos</b> para completar el catálogo de Educación General Básica y Bachillerato.</div>
+        </div>
+        <button class="btn-gold">Continuar configuración</button>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpis">
+        <div class="kpi" style="--accent:var(--gold-deep)">
+          <div class="kpi-eyebrow"><span class="dot"></span>Estudiantes</div>
+          <div class="kpi-num">847</div>
+          <div class="kpi-sub"><b>+12</b> esta semana</div>
+          <div class="kpi-trend">+1.4% vs mes anterior</div>
+          <svg class="kpi-spark" viewBox="0 0 120 32" preserveAspectRatio="none">
+            <path d="M0 26 L15 22 L30 24 L45 18 L60 20 L75 14 L90 12 L105 8 L120 6" fill="none" stroke="var(--gold-deep)" stroke-width="1.4"/>
+            <path d="M0 26 L15 22 L30 24 L45 18 L60 20 L75 14 L90 12 L105 8 L120 6 L120 32 L0 32 Z" fill="var(--gold-faint)"/>
+          </svg>
+        </div>
+        <div class="kpi" style="--accent:var(--green-deep)">
+          <div class="kpi-eyebrow"><span class="dot"></span>Matriculados</div>
+          <div class="kpi-num">812</div>
+          <div class="kpi-sub"><b>95.9%</b> del total</div>
+          <div class="kpi-trend">+2.1% vs mes anterior</div>
+          <svg class="kpi-spark" viewBox="0 0 120 32" preserveAspectRatio="none">
+            <path d="M0 28 L15 24 L30 22 L45 20 L60 16 L75 14 L90 10 L105 8 L120 4" fill="none" stroke="var(--green-deep)" stroke-width="1.4"/>
+            <path d="M0 28 L15 24 L30 22 L45 20 L60 16 L75 14 L90 10 L105 8 L120 4 L120 32 L0 32 Z" fill="var(--green-tint)"/>
+          </svg>
+        </div>
+        <div class="kpi" style="--accent:var(--plum)">
+          <div class="kpi-eyebrow"><span class="dot"></span>Secciones activas</div>
+          <div class="kpi-num">32</div>
+          <div class="kpi-sub"><b>28</b> con docente asignado</div>
+          <div class="kpi-trend down">−4 sin docente</div>
+          <svg class="kpi-spark" viewBox="0 0 120 32" preserveAspectRatio="none">
+            <path d="M0 18 L15 18 L30 18 L45 18 L60 18 L75 18 L90 18 L105 18 L120 18" fill="none" stroke="var(--plum)" stroke-width="1.4" stroke-dasharray="2 3"/>
+          </svg>
+        </div>
+        <div class="kpi" style="--accent:var(--orange-deep)">
+          <div class="kpi-eyebrow"><span class="dot"></span>Asistencia</div>
+          <div class="kpi-num">94<span class="suffix">%</span></div>
+          <div class="kpi-sub">promedio institucional</div>
+          <div class="kpi-trend">+0.8% vs mes anterior</div>
+          <svg class="kpi-spark" viewBox="0 0 120 32" preserveAspectRatio="none">
+            <path d="M0 12 L15 14 L30 10 L45 16 L60 8 L75 12 L90 6 L105 10 L120 4" fill="none" stroke="var(--orange-deep)" stroke-width="1.4"/>
+            <path d="M0 12 L15 14 L30 10 L45 16 L60 8 L75 12 L90 6 L105 10 L120 4 L120 32 L0 32 Z" fill="var(--orange-tint)"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Chart card -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Evolución de matrículas</h2>
+            <p class="card-sub">Últimos 7 meses · Período 2025-2026</p>
+          </div>
+          <div class="card-tabs">
+            <button class="card-tab">7M</button>
+            <button class="card-tab">12M</button>
+            <button class="card-tab active">YTD</button>
+            <button class="card-tab">Todo</button>
+          </div>
+        </div>
+        <svg class="chart-svg" viewBox="0 0 800 240" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--gold)" stop-opacity=".25"/>
+              <stop offset="100%" stop-color="var(--gold)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- Y grid -->
+          <line x1="40" y1="40"  x2="780" y2="40"  stroke="var(--line-1)" stroke-dasharray="2 4"/>
+          <line x1="40" y1="90"  x2="780" y2="90"  stroke="var(--line-1)" stroke-dasharray="2 4"/>
+          <line x1="40" y1="140" x2="780" y2="140" stroke="var(--line-1)" stroke-dasharray="2 4"/>
+          <line x1="40" y1="190" x2="780" y2="190" stroke="var(--line-1)"/>
+          <!-- Y labels -->
+          <text x="30" y="44"  text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">900</text>
+          <text x="30" y="94"  text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">700</text>
+          <text x="30" y="144" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">500</text>
+          <text x="30" y="194" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">300</text>
+          <!-- X labels -->
+          <text x="80"  y="220" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">Feb</text>
+          <text x="190" y="220" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">Mar</text>
+          <text x="300" y="220" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">Abr</text>
+          <text x="410" y="220" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">May</text>
+          <text x="520" y="220" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">Jun</text>
+          <text x="630" y="220" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">Jul</text>
+          <text x="740" y="220" font-family="JetBrains Mono" font-size="10" fill="var(--ink-4)">Ago</text>
+          <!-- Area + line: data 380, 480, 560, 610, 680, 750, 812 -->
+          <path d="M80 160 L190 140 L300 115 L410 100 L520 80 L630 55 L740 35 L740 200 L80 200 Z" fill="url(#area)"/>
+          <path d="M80 160 L190 140 L300 115 L410 100 L520 80 L630 55 L740 35" fill="none" stroke="var(--gold-deep)" stroke-width="2"/>
+          <!-- Points -->
+          <g fill="var(--surface)" stroke="var(--gold-deep)" stroke-width="1.8">
+            <circle cx="80"  cy="160" r="3.5"/>
+            <circle cx="190" cy="140" r="3.5"/>
+            <circle cx="300" cy="115" r="3.5"/>
+            <circle cx="410" cy="100" r="3.5"/>
+            <circle cx="520" cy="80"  r="3.5"/>
+            <circle cx="630" cy="55"  r="3.5"/>
+            <circle cx="740" cy="35"  r="3.5" fill="var(--gold-deep)"/>
+          </g>
+          <!-- Tooltip on last point -->
+          <g transform="translate(670 0)">
+            <rect x="0" y="6" width="80" height="34" fill="var(--ink-bg)"/>
+            <text x="40" y="22" text-anchor="middle" font-family="JetBrains Mono" font-size="9" letter-spacing="1.2" fill="var(--gold)">AGO · 812</text>
+            <text x="40" y="34" text-anchor="middle" font-family="Manrope" font-size="9" fill="rgba(244,241,232,.65)">+8.3% MoM</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Two-col: actividad + acciones -->
+      <div class="grid-2">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title">Actividad reciente</h2>
+              <p class="card-sub">Últimos eventos del sistema</p>
+            </div>
+            <button class="card-tab" style="border:1px solid var(--line-1);background:var(--surface)">Ver todo →</button>
+          </div>
+          <table class="tbl">
+            <thead><tr><th>Hora</th><th>Evento</th><th style="text-align:right">Usuario</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>14:32</td>
+                <td class="event">Sección <b style="color:var(--ink)">10°A — Matemáticas</b> cerrada</td>
+                <td class="user">d.velasco</td>
+              </tr>
+              <tr>
+                <td>14:18</td>
+                <td class="event">38 estudiantes matriculados vía <span class="tbl-pill info">CSV</span></td>
+                <td class="user">a.arboleda</td>
+              </tr>
+              <tr>
+                <td>13:55</td>
+                <td class="event">Asistencia registrada — <b style="color:var(--ink)">8°B</b></td>
+                <td class="user">m.cardenas</td>
+              </tr>
+              <tr>
+                <td>13:21</td>
+                <td class="event">Consentimiento LOPDP firmado <span class="tbl-pill ok">Aprobado</span></td>
+                <td class="user">e.ruales</td>
+              </tr>
+              <tr>
+                <td>12:47</td>
+                <td class="event">3 alertas tempranas nuevas <span class="tbl-pill warn">Riesgo</span></td>
+                <td class="user">sistema</td>
+              </tr>
+              <tr>
+                <td>11:30</td>
+                <td class="event">Esquema de evaluación configurado — <b style="color:var(--ink)">Lengua 9°A</b></td>
+                <td class="user">p.ordoñez</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head">
+            <div>
+              <h2 class="card-title">Acciones rápidas</h2>
+              <p class="card-sub">Tareas comunes del administrador</p>
+            </div>
+          </div>
+          <div class="actions" style="border:0;background:transparent;gap:1px">
+            <button class="action" style="border:1px solid var(--line-1)">
+              <div class="action-ico"><svg class="ico"><use href="#i-plus"/></svg></div>
+              <div class="action-body">
+                <div class="action-title">Crear período</div>
+                <div class="action-sub">Wizard guiado de 4 pasos para configurar el siguiente año lectivo.</div>
+              </div>
+            </button>
+            <button class="action" style="border:1px solid var(--line-1)">
+              <div class="action-ico"><svg class="ico"><use href="#i-upload"/></svg></div>
+              <div class="action-body">
+                <div class="action-title">Importar estudiantes</div>
+                <div class="action-sub">Carga masiva desde CSV con validación previa y previsualización.</div>
+              </div>
+            </button>
+            <button class="action" style="border:1px solid var(--line-1)">
+              <div class="action-ico"><svg class="ico"><use href="#i-users"/></svg></div>
+              <div class="action-body">
+                <div class="action-title">Asignar docentes</div>
+                <div class="action-sub">4 secciones aún sin docente asignado este período.</div>
+              </div>
+            </button>
+            <button class="action" style="border:1px solid var(--line-1)">
+              <div class="action-ico"><svg class="ico"><use href="#i-download"/></svg></div>
+              <div class="action-body">
+                <div class="action-title">Exportar reportes</div>
+                <div class="action-sub">Boletines, listas de asistencia, nóminas en PDF firmados.</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alertas tempranas -->
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-title">Alertas tempranas</h2>
+            <p class="card-sub">Estudiantes con riesgo académico detectado esta semana</p>
+          </div>
+          <button class="card-tab" style="border:1px solid var(--line-1);background:var(--surface)">Ver todas (12) →</button>
+        </div>
+        <div class="risk-list">
+          <div class="risk-row">
+            <div class="risk-avatar">EM</div>
+            <div>
+              <div class="risk-name">Esteban Morales Vega</div>
+              <div class="risk-section">10°A · RUDE 1024-2010</div>
+            </div>
+            <div class="risk-stat">
+              <div class="risk-stat-num">4.8</div>
+              <div class="risk-stat-lbl">Promedio</div>
+            </div>
+            <div class="risk-stat">
+              <div class="risk-stat-num">68%</div>
+              <div class="risk-stat-lbl">Asist.</div>
+            </div>
+            <div class="risk-badge high">Alto</div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-avatar">CR</div>
+            <div>
+              <div class="risk-name">Camila Ramírez Ortega</div>
+              <div class="risk-section">9°B · RUDE 0987-2011</div>
+            </div>
+            <div class="risk-stat">
+              <div class="risk-stat-num">5.2</div>
+              <div class="risk-stat-lbl">Promedio</div>
+            </div>
+            <div class="risk-stat">
+              <div class="risk-stat-num">72%</div>
+              <div class="risk-stat-lbl">Asist.</div>
+            </div>
+            <div class="risk-badge high">Alto</div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-avatar">JT</div>
+            <div>
+              <div class="risk-name">Joaquín Torres Pazmiño</div>
+              <div class="risk-section">8°A · RUDE 1456-2012</div>
+            </div>
+            <div class="risk-stat">
+              <div class="risk-stat-num">6.1</div>
+              <div class="risk-stat-lbl">Promedio</div>
+            </div>
+            <div class="risk-stat">
+              <div class="risk-stat-num">81%</div>
+              <div class="risk-stat-lbl">Asist.</div>
+            </div>
+            <div class="risk-badge med">Medio</div>
+          </div>
+          <div class="risk-row">
+            <div class="risk-avatar">LV</div>
+            <div>
+              <div class="risk-name">Lucía Vera Sánchez</div>
+              <div class="risk-section">10°B · RUDE 0832-2010</div>
+            </div>
+            <div class="risk-stat">
+              <div class="risk-stat-num">6.5</div>
+              <div class="risk-stat-lbl">Promedio</div>
+            </div>
+            <div class="risk-stat">
+              <div class="risk-stat-num">88%</div>
+              <div class="risk-stat-lbl">Asist.</div>
+            </div>
+            <div class="risk-badge med">Medio</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot">
+        <div class="foot-l">SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div>
+        <div class="foot-r">
+          <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><use href="#i-lotus-mark"/></svg>
+          Modo claro · LOPDP & LOEI
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

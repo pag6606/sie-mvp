@@ -95,7 +95,7 @@ class ParidadValidacionTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("casos")
     void paridad(String nombre, String email, String nombrePersona, Set<RolCodigo> roles, boolean validoEsperado) {
-        var request = new CrearUsuarioRequest(email, nombrePersona, roles);
+        var request = new CrearUsuarioRequest(email, nombrePersona, roles, null);
         Set<ConstraintViolation<CrearUsuarioRequest>> violations = validator.validate(request);
         boolean esValido = violations.isEmpty();
         assertThat(esValido)

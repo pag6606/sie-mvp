@@ -59,7 +59,7 @@ class UsuarioServiceTest {
 
     @Test
     void crearUsuario_exitoso_publicaEventoNoEmail() {
-        var request = new CrearUsuarioRequest("diana@colegio.edu.ec", "Diana Ramírez", Set.of(RolCodigo.DOCENTE));
+        var request = new CrearUsuarioRequest("diana@colegio.edu.ec", "Diana Ramírez", Set.of(RolCodigo.DOCENTE), null);
 
         when(usuarioRepository.existsByEmailAndColegioId(request.email(), colegioId)).thenReturn(false);
         when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
@@ -85,7 +85,7 @@ class UsuarioServiceTest {
 
     @Test
     void crearUsuario_emailDuplicado_lanzaExcepcion() {
-        var request = new CrearUsuarioRequest("diana@colegio.edu.ec", "Diana", Set.of(RolCodigo.DOCENTE));
+        var request = new CrearUsuarioRequest("diana@colegio.edu.ec", "Diana", Set.of(RolCodigo.DOCENTE), null);
 
         when(usuarioRepository.existsByEmailAndColegioId(request.email(), colegioId)).thenReturn(true);
 
@@ -98,7 +98,7 @@ class UsuarioServiceTest {
 
     @Test
     void crearUsuario_rolNoEncontrado_lanzaExcepcion() {
-        var request = new CrearUsuarioRequest("diana@colegio.edu.ec", "Diana", Set.of(RolCodigo.DOCENTE));
+        var request = new CrearUsuarioRequest("diana@colegio.edu.ec", "Diana", Set.of(RolCodigo.DOCENTE), null);
 
         when(usuarioRepository.existsByEmailAndColegioId(request.email(), colegioId)).thenReturn(false);
         when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.empty());
@@ -111,9 +111,9 @@ class UsuarioServiceTest {
 
     @Test
     void crearUsuarios_atomico_siUnUsuarioFalla_ningunEventoNiEmail() {
-        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
-        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE));
-        var req3 = new CrearUsuarioRequest("c@colegio.edu.ec", "Carla Mora", Set.of(RolCodigo.DOCENTE));
+        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE), null);
+        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE), null);
+        var req3 = new CrearUsuarioRequest("c@colegio.edu.ec", "Carla Mora", Set.of(RolCodigo.DOCENTE), null);
 
         when(usuarioRepository.existsByEmailAndColegioId("a@colegio.edu.ec", colegioId)).thenReturn(false);
         when(usuarioRepository.existsByEmailAndColegioId("b@colegio.edu.ec", colegioId)).thenReturn(false);
@@ -130,7 +130,7 @@ class UsuarioServiceTest {
 
     @Test
     void crearUsuarios_atomico_emailServiceNuncaEsLlamado() {
-        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
+        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE), null);
 
         when(usuarioRepository.existsByEmailAndColegioId(anyString(), any(UUID.class))).thenReturn(false);
         when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
@@ -144,8 +144,8 @@ class UsuarioServiceTest {
 
     @Test
     void crearUsuarios_atomico_siSaveLanzaExcepcion_ningunEvento() {
-        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
-        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE));
+        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE), null);
+        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE), null);
 
         when(usuarioRepository.existsByEmailAndColegioId(anyString(), any(UUID.class))).thenReturn(false);
         when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
@@ -170,8 +170,8 @@ class UsuarioServiceTest {
 
     @Test
     void crearUsuariosBatch_exitoso_retornaCantidadYPublicaEventos() {
-        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
-        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE));
+        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE), null);
+        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE), null);
 
         when(usuarioRepository.existsByEmailAndColegioId(anyString(), any(UUID.class))).thenReturn(false);
         when(rolRepository.findByCodigo(RolCodigo.DOCENTE)).thenReturn(Optional.of(rolDocente));
@@ -190,8 +190,8 @@ class UsuarioServiceTest {
 
     @Test
     void crearUsuariosBatch_siFalla_lanzaBatchImportException() {
-        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
-        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE));
+        var req1 = new CrearUsuarioRequest("a@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE), null);
+        var req2 = new CrearUsuarioRequest("b@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE), null);
 
         when(usuarioRepository.existsByEmailAndColegioId("a@colegio.edu.ec", colegioId)).thenReturn(false);
         when(usuarioRepository.existsByEmailAndColegioId("b@colegio.edu.ec", colegioId)).thenReturn(true);
@@ -207,8 +207,8 @@ class UsuarioServiceTest {
 
     @Test
     void crearUsuariosBatch_emailsDuplicadosIntraBatch_lanzaBatchImportException() {
-        var req1 = new CrearUsuarioRequest("dup@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE));
-        var req2 = new CrearUsuarioRequest("dup@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE));
+        var req1 = new CrearUsuarioRequest("dup@colegio.edu.ec", "Ana Pérez", Set.of(RolCodigo.DOCENTE), null);
+        var req2 = new CrearUsuarioRequest("dup@colegio.edu.ec", "Beto López", Set.of(RolCodigo.DOCENTE), null);
 
         assertThrows(com.sie.identidad.application.exception.BatchImportException.class,
                 () -> usuarioService.crearUsuariosBatch(List.of(req1, req2), colegioId));

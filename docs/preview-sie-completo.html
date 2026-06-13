@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIE · Preview completo — 25 pantallas con Ghanima (modo claro)</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --paper:#EEF1F4; --bone-bg-2:#DDE3EA; --surface:#FFFFFF; --surface-2:#F6F8FA; --ink-bg:#0A0A0B;
+  --ink:#0A0A0B; --ink-2:#1C1C20; --ink-3:rgba(10,10,11,.72); --ink-4:rgba(10,10,11,.48); --ink-5:rgba(10,10,11,.28);
+  --gold:#D4AF37; --gold-bright:#B8941F; --gold-deep:#8A6A18; --gold-faint:rgba(138,106,24,.10); --gold-line:rgba(138,106,24,.32);
+  --plum:#4A2E5F; --plum-bright:#7A4FA8; --plum-tint:rgba(74,46,95,.07);
+  --green:#2BB07A; --green-deep:#16724F; --green-tint:rgba(43,176,122,.10);
+  --orange:#E25E10; --orange-deep:#A8420A; --orange-tint:rgba(226,94,16,.08);
+  --red:#C53030; --red-tint:rgba(197,48,48,.08);
+  --display:'Cormorant Garamond','Times New Roman',serif; --body:'Manrope',system-ui,sans-serif; --mono:'JetBrains Mono','SF Mono',monospace;
+  --line-1:rgba(10,10,11,.10); --line-2:rgba(10,10,11,.18); --line-3:rgba(10,10,11,.28);
+  --sidebar-w:248px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit}
+::selection{background:var(--gold);color:var(--paper)}
+body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0 0.06 0 0 0 0.6 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");opacity:.04;mix-blend-mode:multiply}
+
+.gallery-top{position:sticky;top:0;z-index:100;height:54px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line-1);display:flex;align-items:center;padding:0 1.5rem;gap:1.5rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase}
+.gallery-top .mark{color:var(--gold-deep);font-weight:700}
+.gallery-top .sub{color:var(--ink-4);font-weight:500}
+.gallery-top .count{margin-left:auto;color:var(--ink-3);font-weight:600}
+.gallery-top .count b{color:var(--gold-deep)}
+
+.toc-toggle{position:fixed;right:1.5rem;bottom:1.5rem;z-index:200;display:flex;align-items:center;gap:.6rem;background:var(--ink-bg);color:var(--paper);padding:.7rem 1.1rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;box-shadow:0 12px 32px -8px rgba(0,0,0,.4);transition:all .2s}
+.toc-toggle:hover{transform:translateY(-2px)}
+.toc-toggle .ico{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.toc-toggle .num{color:var(--gold)}
+
+.toc-panel{position:fixed;right:1.5rem;bottom:4.5rem;z-index:200;width:340px;max-height:75vh;overflow-y:auto;background:var(--surface);border:1px solid var(--line-2);box-shadow:0 24px 60px -12px rgba(0,0,0,.25);display:none}
+.toc-panel.open{display:block}
+.toc-head{position:sticky;top:0;background:var(--surface);padding:.85rem 1rem;border-bottom:1px solid var(--line-1);display:flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-deep);font-weight:600}
+.toc-group{padding:.6rem 0;border-bottom:1px solid var(--line-1)}
+.toc-group:last-child{border-bottom:0}
+.toc-group-title{padding:.35rem 1rem .25rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-4);font-weight:600}
+.toc-link{display:flex;align-items:baseline;gap:.6rem;padding:.4rem 1rem;font-size:.84rem;color:var(--ink-3);transition:all .15s;border-left:2px solid transparent}
+.toc-link:hover{background:var(--surface-2);color:var(--ink);border-left-color:var(--gold-deep)}
+.toc-link.active{background:var(--gold-faint);color:var(--gold-deep);border-left-color:var(--gold-deep);font-weight:500}
+.toc-link .n{font-family:var(--mono);font-size:.66rem;color:var(--ink-4);width:24px;flex-shrink:0;letter-spacing:.1em}
+.toc-link.active .n{color:var(--gold-deep)}
+
+.page{padding:2.5rem 1.5rem 4rem;position:relative;z-index:2}
+.page + .page{border-top:1px dashed var(--line-2)}
+.page-label{max-width:1280px;margin:0 auto 1.25rem;display:flex;align-items:baseline;gap:1rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-4);font-weight:600}
+.page-label .num{color:var(--gold-deep);font-weight:700}
+.page-label .name{color:var(--ink-2);font-weight:500}
+.page-frame{max-width:1280px;margin:0 auto}
+
+.app{display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:680px;background:var(--paper);border:1px solid var(--line-2);box-shadow:0 20px 50px -20px rgba(10,10,11,.18)}
+
+.sidebar{background:var(--surface);border-right:1px solid var(--line-1);display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:.7rem;padding:1.1rem 1.1rem;border-bottom:1px solid var(--line-1)}
+.brand-mark{width:34px;height:34px;display:grid;place-items:center;color:var(--gold-deep);border:1px solid var(--gold-line)}
+.brand-mark svg{width:26px;height:26px}
+.brand-text{display:flex;flex-direction:column;line-height:1.05}
+.brand-name{font-family:var(--display);font-size:1.1rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+.brand-sub{font-family:var(--mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-4);margin-top:.2rem}
+.nav{padding:.8rem .7rem;flex:1;overflow-y:auto}
+.nav-section{margin-bottom:1.4rem}
+.nav-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-4);padding:0 .9rem .55rem;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:.7rem;padding:.55rem .9rem;font-size:.86rem;color:var(--ink-3);border-left:2px solid transparent;transition:all .2s}
+.nav-item:hover{color:var(--ink);background:var(--surface-2)}
+.nav-item.active{color:var(--gold-deep);background:var(--gold-faint);border-left-color:var(--gold-deep);font-weight:500}
+.nav-item .ico{width:18px;height:18px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.nav-item .badge{margin-left:auto;font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;background:var(--orange-tint);color:var(--orange-deep);padding:.15rem .45rem;font-weight:600}
+.nav-item.active .badge{background:var(--gold-faint);color:var(--gold-deep)}
+.user-card{border-top:1px solid var(--line-1);padding:.85rem;display:flex;align-items:center;gap:.7rem}
+.avatar{width:34px;height:34px;display:grid;place-items:center;background:var(--gold-deep);color:var(--paper);font-family:var(--display);font-size:.95rem;font-weight:500;flex-shrink:0}
+.user-meta{min-width:0;flex:1}
+.user-name{font-size:.84rem;font-weight:500;color:var(--ink);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4);margin-top:.25rem}
+.user-caret{color:var(--ink-4);font-size:.7rem}
+
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--line-1);display:flex;align-items:center;padding:0 1.75rem;gap:1rem}
+.crumb{font-family:var(--mono);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4)}
+.crumb b{color:var(--gold-deep);font-weight:600}
+.topbar-search{margin-left:auto;display:flex;align-items:center;gap:.5rem;background:var(--paper);border:1px solid var(--line-1);padding:.45rem .8rem;font-size:.82rem;color:var(--ink-4);min-width:280px}
+.topbar-search .ico{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+.topbar-search kbd{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;background:var(--surface);border:1px solid var(--line-1);padding:.1rem .35rem;margin-left:auto;color:var(--ink-4)}
+.topbar-icon{width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--line-1);background:var(--surface);position:relative}
+.topbar-icon .ico{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+.topbar-icon .dot{position:absolute;top:6px;right:6px;width:6px;height:6px;background:var(--orange-deep);border:1.5px solid var(--surface)}
+.content{padding:1.75rem 1.75rem 4rem;max-width:1200px;width:100%}
+
+.page-head{margin-bottom:1.5rem}
+.eyebrow{font-family:var(--mono);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold-deep);font-weight:600;margin-bottom:.65rem;display:flex;align-items:center;gap:.6rem}
+.eyebrow::before{content:'';width:18px;height:1px;background:var(--gold-deep)}
+.page-title{font-family:var(--display);font-size:2.2rem;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:var(--ink)}
+.page-title em{font-style:italic;color:var(--gold-deep);font-weight:500}
+.page-sub{margin-top:.4rem;font-size:.9rem;color:var(--ink-3);max-width:60ch}
+.page-meta{margin-top:.55rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;font-size:.84rem;color:var(--ink-3)}
+.page-meta .state{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--green-deep);font-weight:600}
+.page-meta .state::before{content:'';width:6px;height:6px;background:var(--green-deep);border-radius:50%}
+.page-meta .sep{color:var(--ink-5)}
+.page-meta code{font-family:var(--mono);font-size:.78rem;color:var(--ink-2)}
+
+.callout{background:linear-gradient(135deg,var(--gold-faint),transparent 60%),var(--surface);border:1px solid var(--gold-line);border-left:3px solid var(--gold-deep);padding:1.1rem 1.4rem;display:flex;align-items:center;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.callout-ico{width:36px;height:36px;display:grid;place-items:center;flex-shrink:0;background:var(--gold-faint);color:var(--gold-deep);border:1px solid var(--gold-line)}
+.callout-ico .ico{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.callout-body{flex:1;min-width:240px}
+.callout-eyebrow{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-deep);font-weight:600;margin-bottom:.25rem}
+.callout-title{font-family:var(--display);font-size:1.25rem;font-weight:500;color:var(--ink);line-height:1.1}
+.callout-sub{font-size:.84rem;color:var(--ink-3);margin-top:.3rem}
+.callout-sub b{color:var(--ink);font-weight:500}
+
+.btn-gold{display:inline-flex;align-items:center;gap:.6rem;background:var(--gold-deep);color:var(--paper);font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:.75rem 1.4rem;transition:all .2s}
+.btn-gold:hover{background:var(--ink-bg)}
+.btn-gold::after{content:'→';font-family:var(--body);font-size:.95rem}
+.btn-ghost{border:1px solid var(--gold-deep);color:var(--gold-deep);background:transparent;padding:.6rem 1.1rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;transition:all .2s}
+.btn-ghost:hover{background:var(--gold-deep);color:var(--paper)}
+.btn-danger{display:inline-flex;align-items:center;gap:.6rem;background:var(--red);color:#fff;font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:.75rem 1.4rem}
+.btn-secondary{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line-1);font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;padding:.75rem 1.4rem}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line-1);border:1px solid var(--line-1);margin-bottom:1.5rem}
+.kpis.cols-2{grid-template-columns:repeat(2,1fr)}
+.kpis.cols-3{grid-template-columns:repeat(3,1fr)}
+.kpi{background:var(--surface);padding:1.2rem 1.25rem;display:flex;flex-direction:column;gap:.5rem}
+.kpi-eyebrow{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4);font-weight:600;display:flex;align-items:center;gap:.5rem}
+.kpi-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--accent,var(--ink-4))}
+.kpi-num{font-family:var(--display);font-size:2.4rem;font-weight:400;line-height:1;color:var(--ink);letter-spacing:-.025em}
+.kpi-num .suffix{font-size:1.2rem;color:var(--ink-3);font-style:italic;margin-left:.15rem}
+.kpi-sub{font-size:.78rem;color:var(--ink-3)}
+.kpi-sub b{color:var(--ink-2);font-weight:500}
+.kpi-trend{display:inline-flex;align-items:center;gap:.3rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--green-deep);font-weight:600}
+.kpi-trend.down{color:var(--orange-deep)}
+.kpi-trend::before{content:'↑'}
+.kpi-trend.down::before{content:'↓'}
+
+.card{background:var(--surface);border:1px solid var(--line-1);padding:1.4rem;margin-bottom:1.5rem}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.card-title{font-family:var(--display);font-size:1.35rem;font-weight:500;color:var(--ink);line-height:1.1;letter-spacing:-.01em}
+.card-sub{font-size:.82rem;color:var(--ink-3);margin-top:.2rem}
+
+.grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+
+.tbl{width:100%;border-collapse:collapse;font-size:.84rem}
+.tbl th{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;text-align:left;padding:.7rem .8rem;border-bottom:1px solid var(--gold-line);color:var(--gold-deep);font-weight:600;background:var(--surface-2)}
+.tbl th.r{text-align:right}
+.tbl td{padding:.8rem;border-bottom:1px solid var(--line-1);color:var(--ink-3);vertical-align:middle}
+.tbl td.r{text-align:right}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr:hover td{background:var(--surface-2)}
+.tbl-name{color:var(--ink);font-weight:500}
+.tbl-mono{font-family:var(--mono);font-size:.74rem;color:var(--ink-2)}
+.tbl-pill{display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;padding:.12rem .45rem;text-transform:uppercase;font-weight:600;background:var(--surface-2);color:var(--ink-3);border:1px solid var(--line-1)}
+.tbl-pill.ok{background:var(--green-tint);color:var(--green-deep);border-color:transparent}
+.tbl-pill.warn{background:var(--orange-tint);color:var(--orange-deep);border-color:transparent}
+.tbl-pill.info{background:var(--gold-faint);color:var(--gold-deep);border-color:transparent}
+.tbl-pill.muted{background:var(--surface-2);color:var(--ink-4);border-color:transparent}
+.tbl-pill.danger{background:var(--red-tint);color:var(--red);border-color:transparent}
+.tbl-actions{display:flex;gap:.4rem;justify-content:flex-end}
+.tbl-icon-btn{width:26px;height:26px;display:grid;place-items:center;border:1px solid var(--line-1);background:var(--surface);color:var(--ink-3)}
+.tbl-icon-btn:hover{color:var(--gold-deep);border-color:var(--gold-line)}
+.tbl-icon-btn .ico{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem 1.25rem;margin-bottom:1.25rem}
+.form-grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.form-grid.cols-1{grid-template-columns:1fr}
+.field{display:flex;flex-direction:column;gap:.4rem}
+.field.full{grid-column:1/-1}
+.field label{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-4);font-weight:600}
+.field label .req{color:var(--orange-deep);margin-left:.2rem}
+.field input,.field select,.field textarea{background:transparent;border:0;border-bottom:1px solid var(--line-2);color:var(--ink);padding:.6rem 0;font-size:.95rem;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green-deep)}
+.field .hint{font-size:.74rem;color:var(--ink-4);margin-top:.2rem}
+.field-row{display:flex;gap:1.25rem;align-items:center}
+.checkbox{display:flex;align-items:center;gap:.55rem;font-size:.88rem;color:var(--ink-2);cursor:pointer}
+.checkbox input{width:16px;height:16px;accent-color:var(--gold-deep)}
+
+.pagination{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line-1);flex-wrap:wrap;gap:.75rem}
+.pagination-info{font-size:.82rem;color:var(--ink-3)}
+.pagination-info b{color:var(--ink);font-weight:500}
+.pagination-ctrls{display:flex;gap:.3rem;align-items:center}
+.pg-btn{min-width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--line-1);background:var(--surface);font-family:var(--mono);font-size:.76rem;color:var(--ink-2)}
+.pg-btn:hover{border-color:var(--gold-line);color:var(--gold-deep)}
+.pg-btn.active{background:var(--gold-deep);color:var(--paper);border-color:var(--gold-deep)}
+.pg-btn.arrow{color:var(--ink-3)}
+
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:2rem;background:var(--surface);border:1px solid var(--line-1);padding:0}
+.step{flex:1;display:flex;align-items:center;gap:.7rem;padding:1rem 1.25rem;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;right:-1px;top:0;bottom:0;width:1px;background:var(--line-1)}
+.step.done .step-n{background:var(--green-deep);color:#fff;border-color:var(--green-deep)}
+.step.active{background:var(--gold-faint)}
+.step.active .step-n{background:var(--gold-deep);color:var(--paper);border-color:var(--gold-deep)}
+.step.pending{opacity:.55}
+.step-n{width:28px;height:28px;display:grid;place-items:center;border:1.5px solid var(--line-2);font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--ink-3);flex-shrink:0;background:var(--surface)}
+.step.done .step-n::before{content:'✓'}
+.step.done .step-n span{display:none}
+.step-meta{display:flex;flex-direction:column;line-height:1.15}
+.step-eyebrow{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4);font-weight:600}
+.step.active .step-eyebrow{color:var(--gold-deep)}
+.step-name{font-size:.88rem;font-weight:500;color:var(--ink-2);margin-top:.1rem}
+
+.pbar{height:6px;background:var(--surface-2);position:relative;overflow:hidden}
+.pbar-fill{height:100%;background:var(--gold-deep);transition:width .3s}
+.pbar-fill.green{background:var(--green-deep)}
+.pbar-fill.orange{background:var(--orange-deep)}
+.pbar-fill.red{background:var(--red)}
+
+.gauge{position:relative;width:100%;aspect-ratio:1;max-width:240px;margin:0 auto;display:grid;place-items:center}
+.gauge-svg{width:100%;height:100%}
+.gauge-text{position:absolute;text-align:center}
+.gauge-num{font-family:var(--display);font-size:2.6rem;font-weight:500;color:var(--ink);line-height:1}
+.gauge-lbl{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4);margin-top:.3rem}
+
+.risk-list{display:flex;flex-direction:column}
+.risk-row{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:1rem;align-items:center;padding:.85rem .25rem;border-bottom:1px solid var(--line-1)}
+.risk-row:last-child{border-bottom:0}
+.risk-avatar{width:32px;height:32px;display:grid;place-items:center;background:var(--surface-2);color:var(--ink-2);font-family:var(--display);font-size:.9rem;font-weight:500;border:1px solid var(--line-1)}
+.risk-name{font-size:.88rem;color:var(--ink);font-weight:500;line-height:1.1}
+.risk-section{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-4);margin-top:.2rem}
+.risk-stat{text-align:right}
+.risk-stat-num{font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--ink);line-height:1}
+.risk-stat-lbl{font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4);margin-top:.2rem}
+.risk-badge{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;padding:.22rem .55rem;font-weight:700;border:1px solid currentColor}
+.risk-badge.high{color:var(--orange-deep);background:var(--orange-tint);border-color:transparent}
+.risk-badge.med{color:var(--gold-deep);background:var(--gold-faint);border-color:transparent}
+.risk-badge.low{color:var(--green-deep);background:var(--green-tint);border-color:transparent}
+
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
+.choice{background:var(--surface);border:1.5px solid var(--line-1);padding:1.5rem;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:1rem}
+.choice:hover{border-color:var(--gold-line)}
+.choice.selected{border-color:var(--gold-deep);background:linear-gradient(135deg,var(--gold-faint),transparent 60%),var(--surface)}
+.choice-ico{width:44px;height:44px;display:grid;place-items:center;background:var(--gold-faint);color:var(--gold-deep);border:1px solid var(--gold-line)}
+.choice-ico .ico{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.choice-title{font-family:var(--display);font-size:1.3rem;font-weight:500;color:var(--ink);line-height:1.1}
+.choice-desc{font-size:.86rem;color:var(--ink-3);line-height:1.55}
+
+.notice{padding:.85rem 1rem;border:1px solid var(--line-1);background:var(--surface);font-size:.84rem;color:var(--ink-3);display:flex;gap:.6rem;align-items:flex-start;line-height:1.5}
+.notice b{color:var(--ink);font-weight:500}
+.notice.warn{border-left:3px solid var(--orange-deep);background:var(--orange-tint)}
+.notice.info{border-left:3px solid var(--gold-deep);background:var(--gold-faint)}
+.notice.ok{border-left:3px solid var(--green-deep);background:var(--green-tint)}
+.notice .ico{width:16px;height:16px;flex-shrink:0;margin-top:.1rem;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+.notice.warn .ico{color:var(--orange-deep)}
+.notice.info .ico{color:var(--gold-deep)}
+.notice.ok .ico{color:var(--green-deep)}
+
+.auth-frame{min-height:680px;display:grid;grid-template-columns:1fr 1fr;background:var(--paper);border:1px solid var(--line-2);box-shadow:0 20px 50px -20px rgba(10,10,11,.18)}
+.auth-side{background:var(--ink-bg);color:var(--paper);padding:3rem;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.auth-side::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'><g fill='none' stroke='%23D4AF37' stroke-width='0.4' opacity='0.2'><circle cx='40' cy='40' r='30'/><polygon points='40,10 64,28 56,58 24,58 16,28'/><polygon points='40,18 58,32 51,53 29,53 22,32'/></g></svg>");background-size:300px;opacity:.4;mix-blend-mode:screen;mask-image:radial-gradient(circle at 30% 40%, black 0%, transparent 70%);-webkit-mask-image:radial-gradient(circle at 30% 40%, black 0%, transparent 70%)}
+.auth-side-mark{width:48px;height:48px;display:grid;place-items:center;color:var(--gold);border:1px solid var(--gold-line);position:relative;z-index:1}
+.auth-side-mark svg{width:34px;height:34px}
+.auth-side-title{position:relative;z-index:1}
+.auth-side-title h1{font-family:var(--display);font-size:2.4rem;font-weight:400;line-height:1.05;letter-spacing:-.02em;margin-bottom:.7rem}
+.auth-side-title h1 em{font-style:italic;color:var(--gold);font-weight:500}
+.auth-side-title p{font-size:.95rem;color:rgba(244,241,232,.7);max-width:34ch;line-height:1.6}
+.auth-side-foot{position:relative;z-index:1;font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,241,232,.5);display:flex;flex-direction:column;gap:.5rem}
+.auth-side-foot b{color:var(--gold);font-weight:600}
+.auth-side-card{background:rgba(244,241,232,.04);border:1px solid rgba(244,241,232,.12);padding:1rem;display:flex;gap:.7rem;align-items:center;position:relative;z-index:1;max-width:320px}
+.auth-side-card-avatar{width:36px;height:36px;display:grid;place-items:center;background:var(--gold);color:var(--ink-bg);font-family:var(--display);font-size:1rem;font-weight:500;flex-shrink:0}
+.auth-side-card-text{font-size:.82rem;color:rgba(244,241,232,.85);line-height:1.4}
+.auth-side-card-text b{color:var(--paper);font-weight:500}
+
+.auth-main{padding:3rem;display:flex;flex-direction:column;justify-content:center}
+.auth-eyebrow{font-family:var(--mono);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold-deep);font-weight:600;margin-bottom:.7rem;display:flex;align-items:center;gap:.6rem}
+.auth-eyebrow::before{content:'';width:18px;height:1px;background:var(--gold-deep)}
+.auth-h{font-family:var(--display);font-size:1.9rem;font-weight:400;line-height:1.1;letter-spacing:-.02em;color:var(--ink);margin-bottom:.4rem}
+.auth-h em{font-style:italic;color:var(--gold-deep);font-weight:500}
+.auth-sub{font-size:.9rem;color:var(--ink-3);margin-bottom:1.75rem;max-width:48ch}
+.auth-form{max-width:380px;display:flex;flex-direction:column;gap:1rem}
+.auth-form .row{display:flex;align-items:center;justify-content:space-between;font-size:.82rem}
+.auth-form .row a{color:var(--gold-deep);font-weight:500}
+.auth-form-foot{text-align:center;font-size:.78rem;color:var(--ink-4);margin-top:.5rem}
+.auth-form-foot a{color:var(--gold-deep);font-weight:500}
+.auth-divider{display:flex;align-items:center;gap:1rem;margin:1.25rem 0;color:var(--ink-4);font-family:var(--mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line-1)}
+
+.auth-center{min-height:680px;display:grid;place-items:center;background:var(--paper);border:1px solid var(--line-2);box-shadow:0 20px 50px -20px rgba(10,10,11,.18);padding:2rem}
+.auth-card{background:var(--surface);border:1px solid var(--line-1);padding:2.5rem;width:100%;max-width:420px}
+.auth-card .auth-h{font-size:1.6rem;margin-bottom:.3rem}
+.auth-card .auth-sub{margin-bottom:1.5rem;font-size:.86rem}
+
+.tabs{display:flex;border:1px solid var(--line-1);background:var(--surface);margin-bottom:1.5rem;width:fit-content}
+.tab{font-family:var(--mono);font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;padding:.7rem 1.2rem;color:var(--ink-4);font-weight:600;border-right:1px solid var(--line-1)}
+.tab:last-child{border-right:0}
+.tab.active{background:var(--gold-deep);color:var(--paper)}
+.tab:not(.active):hover{background:var(--surface-2);color:var(--ink)}
+
+.foot{border-top:1px solid var(--line-1);margin-top:1rem;padding-top:1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.foot-l,.foot-r{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4)}
+.foot-l b,.foot-r b{color:var(--gold-deep);font-weight:600}
+
+.section-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.section-card{background:var(--surface);border:1px solid var(--line-1);padding:1.4rem;display:flex;flex-direction:column;gap:1rem;position:relative}
+.section-card-head{display:flex;align-items:flex-start;gap:1rem}
+.section-card-ico{width:40px;height:40px;display:grid;place-items:center;background:var(--gold-faint);color:var(--gold-deep);border:1px solid var(--gold-line);flex-shrink:0}
+.section-card-ico .ico{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.section-card-title{font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--ink);line-height:1.1}
+.section-card-meta{font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-4);margin-top:.2rem}
+.section-card-cap-info{display:flex;justify-content:space-between;font-size:.78rem;color:var(--ink-3)}
+.section-card-cap-info b{color:var(--ink-2);font-weight:500}
+.section-card-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.2rem}
+.btn-xs{font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;padding:.45rem .75rem;border:1px solid var(--line-1);background:var(--surface);color:var(--ink-2)}
+.btn-xs:hover{border-color:var(--gold-line);color:var(--gold-deep)}
+.btn-xs.primary{background:var(--gold-deep);color:var(--paper);border-color:var(--gold-deep)}
+.btn-xs.primary:hover{background:var(--ink-bg);border-color:var(--ink-bg)}
+.btn-xs.green{background:var(--green-deep);color:#fff;border-color:var(--green-deep)}
+.btn-xs.orange{background:var(--orange-deep);color:#fff;border-color:var(--orange-deep)}
+
+.status-pill{font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;padding:.18rem .5rem;font-weight:700}
+.status-pill.ok{background:var(--green-tint);color:var(--green-deep)}
+.status-pill.warn{background:var(--orange-tint);color:var(--orange-deep)}
+.status-pill.pend{background:var(--gold-faint);color:var(--gold-deep)}
+
+.confirm-card{background:var(--surface);border:1.5px solid var(--red);max-width:520px;margin:0 auto;padding:2.5rem;text-align:center}
+.confirm-card .ico-wrap{width:56px;height:56px;display:grid;place-items:center;background:var(--red-tint);color:var(--red);border:1.5px solid var(--red);margin:0 auto 1.25rem}
+.confirm-card .ico-wrap .ico{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.confirm-card h2{font-family:var(--display);font-size:1.5rem;font-weight:500;margin-bottom:.5rem}
+.confirm-card p{font-size:.88rem;color:var(--ink-3);margin-bottom:1.25rem}
+.confirm-card ul{list-style:none;text-align:left;margin:0 auto 1.5rem;max-width:380px}
+.confirm-card li{font-size:.86rem;color:var(--ink-3);padding:.5rem 0;border-bottom:1px solid var(--line-1);display:flex;gap:.5rem;align-items:flex-start}
+.confirm-card li::before{content:'!';color:var(--orange-deep);font-weight:700;flex-shrink:0;width:18px;height:18px;display:grid;place-items:center;background:var(--orange-tint);font-family:var(--mono);font-size:.78rem}
+.confirm-card .actions{display:flex;gap:.75rem;justify-content:center}
+
+.schema-row{display:grid;grid-template-columns:1fr 120px 40px;gap:1rem;align-items:end;padding:1rem 0;border-bottom:1px solid var(--line-1)}
+.schema-row:first-child{padding-top:0}
+.schema-row:last-child{border-bottom:0}
+.schema-row .pct{position:relative}
+.schema-row .pct::after{content:'%';position:absolute;right:0;bottom:.7rem;font-family:var(--mono);font-size:.85rem;color:var(--ink-4);pointer-events:none}
+.schema-row input[type=text],.schema-row input[type=number]{width:100%;background:transparent;border:0;border-bottom:1px solid var(--line-2);color:var(--ink);padding:.6rem 0;font-size:.95rem;outline:none;padding-right:1rem}
+.schema-row input:focus{border-color:var(--gold-deep)}
+.schema-row .rm{width:30px;height:30px;display:grid;place-items:center;color:var(--ink-4);border:1px solid var(--line-1)}
+.schema-row .rm .ico{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round}
+
+.schema-foot{display:flex;align-items:center;justify-content:space-between;padding-top:1.25rem;border-top:1.5px solid var(--gold-line);margin-top:.5rem;flex-wrap:wrap;gap:1rem}
+.schema-total{font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4);font-weight:600}
+.schema-total b{color:var(--green-deep);font-size:1.4rem;font-family:var(--display);font-weight:500;letter-spacing:0;margin-left:.4rem}
+.schema-add{padding:1rem 0}
+.schema-add .add-btn{display:flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--gold-deep);padding:.5rem 0}
+.schema-add .add-btn .ico{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5}
+
+.notas-stats{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.stat-chip{font-family:var(--mono);font-size:.66rem;letter-spacing:.12em;padding:.3rem .7rem;background:var(--surface-2);border:1px solid var(--line-1);color:var(--ink-3);font-weight:600}
+.stat-chip b{color:var(--ink);font-weight:600;margin-left:.3rem}
+.stat-chip.ok b{color:var(--green-deep)}
+.stat-chip.warn b{color:var(--orange-deep)}
+.comp-chips{display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap}
+.comp-chip{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;padding:.3rem .65rem;background:var(--gold-faint);color:var(--gold-deep);font-weight:600;border:1px solid var(--gold-line)}
+.comp-chip b{color:var(--ink);font-weight:700;margin-left:.3rem}
+
+.grade-cell{width:64px;padding:.5rem .4rem;border:1px solid var(--line-1);background:var(--surface);font-size:.9rem;color:var(--ink);font-family:var(--display);font-weight:500;text-align:center;outline:none}
+.grade-cell:focus{border-color:var(--gold-deep)}
+.grade-cell.fail{color:var(--red);border-color:var(--red);background:var(--red-tint)}
+.grade-cell.ok{color:var(--green-deep);border-color:var(--green-deep);background:var(--green-tint)}
+.grade-cell.final{font-size:1.05rem;background:var(--surface-2)}
+.grade-cell.final.fail{background:var(--red-tint);color:var(--red)}
+.grade-cell.final.ok{background:var(--green-tint);color:var(--green-deep)}
+
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--line-1);margin-bottom:1.5rem}
+.tab-bar .tab{border:0;border-bottom:2px solid transparent;padding:.85rem 1.25rem;background:transparent}
+.tab-bar .tab.active{background:transparent;color:var(--gold-deep);border-bottom-color:var(--gold-deep)}
+
+.grade-card{background:var(--surface);border:1px solid var(--line-1);padding:1.25rem;display:flex;flex-direction:column;gap:.6rem;position:relative}
+.grade-card-eyebrow{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4);font-weight:600}
+.grade-card-name{font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--ink);line-height:1.1}
+.grade-card-doc{font-size:.78rem;color:var(--ink-3);margin-top:.1rem}
+.grade-card-score{font-family:var(--display);font-size:2.6rem;font-weight:400;line-height:1;letter-spacing:-.025em;color:var(--ink);display:flex;align-items:baseline;gap:.3rem}
+.grade-card-score .lbl{font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4);font-weight:600}
+.grade-card-state{font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;padding:.2rem .5rem;font-weight:700;width:fit-content}
+.grade-card-state.ok{background:var(--green-tint);color:var(--green-deep)}
+.grade-card-state.fail{background:var(--red-tint);color:var(--red)}
+.grade-card-state.pend{background:var(--gold-faint);color:var(--gold-deep)}
+.grade-card-att{display:flex;flex-direction:column;gap:.4rem;padding-top:.6rem;border-top:1px solid var(--line-1)}
+.grade-card-att-info{display:flex;justify-content:space-between;font-size:.78rem;color:var(--ink-3)}
+.grade-card-att-info b{color:var(--ink-2);font-weight:500}
+
+.boletin{max-width:680px;margin:0 auto;background:var(--surface);border:1.5px solid var(--gold-line);box-shadow:0 16px 40px -12px rgba(10,10,11,.2)}
+.boletin-head{background:var(--ink-bg);color:var(--paper);padding:1.5rem 2rem;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--gold)}
+.boletin-head-left{display:flex;gap:1rem;align-items:center}
+.boletin-mark{width:42px;height:42px;display:grid;place-items:center;color:var(--gold);border:1px solid var(--gold-line)}
+.boletin-mark svg{width:30px;height:30px}
+.boletin-brand{font-family:var(--display);font-size:1.4rem;font-weight:500;letter-spacing:-.01em}
+.boletin-brand em{font-style:italic;color:var(--gold);font-weight:500}
+.boletin-sub{font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(244,241,232,.6);margin-top:.2rem}
+.boletin-head-right{text-align:right;font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(244,241,232,.6);line-height:1.6}
+.boletin-head-right b{color:var(--gold);font-weight:600}
+.boletin-body{padding:1.75rem 2rem}
+.boletin-stu{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:1.25rem;border-bottom:1px solid var(--line-1);margin-bottom:1.25rem;gap:1rem;flex-wrap:wrap}
+.boletin-stu h2{font-family:var(--display);font-size:1.5rem;font-weight:500;color:var(--ink);line-height:1.1}
+.boletin-stu-meta{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-4);margin-top:.3rem}
+.boletin-stu-meta b{color:var(--ink-2);font-weight:600}
+.boletin-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:1.5rem;border:1px solid var(--line-1)}
+.boletin-tile{padding:1rem 1.25rem;border-right:1px solid var(--line-1);text-align:center;background:var(--surface)}
+.boletin-tile:last-child{border-right:0}
+.boletin-tile-eyebrow{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4);font-weight:600}
+.boletin-tile-num{font-family:var(--display);font-size:2.2rem;font-weight:400;line-height:1;color:var(--ink);margin:.25rem 0 .2rem;letter-spacing:-.02em}
+.boletin-tile-num.ok{color:var(--green-deep)}
+.boletin-tile-num.warn{color:var(--orange-deep)}
+.boletin-tile-lbl{font-size:.74rem;color:var(--ink-3)}
+.boletin-section-h{font-family:var(--display);font-size:1.05rem;font-weight:500;color:var(--ink);margin:1.25rem 0 .5rem;padding-bottom:.4rem;border-bottom:1px solid var(--gold-line)}
+.boletin-row{display:grid;grid-template-columns:1fr 90px 70px 80px;gap:.75rem;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--line-1);font-size:.84rem}
+.boletin-row:last-child{border-bottom:0}
+.boletin-row .nm{color:var(--ink);font-weight:500}
+.boletin-row .code{font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem}
+.boletin-row .sc{font-family:var(--display);font-size:1.1rem;font-weight:500;text-align:right}
+.boletin-row .sc.ok{color:var(--green-deep)}
+.boletin-row .sc.fail{color:var(--red)}
+.boletin-row .at{font-family:var(--mono);font-size:.76rem;text-align:right;color:var(--ink-3)}
+.boletin-foot{padding:1rem 2rem;border-top:1px solid var(--line-1);font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;background:var(--surface-2)}
+.boletin-foot b{color:var(--gold-deep);font-weight:600}
+
+.dropzone{border:1.5px dashed var(--gold-line);background:var(--gold-faint);padding:2.5rem;text-align:center;margin-bottom:1.25rem}
+.dropzone-ico{width:48px;height:48px;display:grid;place-items:center;background:var(--surface);color:var(--gold-deep);border:1px solid var(--gold-line);margin:0 auto .75rem}
+.dropzone-ico .ico{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.dropzone-h{font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--ink);margin-bottom:.3rem}
+.dropzone-sub{font-size:.84rem;color:var(--ink-3);margin-bottom:1rem}
+.dropzone-pick{display:inline-flex;align-items:center;gap:.5rem;background:var(--gold-deep);color:var(--paper);font-family:var(--mono);font-size:.68rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:.65rem 1.2rem}
+
+.seccion-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1px;background:var(--line-1);border:1px solid var(--line-1);margin-top:1.25rem}
+.seccion-tile{background:var(--surface);padding:1rem 1.1rem;display:flex;flex-direction:column;gap:.6rem}
+.seccion-tile-code{font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-deep);font-weight:600}
+.seccion-tile-name{font-family:var(--display);font-size:1.05rem;font-weight:500;color:var(--ink);line-height:1.15}
+.seccion-tile-cap-info{display:flex;justify-content:space-between;font-size:.74rem;color:var(--ink-3);margin-top:.2rem}
+.seccion-tile-cap-info b{color:var(--ink-2);font-weight:500}
+.seccion-tile-cap-bar{height:4px;background:var(--surface-2)}
+.seccion-tile-cap-bar .fill{height:100%;background:var(--green-deep)}
+.seccion-tile-cap-bar .fill.warn{background:var(--orange-deep)}
+.seccion-tile-cap-bar .fill.danger{background:var(--red)}
+
+.foot-page{border-top:1px solid var(--line-1);margin-top:1.5rem;padding-top:1rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4)}
+.foot-page b{color:var(--gold-deep);font-weight:600}
+
+.success-card{background:var(--surface);border:1.5px solid var(--green-deep);max-width:560px;margin:0 auto;padding:2.5rem;text-align:center}
+.success-card .ico-wrap{width:64px;height:64px;display:grid;place-items:center;background:var(--green-tint);color:var(--green-deep);border:1.5px solid var(--green-deep);margin:0 auto 1.25rem}
+.success-card .ico-wrap .ico{width:30px;height:30px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+@media (max-width:900px){
+  .app,.auth-frame{grid-template-columns:1fr}
+  .auth-side{display:none}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .grid-2,.section-cards,.form-grid,.form-grid.cols-3,.choice-grid,.seccion-grid{grid-template-columns:1fr}
+  .boletin-tiles{grid-template-columns:1fr}
+  .boletin-tile{border-right:0;border-bottom:1px solid var(--line-1)}
+  .boletin-tile:last-child{border-bottom:0}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="lotus-ou" viewBox="0 0 200 200">
+    <g stroke="currentColor" stroke-width="1.4" fill="transparent" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M 100 41.8 Q 128 81.4, 100 121 Q 72 81.4, 100 41.8 Z" transform="rotate(-75 100 121)"/>
+      <path d="M 100 41.8 Q 128 81.4, 100 121 Q 72 81.4, 100 41.8 Z" transform="rotate(75 100 121)"/>
+      <path d="M 100 28.6 Q 130 74.8, 100 121 Q 70 74.8, 100 28.6 Z" transform="rotate(-45 100 121)"/>
+      <path d="M 100 28.6 Q 130 74.8, 100 121 Q 70 74.8, 100 28.6 Z" transform="rotate(45 100 121)"/>
+      <path d="M 100 17.2 Q 132 69.1, 100 121 Q 68 69.1, 100 17.2 Z" transform="rotate(-22 100 121)"/>
+      <path d="M 100 17.2 Q 132 69.1, 100 121 Q 68 69.1, 100 17.2 Z" transform="rotate(22 100 121)"/>
+      <path d="M 100 8.4 Q 134 64.7, 100 121 Q 66 64.7, 100 8.4 Z"/>
+    </g>
+    <circle cx="100" cy="128" r="9" fill="none" stroke="currentColor" stroke-width="1" opacity="0.7"/>
+  </symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 21a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.9.5c0 1.5-2.4 2-2.4 3.5"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.8"/><path d="M16 20a5 5 0 0 1 5.5-5"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4.5A1.5 1.5 0 0 1 5.5 3H19a1 1 0 0 1 1 1v15.5a.5.5 0 0 1-.8.4L17 18l-2.2 1.9a.5.5 0 0 1-.6 0L12 18l-2.2 1.9a.5.5 0 0 1-.6 0L7 18l-2.2 1.9a.5.5 0 0 1-.8-.4z"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M2 12 12 5l10 7-10 7z"/><path d="m6 14 6 4 6-4"/><path d="m6 17 6 4 6-4"/></symbol>
+  <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="1"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M8 11h8M8 15h5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8.5 8 9 4.5-.5 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M14 4l6 6L8 22H2v-6z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1L5 6"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 21h20z"/><path d="M12 10v5M12 18v.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 8v.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14"/><path d="m3 7 9 6 9-6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.4.8a7 7 0 0 0-2-1.2L14 3h-4l-.5 2.5a7 7 0 0 0-2 1.2l-2.4-.8-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.4-.8a7 7 0 0 0 2 1.2L10 21h4l.5-2.5a7 7 0 0 0 2-1.2l2.4.8 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-list-2" viewBox="0 0 24 24"><path d="M9 5h11M9 12h11M9 19h11M4 5h.01M4 12h.01M4 19h.01"/><rect x="3" y="3" width="3" height="3"/><rect x="3" y="10" width="3" height="3"/><rect x="3" y="17" width="3" height="3"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 21V9m0 0-4 4m4-4 4 4"/><path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-clone" viewBox="0 0 24 24"><rect x="3" y="3" width="14" height="14"/><rect x="7" y="7" width="14" height="14" fill="none"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="14" r="4"/><path d="m12 12 9-9M17 7l3 3M14 10l3 3"/></symbol>
+</svg>
+
+<header class="gallery-top">
+  <div><span class="mark">Ghanima · SIE</span> · <span class="sub">Preview Completo · Línea gráfica modo claro</span></div>
+  <div class="count">25 pantallas · <b>v0.4.0-MVP</b></div>
+</header>
+
+<button class="toc-toggle" id="tocToggle">
+  <svg class="ico"><use href="#i-menu"/></svg>
+  Índice · <span class="num">25</span>
+</button>
+
+<aside class="toc-panel" id="tocPanel">
+  <div class="toc-head">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--gold-deep)"><use href="#i-list-2"/></svg>
+    Índice de pantallas
+  </div>
+  <div class="toc-group">
+    <div class="toc-group-title">Acceso · 4</div>
+    <a class="toc-link" href="#login"><span class="n">01</span>Login</a>
+    <a class="toc-link" href="#activate"><span class="n">02</span>Activar cuenta</a>
+    <a class="toc-link" href="#pwdreset"><span class="n">03</span>Recuperar contraseña</a>
+    <a class="toc-link" href="#privacy"><span class="n">04</span>Privacidad LOPDP</a>
+  </div>
+  <div class="toc-group">
+    <div class="toc-group-title">Administrativo · 14</div>
+    <a class="toc-link" href="#ad-dash"><span class="n">05</span>Dashboard</a>
+    <a class="toc-link" href="#ad-usuarios"><span class="n">06</span>Usuarios</a>
+    <a class="toc-link" href="#ad-impusers"><span class="n">07</span>Importar usuarios</a>
+    <a class="toc-link" href="#ad-cursos"><span class="n">08</span>Cursos</a>
+    <a class="toc-link" href="#ad-secciones"><span class="n">09</span>Secciones</a>
+    <a class="toc-link" href="#ad-wiz-clonar"><span class="n">10</span>Wizard · Clonar</a>
+    <a class="toc-link" href="#ad-wiz-crear"><span class="n">11</span>Wizard · Crear período</a>
+    <a class="toc-link" href="#ad-wiz-confirmar"><span class="n">12</span>Wizard · Confirmar apertura</a>
+    <a class="toc-link" href="#ad-wiz-revisar"><span class="n">13</span>Wizard · Revisar secciones</a>
+    <a class="toc-link" href="#ad-matricula"><span class="n">14</span>Matrícula</a>
+    <a class="toc-link" href="#ad-impcsv"><span class="n">15</span>Importar CSV matrícula</a>
+    <a class="toc-link" href="#ad-cierres"><span class="n">16</span>Dashboard de cierres</a>
+    <a class="toc-link" href="#ad-alertas"><span class="n">17</span>Alertas tempranas</a>
+    <a class="toc-link" href="#ad-consent"><span class="n">18</span>Consentimientos</a>
+  </div>
+  <div class="toc-group">
+    <div class="toc-group-title">Docente · 5</div>
+    <a class="toc-link" href="#do-dash"><span class="n">19</span>Mis secciones</a>
+    <a class="toc-link" href="#do-asist"><span class="n">20</span>Asistencia</a>
+    <a class="toc-link" href="#do-esquema"><span class="n">21</span>Esquema evaluación</a>
+    <a class="toc-link" href="#do-notas"><span class="n">22</span>Notas</a>
+    <a class="toc-link" href="#do-cierre"><span class="n">23</span>Cerrar sección</a>
+  </div>
+  <div class="toc-group">
+    <div class="toc-group-title">Estudiante · 2</div>
+    <a class="toc-link" href="#es-dash"><span class="n">24</span>Mi panel</a>
+    <a class="toc-link" href="#es-boletin"><span class="n">25</span>Boletín</a>
+  </div>
+</aside>
+
+<!-- =================================================================
+     01 · LOGIN
+     ================================================================= -->
+<section class="page" id="login">
+  <div class="page-label"><span class="num">01 / 25</span><span class="name">Login · acceso al sistema</span></div>
+  <div class="page-frame">
+    <div class="auth-frame">
+      <aside class="auth-side">
+        <div class="auth-side-mark"><svg><use href="#lotus-ou"/></svg></div>
+        <div class="auth-side-title">
+          <h1>Sistema de <em>Información</em><br>Estudiantil</h1>
+          <p>Plataforma institucional para la gestión de matrículas, calificaciones y trayectoria académica de su comunidad educativa.</p>
+        </div>
+        <div class="auth-side-card">
+          <div class="auth-side-card-avatar">AA</div>
+          <div class="auth-side-card-text"><b>Alma Arboleda</b><br>Administradora · Unidad Educativa San Agustín</div>
+        </div>
+        <div class="auth-side-foot">
+          <span><b>SIE</b> · v0.4.0-MVP</span>
+          <span>Cumple LOPDP & LOEI</span>
+        </div>
+      </aside>
+      <div class="auth-main">
+        <div class="auth-eyebrow">Acceso seguro</div>
+        <h1 class="auth-h">Bienvenido <em>de vuelta</em></h1>
+        <p class="auth-sub">Ingrese sus credenciales institucionales para acceder al sistema.</p>
+        <form class="auth-form" onsubmit="return false">
+          <div class="field"><label>Correo electrónico</label><input type="email" placeholder="nombre@colegio.edu.ec" value="admin@sie.edu.ec"></div>
+          <div class="field"><label>Contraseña</label><input type="password" placeholder="••••••••••" value="Admin123!!"></div>
+          <div class="row">
+            <label class="checkbox"><input type="checkbox" checked>Mantener sesión</label>
+            <a href="#pwdreset">¿Olvidó su contraseña?</a>
+          </div>
+          <button class="btn-gold" type="submit">Ingresar al sistema</button>
+        </form>
+        <div class="auth-form-foot">¿Primera vez? <a href="#activate">Active su cuenta</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     02 · ACTIVATE
+     ================================================================= -->
+<section class="page" id="activate">
+  <div class="page-label"><span class="num">02 / 25</span><span class="name">Activar cuenta · primera vez</span></div>
+  <div class="page-frame">
+    <div class="auth-center">
+      <div class="auth-card">
+        <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:1.5rem">
+          <div class="auth-side-mark" style="width:38px;height:38px;color:var(--gold-deep);border-color:var(--gold-line)"><svg style="width:26px;height:26px"><use href="#lotus-ou"/></svg></div>
+          <div>
+            <div class="brand-name" style="font-family:var(--display);font-size:1.1rem;font-weight:500;color:var(--ink)">SIE</div>
+            <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-4);margin-top:.2rem">Activación de cuenta</div>
+          </div>
+        </div>
+        <div class="auth-eyebrow">Bienvenida, Diana</div>
+        <h1 class="auth-h">Active su <em>cuenta</em></h1>
+        <p class="auth-sub">Defina una contraseña segura para acceder al sistema. Su cuenta ha sido creada por la administración institucional.</p>
+        <form class="auth-form" onsubmit="return false">
+          <div class="field"><label>Nueva contraseña <span class="req">*</span></label><input type="password" placeholder="Mínimo 8 caracteres"><div class="hint">Use mayúsculas, minúsculas, números y un símbolo.</div></div>
+          <div class="field"><label>Confirmar contraseña <span class="req">*</span></label><input type="password" placeholder="Repita la contraseña"></div>
+          <div class="notice info"><svg class="ico"><use href="#i-info"/></svg><span>Su contraseña se cifra con <b>bcrypt</b> y nunca se almacena en texto plano.</span></div>
+          <button class="btn-gold" type="submit">Activar cuenta e ingresar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     03 · PASSWORD RESET
+     ================================================================= -->
+<section class="page" id="pwdreset">
+  <div class="page-label"><span class="num">03 / 25</span><span class="name">Recuperar contraseña</span></div>
+  <div class="page-frame">
+    <div class="auth-center">
+      <div class="auth-card">
+        <div class="auth-eyebrow">Acceso · recuperar</div>
+        <h1 class="auth-h">¿Olvidó su <em>contraseña</em>?</h1>
+        <p class="auth-sub">Le enviaremos un enlace de recuperación al correo electrónico registrado en el sistema.</p>
+        <form class="auth-form" onsubmit="return false">
+          <div class="field"><label>Correo electrónico <span class="req">*</span></label><input type="email" placeholder="nombre@colegio.edu.ec" value="diana@colegio.edu.ec"></div>
+          <button class="btn-gold" type="submit">Enviar enlace de recuperación</button>
+        </form>
+        <div class="auth-divider">o</div>
+        <div style="text-align:center;font-size:.84rem;color:var(--ink-3)">¿Ya tiene el enlace? <a href="#activate" style="color:var(--gold-deep);font-weight:500">Defina su nueva contraseña</a></div>
+        <div class="auth-form-foot" style="margin-top:1.25rem"><a href="#login">← Volver al inicio de sesión</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     04 · PRIVACY (LOPDP)
+     ================================================================= -->
+<section class="page" id="privacy">
+  <div class="page-label"><span class="num">04 / 25</span><span class="name">Privacidad · portal LOPDP</span></div>
+  <div class="page-frame">
+    <div class="auth-center" style="display:block;padding:3rem 2rem;overflow-y:auto">
+      <div style="max-width:780px;margin:0 auto;background:var(--surface);border:1px solid var(--line-1);padding:3rem 3.5rem;box-shadow:0 16px 40px -12px rgba(10,10,11,.15)">
+        <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--gold-line)">
+          <div class="auth-side-mark" style="width:38px;height:38px;color:var(--gold-deep);border-color:var(--gold-line)"><svg style="width:26px;height:26px"><use href="#lotus-ou"/></svg></div>
+          <div>
+            <div style="font-family:var(--display);font-size:1.3rem;font-weight:500;color:var(--ink)">Política de Privacidad</div>
+            <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-4);margin-top:.2rem">Ley Orgánica de Protección de Datos Personales · Ecuador</div>
+          </div>
+        </div>
+        <p style="font-size:.92rem;color:var(--ink-3);line-height:1.65;margin-bottom:1.25rem">El <b style="color:var(--ink);font-weight:500">Sistema de Información Estudiantil (SIE)</b> trata datos personales conforme a la <b style="color:var(--ink);font-weight:500">LOPDP (2021)</b>, su Reglamento y las guías de la Superintendencia.</p>
+        <h2 style="font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--ink);margin:1.5rem 0 .5rem;padding-bottom:.4rem;border-bottom:1px solid var(--line-1)">I. Responsable del tratamiento</h2>
+        <p style="font-size:.88rem;color:var(--ink-3);line-height:1.65">Unidad Educativa San Agustín, RUC 1791234567001, con domicilio en Quito, Ecuador.</p>
+        <h2 style="font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--ink);margin:1.5rem 0 .5rem;padding-bottom:.4rem;border-bottom:1px solid var(--line-1)">II. Finalidades</h2>
+        <p style="font-size:.88rem;color:var(--ink-3);line-height:1.65">Gestión de matrícula, registro de calificaciones y asistencia, emisión de boletines, comunicaciones institucionales, cumplimiento ante el Ministerio de Educación.</p>
+        <h2 style="font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--ink);margin:1.5rem 0 .5rem;padding-bottom:.4rem;border-bottom:1px solid var(--line-1)">III. Base legal</h2>
+        <p style="font-size:.88rem;color:var(--ink-3);line-height:1.65">Consentimiento explícito del titular o su representante legal; cumplimiento de la LOEI.</p>
+        <h2 style="font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--ink);margin:1.5rem 0 .5rem;padding-bottom:.4rem;border-bottom:1px solid var(--line-1)">IV. Derechos ARCO</h2>
+        <p style="font-size:.88rem;color:var(--ink-3);line-height:1.65">Acceso, rectificación, cancelación y oposición en <b style="color:var(--ink-2);font-weight:500">dpo@colegio.edu.ec</b>.</p>
+        <h2 style="font-family:var(--display);font-size:1.2rem;font-weight:500;color:var(--ink);margin:1.5rem 0 .5rem;padding-bottom:.4rem;border-bottom:1px solid var(--line-1)">V. Conservación</h2>
+        <p style="font-size:.88rem;color:var(--ink-3);line-height:1.65">Mínimo 5 años posteriores a la salida del estudiante, conforme a normativa aplicable.</p>
+        <div style="margin-top:2.5rem;padding-top:1.25rem;border-top:1px solid var(--line-1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem">
+          <span style="font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4)">Última actualización · <b style="color:var(--gold-deep)">2025-04-01</b></span>
+          <a href="#login" class="btn-ghost">← Volver al sistema</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     05 · ADMIN DASHBOARD
+     ================================================================= -->
+<section class="page" id="ad-dash">
+  <div class="page-label"><span class="num">05 / 25</span><span class="name">Administrativo · Dashboard</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav">
+          <div class="nav-section"><div class="nav-label">Operación</div>
+            <a class="nav-item active" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+            <a class="nav-item" href="#ad-usuarios"><svg class="ico"><use href="#i-users"/></svg>Usuarios</a>
+            <a class="nav-item" href="#ad-cursos"><svg class="ico"><use href="#i-book"/></svg>Cursos</a>
+            <a class="nav-item" href="#ad-secciones"><svg class="ico"><use href="#i-layers"/></svg>Secciones<span class="badge">32</span></a>
+            <a class="nav-item" href="#ad-matricula"><svg class="ico"><use href="#i-clipboard"/></svg>Matrícula</a>
+            <a class="nav-item" href="#ad-consent"><svg class="ico"><use href="#i-shield"/></svg>Consentimientos</a>
+          </div>
+          <div class="nav-section"><div class="nav-label">Sistema</div>
+            <a class="nav-item" href="#ad-cierres"><svg class="ico"><use href="#i-check"/></svg>Cierres</a>
+            <a class="nav-item" href="#ad-alertas"><svg class="ico"><use href="#i-alert"/></svg>Alertas</a>
+            <a class="nav-item" href="#"><svg class="ico"><use href="#i-gear"/></svg>Configuración</a>
+          </div>
+        </nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar">
+          <div class="crumb">SIE · <b>Dashboard</b></div>
+          <div class="topbar-search"><svg class="ico"><use href="#i-search"/></svg>Buscar estudiante, sección, RUDE…<kbd>⌘ K</kbd></div>
+          <button class="topbar-icon"><svg class="ico"><use href="#i-bell"/></svg><span class="dot"></span></button>
+          <button class="topbar-icon"><svg class="ico"><use href="#i-help"/></svg></button>
+        </header>
+        <div class="content">
+          <div class="page-head">
+            <div class="eyebrow">Período activo · 2025–2026</div>
+            <h1 class="page-title">2025-2026 — <em>Período Ordinario</em></h1>
+            <div class="page-meta">
+              <span class="state">En curso</span>
+              <span class="sep">·</span>
+              <code>2025-04-14</code> <span>→</span> <code>2025-08-22</code>
+              <span class="sep">·</span>
+              <span>Unidad Educativa <b style="color:var(--ink-2)">San Agustín</b></span>
+            </div>
+          </div>
+          <div class="callout">
+            <div class="callout-ico"><svg class="ico"><use href="#i-spark"/></svg></div>
+            <div class="callout-body">
+              <div class="callout-eyebrow">Período en configuración · 2026-2027</div>
+              <div class="callout-title">Paso 3 de 4 — Crear cursos del catálogo</div>
+              <div class="callout-sub">Tienes <b>14 cursos</b> ya ingresados. Faltan <b>23 cursos</b> para completar el catálogo.</div>
+            </div>
+            <button class="btn-gold">Continuar configuración</button>
+          </div>
+          <div class="kpis">
+            <div class="kpi" style="--accent:var(--gold-deep)">
+              <div class="kpi-eyebrow"><span class="dot"></span>Estudiantes</div>
+              <div class="kpi-num">847</div>
+              <div class="kpi-sub"><b>+12</b> esta semana</div>
+              <div class="kpi-trend">+1.4% vs mes anterior</div>
+            </div>
+            <div class="kpi" style="--accent:var(--green-deep)">
+              <div class="kpi-eyebrow"><span class="dot"></span>Matriculados</div>
+              <div class="kpi-num">812</div>
+              <div class="kpi-sub"><b>95.9%</b> del total</div>
+              <div class="kpi-trend">+2.1% vs mes anterior</div>
+            </div>
+            <div class="kpi" style="--accent:var(--plum)">
+              <div class="kpi-eyebrow"><span class="dot"></span>Secciones activas</div>
+              <div class="kpi-num">32</div>
+              <div class="kpi-sub"><b>28</b> con docente</div>
+              <div class="kpi-trend down">−4 sin docente</div>
+            </div>
+            <div class="kpi" style="--accent:var(--orange-deep)">
+              <div class="kpi-eyebrow"><span class="dot"></span>Asistencia</div>
+              <div class="kpi-num">94<span class="suffix">%</span></div>
+              <div class="kpi-sub">promedio institucional</div>
+              <div class="kpi-trend">+0.8% vs mes anterior</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div><h2 class="card-title">Evolución de matrículas</h2><p class="card-sub">Últimos 7 meses · Período 2025-2026</p></div>
+              <div class="tabs"><button class="tab">7M</button><button class="tab">12M</button><button class="tab active">YTD</button><button class="tab">Todo</button></div>
+            </div>
+            <svg viewBox="0 0 800 200" style="width:100%;height:200px">
+              <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#D4AF37" stop-opacity=".25"/><stop offset="100%" stop-color="#D4AF37" stop-opacity="0"/></linearGradient></defs>
+              <line x1="40" y1="20"  x2="780" y2="20"  stroke="rgba(10,10,11,.10)" stroke-dasharray="2 4"/>
+              <line x1="40" y1="70"  x2="780" y2="70"  stroke="rgba(10,10,11,.10)" stroke-dasharray="2 4"/>
+              <line x1="40" y1="120" x2="780" y2="120" stroke="rgba(10,10,11,.10)" stroke-dasharray="2 4"/>
+              <line x1="40" y1="170" x2="780" y2="170" stroke="rgba(10,10,11,.10)"/>
+              <text x="30" y="24" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">900</text>
+              <text x="30" y="74" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">700</text>
+              <text x="30" y="124" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">500</text>
+              <text x="30" y="174" text-anchor="end" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">300</text>
+              <text x="80" y="190" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">Feb</text>
+              <text x="190" y="190" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">Mar</text>
+              <text x="300" y="190" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">Abr</text>
+              <text x="410" y="190" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">May</text>
+              <text x="520" y="190" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">Jun</text>
+              <text x="630" y="190" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">Jul</text>
+              <text x="740" y="190" font-family="JetBrains Mono" font-size="10" fill="rgba(10,10,11,.48)">Ago</text>
+              <path d="M80 140 L190 120 L300 95 L410 80 L520 60 L630 35 L740 15 L740 180 L80 180 Z" fill="url(#g1)"/>
+              <path d="M80 140 L190 120 L300 95 L410 80 L520 60 L630 35 L740 15" fill="none" stroke="#8A6A18" stroke-width="2"/>
+              <g fill="#FFFFFF" stroke="#8A6A18" stroke-width="1.8">
+                <circle cx="80" cy="140" r="3.5"/><circle cx="190" cy="120" r="3.5"/><circle cx="300" cy="95" r="3.5"/><circle cx="410" cy="80" r="3.5"/><circle cx="520" cy="60" r="3.5"/><circle cx="630" cy="35" r="3.5"/><circle cx="740" cy="15" r="3.5" fill="#8A6A18"/>
+              </g>
+            </svg>
+          </div>
+          <div class="grid-2">
+            <div class="card" style="margin-bottom:0">
+              <div class="card-head"><div><h2 class="card-title">Actividad reciente</h2><p class="card-sub">Últimos eventos del sistema</p></div><button class="btn-ghost">Ver todo →</button></div>
+              <table class="tbl">
+                <thead><tr><th>Hora</th><th>Evento</th><th class="r">Usuario</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">14:32</td><td><span class="tbl-name">Sección 10°A — Matemáticas cerrada</span></td><td class="r"><span class="tbl-mono">d.velasco</span></td></tr>
+                  <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">14:18</td><td><span class="tbl-name">38 estudiantes matriculados <span class="tbl-pill info">CSV</span></span></td><td class="r"><span class="tbl-mono">a.arboleda</span></td></tr>
+                  <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">13:55</td><td><span class="tbl-name">Asistencia registrada — 8°B</span></td><td class="r"><span class="tbl-mono">m.cardenas</span></td></tr>
+                  <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">13:21</td><td><span class="tbl-name">Consentimiento firmado <span class="tbl-pill ok">Aprobado</span></span></td><td class="r"><span class="tbl-mono">e.ruales</span></td></tr>
+                  <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">12:47</td><td><span class="tbl-name">3 alertas tempranas <span class="tbl-pill warn">Riesgo</span></span></td><td class="r"><span class="tbl-mono">sistema</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card" style="margin-bottom:0">
+              <div class="card-head"><div><h2 class="card-title">Acciones rápidas</h2><p class="card-sub">Tareas comunes</p></div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-1);border:1px solid var(--line-1)">
+                <button style="background:var(--surface);padding:.9rem;display:flex;align-items:center;gap:.7rem;text-align:left"><div style="width:30px;height:30px;display:grid;place-items:center;background:var(--gold-faint);color:var(--gold-deep);border:1px solid var(--gold-line)"><svg class="ico" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5"><use href="#i-plus"/></svg></div><div><div style="font-family:var(--display);font-size:1rem;font-weight:500;color:var(--ink)">Crear período</div><div style="font-size:.74rem;color:var(--ink-3)">Wizard 4 pasos</div></div></button>
+                <button style="background:var(--surface);padding:.9rem;display:flex;align-items:center;gap:.7rem;text-align:left"><div style="width:30px;height:30px;display:grid;place-items:center;background:var(--gold-faint);color:var(--gold-deep);border:1px solid var(--gold-line)"><svg class="ico" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5"><use href="#i-upload"/></svg></div><div><div style="font-family:var(--display);font-size:1rem;font-weight:500;color:var(--ink)">Importar CSV</div><div style="font-size:.74rem;color:var(--ink-3)">Carga masiva</div></div></button>
+                <button style="background:var(--surface);padding:.9rem;display:flex;align-items:center;gap:.7rem;text-align:left"><div style="width:30px;height:30px;display:grid;place-items:center;background:var(--gold-faint);color:var(--gold-deep);border:1px solid var(--gold-line)"><svg class="ico" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5"><use href="#i-users"/></svg></div><div><div style="font-family:var(--display);font-size:1rem;font-weight:500;color:var(--ink)">Asignar docentes</div><div style="font-size:.74rem;color:var(--ink-3)">4 pendientes</div></div></button>
+                <button style="background:var(--surface);padding:.9rem;display:flex;align-items:center;gap:.7rem;text-align:left"><div style="width:30px;height:30px;display:grid;place-items:center;background:var(--gold-faint);color:var(--gold-deep);border:1px solid var(--gold-line)"><svg class="ico" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5"><use href="#i-download"/></svg></div><div><div style="font-family:var(--display);font-size:1rem;font-weight:500;color:var(--ink)">Reportes</div><div style="font-size:.74rem;color:var(--ink-3)">PDFs firmados</div></div></button>
+              </div>
+            </div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro · LOPDP & LOEI</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     06 · USUARIOS
+     ================================================================= -->
+<section class="page" id="ad-usuarios">
+  <div class="page-label"><span class="num">06 / 25</span><span class="name">Administrativo · Usuarios</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div>
+          <a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+          <a class="nav-item active" href="#ad-usuarios"><svg class="ico"><use href="#i-users"/></svg>Usuarios</a>
+          <a class="nav-item" href="#ad-cursos"><svg class="ico"><use href="#i-book"/></svg>Cursos</a>
+          <a class="nav-item" href="#ad-secciones"><svg class="ico"><use href="#i-layers"/></svg>Secciones<span class="badge">32</span></a>
+          <a class="nav-item" href="#ad-matricula"><svg class="ico"><use href="#i-clipboard"/></svg>Matrícula</a>
+          <a class="nav-item" href="#ad-consent"><svg class="ico"><use href="#i-shield"/></svg>Consentimientos</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Usuarios</b></div><div class="topbar-search"><svg class="ico"><use href="#i-search"/></svg>Buscar por nombre, email, RUDE…<kbd>⌘ K</kbd></div></header>
+        <div class="content">
+          <div class="page-head">
+            <div class="eyebrow">Identidad · gestión de cuentas</div>
+            <h1 class="page-title"><em>Usuarios</em> del sistema</h1>
+            <p class="page-sub">Administre las cuentas de administrativos, docentes, estudiantes y representantes legales.</p>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Crear nuevo usuario</h2><p class="card-sub">Complete los datos y asigne uno o más roles</p></div></div>
+            <div class="form-grid">
+              <div class="field"><label>Email <span class="req">*</span></label><input type="email" placeholder="usuario@colegio.edu.ec"></div>
+              <div class="field"><label>Nombre completo <span class="req">*</span></label><input type="text" placeholder="Diana Pérez"></div>
+              <div class="field"><label>Fecha de nacimiento</label><input type="date" value="1985-03-12"></div>
+              <div class="field full"><label>Roles <span class="req">*</span></label><div class="field-row" style="gap:1.5rem"><label class="checkbox"><input type="checkbox">Administrativo</label><label class="checkbox"><input type="checkbox" checked>Docente</label><label class="checkbox"><input type="checkbox">Estudiante</label><label class="checkbox"><input type="checkbox">Representante</label></div></div>
+            </div>
+            <div style="display:flex;gap:.5rem;justify-content:flex-end"><button class="btn-secondary">Cancelar</button><button class="btn-gold">Crear usuario</button></div>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div><h2 class="card-title">Usuarios registrados</h2><p class="card-sub"><b>847</b> cuentas en total · 32 docentes · 812 estudiantes · 3 administrativos</p></div>
+              <button class="btn-ghost"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:.4rem;vertical-align:-1px"><use href="#i-upload"/></svg>Importar CSV</button>
+            </div>
+            <table class="tbl">
+              <thead><tr><th>Nombre</th><th>Email</th><th>Roles</th><th>Estado</th><th class="r">Acciones</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tbl-name">Alma Arboleda Vega</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE · 0001-1972</div></td><td><span class="tbl-mono">admin@sie.edu.ec</span></td><td><span class="tbl-pill info">Administrativo</span></td><td><span class="tbl-pill ok">Activo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-eye"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td><span class="tbl-name">Diana Pérez Ortega</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">Docente · Matemáticas</div></td><td><span class="tbl-mono">diana@colegio.edu.ec</span></td><td><span class="tbl-pill ok">Docente</span></td><td><span class="tbl-pill ok">Activo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-eye"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td><span class="tbl-name">Mario Cárdenas Loaiza</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">Docente · Lengua</div></td><td><span class="tbl-mono">m.cardenas@colegio.edu.ec</span></td><td><span class="tbl-pill ok">Docente</span></td><td><span class="tbl-pill ok">Activo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-eye"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td><span class="tbl-name">Ernesto Ruales Morales</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">Estudiante · 10°A</div></td><td><span class="tbl-mono">ernesto@colegio.edu.ec</span></td><td><span class="tbl-pill warn">Estudiante</span></td><td><span class="tbl-pill ok">Activo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-eye"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td><span class="tbl-name">Sofía Mendoza Páez</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">Estudiante · 9°B</div></td><td><span class="tbl-mono">sofia@colegio.edu.ec</span></td><td><span class="tbl-pill warn">Estudiante</span></td><td><span class="tbl-pill muted">Inactivo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-eye"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td><span class="tbl-name">Patricia Ordóñez Vega</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">Docente · Ciencias</div></td><td><span class="tbl-mono">p.ordonez@colegio.edu.ec</span></td><td><span class="tbl-pill ok">Docente</span></td><td><span class="tbl-pill ok">Activo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-eye"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+              </tbody>
+            </table>
+            <div class="pagination">
+              <div class="pagination-info">Mostrando <b>1–6</b> de <b>847</b> usuarios</div>
+              <div class="pagination-ctrls"><button class="pg-btn arrow"><svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8"><use href="#i-chev-l"/></svg></button><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">3</button><button class="pg-btn">…</button><button class="pg-btn">141</button><button class="pg-btn arrow"><svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8"><use href="#i-chev-r"/></svg></button></div>
+            </div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     07 · IMPORTAR USUARIOS (wizard 3 pasos)
+     ================================================================= -->
+<section class="page" id="ad-impusers">
+  <div class="page-label"><span class="num">07 / 25</span><span class="name">Administrativo · Importar usuarios (wizard)</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div>
+          <a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+          <a class="nav-item active" href="#ad-usuarios"><svg class="ico"><use href="#i-users"/></svg>Usuarios</a>
+          <a class="nav-item" href="#ad-cursos"><svg class="ico"><use href="#i-book"/></svg>Cursos</a>
+          <a class="nav-item" href="#ad-secciones"><svg class="ico"><use href="#i-layers"/></svg>Secciones</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Usuarios</b> · <b>Importar</b></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Carga masiva · CSV</div><h1 class="page-title">Importar <em>usuarios</em></h1><p class="page-sub">Cargue un archivo CSV con las columnas requeridas. El sistema validará los datos antes de crear las cuentas.</p></div>
+          <div class="stepper">
+            <div class="step done"><div class="step-n"><span>1</span></div><div class="step-meta"><div class="step-eyebrow">Paso 1</div><div class="step-name">Cargar archivo</div></div></div>
+            <div class="step active"><div class="step-n"><span>2</span></div><div class="step-meta"><div class="step-eyebrow">Paso 2</div><div class="step-name">Validar y previsualizar</div></div></div>
+            <div class="step pending"><div class="step-n"><span>3</span></div><div class="step-meta"><div class="step-eyebrow">Paso 3</div><div class="step-name">Confirmar</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Previsualización · <span style="color:var(--gold-deep)">estudiantes_2025.csv</span></h2><p class="card-sub"><b>38 filas detectadas</b> · 36 válidas · 2 con advertencias</p></div><button class="btn-ghost">Reemplazar archivo</button></div>
+            <div class="notice warn" style="margin-bottom:1rem"><svg class="ico"><use href="#i-alert"/></svg><span><b>2 filas requieren revisión:</b> fila 12 (email duplicado) y fila 27 (cédula inválida). Puede corregirlas o continuar y omitirlas.</span></div>
+            <table class="tbl">
+              <thead><tr><th>#</th><th>Email</th><th>Nombre</th><th>Rol</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tbl-mono">01</span></td><td><span class="tbl-mono">sofia.mendoza@colegio.edu.ec</span></td><td><span class="tbl-name">Sofía Mendoza Páez</span></td><td><span class="tbl-pill warn">Estudiante</span></td><td><span class="tbl-pill ok">Válido</span></td></tr>
+                <tr><td><span class="tbl-mono">02</span></td><td><span class="tbl-mono">esteban.morales@colegio.edu.ec</span></td><td><span class="tbl-name">Esteban Morales Vega</span></td><td><span class="tbl-pill warn">Estudiante</span></td><td><span class="tbl-pill ok">Válido</span></td></tr>
+                <tr><td><span class="tbl-mono">12</span></td><td><span class="tbl-mono">juan.r@colegio.edu.ec</span></td><td><span class="tbl-name">Juan Rodríguez Paz</span></td><td><span class="tbl-pill warn">Estudiante</span></td><td><span class="tbl-pill danger">Email duplicado</span></td></tr>
+                <tr><td><span class="tbl-mono">13</span></td><td><span class="tbl-mono">camila.ramirez@colegio.edu.ec</span></td><td><span class="tbl-name">Camila Ramírez Ortega</span></td><td><span class="tbl-pill warn">Estudiante</span></td><td><span class="tbl-pill ok">Válido</span></td></tr>
+                <tr><td><span class="tbl-mono">27</span></td><td><span class="tbl-mono">lucia.v@colegio.edu.ec</span></td><td><span class="tbl-name">Lucía Vera Sánchez</span></td><td><span class="tbl-pill warn">Estudiante</span></td><td><span class="tbl-pill danger">Cédula inválida</span></td></tr>
+              </tbody>
+            </table>
+            <div style="display:flex;gap:.5rem;justify-content:space-between;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--line-1)"><button class="btn-secondary">← Volver al paso 1</button><button class="btn-gold">Confirmar e importar 36 usuarios</button></div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     08 · CURSOS
+     ================================================================= -->
+<section class="page" id="ad-cursos">
+  <div class="page-label"><span class="num">08 / 25</span><span class="name">Administrativo · Cursos (catálogo)</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div>
+          <a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+          <a class="nav-item" href="#ad-usuarios"><svg class="ico"><use href="#i-users"/></svg>Usuarios</a>
+          <a class="nav-item active" href="#ad-cursos"><svg class="ico"><use href="#i-book"/></svg>Cursos</a>
+          <a class="nav-item" href="#ad-secciones"><svg class="ico"><use href="#i-layers"/></svg>Secciones<span class="badge">32</span></a>
+          <a class="nav-item" href="#ad-matricula"><svg class="ico"><use href="#i-clipboard"/></svg>Matrícula</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Cursos</b></div><div class="topbar-search"><svg class="ico"><use href="#i-search"/></svg>Buscar curso…<kbd>⌘ K</kbd></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Académico · catálogo</div><h1 class="page-title">Catálogo de <em>cursos</em></h1><p class="page-sub">Administre las asignaturas y cursos de la oferta académica institucional.</p></div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Crear nuevo curso</h2></div></div>
+            <div class="form-grid cols-3">
+              <div class="field"><label>Código <span class="req">*</span></label><input type="text" placeholder="MAT-10A" value="MAT-10B"></div>
+              <div class="field full"><label>Nombre del curso <span class="req">*</span></label><input type="text" placeholder="Matemáticas — Décimo EGB" value="Matemáticas — Décimo B"></div>
+              <div class="field"><label>Créditos</label><input type="number" value="4"></div>
+            </div>
+            <div style="display:flex;gap:.5rem;justify-content:flex-end"><button class="btn-secondary">Cancelar</button><button class="btn-gold">Crear curso</button></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Cursos registrados</h2><p class="card-sub"><b>37</b> cursos en el catálogo</p></div></div>
+            <table class="tbl">
+              <thead><tr><th>Código</th><th>Nombre</th><th>Estado</th><th class="r">Acción</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">MAT-10A</span></td><td><span class="tbl-name">Matemáticas — Décimo EGB</span></td><td><span class="tbl-pill ok">Activo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">LEN-09A</span></td><td><span class="tbl-name">Lengua y Literatura — Noveno EGB</span></td><td><span class="tbl-pill ok">Activo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">CNA-08B</span></td><td><span class="tbl-name">Ciencias Naturales — Octavo EGB</span></td><td><span class="tbl-pill ok">Activo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">SOC-10A</span></td><td><span class="tbl-name">Estudios Sociales — Décimo EGB</span></td><td><span class="tbl-pill ok">Activo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">ING-10A</span></td><td><span class="tbl-name">Inglés — Décimo EGB</span></td><td><span class="tbl-pill ok">Activo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">EFI-08A</span></td><td><span class="tbl-name">Educación Física — Octavo EGB</span></td><td><span class="tbl-pill muted">Inactivo</span></td><td class="r"><div class="tbl-actions"><button class="tbl-icon-btn"><svg class="ico"><use href="#i-edit"/></svg></button><button class="tbl-icon-btn"><svg class="ico"><use href="#i-trash"/></svg></button></div></td></tr>
+              </tbody>
+            </table>
+            <div class="pagination"><div class="pagination-info">Mostrando <b>1–6</b> de <b>37</b> cursos</div><div class="pagination-ctrls"><button class="pg-btn arrow"><svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8"><use href="#i-chev-l"/></svg></button><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">…</button><button class="pg-btn">7</button><button class="pg-btn arrow"><svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8"><use href="#i-chev-r"/></svg></button></div></div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     09 · SECCIONES
+     ================================================================= -->
+<section class="page" id="ad-secciones">
+  <div class="page-label"><span class="num">09 / 25</span><span class="name">Administrativo · Secciones (paralelos)</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div>
+          <a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+          <a class="nav-item" href="#ad-usuarios"><svg class="ico"><use href="#i-users"/></svg>Usuarios</a>
+          <a class="nav-item" href="#ad-cursos"><svg class="ico"><use href="#i-book"/></svg>Cursos</a>
+          <a class="nav-item active" href="#ad-secciones"><svg class="ico"><use href="#i-layers"/></svg>Secciones<span class="badge">32</span></a>
+          <a class="nav-item" href="#ad-matricula"><svg class="ico"><use href="#i-clipboard"/></svg>Matrícula</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Secciones</b></div><div class="topbar-search"><svg class="ico"><use href="#i-search"/></svg>Buscar sección…<kbd>⌘ K</kbd></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Académico · paralelos</div><h1 class="page-title"><em>Secciones</em> del período</h1><p class="page-sub">Lista de paralelos abiertos en el período 2025-2026, agrupados por curso y docente.</p></div>
+          <div class="card">
+            <div class="card-head">
+              <div><h2 class="card-title">Secciones activas</h2><p class="card-sub"><b>32</b> secciones · <b>28</b> con docente · <b>4</b> pendientes</p></div>
+              <div style="display:flex;gap:.5rem"><select style="background:transparent;border:1px solid var(--line-1);padding:.45rem .8rem;font-size:.82rem;color:var(--ink-2);font-family:var(--mono);letter-spacing:.12em"><option>2025-2026 — Ordinario</option><option>2024-2025 — Ordinario</option></select></div>
+            </div>
+            <table class="tbl">
+              <thead><tr><th>Código</th><th>Curso</th><th>Capacidad</th><th>Docente</th><th>Horario</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">10°A</span></td><td><span class="tbl-name">Matemáticas — Décimo EGB</span></td><td>35 / 40</td><td>Diana Pérez</td><td><span class="tbl-mono">Lun-Mié-Vie 07:00-08:00</span></td><td><span class="tbl-pill ok">Activo</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">10°B</span></td><td><span class="tbl-name">Matemáticas — Décimo EGB</span></td><td>32 / 40</td><td>Diana Pérez</td><td><span class="tbl-mono">Mar-Jue 07:00-08:00</span></td><td><span class="tbl-pill ok">Activo</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">9°A</span></td><td><span class="tbl-name">Lengua y Literatura — Noveno</span></td><td>28 / 35</td><td>Mario Cárdenas</td><td><span class="tbl-mono">Lun-Mié 09:00-10:00</span></td><td><span class="tbl-pill ok">Activo</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">8°B</span></td><td><span class="tbl-name">Ciencias Naturales — Octavo</span></td><td>30 / 35</td><td>Patricia Ordóñez</td><td><span class="tbl-mono">Mar-Jue 10:00-11:00</span></td><td><span class="tbl-pill ok">Activo</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">10°C</span></td><td><span class="tbl-name">Inglés — Décimo EGB</span></td><td>0 / 30</td><td><span style="color:var(--ink-4)">— sin asignar —</span></td><td><span class="tbl-mono">Por definir</span></td><td><span class="tbl-pill warn">Pendiente</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">8°A</span></td><td><span class="tbl-name">Estudios Sociales — Octavo</span></td><td>33 / 35</td><td>Roberto Salazar</td><td><span class="tbl-mono">Vie 08:00-10:00</span></td><td><span class="tbl-pill ok">Activo</span></td></tr>
+              </tbody>
+            </table>
+            <div class="pagination"><div class="pagination-info">Mostrando <b>1–6</b> de <b>32</b> secciones</div><div class="pagination-ctrls"><button class="pg-btn arrow"><svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8"><use href="#i-chev-l"/></svg></button><button class="pg-btn active">1</button><button class="pg-btn">2</button><button class="pg-btn">…</button><button class="pg-btn">6</button><button class="pg-btn arrow"><svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8"><use href="#i-chev-r"/></svg></button></div></div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     10 · WIZARD · CLONAR (paso 2/4)
+     ================================================================= -->
+<section class="page" id="ad-wiz-clonar">
+  <div class="page-label"><span class="num">10 / 25</span><span class="name">Administrativo · Wizard · Clonar período (paso 2/4)</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div>
+          <a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+          <a class="nav-item" href="#ad-cursos"><svg class="ico"><use href="#i-book"/></svg>Cursos</a>
+          <a class="nav-item" href="#ad-secciones"><svg class="ico"><use href="#i-layers"/></svg>Secciones</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Nuevo período</b> · <b>Clonar</b></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Configuración de período · wizard</div><h1 class="page-title">Crear período <em>2026-2027</em></h1></div>
+          <div class="stepper">
+            <div class="step done"><div class="step-n"><span>1</span></div><div class="step-meta"><div class="step-eyebrow">Paso 1</div><div class="step-name">Datos básicos</div></div></div>
+            <div class="step active"><div class="step-n"><span>2</span></div><div class="step-meta"><div class="step-eyebrow">Paso 2</div><div class="step-name">Origen de secciones</div></div></div>
+            <div class="step pending"><div class="step-n"><span>3</span></div><div class="step-meta"><div class="step-eyebrow">Paso 3</div><div class="step-name">Revisar y asignar</div></div></div>
+            <div class="step pending"><div class="step-n"><span>4</span></div><div class="step-meta"><div class="step-eyebrow">Paso 4</div><div class="step-name">Confirmar apertura</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">¿Cómo desea crear las secciones?</h2><p class="card-sub">Puede clonar la estructura del período anterior o comenzar desde cero</p></div></div>
+            <div class="choice-grid">
+              <div class="choice selected">
+                <div class="choice-ico"><svg class="ico"><use href="#i-clone"/></svg></div>
+                <div>
+                  <div class="choice-title">Clonar del período anterior</div>
+                  <div class="choice-desc">Replica los cursos, secciones y docentes del período <b>2025-2026</b>. Podrá ajustar docentes y horarios en el siguiente paso.</div>
+                </div>
+                <div class="notice info" style="margin:0"><svg class="ico"><use href="#i-info"/></svg><span>32 secciones, 28 docentes, 12 cursos se copiarán</span></div>
+              </div>
+              <div class="choice">
+                <div class="choice-ico"><svg class="ico"><use href="#i-plus"/></svg></div>
+                <div>
+                  <div class="choice-title">Crear desde cero</div>
+                  <div class="choice-desc">Comience con un catálogo vacío y agregue cursos, secciones y docentes manualmente.</div>
+                </div>
+                <div class="notice warn" style="margin:0"><svg class="ico"><use href="#i-alert"/></svg><span>Deberá configurar todo manualmente</span></div>
+              </div>
+            </div>
+            <div style="display:flex;gap:.5rem;justify-content:space-between;padding-top:1.25rem;border-top:1px solid var(--line-1)"><button class="btn-secondary">← Volver al paso 1</button><button class="btn-gold">Continuar al paso 3</button></div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     11 · WIZARD · CREAR PERIODO (paso 1/4)
+     ================================================================= -->
+<section class="page" id="ad-wiz-crear">
+  <div class="page-label"><span class="num">11 / 25</span><span class="name">Administrativo · Wizard · Crear período (paso 1/4)</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub\">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div><a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a></div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Nuevo período</b></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Configuración de período · wizard</div><h1 class="page-title">Datos del <em>período</em></h1></div>
+          <div class="stepper">
+            <div class="step active"><div class="step-n"><span>1</span></div><div class="step-meta"><div class="step-eyebrow">Paso 1</div><div class="step-name">Datos básicos</div></div></div>
+            <div class="step pending"><div class="step-n"><span>2</span></div><div class="step-meta"><div class="step-eyebrow">Paso 2</div><div class="step-name">Origen de secciones</div></div></div>
+            <div class="step pending"><div class="step-n"><span>3</span></div><div class="step-meta"><div class="step-eyebrow">Paso 3</div><div class="step-name">Revisar y asignar</div></div></div>
+            <div class="step pending"><div class="step-n"><span>4</span></div><div class="step-meta"><div class="step-eyebrow">Paso 4</div><div class="step-name">Confirmar apertura</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Información general</h2><p class="card-sub">Defina código, nombre y fechas del nuevo período académico</p></div></div>
+            <div class="form-grid">
+              <div class="field"><label>Código <span class="req">*</span></label><input type="text" placeholder="2026-2027" value="2026-2027"></div>
+              <div class="field"><label>Nombre <span class="req">*</span></label><input type="text" placeholder="Período Ordinario 2026-2027" value="Período Ordinario 2026-2027"></div>
+              <div class="field"><label>Fecha de inicio <span class="req">*</span></label><input type="date" value="2026-04-13"></div>
+              <div class="field"><label>Fecha de fin <span class="req">*</span></label><input type="date" value="2026-08-21"></div>
+              <div class="field"><label>Fecha cierre Q1</label><input type="date" value="2026-06-12"></div>
+              <div class="field"><label>Fecha cierre Q2</label><input type="date" value="2026-08-21"></div>
+            </div>
+            <div class="notice info" style="margin-bottom:1rem"><svg class="ico"><use href="#i-info"/></svg><span>Los cierres de quimestre definen cuándo los docentes deben tener las notas ingresadas y secciones cerradas.</span></div>
+            <div style="display:flex;gap:.5rem;justify-content:space-between;padding-top:1.25rem;border-top:1px solid var(--line-1)"><button class="btn-secondary">Cancelar</button><button class="btn-gold">Continuar al paso 2 →</button></div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     12 · WIZARD · CONFIRMAR APERTURA (paso 4/4)
+     ================================================================= -->
+<section class="page" id="ad-wiz-confirmar">
+  <div class="page-label"><span class="num">12 / 25</span><span class="name">Administrativo · Wizard · Confirmar apertura (paso 4/4)</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub\">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div><a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a></div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Nuevo período</b> · <b>Confirmar</b></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Configuración de período · wizard</div><h1 class="page-title">Confirmar <em>apertura</em></h1></div>
+          <div class="stepper">
+            <div class="step done"><div class="step-n"><span>1</span></div><div class="step-meta"><div class="step-eyebrow">Paso 1</div><div class="step-name">Datos básicos</div></div></div>
+            <div class="step done"><div class="step-n"><span>2</span></div><div class="step-meta"><div class="step-eyebrow">Paso 2</div><div class="step-name">Origen de secciones</div></div></div>
+            <div class="step done"><div class="step-n"><span>3</span></div><div class="step-meta"><div class="step-eyebrow">Paso 3</div><div class="step-name">Revisar y asignar</div></div></div>
+            <div class="step active"><div class="step-n"><span>4</span></div><div class="step-meta"><div class="step-eyebrow">Paso 4</div><div class="step-name">Confirmar apertura</div></div></div>
+          </div>
+          <div class="success-card" style="margin-top:1rem">
+            <div class="ico-wrap"><svg class="ico"><use href="#i-check"/></svg></div>
+            <h2 class="card-title" style="font-size:1.6rem">Todo listo para abrir el período</h2>
+            <p>Ha configurado <b>2026-2027 — Período Ordinario</b> con <b>32 secciones</b> y <b>28 docentes asignados</b>. Una vez abierto, el período será visible para todos los usuarios.</p>
+            <div class="notice warn" style="text-align:left;margin:1.5rem auto;max-width:440px"><svg class="ico"><use href="#i-alert"/></svg><span><b>Esta acción no se puede deshacer.</b> Una vez abierto, las secciones y matrículas no podrán revertirse. Use "Vista previa" si necesita revisar antes.</span></div>
+            <div style="display:flex;gap:.75rem;justify-content:center;margin-top:1.5rem">
+              <button class="btn-secondary">← Volver al paso 3</button>
+              <button class="btn-gold">Abrir período →</button>
+            </div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     13 · WIZARD · REVISAR SECCIONES (paso 3/4)
+     ================================================================= -->
+<section class="page" id="ad-wiz-revisar">
+  <div class="page-label"><span class="num">13 / 25</span><span class="name">Administrativo · Wizard · Revisar secciones (paso 3/4)</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div><a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a></div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Nuevo período</b> · <b>Revisar</b></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Configuración de período · wizard</div><h1 class="page-title\">Revisar <em>secciones</em></h1><p class="page-sub">Asigne docentes a las 4 secciones pendientes y cree nuevas secciones si es necesario.</p></div>
+          <div class="stepper">
+            <div class="step done"><div class="step-n"><span>1</span></div><div class="step-meta"><div class="step-eyebrow">Paso 1</div><div class="step-name">Datos básicos</div></div></div>
+            <div class="step done"><div class="step-n"><span>2</span></div><div class="step-meta"><div class="step-eyebrow">Paso 2</div><div class="step-name">Origen de secciones</div></div></div>
+            <div class="step active"><div class="step-n"><span>3</span></div><div class="step-meta"><div class="step-eyebrow">Paso 3</div><div class="step-name">Revisar y asignar</div></div></div>
+            <div class="step pending"><div class="step-n"><span>4</span></div><div class="step-meta"><div class="step-eyebrow">Paso 4</div><div class="step-name">Confirmar apertura</div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Crear nueva sección</h2><p class="card-sub">Complete los datos para agregar una sección adicional</p></div></div>
+            <div class="form-grid cols-3">
+              <div class="field"><label>Curso <span class="req">*</span></label><select><option>MAT-10A · Matemáticas 10°</option><option>LEN-09A · Lengua 9°</option></select></div>
+              <div class="field"><label>Código <span class="req\">*</span></label><input type="text" placeholder="10°C" value="10°C"></div>
+              <div class="field"><label>Capacidad <span class="req\">*</span></label><input type="number" value="30"></div>
+              <div class="field"><label>Docente <span class="req">*</span></label><select><option>— Sin asignar —</option><option>Diana Pérez Ortega</option><option>Mario Cárdenas Loaiza</option></select></div>
+              <div class="field"><label>Día / Hora <span class="req">*</span></label><input type="text" placeholder="Lun-Mié-Vie 07:00"></div>
+              <div class="field"><label>Aula</label><input type="text" placeholder="A-201" value="A-201"></div>
+            </div>
+            <div style="display:flex;gap:.5rem;justify-content:flex-end"><button class="btn-secondary">Cancelar</button><button class="btn-gold"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:.4rem;vertical-align:-1px"><use href="#i-plus"/></svg>Crear sección</button></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Secciones del período 2026-2027</h2><p class="card-sub"><b>32</b> secciones · <b>28</b> con docente · <b style="color:var(--orange-deep)">4 pendientes</b> de asignación</p></div><button class="btn-gold">Continuar al paso 4 →</button></div>
+            <table class="tbl">
+              <thead><tr><th>Sección</th><th>Curso</th><th>Capacidad</th><th>Docente</th><th>Horario</th><th class="r">Asignado</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">10°A</span></td><td>Matemáticas 10°</td><td>35 / 40</td><td>Diana Pérez</td><td><span class="tbl-mono">L-M-V 07:00</span></td><td class="r"><span class="tbl-pill ok">✓ Sí</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">10°B</span></td><td>Matemáticas 10°</td><td>32 / 40</td><td>Diana Pérez</td><td><span class="tbl-mono">M-J 07:00</span></td><td class="r"><span class="tbl-pill ok">✓ Sí</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">9°A</span></td><td>Lengua 9°</td><td>28 / 35</td><td>Mario Cárdenas</td><td><span class="tbl-mono">L-M 09:00</span></td><td class="r"><span class="tbl-pill ok">✓ Sí</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">10°C</span></td><td>Inglés 10°</td><td>0 / 30</td><td><span style="color:var(--orange-deep)">— Pendiente —</span></td><td><span class="tbl-mono" style="color:var(--ink-4)">Por definir</span></td><td class="r"><span class="tbl-pill warn">Pendiente</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">8°B</span></td><td>Ciencias 8°</td><td>30 / 35</td><td>Patricia Ordóñez</td><td><span class="tbl-mono">M-J 10:00</span></td><td class="r"><span class="tbl-pill ok">✓ Sí</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">8°C</span></td><td>Matemáticas 8°</td><td>0 / 30</td><td><span style="color:var(--orange-deep)">— Pendiente —</span></td><td><span class="tbl-mono" style="color:var(--ink-4)">Por definir</span></td><td class="r"><span class="tbl-pill warn">Pendiente</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     14 · MATRICULA
+     ================================================================= -->
+<section class="page" id="ad-matricula">
+  <div class="page-label"><span class="num">14 / 25</span><span class="name">Administrativo · Matrícula</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div>
+          <a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+          <a class="nav-item" href="#ad-cursos"><svg class="ico"><use href="#i-book"/></svg>Cursos</a>
+          <a class="nav-item" href="#ad-secciones"><svg class="ico"><use href="#i-layers"/></svg>Secciones<span class="badge">32</span></a>
+          <a class="nav-item active" href="#ad-matricula"><svg class="ico"><use href="#i-clipboard"/></svg>Matrícula</a>
+          <a class="nav-item" href="#ad-consent"><svg class="ico"><use href="#i-shield"/></svg>Consentimientos</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Matrícula</b></div><div class="topbar-search"><svg class="ico"><use href="#i-search"/></svg>Buscar estudiante…<kbd>⌘ K</kbd></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Matrícula · período 2025-2026</div><h1 class="page-title">Matricular <em>estudiantes</em></h1><p class="page-sub">Matrícula individual o carga masiva desde CSV. El sistema valida el cupo por sección automáticamente.</p></div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Matricular estudiante</h2><p class="card-sub">Búsqueda por RUDE o nombre</p></div><button class="btn-ghost"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:.4rem;vertical-align:-1px"><use href="#i-upload"/></svg>Importar CSV masivo</button></div>
+            <div class="form-grid">
+              <div class="field"><label>Estudiante <span class="req">*</span></label><select><option>Sofía Mendoza Páez · RUDE 0987-2011</option><option>Esteban Morales Vega · RUDE 1024-2010</option><option>Ernesto Ruales Morales · RUDE 1056-2010</option></select></div>
+              <div class="field"><label>Sección <span class="req">*</span></label><select><option>10°A · Matemáticas (35/40)</option><option>9°A · Lengua (28/35)</option><option>8°B · Ciencias (30/35)</option></select></div>
+            </div>
+            <div style="display:flex;gap:.5rem;justify-content:flex-end"><button class="btn-gold"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:.4rem;vertical-align:-1px"><use href="#i-plus"/></svg>Matricular</button></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Ocupación por sección</h2><p class="card-sub">Estado de cupo en las 32 secciones del período</p></div></div>
+            <div class="seccion-grid">
+              <div class="seccion-tile"><div class="seccion-tile-code">10°A</div><div class="seccion-tile-name">Matemáticas — Décimo EGB</div><div class="seccion-tile-cap-info"><span><b>35</b> / 40</span><span style="color:var(--green-deep)">87%</span></div><div class="seccion-tile-cap-bar"><div class="fill" style="width:87%"></div></div></div>
+              <div class="seccion-tile"><div class="seccion-tile-code">10°B</div><div class="seccion-tile-name">Matemáticas — Décimo EGB</div><div class="seccion-tile-cap-info"><span><b>32</b> / 40</span><span style="color:var(--green-deep)">80%</span></div><div class="seccion-tile-cap-bar"><div class="fill" style="width:80%"></div></div></div>
+              <div class="seccion-tile"><div class="seccion-tile-code">9°A</div><div class="seccion-tile-name">Lengua y Literatura</div><div class="seccion-tile-cap-info"><span><b>28</b> / 35</span><span style="color:var(--green-deep)">80%</span></div><div class="seccion-tile-cap-bar"><div class="fill" style="width:80%"></div></div></div>
+              <div class="seccion-tile"><div class="seccion-tile-code">8°B</div><div class="seccion-tile-name">Ciencias Naturales</div><div class="seccion-tile-cap-info"><span><b>30</b> / 35</span><span style="color:var(--orange-deep)">86%</span></div><div class="seccion-tile-cap-bar"><div class="fill warn" style="width:86%"></div></div></div>
+              <div class="seccion-tile"><div class="seccion-tile-code">8°A</div><div class="seccion-tile-name">Estudios Sociales</div><div class="seccion-tile-cap-info"><span><b>33</b> / 35</span><span style="color:var(--orange-deep)">94%</span></div><div class="seccion-tile-cap-bar"><div class="fill warn" style="width:94%"></div></div></div>
+              <div class="seccion-tile"><div class="seccion-tile-code">10°C</div><div class="seccion-tile-name">Inglés — Décimo EGB</div><div class="seccion-tile-cap-info"><span><b>0</b> / 30</span><span style="color:var(--ink-4)">0%</span></div><div class="seccion-tile-cap-bar"><div class="fill" style="width:0%"></div></div></div>
+              <div class="seccion-tile"><div class="seccion-tile-code">9°B</div><div class="seccion-tile-name">Lengua — Noveno EGB</div><div class="seccion-tile-cap-info"><span><b>35</b> / 35</span><span style="color:var(--red)">100%</span></div><div class="seccion-tile-cap-bar"><div class="fill danger" style="width:100%"></div></div></div>
+              <div class="seccion-tile"><div class="seccion-tile-code">7°A</div><div class="seccion-tile-name">Matemáticas — Séptimo</div><div class="seccion-tile-cap-info"><span><b>22</b> / 30</span><span style="color:var(--green-deep)">73%</span></div><div class="seccion-tile-cap-bar"><div class="fill" style="width:73%"></div></div></div>
+            </div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     15 · IMPORTAR CSV MATRICULA
+     ================================================================= -->
+<section class="page" id="ad-impcsv">
+  <div class="page-label"><span class="num">15 / 25</span><span class="name">Administrativo · Importar CSV matrícula</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub\">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div>
+          <a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+          <a class="nav-item active" href="#ad-matricula"><svg class="ico"><use href="#i-clipboard"/></svg>Matrícula</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Matrícula</b> · <b>Importar CSV</b></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Carga masiva · matrículas</div><h1 class="page-title">Importar <em>matrículas</em> CSV</h1><p class="page-sub">Cargue un archivo con RUDE + código de sección. El sistema validará y mostrará el resumen.</p></div>
+          <div class="dropzone">
+            <div class="dropzone-ico"><svg class="ico"><use href="#i-upload"/></svg></div>
+            <div class="dropzone-h">Arrastre su archivo CSV aquí</div>
+            <div class="dropzone-sub">o selecciónelo desde su equipo · Tamaño máximo 10 MB</div>
+            <button class="dropzone-pick"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:.4rem;vertical-align:-1px"><use href="#i-doc"/></svg>Seleccionar archivo</button>
+          </div>
+          <div class="card" style="margin-top:0">
+            <div class="card-head"><div><h2 class="card-title">Resultado de la importación</h2><p class="card-sub">Archivo: <b>matriculas_2025_q1.csv</b> · Procesado en 2.3s</p></div></div>
+            <div class="kpis cols-3" style="margin-bottom:1.25rem">
+              <div class="kpi" style="--accent:var(--green-deep)"><div class="kpi-eyebrow"><span class="dot"></span>Matriculados</div><div class="kpi-num">38</div><div class="kpi-sub">nuevas matrículas</div></div>
+              <div class="kpi" style="--accent:var(--gold-deep)"><div class="kpi-eyebrow"><span class="dot"></span>Ya existentes</div><div class="kpi-num">4</div><div class="kpi-sub">omitidas (idempotente)</div></div>
+              <div class="kpi" style="--accent:var(--red)"><div class="kpi-eyebrow"><span class="dot"></span>Errores</div><div class="kpi-num">2</div><div class="kpi-sub">filas con problemas</div></div>
+            </div>
+            <h3 class="card-title" style="font-size:1.05rem;margin-bottom:.5rem">Errores detectados</h3>
+            <table class="tbl">
+              <thead><tr><th>Fila</th><th>RUDE</th><th>Sección</th><th>Error</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tbl-mono">17</span></td><td><span class="tbl-mono">0932-2010</span></td><td><span class="tbl-mono" style="color:var(--gold-deep)">9°A</span></td><td><span class="tbl-pill danger">Cupo lleno (35/35)</span></td></tr>
+                <tr><td><span class="tbl-mono">28</span></td><td><span class="tbl-mono">—</span></td><td><span class="tbl-mono" style="color:var(--gold-deep)">10°C</span></td><td><span class="tbl-pill danger">RUDE vacío</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     16 · DASHBOARD DE CIERRES
+     ================================================================= -->
+<section class="page" id="ad-cierres">
+  <div class="page-label"><span class="num">16 / 25</span><span class="name">Administrativo · Dashboard de cierres</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div>
+          <a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+          <a class="nav-item active" href="#ad-cierres"><svg class="ico"><use href="#i-check"/></svg>Cierres</a>
+          <a class="nav-item" href="#ad-alertas"><svg class="ico"><use href="#i-alert"/></svg>Alertas</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Cierres</b></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Quimestre 1 · cierre institucional</div><h1 class="page-title">Dashboard de <em>cierres</em></h1><p class="page-sub">Estado de cierre de quimestre por sección. La fecha límite es <b>2025-06-12</b>.</p></div>
+          <div class="kpis cols-3">
+            <div class="kpi" style="--accent:var(--gold-deep)"><div class="kpi-eyebrow"><span class="dot"></span>Pendientes</div><div class="kpi-num">14</div><div class="kpi-sub">secciones por cerrar</div><div class="kpi-trend down">+2 hoy</div></div>
+            <div class="kpi" style="--accent:var(--orange-deep)"><div class="kpi-eyebrow"><span class="dot"></span>Listas para cierre</div><div class="kpi-num">8</div><div class="kpi-sub">con notas completas</div><div class="kpi-trend">+1 hoy</div></div>
+            <div class="kpi" style="--accent:var(--green-deep)"><div class="kpi-eyebrow"><span class="dot"></span>Cerradas</div><div class="kpi-num">10</div><div class="kpi-sub">en quimestre 1</div><div class="kpi-trend">+3 hoy</div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Estado por sección</h2><p class="card-sub">32 secciones · 10 cerradas · 8 listas · 14 pendientes</p></div><select style="background:transparent;border:1px solid var(--line-1);padding:.45rem .8rem;font-size:.82rem;color:var(--ink-2);font-family:var(--mono);letter-spacing:.12em"><option>2025-2026 — Q1</option><option>2024-2025 — Q2</option></select></div>
+            <table class="tbl">
+              <thead><tr><th>Sección</th><th>Curso</th><th>Docente</th><th class="r">Estado</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">10°A</span></td><td><span class="tbl-name">Matemáticas — Décimo</span></td><td>Diana Pérez</td><td class="r"><span class="tbl-pill ok">Cerrada</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">9°A</span></td><td><span class="tbl-name">Lengua — Noveno</span></td><td>Mario Cárdenas</td><td class="r"><span class="tbl-pill ok">Cerrada</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">8°B</span></td><td><span class="tbl-name">Ciencias — Octavo</span></td><td>Patricia Ordóñez</td><td class="r"><span class="tbl-pill info">Lista</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">10°B</span></td><td><span class="tbl-name">Matemáticas — Décimo</span></td><td>Diana Pérez</td><td class="r"><span class="tbl-pill warn">Pendiente</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">8°A</span></td><td><span class="tbl-name">Estudios Sociales</span></td><td>Roberto Salazar</td><td class="r"><span class="tbl-pill warn">Pendiente</span></td></tr>
+                <tr><td><span class="tbl-mono" style="color:var(--gold-deep);font-weight:600">10°C</span></td><td><span class="tbl-name">Inglés — Décimo</span></td><td><span style="color:var(--ink-4)">— sin docente —</span></td><td class="r"><span class="tbl-pill muted">Bloqueada</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     17 · ALERTAS TEMPRANAS
+     ================================================================= -->
+<section class="page" id="ad-alertas">
+  <div class="page-label"><span class="num">17 / 25</span><span class="name">Administrativo · Alertas tempranas</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div>
+          <a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+          <a class="nav-item" href="#ad-cierres"><svg class="ico"><use href="#i-check"/></svg>Cierres</a>
+          <a class="nav-item active" href="#ad-alertas"><svg class="ico"><use href="#i-alert"/></svg>Alertas</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Alertas tempranas</b></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">Riesgo académico · detección automática</div><h1 class="page-title"><em>Alertas</em> tempranas</h1><p class="page-sub">Estudiantes con indicadores de riesgo detectados en las últimas 4 semanas. Intervención recomendada.</p></div>
+          <div class="kpis cols-2" style="grid-template-columns:repeat(4,1fr)">
+            <div class="kpi" style="--accent:var(--red)"><div class="kpi-eyebrow"><span class="dot"></span>Riesgo alto</div><div class="kpi-num">5</div><div class="kpi-sub">atención inmediata</div></div>
+            <div class="kpi" style="--accent:var(--orange-deep)"><div class="kpi-eyebrow"><span class="dot"></span>Riesgo medio</div><div class="kpi-num">12</div><div class="kpi-sub">monitoreo semanal</div></div>
+            <div class="kpi" style="--accent:var(--gold-deep)"><div class="kpi-eyebrow"><span class="dot"></span>En observación</div><div class="kpi-num">23</div><div class="kpi-sub">seguimiento mensual</div></div>
+            <div class="kpi" style="--accent:var(--green-deep)"><div class="kpi-eyebrow"><span class="dot"></span>Mejorados</div><div class="kpi-num">8</div><div class="kpi-sub">+0.6% vs mes ant.</div></div>
+          </div>
+          <div class="grid-2" style="grid-template-columns:1.6fr 1fr">
+            <div class="card" style="margin-bottom:0">
+              <div class="card-head"><div><h2 class="card-title">Estudiantes en riesgo</h2><p class="card-sub">Ordenados por nivel de riesgo</p></div><button class="btn-ghost">Ver todos (40) →</button></div>
+              <div class="risk-list">
+                <div class="risk-row">
+                  <div class="risk-avatar">EM</div>
+                  <div><div class="risk-name">Esteban Morales Vega</div><div class="risk-section">10°A · RUDE 1024-2010</div></div>
+                  <div class="risk-stat"><div class="risk-stat-num" style="color:var(--red)">4.8</div><div class="risk-stat-lbl">Promedio</div></div>
+                  <div class="risk-stat"><div class="risk-stat-num" style="color:var(--orange-deep)">68%</div><div class="risk-stat-lbl">Asist.</div></div>
+                  <div class="risk-badge high">Alto</div>
+                </div>
+                <div class="risk-row">
+                  <div class="risk-avatar">CR</div>
+                  <div><div class="risk-name">Camila Ramírez Ortega</div><div class="risk-section">9°B · RUDE 0987-2011</div></div>
+                  <div class="risk-stat"><div class="risk-stat-num" style="color:var(--red)">5.2</div><div class="risk-stat-lbl">Promedio</div></div>
+                  <div class="risk-stat"><div class="risk-stat-num" style="color:var(--orange-deep)">72%</div><div class="risk-stat-lbl">Asist.</div></div>
+                  <div class="risk-badge high">Alto</div>
+                </div>
+                <div class="risk-row">
+                  <div class="risk-avatar">JT</div>
+                  <div><div class="risk-name">Joaquín Torres Pazmiño</div><div class="risk-section">8°A · RUDE 1456-2012</div></div>
+                  <div class="risk-stat"><div class="risk-stat-num" style="color:var(--orange-deep)">6.1</div><div class="risk-stat-lbl">Promedio</div></div>
+                  <div class="risk-stat"><div class="risk-stat-num" style="color:var(--gold-deep)">81%</div><div class="risk-stat-lbl">Asist.</div></div>
+                  <div class="risk-badge med">Medio</div>
+                </div>
+                <div class="risk-row">
+                  <div class="risk-avatar">LV</div>
+                  <div><div class="risk-name">Lucía Vera Sánchez</div><div class="risk-section">10°B · RUDE 0832-2010</div></div>
+                  <div class="risk-stat"><div class="risk-stat-num" style="color:var(--gold-deep)">6.5</div><div class="risk-stat-lbl">Promedio</div></div>
+                  <div class="risk-stat"><div class="risk-stat-num" style="color:var(--green-deep)">88%</div><div class="risk-stat-lbl">Asist.</div></div>
+                  <div class="risk-badge med">Medio</div>
+                </div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:0">
+              <div class="card-head"><div><h2 class="card-title">Indicador de riesgo</h2><p class="card-sub">Distribución institucional</p></div></div>
+              <div class="gauge">
+                <svg class="gauge-svg" viewBox="0 0 120 120">
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="var(--line-1)" stroke-width="10"/>
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="var(--orange-deep)" stroke-width="10" stroke-dasharray="200 302" stroke-dashoffset="0" transform="rotate(-90 60 60)" stroke-linecap="butt"/>
+                  <circle cx="60" cy="60" r="48" fill="none" stroke="var(--red)" stroke-width="10" stroke-dasharray="60 302" stroke-dashoffset="-200" transform="rotate(-90 60 60)" stroke-linecap="butt"/>
+                </svg>
+                <div class="gauge-text"><div class="gauge-num">40</div><div class="gauge-lbl">en riesgo</div></div>
+              </div>
+              <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.5rem">
+                <div style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--ink-3)"><span style="width:10px;height:10px;background:var(--red);display:inline-block"></span><b style="color:var(--ink)">5</b>&nbsp;riesgo alto · 1.3%</div>
+                <div style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--ink-3)"><span style="width:10px;height:10px;background:var(--orange-deep);display:inline-block"></span><b style="color:var(--ink)">12</b>&nbsp;riesgo medio · 3.0%</div>
+                <div style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--ink-3)"><span style="width:10px;height:10px;background:var(--gold-deep);display:inline-block"></span><b style="color:var(--ink)">23</b>&nbsp;en observación · 5.8%</div>
+              </div>
+            </div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     18 · CONSENTIMIENTOS
+     ================================================================= -->
+<section class="page" id="ad-consent">
+  <div class="page-label"><span class="num">18 / 25</span><span class="name">Administrativo · Consentimientos (LOPDP)</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Ghanima Core</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Operación</div>
+          <a class="nav-item" href="#ad-dash"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+          <a class="nav-item" href="#ad-matricula"><svg class="ico"><use href="#i-clipboard"/></svg>Matrícula</a>
+          <a class="nav-item active" href="#ad-consent"><svg class="ico"><use href="#i-shield"/></svg>Consentimientos</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar">AA</div><div class="user-meta"><div class="user-name">Alma Arboleda</div><div class="user-role">Administradora</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Consentimientos</b></div></header>
+        <div class="content">
+          <div class="page-head"><div class="eyebrow">LOPDP · registro de consentimientos</div><h1 class="page-title">Consentimientos <em>informados</em></h1><p class="page-sub">Registro de consentimientos de tratamiento de datos personales de estudiantes y representantes.</p></div>
+          <div class="tabs"><button class="tab active">Registrados <span style="margin-left:.4rem;color:var(--paper)">· 798</span></button><button class="tab">Pendientes <span style="margin-left:.4rem">· 14</span></button></div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Registrar consentimiento</h2><p class="card-sub">Complete los datos del representante y adjunte el PDF firmado</p></div></div>
+            <div class="form-grid">
+              <div class="field"><label>Estudiante <span class="req">*</span></label><select><option>Sofía Mendoza Páez · RUDE 0987-2011</option><option>Esteban Morales Vega · RUDE 1024-2010</option></select></div>
+              <div class="field"><label>Nombre del representante <span class="req">*</span></label><input type="text" placeholder="María Páez"></div>
+              <div class="field"><label>Cédula <span class="req">*</span></label><input type="text" placeholder="1712345678" value="1712345678"></div>
+              <div class="field"><label>Email</label><input type="email" placeholder="maria@email.com" value="maria.paez@email.com"></div>
+              <div class="field full"><label>Documento firmado (PDF) <span class="req">*</span></label><div style="display:flex;align-items:center;gap:.75rem;padding:.5rem 0"><div style="display:flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.78rem;color:var(--ink-2);background:var(--surface-2);padding:.4rem .7rem;border:1px solid var(--line-1)"><svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5"><use href="#i-doc"/></svg>consentimiento_mendoza_2025.pdf</div><button class="btn-xs">Cambiar</button></div></div>
+            </div>
+            <div style="display:flex;gap:.5rem;justify-content:flex-end"><button class="btn-secondary">Cancelar</button><button class="btn-gold">Registrar consentimiento</button></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Consentimientos registrados</h2><p class="card-sub"><b>798</b> registros · <b>14</b> pendientes este mes</p></div></div>
+            <table class="tbl">
+              <thead><tr><th>Estudiante</th><th>Representante</th><th>Cédula</th><th>Fecha</th><th>Documento</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tbl-name">Sofía Mendoza Páez</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">9°B</div></td><td>María Páez Ortega</td><td><span class="tbl-mono">1712345678</span></td><td>2025-04-08</td><td><a style="color:var(--gold-deep);font-family:var(--mono);font-size:.74rem">PDF →</a></td><td><span class="tbl-pill ok">Aprobado</span></td></tr>
+                <tr><td><span class="tbl-name">Esteban Morales Vega</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">10°A</div></td><td>Carlos Morales</td><td><span class="tbl-mono">1709876543</span></td><td>2025-04-08</td><td><a style="color:var(--gold-deep);font-family:var(--mono);font-size:.74rem">PDF →</a></td><td><span class="tbl-pill ok">Aprobado</span></td></tr>
+                <tr><td><span class="tbl-name">Ernesto Ruales Morales</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">10°A</div></td><td>Patricia Ruales</td><td><span class="tbl-mono">1701234567</span></td><td>2025-04-07</td><td><a style="color:var(--gold-deep);font-family:var(--mono);font-size:.74rem">PDF →</a></td><td><span class="tbl-pill ok">Aprobado</span></td></tr>
+                <tr><td><span class="tbl-name">Camila Ramírez Ortega</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">9°B</div></td><td>Andrés Ramírez</td><td><span class="tbl-mono">1719876543</span></td><td>2025-04-05</td><td><a style="color:var(--gold-deep);font-family:var(--mono);font-size:.74rem">PDF →</a></td><td><span class="tbl-pill ok">Aprobado</span></td></tr>
+                <tr><td><span class="tbl-name">Lucía Vera Sánchez</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">10°B</div></td><td>Lucía Sánchez</td><td><span class="tbl-mono">1723456789</span></td><td>2025-04-02</td><td><a style="color:var(--gold-deep);font-family:var(--mono);font-size:.74rem">PDF →</a></td><td><span class="tbl-pill ok">Aprobado</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro · LOPDP & LOEI</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     19 · DOCENTE · MIS SECCIONES
+     ================================================================= -->
+<section class="page" id="do-dash">
+  <div class="page-label"><span class="num">19 / 25</span><span class="name">Docente · Mis secciones</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name\">SIE</div><div class="brand-sub">Docente</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Mi docencia</div>
+          <a class="nav-item active" href="#do-dash"><svg class="ico"><use href="#i-layers"/></svg>Mis secciones</a>
+        </div>
+        <div class="nav-section"><div class="nav-label">Acciones</div>
+          <a class="nav-item" href="#do-asist"><svg class="ico"><use href="#i-check"/></svg>Asistencia</a>
+          <a class="nav-item" href="#do-esquema"><svg class="ico"><use href="#i-list"/></svg>Esquema evaluación</a>
+          <a class="nav-item" href="#do-notas"><svg class="ico"><use href="#i-edit"/></svg>Ingresar notas</a>
+          <a class="nav-item" href="#do-cierre"><svg class="ico"><use href="#i-lock"/></svg>Cerrar sección</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar" style="background:var(--green-deep)">DP</div><div class="user-meta"><div class="user-name">Diana Pérez</div><div class="user-role">Docente</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Mis secciones</b></div><div class="topbar-search"><svg class="ico"><use href="#i-search"/></svg>Buscar estudiante…<kbd>⌘ K</kbd></div></header>
+        <div class="content">
+          <div class="page-head">
+            <div class="eyebrow">Docente · 2025-2026</div>
+            <h1 class="page-title">Mis <em>secciones</em></h1>
+            <p class="page-sub">Diana Pérez Ortega · <b>Matemáticas</b> · 2 secciones · 67 estudiantes</p>
+          </div>
+          <div class="notice warn" style="margin-bottom:1.5rem"><svg class="ico"><use href="#i-alert"/></svg><span><b>3 estudiantes en riesgo académico</b> en tus secciones. Revisa la pestaña de alertas para más detalle.</span></div>
+          <div class="section-cards">
+            <div class="section-card">
+              <div class="section-card-head">
+                <div class="section-card-ico"><svg class="ico"><use href="#i-layers"/></svg></div>
+                <div style="flex:1">
+                  <div class="section-card-title">10°A — Matemáticas</div>
+                  <div class="section-card-meta">Décimo EGB · Lun-Mié-Vie 07:00-08:00</div>
+                </div>
+              </div>
+              <div class="section-card-stat"><div class="section-card-stat-num">35</div><div class="section-card-stat-lbl">Estudiantes</div></div>
+              <div class="section-card-cap"><div class="section-card-cap-info"><span><b>35</b> / 40 cupos</span><span style="color:var(--green-deep)">87%</span></div><div class="pbar"><div class="pbar-fill green" style="width:87%"></div></div></div>
+              <div class="section-card-actions">
+                <button class="btn-xs primary">Ingresar notas</button>
+                <button class="btn-xs green">Asistencia</button>
+                <button class="btn-xs orange">Cerrar Q1</button>
+              </div>
+            </div>
+            <div class="section-card">
+              <div class="section-card-head">
+                <div class="section-card-ico"><svg class="ico"><use href="#i-layers"/></svg></div>
+                <div style="flex:1">
+                  <div class="section-card-title">10°B — Matemáticas</div>
+                  <div class="section-card-meta">Décimo EGB · Mar-Jue 07:00-08:00</div>
+                </div>
+              </div>
+              <div class="section-card-stat"><div class="section-card-stat-num">32</div><div class="section-card-stat-lbl">Estudiantes</div></div>
+              <div class="section-card-cap"><div class="section-card-cap-info"><span><b>32</b> / 40 cupos</span><span style="color:var(--green-deep)">80%</span></div><div class="pbar"><div class="pbar-fill green" style="width:80%"></div></div></div>
+              <div class="section-card-actions">
+                <button class="btn-xs primary">Ingresar notas</button>
+                <button class="btn-xs green">Asistencia</button>
+                <button class="btn-xs orange">Cerrar Q1</button>
+              </div>
+            </div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     20 · DOCENTE · ASISTENCIA
+     ================================================================= -->
+<section class="page" id="do-asist">
+  <div class="page-label"><span class="num">20 / 25</span><span class="name">Docente · Asistencia</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Docente</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Mi docencia</div><a class="nav-item" href="#do-dash"><svg class="ico"><use href="#i-layers"/></svg>Mis secciones</a></div><div class="nav-section"><div class="nav-label">Acciones</div><a class="nav-item active" href="#do-asist"><svg class="ico"><use href="#i-check"/></svg>Asistencia</a><a class="nav-item" href="#do-esquema"><svg class="ico"><use href="#i-list"/></svg>Esquema evaluación</a><a class="nav-item" href="#do-notas"><svg class="ico"><use href="#i-edit"/></svg>Ingresar notas</a><a class="nav-item" href="#do-cierre"><svg class="ico"><use href="#i-lock"/></svg>Cerrar sección</a></div></nav>
+        <button class="user-card"><div class="avatar" style="background:var(--green-deep)">DP</div><div class="user-meta"><div class="user-name">Diana Pérez</div><div class="user-role">Docente</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Asistencia</b> · 10°A</div></header>
+        <div class="content">
+          <div class="page-head">
+            <div class="eyebrow">Docencia · registro diario</div>
+            <h1 class="page-title">Asistencia <em>10°A</em></h1>
+            <p class="page-sub">Marque la asistencia del día para los 35 estudiantes de la sección.</p>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap">
+                <div class="field" style="gap:.2rem"><label>Fecha</label><input type="date" value="2025-04-22" style="width:auto;padding:.4rem 0;font-size:.95rem"></div>
+                <div class="field" style="gap:.2rem"><label>Sección</label><select style="width:auto;padding:.4rem 0;font-size:.95rem"><option>10°A — Matemáticas</option><option>10°B — Matemáticas</option></select></div>
+              </div>
+              <div style="display:flex;gap:.5rem">
+                <button class="btn-xs">Todos presentes</button>
+                <button class="btn-xs">Todos ausentes</button>
+                <button class="btn-gold"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:.4rem;vertical-align:-1px"><use href="#i-check"/></svg>Guardar asistencia</button>
+              </div>
+            </div>
+            <div class="notas-stats" style="margin-bottom:1.25rem">
+              <span class="stat-chip">Presentes <b>32</b></span>
+              <span class="stat-chip warn">Ausentes <b>2</b></span>
+              <span class="stat-chip">Atrasos <b>1</b></span>
+              <span class="stat-chip ok">% Asistencia <b>91.4%</b></span>
+            </div>
+            <table class="tbl">
+              <thead><tr><th style="width:50px">#</th><th>Estudiante</th><th>Estado</th><th class="r">% Asistencia</th></tr></thead>
+              <tbody>
+                <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">01</td><td><span class="tbl-name">Aguilar Paz, Valentina</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 0912-2010</div></td><td><select style="padding:.35rem .6rem;font-size:.82rem;font-family:var(--mono);color:var(--green-deep);background:var(--green-tint);border:1px solid var(--green-deep)"><option>Presente</option><option>Ausente</option><option>Atraso</option><option>Justificado</option></select></td><td class="r"><span class="tbl-mono" style="color:var(--green-deep)">98%</span></td></tr>
+                <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">02</td><td><span class="tbl-name">Cárdenas López, Andrés</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 1043-2010</div></td><td><select style="padding:.35rem .6rem;font-size:.82rem;font-family:var(--mono);color:var(--green-deep);background:var(--green-tint);border:1px solid var(--green-deep)"><option>Presente</option></select></td><td class="r"><span class="tbl-mono" style="color:var(--green-deep)">96%</span></td></tr>
+                <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">03</td><td><span class="tbl-name">Espinoza Torres, María</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 0821-2011</div></td><td><select style="padding:.35rem .6rem;font-size:.82rem;font-family:var(--mono);color:var(--red);background:var(--red-tint);border:1px solid var(--red)"><option selected>Ausente</option></select></td><td class="r"><span class="tbl-mono" style="color:var(--orange-deep)">68%</span></td></tr>
+                <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">04</td><td><span class="tbl-name">Morales Vega, Esteban</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 1024-2010</div></td><td><select style="padding:.35rem .6rem;font-size:.82rem;font-family:var(--mono);color:var(--orange-deep);background:var(--orange-tint);border:1px solid var(--orange-deep)"><option>Atraso</option><option selected>Justificado</option></select></td><td class="r"><span class="tbl-mono" style="color:var(--orange-deep)">68%</span></td></tr>
+                <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">05</td><td><span class="tbl-name">Ramírez Ortega, Camila</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 0987-2011</div></td><td><select style="padding:.35rem .6rem;font-size:.82rem;font-family:var(--mono);color:var(--red);background:var(--red-tint);border:1px solid var(--red)"><option selected>Ausente</option></select></td><td class="r"><span class="tbl-mono" style="color:var(--orange-deep)">72%</span></td></tr>
+                <tr><td style="font-family:var(--mono);font-size:.74rem;color:var(--ink-4)">06</td><td><span class="tbl-name">Ruales Morales, Ernesto</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 1056-2010</div></td><td><select style="padding:.35rem .6rem;font-size:.82rem;font-family:var(--mono);color:var(--green-deep);background:var(--green-tint);border:1px solid var(--green-deep)"><option>Presente</option></select></td><td class="r"><span class="tbl-mono" style="color:var(--green-deep)">94%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     21 · DOCENTE · ESQUEMA EVALUACION
+     ================================================================= -->
+<section class="page" id="do-esquema">
+  <div class="page-label"><span class="num">21 / 25</span><span class="name">Docente · Esquema de evaluación</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Docente</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Mi docencia</div><a class="nav-item" href="#do-dash"><svg class="ico"><use href="#i-layers"/></svg>Mis secciones</a></div><div class="nav-section"><div class="nav-label">Acciones</div><a class="nav-item" href="#do-asist"><svg class="ico"><use href="#i-check"/></svg>Asistencia</a><a class="nav-item active" href="#do-esquema"><svg class="ico"><use href="#i-list"/></svg>Esquema evaluación</a><a class="nav-item" href="#do-notas"><svg class="ico"><use href="#i-edit"/></svg>Ingresar notas</a><a class="nav-item" href="#do-cierre"><svg class="ico"><use href="#i-lock"/></svg>Cerrar sección</a></div></nav>
+        <button class="user-card"><div class="avatar" style="background:var(--green-deep)">DP</div><div class="user-meta"><div class="user-name">Diana Pérez</div><div class="user-role">Docente</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Esquema evaluación</b> · 10°A</div></header>
+        <div class="content">
+          <div class="page-head">
+            <div class="eyebrow">Docencia · configuración</div>
+            <h1 class="page-title">Esquema de <em>evaluación</em></h1>
+            <p class="page-sub">Defina los componentes y pesos para la sección <b>10°A — Matemáticas</b>. El total debe sumar 100%.</p>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Componentes de evaluación</h2><p class="card-sub">Quimestre 1 · 4 componentes configurados</p></div></div>
+            <div class="schema-row">
+              <div class="field"><label>Nombre del componente</label><input type="text" value="Pruebas objetivas"></div>
+              <div class="field pct"><label>Peso %</label><input type="number" value="35"></div>
+              <button class="rm"><svg class="ico"><use href="#i-trash"/></svg></button>
+            </div>
+            <div class="schema-row">
+              <div class="field"><label>Nombre del componente</label><input type="text" value="Tareas y talleres"></div>
+              <div class="field pct"><label>Peso %</label><input type="number" value="20"></div>
+              <button class="rm"><svg class="ico"><use href="#i-trash"/></svg></button>
+            </div>
+            <div class="schema-row">
+              <div class="field"><label>Nombre del componente</label><input type="text" value="Proyecto integrador"></div>
+              <div class="field pct"><label>Peso %</label><input type="number" value="25"></div>
+              <button class="rm"><svg class="ico"><use href="#i-trash"/></svg></button>
+            </div>
+            <div class="schema-row">
+              <div class="field"><label>Nombre del componente</label><input type="text" value="Evaluación oral"></div>
+              <div class="field pct"><label>Peso %</label><input type="number" value="20"></div>
+              <button class="rm"><svg class="ico"><use href="#i-trash"/></svg></button>
+            </div>
+            <div class="schema-add"><button class="add-btn"><svg class="ico"><use href="#i-plus"/></svg>Agregar componente</button></div>
+            <div class="schema-foot">
+              <div class="schema-total">Total acumulado <b>100%</b></div>
+              <div style="display:flex;gap:.5rem">
+                <button class="btn-secondary">Cancelar</button>
+                <button class="btn-gold">Guardar esquema</button>
+              </div>
+            </div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     22 · DOCENTE · NOTAS
+     ================================================================= -->
+<section class="page" id="do-notas">
+  <div class="page-label"><span class="num">22 / 25</span><span class="name">Docente · Ingreso de notas</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name\">SIE</div><div class="brand-sub">Docente</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Mi docencia</div><a class="nav-item" href="#do-dash"><svg class="ico"><use href="#i-layers"/></svg>Mis secciones</a></div><div class="nav-section"><div class="nav-label">Acciones</div><a class="nav-item" href="#do-asist"><svg class="ico"><use href="#i-check"/></svg>Asistencia</a><a class="nav-item" href="#do-esquema"><svg class="ico"><use href="#i-list"/></svg>Esquema evaluación</a><a class="nav-item active" href="#do-notas"><svg class="ico"><use href="#i-edit"/></svg>Ingresar notas</a><a class="nav-item" href="#do-cierre"><svg class="ico"><use href="#i-lock"/></svg>Cerrar sección</a></div></nav>
+        <button class="user-card"><div class="avatar" style="background:var(--green-deep)">DP</div><div class="user-meta"><div class="user-name">Diana Pérez</div><div class="user-role">Docente</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Notas</b> · 10°A</div></header>
+        <div class="content">
+          <div class="page-head">
+            <div class="eyebrow">Docencia · registro de calificaciones</div>
+            <h1 class="page-title">Notas · <em>10°A</em> — Quimestre 1</h1>
+            <p class="page-sub">Escala 0-10 · Aprobación <b>7.0</b>. Las notas se guardan automáticamente al cambiar de celda.</p>
+          </div>
+          <div class="comp-chips">
+            <span class="comp-chip">Pruebas objetivas <b>35%</b></span>
+            <span class="comp-chip">Tareas y talleres <b>20%</b></span>
+            <span class="comp-chip">Proyecto integrador <b>25%</b></span>
+            <span class="comp-chip">Evaluación oral <b>20%</b></span>
+          </div>
+          <div class="notas-stats">
+            <span class="stat-chip ok">Aprobados <b>28</b></span>
+            <span class="stat-chip warn">Reprobados <b>5</b></span>
+            <span class="stat-chip">Sin notas <b>2</b></span>
+            <span class="stat-chip">Promedio Q1 <b>7.4</b></span>
+          </div>
+          <div class="card" style="padding:0;overflow-x:auto">
+            <table class="tbl" style="font-size:.84rem">
+              <thead><tr><th style="min-width:200px">Estudiante</th><th class="r" style="text-align:center;padding:.7rem">Pruebas<br><span style="color:var(--ink-4);font-size:.6rem">/10 · 35%</span></th><th class="r" style="text-align:center;padding:.7rem">Tareas<br><span style="color:var(--ink-4);font-size:.6rem">/10 · 20%</span></th><th class="r" style="text-align:center;padding:.7rem">Proyecto<br><span style="color:var(--ink-4);font-size:.6rem">/10 · 25%</span></th><th class="r" style="text-align:center;padding:.7rem">Oral<br><span style="color:var(--ink-4);font-size:.6rem">/10 · 20%</span></th><th class="r" style="text-align:center;padding:.7rem;background:var(--surface-2)">Final Q1<br><span style="color:var(--ink-4);font-size:.6rem">/10</span></th><th class="r" style="text-align:center;padding:.7rem">Estado</th></tr></thead>
+              <tbody>
+                <tr><td><span class="tbl-name">Aguilar Paz, Valentina</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 0912-2010</div></td><td style="text-align:center"><input class="grade-cell ok" value="8.5"></td><td style="text-align:center"><input class="grade-cell ok" value="9.0"></td><td style="text-align:center"><input class="grade-cell ok" value="8.5"></td><td style="text-align:center"><input class="grade-cell ok" value="9.0"></td><td style="text-align:center"><div class="grade-cell final ok" style="display:inline-block">8.7</div></td><td style="text-align:center"><span class="tbl-pill ok">Aprobado</span></td></tr>
+                <tr><td><span class="tbl-name">Cárdenas López, Andrés</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 1043-2010</div></td><td style="text-align:center"><input class="grade-cell ok" value="8.0"></td><td style="text-align:center"><input class="grade-cell ok" value="8.5"></td><td style="text-align:center"><input class="grade-cell ok" value="7.5"></td><td style="text-align:center"><input class="grade-cell ok" value="8.0"></td><td style="text-align:center"><div class="grade-cell final ok" style="display:inline-block">8.0</div></td><td style="text-align:center"><span class="tbl-pill ok">Aprobado</span></td></tr>
+                <tr><td><span class="tbl-name">Espinoza Torres, María</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 0821-2011</div></td><td style="text-align:center"><input class="grade-cell fail" value="5.5"></td><td style="text-align:center"><input class="grade-cell fail" value="6.0"></td><td style="text-align:center"><input class="grade-cell" value="7.0"></td><td style="text-align:center"><input class="grade-cell" value="7.0"></td><td style="text-align:center"><div class="grade-cell final" style="display:inline-block">6.3</div></td><td style="text-align:center"><span class="tbl-pill danger">Reprobado</span></td></tr>
+                <tr><td><span class="tbl-name">Morales Vega, Esteban</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 1024-2010</div></td><td style="text-align:center"><input class="grade-cell fail" value="4.5"></td><td style="text-align:center"><input class="grade-cell fail" value="5.0"></td><td style="text-align:center"><input class="grade-cell" value="6.0"></td><td style="text-align:center"><input class="grade-cell fail" value="4.0"></td><td style="text-align:center"><div class="grade-cell final fail" style="display:inline-block">4.8</div></td><td style="text-align:center"><span class="tbl-pill danger">Reprobado</span></td></tr>
+                <tr><td><span class="tbl-name">Ramírez Ortega, Camila</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 0987-2011</div></td><td style="text-align:center"><input class="grade-cell fail" value="5.0"></td><td style="text-align:center"><input class="grade-cell fail" value="5.5"></td><td style="text-align:center"><input class="grade-cell" value="6.5"></td><td style="text-align:center"><input class="grade-cell" value="4.5"></td><td style="text-align:center"><div class="grade-cell final fail" style="display:inline-block">5.4</div></td><td style="text-align:center"><span class="tbl-pill danger">Reprobado</span></td></tr>
+                <tr><td><span class="tbl-name">Ruales Morales, Ernesto</span><div style="font-family:var(--mono);font-size:.7rem;color:var(--ink-4);margin-top:.1rem">RUDE 1056-2010</div></td><td style="text-align:center"><input class="grade-cell ok" value="8.5"></td><td style="text-align:center"><input class="grade-cell ok" value="9.0"></td><td style="text-align:center"><input class="grade-cell ok" value="8.0"></td><td style="text-align:center"><input class="grade-cell ok" value="8.5"></td><td style="text-align:center"><div class="grade-cell final ok" style="display:inline-block">8.5</div></td><td style="text-align:center"><span class="tbl-pill ok">Aprobado</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     23 · DOCENTE · CERRAR SECCION
+     ================================================================= -->
+<section class="page" id="do-cierre">
+  <div class="page-label"><span class="num">23 / 25</span><span class="name">Docente · Cerrar sección</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Docente</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Mi docencia</div><a class="nav-item" href="#do-dash"><svg class="ico"><use href="#i-layers"/></svg>Mis secciones</a></div><div class="nav-section"><div class="nav-label">Acciones</div><a class="nav-item" href="#do-asist"><svg class="ico"><use href="#i-check"/></svg>Asistencia</a><a class="nav-item" href="#do-esquema"><svg class="ico"><use href="#i-list"/></svg>Esquema evaluación</a><a class="nav-item" href="#do-notas"><svg class="ico"><use href="#i-edit"/></svg>Ingresar notas</a><a class="nav-item active" href="#do-cierre"><svg class="ico"><use href="#i-lock"/></svg>Cerrar sección</a></div></nav>
+        <button class="user-card"><div class="avatar" style="background:var(--green-deep)">DP</div><div class="user-meta"><div class="user-name">Diana Pérez</div><div class="user-role">Docente</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Cerrar sección</b> · 10°A</div></header>
+        <div class="content">
+          <div class="page-head" style="text-align:center;margin-bottom:2rem">
+            <div class="eyebrow" style="justify-content:center">Cierre de quimestre</div>
+            <h1 class="page-title">Cerrar <em>10°A — Matemáticas</em></h1>
+          </div>
+          <div class="confirm-card">
+            <div class="ico-wrap"><svg class="ico"><use href="#i-lock"/></svg></div>
+            <h2>¿Confirma el cierre de la sección?</h2>
+            <p>Esta acción bloqueará la edición de notas y asistencia para los <b>35 estudiantes</b> de 10°A, Quimestre 1.</p>
+            <ul>
+              <li><span>Verifique que todas las notas estén ingresadas (<b>2 estudiantes</b> aún sin notas)</span></li>
+              <li><span>La asistencia está completa al <b>100%</b></span></li>
+              <li><span>El esquema de evaluación suma <b>100%</b></span></li>
+              <li><span>Una vez cerrada, solo el administrador podrá reabrir la sección</span></li>
+            </ul>
+            <div class="actions">
+              <button class="btn-secondary">← Volver</button>
+              <button class="btn-danger"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:.4rem;vertical-align:-1px"><use href="#i-lock"/></svg>Cerrar sección</button>
+            </div>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     24 · ESTUDIANTE · MI PANEL
+     ================================================================= -->
+<section class="page" id="es-dash">
+  <div class="page-label"><span class="num">24 / 25</span><span class="name">Estudiante · Mi panel</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Estudiante</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Mi panel</div>
+          <a class="nav-item active" href="#es-dash"><svg class="ico"><use href="#i-grid"/></svg>Mi panel</a>
+          <a class="nav-item" href="#es-boletin"><svg class="ico"><use href="#i-doc"/></svg>Mi boletín</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar" style="background:var(--orange-deep)">ER</div><div class="user-meta"><div class="user-name">Ernesto Ruales</div><div class="user-role">Estudiante · 10°A</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Mi panel</b></div></header>
+        <div class="content">
+          <div class="page-head">
+            <div class="eyebrow">Ernesto Ruales Morales · 10°A</div>
+            <h1 class="page-title">Hola, <em>Ernesto</em> 👋</h1>
+            <p class="page-sub">Aquí puedes revisar tu horario, calificaciones y descargar tu boletín.</p>
+          </div>
+          <div class="tab-bar">
+            <button class="tab">Mi horario</button>
+            <button class="tab active">Mis calificaciones</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem;margin-bottom:1.5rem">
+            <div class="grade-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+                <div>
+                  <div class="grade-card-eyebrow">MAT-10A · Matemáticas</div>
+                  <div class="grade-card-name">Matemáticas</div>
+                  <div class="grade-card-doc">Docente: Diana Pérez Ortega</div>
+                </div>
+                <div class="grade-card-state ok">Aprobado</div>
+              </div>
+              <div class="grade-card-score">8.5<span class="lbl">/ 10</span></div>
+              <div class="grade-card-att">
+                <div class="grade-card-att-info"><span>Asistencia</span><b>94%</b></div>
+                <div class="pbar"><div class="pbar-fill green" style="width:94%"></div></div>
+              </div>
+            </div>
+            <div class="grade-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+                <div>
+                  <div class="grade-card-eyebrow">LEN-10A · Lengua y Literatura</div>
+                  <div class="grade-card-name">Lengua y Literatura</div>
+                  <div class="grade-card-doc">Docente: Mario Cárdenas Loaiza</div>
+                </div>
+                <div class="grade-card-state ok">Aprobado</div>
+              </div>
+              <div class="grade-card-score">7.8<span class="lbl">/ 10</span></div>
+              <div class="grade-card-att">
+                <div class="grade-card-att-info"><span>Asistencia</span><b>91%</b></div>
+                <div class="pbar"><div class="pbar-fill green" style="width:91%"></div></div>
+              </div>
+            </div>
+            <div class="grade-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+                <div>
+                  <div class="grade-card-eyebrow">CNA-10A · Ciencias Naturales</div>
+                  <div class="grade-card-name">Ciencias Naturales</div>
+                  <div class="grade-card-doc">Docente: Patricia Ordóñez</div>
+                </div>
+                <div class="grade-card-state ok">Aprobado</div>
+              </div>
+              <div class="grade-card-score">8.2<span class="lbl">/ 10</span></div>
+              <div class="grade-card-att">
+                <div class="grade-card-att-info"><span>Asistencia</span><b>97%</b></div>
+                <div class="pbar"><div class="pbar-fill green" style="width:97%"></div></div>
+              </div>
+            </div>
+            <div class="grade-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+                <div>
+                  <div class="grade-card-eyebrow">SOC-10A · Estudios Sociales</div>
+                  <div class="grade-card-name">Estudios Sociales</div>
+                  <div class="grade-card-doc">Docente: Roberto Salazar</div>
+                </div>
+                <div class="grade-card-state pend">En curso</div>
+              </div>
+              <div class="grade-card-score" style="color:var(--ink-4)">—<span class="lbl">sin notas Q1</span></div>
+              <div class="grade-card-att">
+                <div class="grade-card-att-info"><span>Asistencia</span><b>88%</b></div>
+                <div class="pbar"><div class="pbar-fill green" style="width:88%"></div></div>
+              </div>
+            </div>
+            <div class="grade-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+                <div>
+                  <div class="grade-card-eyebrow">ING-10A · Inglés</div>
+                  <div class="grade-card-name">Inglés</div>
+                  <div class="grade-card-doc">Docente: María Fernanda López</div>
+                </div>
+                <div class="grade-card-state ok">Aprobado</div>
+              </div>
+              <div class="grade-card-score">9.1<span class="lbl">/ 10</span></div>
+              <div class="grade-card-att">
+                <div class="grade-card-att-info"><span>Asistencia</span><b>100%</b></div>
+                <div class="pbar"><div class="pbar-fill green" style="width:100%"></div></div>
+              </div>
+            </div>
+            <div class="grade-card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
+                <div>
+                  <div class="grade-card-eyebrow">EFI-10A · Educación Física</div>
+                  <div class="grade-card-name">Educación Física</div>
+                  <div class="grade-card-doc">Docente: Carlos Ortega</div>
+                </div>
+                <div class="grade-card-state ok">Aprobado</div>
+              </div>
+              <div class="grade-card-score">9.5<span class="lbl">/ 10</span></div>
+              <div class="grade-card-att">
+                <div class="grade-card-att-info"><span>Asistencia</span><b>95%</b></div>
+                <div class="pbar"><div class="pbar-fill green" style="width:95%"></div></div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:.5rem;justify-content:flex-end">
+            <button class="btn-ghost"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:.4rem;vertical-align:-1px"><use href="#i-cal"/></svg>Exportar a iCal</button>
+            <button class="btn-gold"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:.4rem;vertical-align:-1px"><use href="#i-download"/></svg>Descargar boletín Q1</button>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================
+     25 · BOLETIN
+     ================================================================= -->
+<section class="page" id="es-boletin">
+  <div class="page-label"><span class="num">25 / 25</span><span class="name">Estudiante · Boletín (imprimible / PDF)</span></div>
+  <div class="page-frame">
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand"><div class="brand-mark"><svg><use href="#lotus-ou"/></svg></div><div class="brand-text"><div class="brand-name">SIE</div><div class="brand-sub">Estudiante</div></div></div>
+        <nav class="nav"><div class="nav-section"><div class="nav-label">Mi panel</div>
+          <a class="nav-item" href="#es-dash"><svg class="ico"><use href="#i-grid"/></svg>Mi panel</a>
+          <a class="nav-item active" href="#es-boletin"><svg class="ico"><use href="#i-doc"/></svg>Mi boletín</a>
+        </div></nav>
+        <button class="user-card"><div class="avatar" style="background:var(--orange-deep)">ER</div><div class="user-meta"><div class="user-name">Ernesto Ruales</div><div class="user-role">Estudiante · 10°A</div></div><span class="user-caret">▾</span></button>
+      </aside>
+      <main class="main">
+        <header class="topbar"><div class="crumb">SIE · <b>Mi boletín</b></div></header>
+        <div class="content">
+          <div class="page-head">
+            <div class="eyebrow">Boletín académico</div>
+            <h1 class="page-title">Boletín <em>Q1 · 2025-2026</em></h1>
+            <p class="page-sub">Documento oficial del rendimiento académico del estudiante. Válido para trámites institucionales.</p>
+          </div>
+          <div class="boletin">
+            <div class="boletin-head">
+              <div class="boletin-head-left">
+                <div class="boletin-mark"><svg><use href="#lotus-ou"/></svg></div>
+                <div>
+                  <div class="boletin-brand">SIE · <em>Ghanima</em></div>
+                  <div class="boletin-sub">Unidad Educativa San Agustín</div>
+                </div>
+              </div>
+              <div class="boletin-head-right">
+                <div><b>BOLETÍN OFICIAL</b></div>
+                <div>Quimestre 1 · 2025-2026</div>
+                <div>Emitido · 2025-06-15</div>
+              </div>
+            </div>
+            <div class="boletin-body">
+              <div class="boletin-stu">
+                <div>
+                  <h2>Ernesto Ruales Morales</h2>
+                  <div class="boletin-stu-meta">RUDE <b>1056-2010</b> · 10° EGB "A" · Sección matutina</div>
+                </div>
+                <div style="text-align:right">
+                  <div class="boletin-stu-meta">Representante</div>
+                  <div style="font-family:var(--display);font-size:1.1rem;font-weight:500;color:var(--ink);margin-top:.25rem">Patricia Morales Vega</div>
+                </div>
+              </div>
+              <div class="boletin-tiles">
+                <div class="boletin-tile">
+                  <div class="boletin-tile-eyebrow">Promedio Q1</div>
+                  <div class="boletin-tile-num ok">8.6</div>
+                  <div class="boletin-tile-lbl">/ 10 · Aprobado</div>
+                </div>
+                <div class="boletin-tile">
+                  <div class="boletin-tile-eyebrow">Asistencia</div>
+                  <div class="boletin-tile-num ok">94%</div>
+                  <div class="boletin-tile-lbl">de 60 días lectivos</div>
+                </div>
+                <div class="boletin-tile">
+                  <div class="boletin-tile-eyebrow">Estado</div>
+                  <div class="boletin-tile-num ok" style="font-size:1.4rem;font-family:var(--mono);font-weight:600;letter-spacing:.1em">APROBADO</div>
+                  <div class="boletin-tile-lbl">pasa a Q2</div>
+                </div>
+              </div>
+              <h3 class="boletin-section-h">Calificaciones por asignatura</h3>
+              <div>
+                <div class="boletin-row"><div><div class="nm">Matemáticas</div><div class="code">MAT-10A · Diana Pérez</div></div><div class="at" style="text-align:left">Pruebas 8.5 · Tareas 9.0 · Proyecto 8.0 · Oral 8.5</div><div class="sc ok">8.5</div><div class="at">Aprobado</div></div>
+                <div class="boletin-row"><div><div class="nm">Lengua y Literatura</div><div class="code">LEN-10A · Mario Cárdenas</div></div><div class="at" style="text-align:left">Pruebas 7.5 · Ensayos 8.0 · Lectura 7.5 · Oral 8.0</div><div class="sc ok">7.8</div><div class="at">Aprobado</div></div>
+                <div class="boletin-row"><div><div class="nm">Ciencias Naturales</div><div class="code">CNA-10A · Patricia Ordóñez</div></div><div class="at" style="text-align:left">Pruebas 8.0 · Laborat. 8.5 · Informe 8.0 · Exposición 8.5</div><div class="sc ok">8.2</div><div class="at">Aprobado</div></div>
+                <div class="boletin-row"><div><div class="nm">Estudios Sociales</div><div class="code">SOC-10A · Roberto Salazar</div></div><div class="at" style="text-align:left">En proceso de evaluación</div><div class="sc" style="color:var(--ink-4)">—</div><div class="at">Pendiente</div></div>
+                <div class="boletin-row"><div><div class="nm">Inglés</div><div class="code">ING-10A · María F. López</div></div><div class="at" style="text-align:left">Examen 9.0 · Speaking 9.5 · Writing 8.5 · Reading 9.5</div><div class="sc ok">9.1</div><div class="at">Aprobado</div></div>
+                <div class="boletin-row"><div><div class="nm">Educación Física</div><div class="code">EFI-10A · Carlos Ortega</div></div><div class="at" style="text-align:left">Deportivo 9.5 · Teórico 9.5</div><div class="sc ok">9.5</div><div class="at">Aprobado</div></div>
+              </div>
+              <h3 class="boletin-section-h">Resumen de asistencia</h3>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line-1)">
+                <div style="padding:.7rem 1rem;border-right:1px solid var(--line-1);text-align:center"><div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4)">Presentes</div><div style="font-family:var(--display);font-size:1.4rem;color:var(--green-deep);font-weight:500;margin-top:.2rem">56</div></div>
+                <div style="padding:.7rem 1rem;border-right:1px solid var(--line-1);text-align:center"><div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4)">Ausencias</div><div style="font-family:var(--display);font-size:1.4rem;color:var(--ink);font-weight:500;margin-top:.2rem">2</div></div>
+                <div style="padding:.7rem 1rem;border-right:1px solid var(--line-1);text-align:center"><div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4)">Atrasos</div><div style="font-family:var(--display);font-size:1.4rem;color:var(--ink);font-weight:500;margin-top:.2rem">1</div></div>
+                <div style="padding:.7rem 1rem;text-align:center"><div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4)">Justificados</div><div style="font-family:var(--display);font-size:1.4rem;color:var(--ink);font-weight:500;margin-top:.2rem">1</div></div>
+              </div>
+            </div>
+            <div class="boletin-foot">
+              <span>Documento firmado digitalmente · SHA-256 <b>8f3a2c…b71d</b></span>
+              <span>Verificable en <b>sie.edu.ec/verificar</b></span>
+            </div>
+          </div>
+          <div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:1.5rem">
+            <button class="btn-ghost"><svg style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8;margin-right:.4rem;vertical-align:-1px"><use href="#i-download"/></svg>Descargar PDF</button>
+            <button class="btn-gold">Imprimir boletín</button>
+          </div>
+          <div class="foot-page"><div>SIE · v0.4.0-MVP · <b>Ghanima Core AI</b></div><div>Modo claro · LOPDP & LOEI</div></div>
+        </div>
+      </main>
+    </div>
+  </div>
+</section>
+
+<script>
+  // TOC toggle
+  const tocToggle = document.getElementById('tocToggle');
+  const tocPanel = document.getElementById('tocPanel');
+  tocToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    tocPanel.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    if (!tocPanel.contains(e.target) && !tocToggle.contains(e.target)) {
+      tocPanel.classList.remove('open');
+    }
+  });
+  // Scroll-spy: highlight active section in TOC
+  const links = document.querySelectorAll('.toc-link');
+  const sections = Array.from(links).map(l => document.querySelector(l.getAttribute('href'))).filter(Boolean);
+  const setActive = () => {
+    const scrollY = window.scrollY + 120;
+    let idx = 0;
+    for (let i = 0; i < sections.length; i++) {
+      if (sections[i].offsetTop <= scrollY) idx = i;
+    }
+    links.forEach(l => l.classList.remove('active'));
+    if (links[idx]) links[idx].classList.add('active');
+  };
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+</script>
+</body>
+</html>

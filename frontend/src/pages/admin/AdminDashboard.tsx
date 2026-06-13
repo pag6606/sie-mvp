@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { usePeriodoEnProgreso } from '@/hooks/usePeriodoEnProgreso'
 import { useDashboard } from '@/hooks/useDashboard'
 import AppLayout from '@/components/AppLayout'
+import { PageHead, Callout, Icons } from '@/components/ghanima'
 import { Line } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -16,10 +17,10 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip)
 
 const KPI_CARDS = [
-  { key: 'totalEstudiantes' as const, label: 'Estudiantes', sub: 'registrados', icon: '👥', color: 'text-primary', bg: 'bg-primary/5' },
-  { key: 'totalMatriculados' as const, label: 'Matriculados', sub: 'activos', icon: '✅', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  { key: 'seccionesActivas' as const, label: 'Secciones', sub: 'activas', icon: '📚', color: 'text-blue-600', bg: 'bg-blue-50' },
-  { key: 'porcentajeAsistencia' as const, label: 'Asistencia', sub: 'promedio', icon: '📊', color: 'text-amber-600', bg: 'bg-amber-50', suffix: '%' },
+  { key: 'totalEstudiantes' as const, label: 'Estudiantes', sub: 'registrados', Icon: Icons.Users, color: 'text-primary', bg: 'bg-primary/5' },
+  { key: 'totalMatriculados' as const, label: 'Matriculados', sub: 'activos', Icon: Icons.Check, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+  { key: 'seccionesActivas' as const, label: 'Secciones', sub: 'activas', Icon: Icons.Layers, color: 'text-blue-600', bg: 'bg-blue-50' },
+  { key: 'porcentajeAsistencia' as const, label: 'Asistencia', sub: 'promedio', Icon: Icons.Chart, color: 'text-amber-600', bg: 'bg-amber-50', suffix: '%' },
 ]
 
 function SkeletonKPI() {
@@ -39,44 +40,29 @@ export default function AdminDashboard() {
   return (
     <AppLayout role="admin">
       <div className="mx-auto max-w-5xl space-y-6 p-6 md:p-8">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">
-            {dashboard?.periodoActivo
-              ? `${dashboard.periodoActivo.codigo} — ${dashboard.periodoActivo.nombre}`
-              : 'Dashboard'}
-          </h1>
-          {dashboard?.periodoActivo && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {dashboard.periodoActivo.estado === 'EN_CURSO' ? 'Período en curso' :
-               dashboard.periodoActivo.estado === 'ABIERTO' ? 'Matrícula abierta' :
-               dashboard.periodoActivo.estado}
-              {' · '}
-              {dashboard.periodoActivo.fechaInicio} → {dashboard.periodoActivo.fechaFin}
-            </p>
-          )}
-        </div>
+        <PageHead
+          eyebrow={dashboard?.periodoActivo ? dashboard.periodoActivo.estado === 'EN_CURSO' ? 'Período en curso' : 'Matrícula abierta' : undefined}
+          title={dashboard?.periodoActivo ? `${dashboard.periodoActivo.codigo} — ${dashboard.periodoActivo.nombre}` : 'Dashboard'}
+          subtitle={dashboard?.periodoActivo ? `${dashboard.periodoActivo.fechaInicio} → ${dashboard.periodoActivo.fechaFin}` : undefined}
+        />
 
         {enProgreso && (
-          <div className="rounded-lg border-2 border-primary/30 bg-accent p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-medium text-primary">Período en configuración</p>
-                <p className="mt-1 text-lg font-semibold text-foreground">{enProgreso.codigo}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Paso {enProgreso.paso} de 4 — {enProgreso.pasoLabel}
-                </p>
-              </div>
+          <Callout
+            variant="info"
+            title={`Período en configuración — ${enProgreso.codigo}`}
+            subtitle={`Paso ${enProgreso.paso} de 4 — ${enProgreso.pasoLabel}`}
+            action={
               <button
                 onClick={() => navigate(enProgreso.ruta)}
-                className="rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:opacity-90"
+                className="bg-[#8A6A18] text-white px-4 py-2 font-mono text-xs font-bold uppercase tracking-[0.18em] hover:bg-[#0A0A0B] transition-colors"
               >
                 Continuar configuración →
               </button>
-            </div>
-          </div>
+            }
+          />
         )}
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 border border-[rgba(10,10,11,0.1)] bg-[rgba(10,10,11,0.1)]" style={{ gap: '1px' }}>
           {loadingDashboard
             ? Array.from({ length: 4 }).map((_, i) => <SkeletonKPI key={i} />)
             : KPI_CARDS.map(card => {
@@ -85,13 +71,17 @@ export default function AdminDashboard() {
                   ? `${value}${card.suffix || ''}`
                   : String(value)
                 return (
-                  <div key={card.key} className={`rounded-xl border border-border bg-card p-5 ${card.bg}`}>
-                    <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                      <span aria-hidden="true" className="text-base">{card.icon}</span>
+                  <div key={card.key} className="bg-white p-5 flex flex-col gap-2">
+                    <div className="flex items-center gap-2 font-mono text-[0.62rem] uppercase tracking-[0.2em] text-[rgba(10,10,11,0.48)] font-semibold">
+                      <span className="w-[5px] h-[5px] rounded-full bg-current" style={{ color: `${card.color}`.includes('emerald') ? '#16724F' : `${card.color}`.includes('blue') ? '#4A2E5F' : `${card.color}`.includes('amber') ? '#A8420A' : '#8A6A18' }} />
+                      <card.Icon className="w-3.5 h-3.5" aria-hidden="true" />
                       {card.label}
                     </div>
-                    <p className={`mt-2 text-3xl font-bold ${card.color}`}>{display}</p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{card.sub}</p>
+                    <p className="font-serif text-[2.4rem] font-normal leading-none text-[#0A0A0B] tracking-[-0.025em]">
+                      {display}
+                      {card.suffix && <span className="font-serif text-[1.2rem] italic text-[rgba(10,10,11,0.72)] ml-0.5">{card.suffix}</span>}
+                    </p>
+                    <p className="text-[0.78rem] text-[rgba(10,10,11,0.72)]">{card.sub}</p>
                   </div>
                 )
               })}
@@ -154,18 +144,27 @@ export default function AdminDashboard() {
             </p>
             <button
               onClick={() => navigate('/admin/periodos/nuevo')}
-              className="mt-6 rounded-lg bg-primary px-8 py-3 text-lg font-medium text-primary-foreground hover:opacity-90"
+              className="mt-6 inline-flex items-center gap-2.5 bg-[#8A6A18] text-[#EEF1F4] font-mono text-[0.7rem] font-bold uppercase tracking-[0.18em] px-6 py-3 hover:bg-[#0A0A0B] transition-colors"
             >
               Configurar nuevo período
+              <span className="font-sans text-[0.95rem]" aria-hidden="true">→</span>
             </button>
           </div>
         )}
 
         <div className="flex flex-wrap gap-3">
-          {['/admin/cursos', '/admin/secciones', '/admin/usuarios', '/admin/cierres', '/admin/matricula', '/admin/alertas'].map((path, i) => (
+          {[
+            { path: '/admin/cursos', label: 'Cursos', Icon: Icons.Book },
+            { path: '/admin/secciones', label: 'Secciones', Icon: Icons.Layers },
+            { path: '/admin/usuarios', label: 'Usuarios', Icon: Icons.Users },
+            { path: '/admin/cierres', label: 'Cierres', Icon: Icons.Chart },
+            { path: '/admin/matricula', label: 'Matrícula', Icon: Icons.Clipboard },
+            { path: '/admin/alertas', label: 'Alertas', Icon: Icons.Alert },
+          ].map(({ path, label, Icon }) => (
             <button key={path} onClick={() => navigate(path)}
-              className="rounded-md border border-border bg-card px-4 py-2 text-sm text-foreground hover:bg-muted">
-              {['📚 Cursos', '📋 Secciones', '👥 Usuarios', '📊 Cierres', '📝 Matrícula', '🚨 Alertas'][i]}
+              className="flex items-center gap-2 border border-[rgba(10,10,11,0.1)] bg-white px-4 py-2 font-mono text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-[#1C1C20] hover:border-[#8A6A18] hover:text-[#8A6A18] transition-colors">
+              <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+              {label}
             </button>
           ))}
         </div>

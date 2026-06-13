@@ -1,0 +1,1 @@
+import{u as o}from"./useQuery-BnB4N7jv.js";import{b as t}from"./index-BGXNp_g0.js";function i(){return o({queryKey:["periodos"],queryFn:()=>t.get("/periodos?size=100").then(r=>{const e=r.data;return Array.isArray(e)?e:e.content||[]}),staleTime:5*60*1e3,gcTime:30*60*1e3})}export{i as u};

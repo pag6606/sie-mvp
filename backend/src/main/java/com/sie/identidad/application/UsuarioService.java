@@ -49,6 +49,12 @@ public class UsuarioService {
         usuario.setActivo(true);
         usuario.setPrimerLogin(true);
         usuario.setHashPassword(passwordEncoder.encode(generateTemporaryPassword()));
+        if (request.dateOfBirth() != null) {
+            usuario.setDateOfBirth(request.dateOfBirth());
+        } else {
+            usuario.setDateOfBirthEstimated(true);
+            usuario.setDateOfBirth(java.time.LocalDate.of(2010, 1, 1));
+        }
 
         Usuario savedUsuario = usuarioRepository.save(usuario);
 

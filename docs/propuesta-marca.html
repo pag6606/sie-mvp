@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Ghanima Core AI · Propuesta de implementación en Modo Claro del Manual de Marca">
+<title>Ghanima · Propuesta Modo Claro v1.0</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* =================================================================
+   GHANIMA · PROPUESTA MODO CLARO v1.0
+   Misma identidad, mismo grid, mismo tipo, distinta atmósfera.
+   Regla dura del manual: el loto a color SOLO vive sobre oscuro;
+   en claro se usa SIEMPRE la versión outline/monocroma del mismo
+   color de marca. Aquí se respeta esa regla.
+   ================================================================= */
+
+/* ---------- TOKENS — MODO CLARO ---------- */
+:root {
+  /* Fondos / superficies. La dirección de porcelana fría sustituye
+     al cream óseo del original — nos alejamos del lenguaje visual
+     de Claude Code / v0 / Lovable (todos warm-cream) y abrazamos
+     un porcelanado azulado que se siente institucional, más banco
+     central que startup AI. El oro gana contraste por oposición
+     térmica: oro cálido sobre base fría. La jerarquía es:
+     paper (base) → bone-bg-2 (sección intermedia) → surface
+     (tarjeta elevada) → ink-bg (inverted, uso reservado). */
+  --paper:        #EEF1F4;   /* lona principal — porcelana fría */
+  --bone-bg-2:    #DDE3EA;   /* secciones alternas — gris azulado */
+  --surface:      #FFFFFF;   /* tarjetas, modales, demos */
+  --surface-2:    #F6F8FA;   /* superficie elevada alternativa */
+  --ink-bg:       #0A0A0B;   /* bloque "inverted" cuando se necesite */
+
+  /* Texto. Toma el rol del antiguo --bone, pero con tres secundarios
+     sobre rgba-ink. La jerarquía de opacidad conserva el ADN. */
+  --ink:          #0A0A0B;
+  --ink-2:        #1C1C20;
+  --ink-3:        rgba(10,10,11,.72);
+  --ink-4:        rgba(10,10,11,.48);
+  --ink-5:        rgba(10,10,11,.28);
+
+  /* Oro. El hex se conserva para gráfico y ornamental, pero se
+     introduce --gold-ink (≈ gold-deep original) para uso tipográfico
+     y de botón sobre papel, donde #D4AF37 no pasa WCAG AA. */
+  --gold:         #D4AF37;   /* ornamental, grandes superficies */
+  --gold-bright:  #B8941F;   /* hovers / foco sobre papel */
+  --gold-deep:    #8A6A18;   /* texto institucional sobre papel */
+  --gold-faint:   rgba(138,106,24,.10);
+  --gold-line:    rgba(138,106,24,.32);
+
+  /* Púrpura. Atmosfera y núcleo Core. Se mantiene como acento
+     cromático, baja su uso en texto. */
+  --plum:         #4A2E5F;
+  --plum-bright:  #7A4FA8;
+  --plum-tint:    rgba(74,46,95,.07);
+
+  /* Acentos seccionales — sin cambios de hex, solo de rol. */
+  --green:        #2BB07A;   /* se aterriza un punto para contraste AA */
+  --green-deep:   #16724F;
+  --green-tint:   rgba(43,176,122,.10);
+  --copper:       #B07A4A;   /* mismo aterrizaje para uso tipográfico */
+  --copper-deep:  #7A4F2A;
+  --orange:       #E25E10;   /* se aterriza para contraste AA */
+  --orange-deep:  #A8420A;
+  --orange-tint:  rgba(226,94,16,.08);
+
+  /* Tipografía — inalterada */
+  --display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --body:    'Manrope', system-ui, sans-serif;
+  --mono:    'JetBrains Mono', 'SF Mono', monospace;
+
+  /* Espaciado — inalterado */
+  --s-1:.5rem; --s-2:1rem; --s-3:1.5rem; --s-4:2rem;
+  --s-5:3rem; --s-6:4.5rem; --s-7:6.5rem; --s-8:9rem;
+
+  /* Hairlines. Invertimos el canal: ya no son hueso a baja opacidad,
+     son tinta a baja opacidad. */
+  --line-1: rgba(10,10,11,.10);
+  --line-2: rgba(10,10,11,.18);
+  --line-3: rgba(10,10,11,.28);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+/* Bandita de color en el borde superior del viewport para anclar
+   la identidad cromática en todo el documento. Mismo truco que
+   usan revistas impresas en la cabecera. */
+body{
+  border-top:3px solid var(--gold-deep);
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--gold);color:var(--paper)}
+
+/* Grano analógico — pasa a multiply sobre papel. Mismo SVG,
+   distinto blend, misma firma. */
+body::before{
+  content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0 0.06 0 0 0 0.6 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity:.06;mix-blend-mode:multiply;
+}
+.container{width:min(1240px,100% - 3rem);margin-inline:auto}
+.mono{font-family:var(--mono)}
+
+/* ---------- NAV ---------- */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;padding:1rem 0;
+  background:rgba(238,241,244,.82);
+  backdrop-filter:blur(20px) saturate(140%);
+  border-bottom:1px solid var(--line-2);
+}
+.nav-inner{
+  display:flex;align-items:center;justify-content:space-between;
+  width:min(1240px,100% - 3rem);margin-inline:auto;gap:1rem;
+}
+.nav-brand{
+  font-family:var(--mono);font-size:.74rem;letter-spacing:.22em;
+  text-transform:uppercase;font-weight:600;
+}
+.nav-brand .accent{color:var(--gold-deep)}
+.nav-badge{
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.22em;
+  text-transform:uppercase;padding:.3rem .55rem;border:1px solid var(--gold-line);
+  color:var(--gold-deep);margin-left:.6rem;vertical-align:middle;
+}
+.nav-links{
+  display:flex;gap:1.6rem;font-family:var(--mono);font-size:.66rem;
+  letter-spacing:.18em;text-transform:uppercase;flex-wrap:wrap;justify-content:flex-end;
+}
+.nav-links a{color:var(--ink-3);transition:color .3s}
+.nav-links a:hover{color:var(--gold-deep)}
+
+/* ---------- COVER ---------- */
+.cover{
+  position:relative;min-height:88vh;display:grid;place-items:center;text-align:center;
+  padding:9rem 0 6rem;isolation:isolate;overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(74,46,95,.10) 0%, transparent 55%),
+    radial-gradient(circle at 50% 90%, rgba(212,175,55,.12) 0%, transparent 55%),
+    var(--paper);
+}
+.cover::before{
+  content:'';position:absolute;inset:0;z-index:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'><g fill='none' stroke='%238A6A18' stroke-width='0.4' opacity='0.22'><circle cx='40' cy='40' r='30'/><polygon points='40,10 64,28 56,58 24,58 16,28'/><polygon points='40,18 58,32 51,53 29,53 22,32'/></g></svg>");
+  background-size:380px;opacity:.55;mix-blend-mode:multiply;
+  mask-image:radial-gradient(circle at 50% 40%, black 0%, transparent 75%);
+  -webkit-mask-image:radial-gradient(circle at 50% 40%, black 0%, transparent 75%);
+}
+.cover-inner{position:relative;z-index:2}
+.cover .lotus{
+  width:clamp(180px,22vw,260px);margin:0 auto 2.5rem;
+  filter:drop-shadow(0 2px 18px rgba(138,106,24,.18));
+}
+.cover-eyebrow{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--gold-deep);font-weight:500;margin-bottom:1.75rem;
+}
+.cover h1{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(2.6rem,6.5vw,5rem);line-height:1;
+  letter-spacing:-.025em;margin-bottom:1.25rem;
+}
+.cover h1 em{font-style:italic;font-weight:500;color:var(--gold-deep)}
+.cover-sub{
+  font-family:var(--display);font-style:italic;
+  font-size:clamp(1.05rem,1.6vw,1.3rem);color:var(--ink-2);margin-bottom:2.25rem;
+}
+.cover-meta{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--ink-4);
+}
+.cover-meta b{color:var(--gold-deep);font-weight:600}
+
+/* ---------- SECTIONS ---------- */
+.section{position:relative;padding:7rem 0;isolation:isolate;overflow:hidden}
+.section.alt{background:var(--bone-bg-2)}
+.section.inverted{background:var(--ink-bg);color:var(--paper)}
+.section-divider{height:1px;background:var(--gold-line);opacity:.7;width:min(1240px,100% - 3rem);margin-inline:auto}
+.sec-head{
+  display:flex;align-items:baseline;gap:1.5rem;margin-bottom:3.5rem;
+  padding-bottom:1.75rem;border-bottom:1px solid var(--gold-line);
+}
+.sec-num{font-family:var(--display);font-style:italic;font-weight:500;font-size:1.4rem;color:var(--gold-deep);flex-shrink:0}
+.sec-head h2{font-family:var(--display);font-size:clamp(1.9rem,4vw,3rem);font-weight:400;line-height:1.05;letter-spacing:-.02em}
+.sec-head h2 em{font-style:italic;font-weight:500;color:var(--gold-deep)}
+.sec-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-4);margin-left:auto;text-align:right}
+.lede{font-size:clamp(1rem,1.4vw,1.12rem);line-height:1.65;color:var(--ink-3);max-width:68ch;font-weight:300;margin-bottom:3rem}
+.lede strong{color:var(--ink);font-weight:500}
+.sub-label{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ink-4);margin:3.5rem 0 1.75rem;display:flex;align-items:center;gap:1rem;
+}
+.sub-label::after{content:'';flex:1;height:1px;background:var(--line-2)}
+
+/* ---------- GRIDS / CARDS ---------- */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+.card{
+  border:1px solid var(--line-1);padding:2rem;
+  background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,0));
+  transition:all .4s cubic-bezier(.2,.8,.2,1);
+}
+.card:hover{transform:translateY(-2px);border-color:var(--accent,var(--gold-deep))}
+.card h4{font-family:var(--display);font-size:1.55rem;font-weight:500;line-height:1.1;margin-bottom:.85rem;color:var(--accent,var(--ink-2))}
+.card p{font-size:.92rem;line-height:1.6;color:var(--ink-3);font-weight:300}
+.card .tag{font-family:var(--mono);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;font-weight:600;color:var(--accent,var(--gold-deep));margin-bottom:.85rem}
+
+/* ---------- BRAND CARDS ---------- */
+.brand-card{
+  padding:2.5rem;text-align:left;border:1px solid var(--line-1);
+  background:var(--surface);
+}
+.brand-card.core{--accent:var(--gold-deep);background:linear-gradient(160deg,var(--gold-faint),rgba(255,255,255,0) 60%),var(--surface)}
+.brand-card.apps{--accent:var(--green-deep);background:linear-gradient(160deg,var(--green-tint),rgba(255,255,255,0) 60%),var(--surface)}
+.brand-card.boost{--accent:var(--orange-deep);background:linear-gradient(160deg,var(--orange-tint),rgba(255,255,255,0) 60%),var(--surface)}
+.brand-card .lotus{width:110px;margin-bottom:1.5rem}
+.brand-card h4{font-family:var(--display);font-size:1.6rem;font-weight:500;margin-bottom:.35rem;color:var(--ink)}
+.brand-card .roman{font-family:var(--display);font-style:italic;font-weight:500;color:var(--accent);font-size:1.1rem;margin-bottom:1rem}
+.brand-meta{margin-top:1.5rem;border-top:1px solid var(--line-1);padding-top:1.25rem;display:grid;gap:.55rem}
+.brand-meta div{display:flex;justify-content:space-between;gap:1rem;font-size:.82rem}
+.brand-meta dt{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4);padding-top:.15em}
+.brand-meta dd{color:var(--ink-2);text-align:right}
+.brand-meta dd .chip{display:inline-block;width:11px;height:11px;border-radius:50%;margin-left:.4rem;vertical-align:-1px;border:1px solid var(--line-2)}
+
+/* ---------- TOKEN SWATCHES (light) ---------- */
+.swatch{border:1px solid var(--line-1);overflow:hidden;background:var(--surface)}
+.swatch-color{height:88px;position:relative;border-bottom:1px solid var(--line-1)}
+.swatch-body{padding:1rem 1.1rem;background:var(--surface)}
+.swatch-name{font-family:var(--display);font-size:1.1rem;font-weight:500;color:var(--ink);line-height:1.15}
+.swatch-hex{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;color:var(--gold-deep);margin:.3rem 0 .45rem}
+.swatch-use{font-size:.78rem;color:var(--ink-3);line-height:1.45;font-weight:300}
+
+/* Token-map: dark vs light. */
+.map{width:100%;border-collapse:collapse;font-size:.84rem;background:var(--surface)}
+.map th{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;text-align:left;padding:.8rem .9rem;border-bottom:1px solid var(--gold-line);font-weight:600;color:var(--gold-deep)}
+.map td{padding:.85rem .9rem;border-bottom:1px solid var(--line-1);color:var(--ink-3);vertical-align:top;line-height:1.5}
+.map td:first-child{font-family:var(--mono);font-size:.74rem;color:var(--ink-2)}
+.map td .chip{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:.5rem;vertical-align:-2px;border:1px solid var(--line-2)}
+.map td code{font-family:var(--mono);font-size:.72rem;background:var(--bone-bg-2);padding:.1rem .35rem;color:var(--ink-2)}
+
+/* ---------- TYPE SPECIMENS ---------- */
+.specimen{border:1px solid var(--line-1);padding:2.25rem;background:var(--surface);margin-bottom:1.5rem}
+.specimen.inverted{background:var(--ink-bg);color:var(--paper);border-color:rgba(244,241,232,.18)}
+.specimen .label{font-family:var(--mono);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold-deep);font-weight:600;margin-bottom:1.25rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.specimen.inverted .label{color:var(--gold)}
+.specimen .label span{color:var(--ink-4)}
+.specimen.inverted .label span{color:rgba(244,241,232,.55)}
+.spec-display{font-family:var(--display);font-size:clamp(2rem,4.5vw,3.4rem);font-weight:400;line-height:1.02;letter-spacing:-.02em}
+.spec-display em{font-style:italic;font-weight:500;color:var(--gold-deep)}
+.specimen.inverted .spec-display em{color:var(--gold)}
+.spec-body{font-size:1.05rem;font-weight:300;color:var(--ink-2);max-width:62ch;line-height:1.65}
+.specimen.inverted .spec-body{color:var(--bone-bg-2)}
+.spec-mono{font-family:var(--mono);font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;color:var(--green-deep)}
+.type-scale{width:100%;border-collapse:collapse;font-size:.86rem;background:var(--surface)}
+.type-scale th{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-deep);text-align:left;padding:.7rem .9rem;border-bottom:1px solid var(--gold-line);font-weight:600}
+.type-scale td{padding:.7rem .9rem;border-bottom:1px solid var(--line-1);color:var(--ink-3);vertical-align:top}
+.type-scale td:first-child{font-family:var(--mono);font-size:.74rem;color:var(--ink-2)}
+
+/* ---------- SPACING ---------- */
+.space-row{display:flex;align-items:center;gap:1.25rem;padding:.6rem 0;border-bottom:1px solid var(--line-1)}
+.space-token{font-family:var(--mono);font-size:.72rem;color:var(--gold-deep);width:64px;flex-shrink:0}
+.space-val{font-family:var(--mono);font-size:.68rem;color:var(--ink-4);width:108px;flex-shrink:0}
+.space-bar{height:12px;background:linear-gradient(90deg,var(--gold),var(--gold-deep));opacity:.85}
+
+/* ---------- RULES ---------- */
+.rule{padding:1.4rem 1.5rem;border:1px solid var(--line-1);background:var(--surface);display:flex;gap:.9rem;align-items:flex-start;font-size:.92rem;line-height:1.55;color:var(--ink-3)}
+.rule b{color:var(--ink);font-weight:600}
+.rule.ok{border-left:2px solid var(--green-deep)}
+.rule.ok::before{content:'✓';color:var(--green-deep);font-weight:700;flex-shrink:0}
+.rule.no{border-left:2px solid var(--orange-deep)}
+.rule.no::before{content:'✕';color:var(--orange-deep);font-weight:700;flex-shrink:0}
+
+/* ---------- DEMOS (sobre light) ---------- */
+.demo{border:1px solid var(--line-1);padding:2.5rem;background:var(--surface);position:relative;margin-bottom:1.5rem}
+.demo.bone{background:var(--bone-bg-2)}
+.demo.inverted{background:var(--ink-bg);color:var(--paper);border-color:rgba(244,241,232,.18)}
+.demo-label{
+  position:absolute;top:0;left:0;background:var(--bone-bg-2);
+  border-right:1px solid var(--line-2);border-bottom:1px solid var(--line-2);
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--ink-4);padding:.45rem .8rem;
+}
+.demo.inverted .demo-label{background:var(--ink-2);color:rgba(244,241,232,.55);border-color:rgba(244,241,232,.18)}
+.demo-note{margin-top:1.5rem;font-size:.8rem;color:var(--ink-4);font-weight:300;max-width:60ch}
+.demo.inverted .demo-note{color:rgba(244,241,232,.55)}
+
+.btn-gold{
+  display:inline-flex;align-items:center;gap:.75rem;background:var(--gold-deep);color:var(--paper);
+  font-family:var(--mono);font-size:.75rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  padding:.9rem 2rem;border:0;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s;
+}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 12px 32px -10px rgba(138,106,24,.45);background:var(--ink-bg)}
+.btn-gold::after{content:'→';font-family:var(--body);font-size:1rem}
+
+.btn-ghost{
+  border:1px solid var(--gold-deep);color:var(--gold-deep);background:transparent;padding:.6rem 1.25rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;font-weight:600;
+  cursor:pointer;transition:all .3s;
+}
+.btn-ghost:hover{background:var(--gold-deep);color:var(--paper)}
+
+.btn-accent{
+  display:inline-flex;align-items:center;gap:1rem;font-family:var(--mono);font-size:.78rem;
+  letter-spacing:.22em;text-transform:uppercase;font-weight:600;
+  padding:1.1rem 2.25rem;background:var(--green);color:#FFFFFF;border:0;cursor:pointer;
+  transition:all .4s cubic-bezier(.2,.8,.2,1);
+}
+.btn-accent.boost{background:var(--orange)}
+.btn-accent::after{content:'→';font-family:var(--body);font-size:1.1rem}
+.btn-accent:hover{transform:translateY(-2px);box-shadow:0 12px 28px -10px rgba(43,176,122,.5)}
+.btn-accent.boost:hover{box-shadow:0 12px 28px -10px rgba(226,94,16,.5)}
+
+/* En light, los inputs pueden ser outline en lugar de solo bottom.
+   Mantenemos bottom para conservar la firma editorial. */
+.demo-field{display:flex;flex-direction:column;max-width:340px}
+.demo-field label{font-family:var(--mono);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;color:var(--ink-4);margin-bottom:.5rem;font-weight:500}
+.demo-field input{
+  background:transparent;border:0;border-bottom:1px solid var(--line-2);color:var(--ink);
+  padding:.65rem 0;font-family:var(--body);font-size:1rem;outline:none;transition:border-color .3s;
+}
+.demo-field input:focus{border-color:var(--green-deep)}
+.demo.inverted .demo-field input{color:var(--paper);border-color:rgba(244,241,232,.25)}
+.demo.inverted .demo-field input:focus{border-color:var(--gold)}
+
+.demo-tier{
+  max-width:360px;border:1.5px solid var(--orange-deep);padding:2.25rem 2rem;position:relative;
+  background:linear-gradient(135deg,var(--orange-tint),transparent 60%),var(--surface);
+}
+.demo-tier .ribbon{
+  position:absolute;top:-1px;right:1.5rem;background:var(--orange);color:#FFFFFF;
+  padding:.4rem .9rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.25em;
+  text-transform:uppercase;font-weight:700;
+}
+.demo-tier .t-name{font-family:var(--display);font-size:1.5rem;font-weight:500;margin-bottom:1rem;color:var(--ink)}
+.demo-tier .t-price{font-family:var(--display);font-size:3.4rem;line-height:1;letter-spacing:-.03em;color:var(--ink)}
+.demo-tier .t-unit{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4)}
+
+.demo-step{
+  max-width:360px;padding-top:2rem;border-top:1px solid var(--line-2);position:relative;
+}
+.demo-step::before{
+  content:'';position:absolute;top:-5px;left:0;width:9px;height:9px;
+  background:var(--green-deep);border-radius:50%;box-shadow:0 0 0 4px var(--surface);
+}
+.demo-step .n{font-family:var(--mono);font-size:.68rem;letter-spacing:.25em;text-transform:uppercase;font-weight:600;color:var(--green-deep);margin-bottom:.8rem}
+.demo-step h5{font-family:var(--display);font-size:1.3rem;font-weight:500;margin-bottom:.5rem;color:var(--ink)}
+.demo-step p{font-size:.88rem;color:var(--ink-3);font-weight:300}
+
+/* ---------- VOICE TABLE ---------- */
+.voice-table{width:100%;border-collapse:collapse;font-size:.88rem;background:var(--surface)}
+.voice-table th{font-family:var(--mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;text-align:left;padding:.8rem .9rem;border-bottom:1px solid var(--gold-line);font-weight:600;color:var(--gold-deep)}
+.voice-table td{padding:.85rem .9rem;border-bottom:1px solid var(--line-1);color:var(--ink-3);vertical-align:top;line-height:1.5}
+.voice-table td:first-child{font-family:var(--display);font-size:1.05rem;font-weight:500;color:var(--ink)}
+.voice-table .c-core{color:var(--gold-deep)}.voice-table .c-apps{color:var(--green-deep)}.voice-table .c-boost{color:var(--orange-deep)}
+
+/* ---------- TEXTURE DEMOS (light) ---------- */
+.texture{height:150px;border:1px solid var(--line-1);position:relative;isolation:isolate;display:grid;place-items:end start;background:var(--surface);overflow:hidden}
+.texture .t-tag{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);padding:.7rem .9rem;  background:rgba(238,241,244,.85);backdrop-filter:blur(6px);border-top:1px solid var(--line-1)}
+.tx-grain::before{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0 0.06 0 0 0 0.6 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity:.20;mix-blend-mode:multiply;
+}
+.tx-grid-g{background:var(--surface)}
+.tx-grid-g::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(43,176,122,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(43,176,122,.10) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.tx-grid-o{background:var(--surface)}
+.tx-grid-o::before{
+  content:'';position:absolute;inset:0;
+  background-image:linear-gradient(rgba(226,94,16,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(226,94,16,.10) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.tx-geo{background:var(--paper)}
+.tx-geo::before{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'><g fill='none' stroke='%238A6A18' stroke-width='0.4' opacity='0.5'><circle cx='40' cy='40' r='30'/><polygon points='40,10 64,28 56,58 24,58 16,28'/><polygon points='40,18 58,32 51,53 29,53 22,32'/></g></svg>");
+  background-size:120px;mix-blend-mode:multiply;
+}
+.tx-glow{
+  background:
+    radial-gradient(circle at 70% 30%, rgba(74,46,95,.15) 0%, transparent 60%),
+    radial-gradient(circle at 20% 85%, rgba(212,175,55,.22) 0%, transparent 55%),
+    var(--paper);
+}
+
+/* Logo showcase on light */
+.logo-stage{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;
+}
+.logo-tile{
+  border:1px solid var(--line-1);background:var(--surface);
+  padding:2.5rem 1.5rem;display:grid;place-items:center;min-height:240px;position:relative;
+}
+.logo-tile.dark{background:var(--ink-bg);border-color:rgba(244,241,232,.18)}
+.logo-tile .lotus{width:130px}
+.logo-tile .lbl{
+  position:absolute;top:.9rem;left:.9rem;font-family:var(--mono);font-size:.6rem;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--ink-4);
+}
+.logo-tile.dark .lbl{color:rgba(244,241,232,.5)}
+
+/* Rationale block */
+.rationale{
+  background:var(--surface);border:1px solid var(--line-1);
+  padding:2.5rem;display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-bottom:3rem;
+}
+.rationale .col h5{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--gold-deep);font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;
+}
+.rationale .col h5::before{content:'';width:18px;height:1px;background:var(--gold-deep)}
+.rationale .col p{font-size:.92rem;color:var(--ink-3);font-weight:300;line-height:1.6}
+.rationale .col p b{color:var(--ink);font-weight:500}
+
+/* ---------- REVEAL ---------- */
+.reveal{opacity:0;transform:translateY(24px);transition:all .9s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:translateY(0)}
+.reveal.d1{transition-delay:.1s}.reveal.d2{transition-delay:.2s}.reveal.d3{transition-delay:.3s}
+
+/* ---------- FOOTER ---------- */
+.footer{padding:5rem 0 2.5rem;border-top:1px solid var(--gold-line);text-align:center;background:var(--bone-bg-2)}
+.footer p{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4)}
+.footer .tagline{
+  font-family:var(--display);font-style:italic;font-size:1.15rem;color:var(--ink-2);
+  letter-spacing:0;text-transform:none;margin-bottom:1rem;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:980px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr 1fr}
+  .logo-stage{grid-template-columns:1fr 1fr}
+  .rationale{grid-template-columns:1fr}
+  .sec-kicker{display:none}
+  .section{padding:4.5rem 0}
+}
+@media (max-width:620px){
+  .container{width:calc(100% - 2rem)}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .logo-stage{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .demo{padding:1.75rem}
+  .sec-head{flex-direction:column;gap:.5rem;align-items:flex-start}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Loto en versión outline (regla de marca: en fondo claro va SIEMPRE outline) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="lotus-outline-ink" viewBox="0 0 200 200">
+      <g stroke="currentColor" stroke-width="1.4" fill="transparent" stroke-linejoin="round" stroke-linecap="round">
+        <path d="M 100 41.8 Q 128 81.4, 100 121 Q 72 81.4, 100 41.8 Z" transform="rotate(-75 100 121)"/>
+        <path d="M 100 41.8 Q 128 81.4, 100 121 Q 72 81.4, 100 41.8 Z" transform="rotate(75 100 121)"/>
+        <path d="M 100 28.6 Q 130 74.8, 100 121 Q 70 74.8, 100 28.6 Z" transform="rotate(-45 100 121)"/>
+        <path d="M 100 28.6 Q 130 74.8, 100 121 Q 70 74.8, 100 28.6 Z" transform="rotate(45 100 121)"/>
+        <path d="M 100 17.2 Q 132 69.1, 100 121 Q 68 69.1, 100 17.2 Z" transform="rotate(-22 100 121)"/>
+        <path d="M 100 17.2 Q 132 69.1, 100 121 Q 68 69.1, 100 17.2 Z" transform="rotate(22 100 121)"/>
+        <path d="M 100 8.4 Q 134 64.7, 100 121 Q 66 64.7, 100 8.4 Z"/>
+      </g>
+      <circle cx="100" cy="128" r="11" fill="none" stroke="currentColor" stroke-width="1" opacity="0.7"/>
+      <text x="100" y="131.5" text-anchor="middle" font-family="Cormorant Garamond, Georgia, serif" font-size="10" font-weight="700" fill="currentColor">AI</text>
+    </symbol>
+  </defs>
+</svg>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">Ghanima · <span class="accent">Propuesta Modo Claro</span><span class="nav-badge">v1.0 · draft</span></div>
+    <div class="nav-links">
+      <a href="#rationale">Rationale</a>
+      <a href="#tokens">Tokens</a>
+      <a href="#marcas">Marcas</a>
+      <a href="#logo">Logo</a>
+      <a href="#color">Color</a>
+      <a href="#tipo">Tipografía</a>
+      <a href="#componentes">Componentes</a>
+      <a href="#voz">Voz</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ COVER ============ -->
+<header class="cover">
+  <div class="container cover-inner">
+    <svg class="lotus" style="color:var(--ink)" role="img" aria-label="Ghanima lotus outline"><use href="#lotus-outline-ink"/></svg>
+    <div class="cover-eyebrow">Ghanima Core AI · Quito · Ecuador</div>
+    <h1>Manual de Marca<br>&amp; <em>Design System</em></h1>
+    <p class="cover-sub">Propuesta de implementación en <em>modo claro</em> · Misma identidad, distinta atmósfera</p>
+    <p class="cover-meta">Versión <b>1.0</b> · Junio 2026 · Documento para validación interna</p>
+  </div>
+</header>
+
+<div class="section-divider"></div>
+
+<!-- ============ 00 RATIONALE ============ -->
+<section class="section" id="rationale">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">00.</span>
+      <h2>Por qué <em>modo claro</em></h2>
+      <span class="sec-kicker">Rationale · decisiones y trade-offs</span>
+    </div>
+    <p class="lede reveal d1">El modo oscuro es la atmósfera primaria de Ghanima — superficie nocturna, oro y púrpura, loto a color. Esta propuesta extiende la <strong>misma identidad</strong> a un contexto de impresión y lectura diurna sin traicionar el sistema: <strong>mismas familias tipográficas, mismo grid, misma geometría del loto, misma jerarquía de opacidades</strong>. Lo que cambia es la luz, no la firma.</p>
+
+    <div class="rationale reveal d2">
+      <div class="col">
+        <h5>01 · Lona y luz</h5>
+        <p><b>Porcelana fría (#EEF1F4)</b> en lugar del cream óseo. Nos aleja del look Claude Code / v0 / Lovable y nos acerca al de un reporte de banco central. El oro gana contraste por <b>oposición térmica</b>: cálido sobre base fría.</p>
+      </div>
+      <div class="col">
+        <h5>02 · Regla de marca intacta</h5>
+        <p>El loto a color <b>jamás</b> vive sobre papel claro. Aquí se usa exclusivamente la versión <b>outline</b>, igual que en papelería, contratos y presentaciones corporativas del cliente.</p>
+      </div>
+      <div class="col">
+        <h5>03 · Oro tipográfico</h5>
+        <p><b>#D4AF37</b> se conserva como acento gráfico, pero para texto y CTAs se introduce <b>--gold-deep (#8A6A18)</b>: mismo ADN cromático, contraste <b>AA Large</b> sobre papel.</p>
+      </div>
+    </div>
+
+    <div class="sub-label reveal">Cuándo usar cada modo</div>
+    <div class="grid-2">
+      <div class="rule ok reveal"><span><b>Modo oscuro (original):</b> interfaces digitales, hero institucional, experiencias de marca, sitios de marketing, documentos nocturnos.</span></div>
+      <div class="rule ok reveal d1"><span><b>Modo claro (esta propuesta):</b> propuestas impresas y PDFs, whitepapers, contratos, presentaciones a clientes financieros, reportes trimestrales, dashboards de día.</span></div>
+      <div class="rule ok reveal"><span><b>Ambos a la vez:</b> light para lectura, dark para inmersión. Mismas voces, mismo ADN.</span></div>
+      <div class="rule no reveal d1"><span><b>No mezclar en una misma pieza:</b> o el documento respira oscuro o respira claro. La mezcla destruye el mood.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 01 TOKENS · MAPA DARK→LIGHT ============ -->
+<section class="section alt" id="tokens">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">01.</span>
+      <h2>Mapa de <em>tokens</em></h2>
+      <span class="sec-kicker">dark → light · inversión de roles</span>
+    </div>
+    <p class="lede reveal d1">El nombre del token describe el <strong>color</strong>, no el rol. Por eso la misma variable sirve para dos atmosferas: en oscuro <code>--ink</code> es fondo, en claro es texto. La jerarquía de opacidades (100% / 70% / 45%) se mantiene, lo que hace que tipografía, espaciado y ritmo respiren igual.</p>
+    <div class="reveal" style="overflow-x:auto">
+      <table class="map">
+        <thead>
+          <tr><th>Token</th><th>Valor · Modo Oscuro</th><th>Valor · Modo Claro</th><th>Justificación</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>--ink</td><td><span class="chip" style="background:#0A0A0B"></span>#0A0A0B · fondo</td><td><span class="chip" style="background:#0A0A0B"></span>#0A0A0B · texto</td><td>Inversión de rol pura. Color idéntico, uso invertido.</td></tr>
+          <tr><td>--bone</td><td><span class="chip" style="background:#F4F1E8"></span>#F4F1E8 · texto</td><td><span class="chip" style="background:#EEF1F4"></span>#EEF1F4 · lona</td><td>Se reasignó el hex hacia porcelana fría para diferenciar del look cream trending.</td></tr>
+          <tr><td>--bone-2</td><td><span class="chip" style="background:#E8E3D3"></span>#E8E3D3 · cita</td><td><span class="chip" style="background:#DDE3EA"></span>#DDE3EA · sección alt</td><td>Se reasigna como "sección alterna" fría, sigue al paper en la misma dirección cromática.</td></tr>
+          <tr><td>--gold</td><td><span class="chip" style="background:#D4AF37"></span>#D4AF37</td><td><span class="chip" style="background:#D4AF37"></span>#D4AF37 · ornamental</td><td>Se conserva para grandes superficies, ornamentos y glows.</td></tr>
+          <tr><td>--gold-deep</td><td><span class="chip" style="background:#9C7F22"></span>#9C7F22</td><td><span class="chip" style="background:#8A6A18"></span>#8A6A18 · texto/CTAs</td><td>Se aterriza un punto más para uso tipográfico (AA Large).</td></tr>
+          <tr><td>--gold-bright</td><td><span class="chip" style="background:#E5C158"></span>#E5C158</td><td><span class="chip" style="background:#B8941F"></span>#B8941F · hover</td><td>Hover y foco sobre papel. Misma familia, mayor densidad.</td></tr>
+          <tr><td>--green</td><td><span class="chip" style="background:#3CE69C"></span>#3CE69C</td><td><span class="chip" style="background:#2BB07A"></span>#2BB07A · CTA Apps</td><td>El neón se apaga un punto: más legible, misma energía.</td></tr>
+          <tr><td>--orange</td><td><span class="chip" style="background:#FF7A29"></span>#FF7A29</td><td><span class="chip" style="background:#E25E10"></span>#E25E10 · CTA Boost</td><td>Mismo principio que verde. Contraste AA sobre bone.</td></tr>
+          <tr><td>--copper</td><td><span class="chip" style="background:#C58D5C"></span>#C58D5C</td><td><span class="chip" style="background:#B07A4A"></span>#B07A4A · núcleo Apps</td><td>Se aterriza para uso como acento secundario.</td></tr>
+          <tr><td>--plum</td><td><span class="chip" style="background:#4A2E5F"></span>#4A2E5F</td><td><span class="chip" style="background:#4A2E5F"></span>#4A2E5F · tints</td><td>Hex idéntico. Se usa como tinte de fondo (rgba .07) o núcleo Core.</td></tr>
+          <tr><td>--navy</td><td><span class="chip" style="background:#081428"></span>#081428 · Apps/Boost</td><td><span class="chip" style="background:#FFFFFF"></span>#FFFFFF · Apps/Boost</td><td>Apps y Boost se distinguen por acento, no por fondo oscuro.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 02 MARCAS ============ -->
+<section class="section" id="marcas">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">02.</span>
+      <h2>Sistema de <em>tres marcas</em></h2>
+      <span class="sec-kicker">Core AI · Apps · Boost</span>
+    </div>
+    <p class="lede reveal d1">Un mismo loto, tres encarnaciones. La geometría de pétalos y la posición del núcleo <strong>nunca cambian</strong>; aquí todas las versiones son <strong>outline</strong> por la regla de marca, y se distinguen únicamente por el color del trazo y el acento seccional.</p>
+    <div class="grid-3">
+      <article class="brand-card core reveal">
+        <svg class="lotus" style="color:var(--gold-deep)" role="img" aria-label="Loto Core AI outline"><use href="#lotus-outline-ink"/></svg>
+        <div class="roman">I.</div>
+        <h4>Core AI</h4>
+        <p>Consultoría estratégica institucional. C-level, banca y seguros.</p>
+        <dl class="brand-meta">
+          <div><dt>Loto</dt><dd>Outline oro<span class="chip" style="background:#8A6A18"></span></dd></div>
+          <div><dt>Acento</dt><dd>Oro profundo<span class="chip" style="background:#8A6A18"></span></dd></div>
+          <div><dt>Fondo</dt><dd>Paper + tinte oro<span class="chip" style="background:#EEF1F4;border-color:var(--gold-line)"></span></dd></div>
+          <div><dt>Email</dt><dd>institucional@ghanima-ai.com</dd></div>
+        </dl>
+      </article>
+      <article class="brand-card apps reveal d1">
+        <svg class="lotus" style="color:var(--green-deep)" role="img" aria-label="Loto Apps outline"><use href="#lotus-outline-ink"/></svg>
+        <div class="roman">II.</div>
+        <h4>Apps</h4>
+        <p>Soluciones empresariales B2B con IA. CTOs y gerencia técnica.</p>
+        <dl class="brand-meta">
+          <div><dt>Loto</dt><dd>Outline verde<span class="chip" style="background:#2BB07A"></span></dd></div>
+          <div><dt>Acento</dt><dd>Verde + cobre<span class="chip" style="background:#B07A4A"></span></dd></div>
+          <div><dt>Fondo</dt><dd>White + tinte verde<span class="chip" style="background:#FFFFFF;border-color:var(--line-1)"></span></dd></div>
+          <div><dt>Email</dt><dd>contacto@ghanima-ai.com</dd></div>
+        </dl>
+      </article>
+      <article class="brand-card boost reveal d2">
+        <svg class="lotus" style="color:var(--green-deep)" role="img" aria-label="Loto Boost outline"><use href="#lotus-outline-ink"/></svg>
+        <div class="roman">III.</div>
+        <h4>Boost</h4>
+        <p>Crecimiento con IA para PYMEs, emprendedores y emprendimientos.</p>
+        <dl class="brand-meta">
+          <div><dt>Loto</dt><dd>Outline verde<span class="chip" style="background:#2BB07A"></span></dd></div>
+          <div><dt>Acento</dt><dd>Verde + naranja<span class="chip" style="background:#E25E10"></span></dd></div>
+          <div><dt>Fondo</dt><dd>White + tinte naranja<span class="chip" style="background:#FFFFFF;border-color:var(--line-1)"></span></dd></div>
+          <div><dt>Email</dt><dd>hola@ghanima-ai.com</dd></div>
+        </dl>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 03 LOGO ============ -->
+<section class="section alt" id="logo">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">03.</span>
+      <h2>Loto sobre <em>papel</em></h2>
+      <span class="sec-kicker">Outline es la única forma válida en claro</span>
+    </div>
+    <p class="lede reveal d1">En modo claro el loto a color está prohibido. La versión <strong>outline</strong> en el color de marca es la única firma válida. En este sistema se entrega en <strong>tres colores</strong> (oro, verde, naranja) y un <strong>negro institucional</strong> para piezas mixtas.</p>
+
+    <div class="logo-stage reveal">
+      <div class="logo-tile">
+        <span class="lbl">01 · Gold deep</span>
+        <svg class="lotus" style="color:var(--gold-deep)"><use href="#lotus-outline-ink"/></svg>
+      </div>
+      <div class="logo-tile">
+        <span class="lbl">02 · Green deep</span>
+        <svg class="lotus" style="color:var(--green-deep)"><use href="#lotus-outline-ink"/></svg>
+      </div>
+      <div class="logo-tile">
+        <span class="lbl">03 · Orange deep</span>
+        <svg class="lotus" style="color:var(--orange-deep)"><use href="#lotus-outline-ink"/></svg>
+      </div>
+      <div class="logo-tile">
+        <span class="lbl">04 · Ink (mixto)</span>
+        <svg class="lotus" style="color:var(--ink)"><use href="#lotus-outline-ink"/></svg>
+      </div>
+      <div class="logo-tile">
+        <span class="lbl">05 · Copper (Apps)</span>
+        <svg class="lotus" style="color:var(--copper-deep)"><use href="#lotus-outline-ink"/></svg>
+      </div>
+      <div class="logo-tile dark">
+        <span class="lbl" style="color:rgba(244,241,232,.5)">06 · Inverted (reservado)</span>
+        <svg class="lotus" style="color:var(--gold)"><use href="#lotus-outline-ink"/></svg>
+      </div>
+    </div>
+
+    <div class="sub-label reveal">Área de protección y restricciones</div>
+    <div class="grid-2">
+      <div class="rule ok reveal"><span><b>Espacio libre mínimo:</b> equivalente a la altura del núcleo del loto, en los cuatro lados. Mismo sistema que en oscuro.</span></div>
+      <div class="rule ok reveal d1"><span><b>Sobre fondo claro:</b> usar exclusivamente la versión outline del color de marca. Nunca loto a color.</span></div>
+      <div class="rule no reveal"><span><b>No mezclar acentos:</b> el naranja (Boost) y el cobre (Apps) jamás conviven en un mismo logo o pieza.</span></div>
+      <div class="rule no reveal d1"><span><b>No recolorear libremente:</b> solo los seis colores listados arriba. No se inventan tonos intermedios.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 04 COLOR ============ -->
+<section class="section" id="color">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">04.</span>
+      <h2>Paleta de <em>color</em></h2>
+      <span class="sec-kicker">Tokens CSS · modo claro</span>
+    </div>
+    <p class="lede reveal d1">La paleta es la misma del manual original, <strong>reencarnada</strong> sobre papel. El oro sigue siendo la voz institucional; el verde y el naranja siguen siendo acentos seccionales; el púrpura se usa exclusivamente como tinte de fondo o núcleo Core, nunca como texto.</p>
+
+    <div class="sub-label reveal">Lona y superficies</div>
+    <div class="grid-4">
+      <div class="swatch reveal"><div class="swatch-color" style="background:#EEF1F4"></div><div class="swatch-body"><div class="swatch-name">Paper</div><div class="swatch-hex">--paper · #EEF1F4</div><div class="swatch-use">Lona principal. Porcelana fría con leve sesgo azulado.</div></div></div>
+      <div class="swatch reveal d1"><div class="swatch-color" style="background:#DDE3EA"></div><div class="swatch-body"><div class="swatch-name">Bone BG 2</div><div class="swatch-hex">--bone-bg-2 · #DDE3EA</div><div class="swatch-use">Sección alterna. Gris azulado, distingue bloques a lo largo del documento.</div></div></div>
+      <div class="swatch reveal d2"><div class="swatch-color" style="background:#FFFFFF"></div><div class="swatch-body"><div class="swatch-name">Surface</div><div class="swatch-hex">--surface · #FFFFFF</div><div class="swatch-use">Tarjetas, demos, componentes. Ex --ink-2.</div></div></div>
+      <div class="swatch reveal d3"><div class="swatch-color" style="background:#0A0A0B"></div><div class="swatch-body"><div class="swatch-name">Ink BG</div><div class="swatch-hex">--ink-bg · #0A0A0B</div><div class="swatch-use">Reservado para inserciones "inverted" puntuales.</div></div></div>
+    </div>
+
+    <div class="sub-label reveal">Texto · Tinta</div>
+    <div class="grid-4">
+      <div class="swatch reveal"><div class="swatch-color" style="background:#0A0A0B"></div><div class="swatch-body"><div class="swatch-name">Ink</div><div class="swatch-hex">--ink · #0A0A0B</div><div class="swatch-use">Títulos y cuerpo principal.</div></div></div>
+      <div class="swatch reveal d1"><div class="swatch-color" style="background:#1C1C20"></div><div class="swatch-body"><div class="swatch-name">Ink 2</div><div class="swatch-hex">--ink-2 · #1C1C20</div><div class="swatch-use">Texto editorial destacado, citas.</div></div></div>
+      <div class="swatch reveal d2" style="background-image:linear-gradient(135deg,#0A0A0B 25%,transparent 25%,transparent 50%,#0A0A0B 50%,#0A0A0B 75%,transparent 75%);background-size:14px 14px"><div class="swatch-color" style="background:rgba(10,10,11,.72)"></div><div class="swatch-body"><div class="swatch-name">Ink 3</div><div class="swatch-hex">rgba(10,10,11,.72)</div><div class="swatch-use">Cuerpo secundario.</div></div></div>
+      <div class="swatch reveal d3" style="background-image:linear-gradient(135deg,#0A0A0B 25%,transparent 25%,transparent 50%,#0A0A0B 50%,#0A0A0B 75%,transparent 75%);background-size:14px 14px"><div class="swatch-color" style="background:rgba(10,10,11,.48)"></div><div class="swatch-body"><div class="swatch-name">Ink 4</div><div class="swatch-hex">rgba(10,10,11,.48)</div><div class="swatch-use">Etiquetas, metadatos, placeholders.</div></div></div>
+    </div>
+
+    <div class="sub-label reveal">Institucional · Oro</div>
+    <div class="grid-4">
+      <div class="swatch reveal"><div class="swatch-color" style="background:#D4AF37"></div><div class="swatch-body"><div class="swatch-name">Gold</div><div class="swatch-hex">--gold · #D4AF37</div><div class="swatch-use">Ornamental. Ornamentos geométricos, glows.</div></div></div>
+      <div class="swatch reveal d1"><div class="swatch-color" style="background:#B8941F"></div><div class="swatch-body"><div class="swatch-name">Gold Bright</div><div class="swatch-hex">--gold-bright · #B8941F</div><div class="swatch-use">Hover / foco sobre papel. Ligeramente más denso.</div></div></div>
+      <div class="swatch reveal d2"><div class="swatch-color" style="background:#8A6A18"></div><div class="swatch-body"><div class="swatch-name">Gold Deep</div><div class="swatch-hex">--gold-deep · #8A6A18</div><div class="swatch-use">Texto institucional, CTAs, kickers. Pasa AA Large.</div></div></div>
+      <div class="swatch reveal d3"><div class="swatch-color" style="background:#4A2E5F"></div><div class="swatch-body"><div class="swatch-name">Plum</div><div class="swatch-hex">--plum · #4A2E5F</div><div class="swatch-use">Tinte atmosférico y núcleo Core. Nunca texto.</div></div></div>
+    </div>
+
+    <div class="sub-label reveal">Acentos seccionales</div>
+    <div class="grid-4">
+      <div class="swatch reveal"><div class="swatch-color" style="background:#2BB07A"></div><div class="swatch-body"><div class="swatch-name">Green</div><div class="swatch-hex">--green · #2BB07A</div><div class="swatch-use">Acento Apps/Boost. Checks, CTAs Apps.</div></div></div>
+      <div class="swatch reveal d1"><div class="swatch-color" style="background:#B07A4A"></div><div class="swatch-body"><div class="swatch-name">Copper</div><div class="swatch-hex">--copper · #B07A4A</div><div class="swatch-use">Secundario Apps. Núcleo del loto Apps.</div></div></div>
+      <div class="swatch reveal d2"><div class="swatch-color" style="background:#E25E10"></div><div class="swatch-body"><div class="swatch-name">Orange</div><div class="swatch-hex">--orange · #E25E10</div><div class="swatch-use">Acento Boost. Pricing, ribbons, CTAs Boost.</div></div></div>
+      <div class="swatch reveal d3"><div class="swatch-color" style="background:#16724F"></div><div class="swatch-body"><div class="swatch-name">Green Deep</div><div class="swatch-hex">--green-deep · #16724F</div><div class="swatch-use">Texto y elementos críticos Apps/Boost.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 05 TIPOGRAFÍA ============ -->
+<section class="section alt" id="tipo">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">05.</span>
+      <h2>Sistema <em>tipográfico</em></h2>
+      <span class="sec-kicker">3 voces · idénticas al original</span>
+    </div>
+    <p class="lede reveal d1">La elección tipográfica no cambia. Cormorant Garamond conserva su autoridad editorial, Manrope su claridad humanista y JetBrains Mono su precisión técnica. Solo cambia el <strong>color</strong> del texto: tinta sobre papel en lugar de hueso sobre negro.</p>
+
+    <div class="specimen reveal">
+      <div class="label">Cormorant Garamond · Display <span>400 / 500 itálica · títulos, citas, numerales romanos</span></div>
+      <p class="spec-display">La inteligencia artificial como <em>decisión estratégica</em>.</p>
+    </div>
+    <div class="specimen reveal d1">
+      <div class="label">Manrope · Body <span>300 / 400 / 500 / 600 · cuerpo, ledes, cards</span></div>
+      <p class="spec-body">Acompañamos a organizaciones — desde comités ejecutivos de banca y seguros hasta emprendimientos locales — en el diseño, gobierno e implementación de capacidades de inteligencia artificial.</p>
+    </div>
+    <div class="specimen reveal d2">
+      <div class="label">JetBrains Mono · Técnica <span>500 / 600 · kickers, etiquetas, números, botones</span></div>
+      <p class="spec-mono">Strategic AI Practice · Quito · Ecuador → 01 · Descubrimiento</p>
+    </div>
+    <div class="specimen inverted reveal d3">
+      <div class="label">Reverso · display sobre ink <span>uso reservado: inserciones puntuales</span></div>
+      <p class="spec-display">Lectura nocturna, <em>firma de autor</em>.</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 06 COMPONENTES ============ -->
+<section class="section" id="componentes">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">06.</span>
+      <h2>Biblioteca de <em>componentes</em></h2>
+      <span class="sec-kicker">Patrones de producción · modo claro</span>
+    </div>
+
+    <div class="demo reveal">
+      <span class="demo-label">Botones</span>
+      <div style="display:flex;gap:1.25rem;flex-wrap:wrap;align-items:center">
+        <button class="btn-gold">Agendar sesión</button>
+        <button class="btn-ghost">Agendar →</button>
+        <button class="btn-accent">Solicitar Descubrimiento</button>
+        <button class="btn-accent boost">Empezar este mes</button>
+      </div>
+      <p class="demo-note">CTA oro = institucional. Ghost = navegación. Botones sólidos verde/naranja = formularios Apps/Boost; texto blanco sobre acento.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="demo bone reveal">
+        <span class="demo-label">Form field · sobre lona</span>
+        <div class="demo-field">
+          <label for="dm-email">Email corporativo</label>
+          <input id="dm-email" type="email" placeholder="nombre@empresa.com">
+        </div>
+        <p class="demo-note">Inputs transparentes con solo borde inferior. Focus = borde al color del acento de la sección.</p>
+      </div>
+      <div class="demo reveal d1">
+        <span class="demo-label">Timeline step · sobre surface</span>
+        <div class="demo-step">
+          <div class="n">02 · Prototipo en 5 días</div>
+          <h5>Usted lo toca, valida, ajusta</h5>
+          <p>Punto de 9px con halo del fondo sobre línea hairline superior.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="demo reveal">
+        <span class="demo-label">Pricing tier · featured</span>
+        <div class="demo-tier">
+          <div class="ribbon">Más popular</div>
+          <div class="t-name">Plan Cosecha</div>
+          <div><span class="t-price">$125</span> <span class="t-unit">/ mes</span></div>
+        </div>
+      </div>
+      <div class="demo reveal d1">
+        <span class="demo-label">Card con acento</span>
+        <article class="card" style="--accent:var(--green-deep);max-width:380px">
+          <div class="tag">Filosofía</div>
+          <h4>AI-First</h4>
+          <p>Numeral romano en itálica serif, kicker mono, título serif al color del acento, cuerpo en Manrope 300.</p>
+        </article>
+      </div>
+    </div>
+
+    <div class="demo inverted reveal">
+      <span class="demo-label">Botón sobre bloque invertido (uso reservado)</span>
+      <div style="display:flex;gap:1.25rem;flex-wrap:wrap;align-items:center">
+        <button class="btn-gold">Volver al modo oscuro</button>
+        <button class="btn-ghost" style="border-color:var(--gold);color:var(--gold)">Descargar PDF →</button>
+      </div>
+      <p class="demo-note">Bloques invertidos solo se justifican para inserciones puntuales (CTAs sobre fotografías, portadas de sección, llamadas a la acción críticas).</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 07 LAYOUT / ATMÓSFERA ============ -->
+<section class="section alt">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">07.</span>
+      <h2>Layout &amp; <em>atmósfera</em></h2>
+      <span class="sec-kicker">Escala idéntica · texturas adaptadas</span>
+    </div>
+    <p class="lede reveal d1">El espaciado, el grid y la regla de esquinas rectas se conservan 1:1. Lo que cambia es la atmósfera: el grano pasa a <strong>multiply</strong>, los glows se vuelven <strong>lavados suaves</strong> con baja opacidad y los ornamentos geométricos se imprimen en oro profundo, no en oro claro.</p>
+    <div class="grid-2">
+      <div class="reveal">
+        <div class="sub-label" style="margin-top:0">Escala de espaciado</div>
+        <div class="space-row"><span class="space-token">--s-1</span><span class="space-val">0.5rem · 8px</span><div class="space-bar" style="width:8px"></div></div>
+        <div class="space-row"><span class="space-token">--s-2</span><span class="space-val">1rem · 16px</span><div class="space-bar" style="width:16px"></div></div>
+        <div class="space-row"><span class="space-token">--s-3</span><span class="space-val">1.5rem · 24px</span><div class="space-bar" style="width:24px"></div></div>
+        <div class="space-row"><span class="space-token">--s-4</span><span class="space-val">2rem · 32px</span><div class="space-bar" style="width:32px"></div></div>
+        <div class="space-row"><span class="space-token">--s-5</span><span class="space-val">3rem · 48px</span><div class="space-bar" style="width:48px"></div></div>
+        <div class="space-row"><span class="space-token">--s-6</span><span class="space-val">4.5rem · 72px</span><div class="space-bar" style="width:72px"></div></div>
+        <div class="space-row"><span class="space-token">--s-7</span><span class="space-val">6.5rem · 104px</span><div class="space-bar" style="width:104px"></div></div>
+        <div class="space-row"><span class="space-token">--s-8</span><span class="space-val">9rem · 144px</span><div class="space-bar" style="width:144px"></div></div>
+      </div>
+      <div class="reveal d1">
+        <div class="sub-label" style="margin-top:0">Texturas y atmósfera</div>
+        <div class="grid-2" style="gap:1rem">
+          <div class="texture tx-grain"><span class="t-tag">Grain · multiply 6%</span></div>
+          <div class="texture tx-geo"><span class="t-tag">Ornamento geométrico</span></div>
+          <div class="texture tx-grid-g"><span class="t-tag">Grid 40px · Apps</span></div>
+          <div class="texture tx-grid-o"><span class="t-tag">Grid 40px · Boost</span></div>
+        </div>
+        <div class="texture tx-glow" style="margin-top:1rem"><span class="t-tag">Lavados suaves · plum + gold</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ============ 08 VOZ ============ -->
+<section class="section" id="voz">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="sec-num">08.</span>
+      <h2>Voz &amp; <em>tono</em></h2>
+      <span class="sec-kicker">Invariante — no depende del modo</span>
+    </div>
+    <p class="lede reveal d1">La voz es invariante. No cambia con el modo: <strong>español, trato de usted, beneficio antes que jerga</strong>. Lo único que se ajusta es el color del acento en la firma tipográfica: oro profundo en Core, verde profundo en Apps, naranja profundo en Boost.</p>
+    <div class="reveal" style="overflow-x:auto">
+      <table class="voice-table">
+        <thead><tr><th>Marca</th><th>Registro</th><th>Ejemplo de titular</th><th>Firma email</th></tr></thead>
+        <tbody>
+          <tr><td class="c-core">Core AI</td><td>Institucional, sobrio, editorial. Habla de riesgo, trazabilidad y retorno.</td><td>«La inteligencia artificial como decisión estratégica, no como experimento.»</td><td>institucional@</td></tr>
+          <tr><td class="c-apps">Apps</td><td>Técnico-ejecutivo, directo, orientado a validación temprana.</td><td>«Toque su producto en cinco días.»</td><td>contacto@</td></tr>
+          <tr><td class="c-boost">Boost</td><td>Cercano, concreto, alineado a resultados: ganamos cuando usted vende.</td><td>«Su negocio, vendiendo 24/7.»</td><td>hola@</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sub-label reveal">Checklist de validación — modo claro</div>
+    <div class="grid-2">
+      <div class="rule ok reveal"><span>El loto en la pieza es outline, no a color. Color = uno de los seis tokens de marca.</span></div>
+      <div class="rule ok reveal d1"><span>El oro usado en texto/CTAs es --gold-deep (#8A6A18), no --gold (#D4AF37).</span></div>
+      <div class="rule ok reveal"><span>El verde/naranja usado en CTAs Apps/Boost es la versión aterrizada (#2BB07A / #E25E10).</span></div>
+      <div class="rule ok reveal d1"><span>Los hairlines son rgba(ink, .10–.18), no rgba(bone, …).</span></div>
+      <div class="rule no reveal"><span>Loto a color (con núcleo fill) sobre papel. Solo se permite en modo oscuro.</span></div>
+      <div class="rule no reveal d1"><span>Texto blanco sobre fondo naranja (#FF7A29) o verde neón (#3CE69C) sin aterrizar: falla contraste.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="container">
+    <p class="tagline">Prosperidad · Abundancia · Buena Fortuna</p>
+    <p>© 2026 Ghanima Core AI · Adrian Cisneros Tello · Propuesta Modo Claro v1.0 · ghanima-ai.com</p>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
