@@ -1,6 +1,7 @@
 package com.sie.calificaciones.application;
 
 import com.sie.calificaciones.domain.*;
+import com.sie.calificaciones.application.event.SeccionCerradaEvent;
 import com.sie.academico.domain.Paralelo;
 import com.sie.academico.infrastructure.ParaleloRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
@@ -9,6 +10,7 @@ import com.sie.matricula.infrastructure.MatriculaRepository;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class CalificacionesService {
     private final ParaleloRepository paraleloRepository;
     private final MatriculaRepository matriculaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${app.evaluacion.max-peso-componente:40}")
     private int maxPesoComponente;
@@ -166,6 +169,15 @@ public class CalificacionesService {
         q.setParameter(1, UUID.randomUUID()); q.setParameter(2, colegioId);
         q.setParameter(3, paraleloId); q.setParameter(4, cerradoPor);
         q.executeUpdate();
+
+        // Publicar evento para notificaciones a padres
+        var estudianteIds = matriculaRepository.findByParaleloId(paraleloId).stream()
+                .map(Matricula::getEstudianteId)
+                .distinct()
+                .toList();
+        var paralelo = paraleloRepository.findById(paraleloId).orElse(null);
+        var periodoId = paralelo != null && paralelo.getPeriodo() != null ? paralelo.getPeriodo().getId() : null;
+        eventPublisher.publishEvent(new SeccionCerradaEvent(paraleloId, periodoId, estudianteIds, colegioId));
     }
 
     public boolean estaCerrada(UUID paraleloId) {

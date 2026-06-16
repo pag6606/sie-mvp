@@ -56,16 +56,25 @@ const NAV_ITEMS: Record<string, NavSection[]> = {
       ]
     },
   ],
+  padre: [
+    {
+      label: 'Mi hijo',
+      items: [
+        { label: 'Dashboard', Icon: Icons.Home, href: '/padre' },
+      ]
+    },
+  ],
 }
 
 const USER_INFO: Record<string, { initials: string; name: string; role: string }> = {
   admin: { initials: 'AD', name: 'Administrador', role: 'Administrador' },
   docente: { initials: 'DC', name: 'Docente', role: 'Docente' },
   estudiante: { initials: 'ES', name: 'Estudiante', role: 'Estudiante' },
+  padre: { initials: 'PF', name: 'Padre de Familia', role: 'Padre' },
 }
 
 interface AppLayoutProps {
-  role: 'admin' | 'docente' | 'estudiante'
+  role: 'admin' | 'docente' | 'estudiante' | 'padre'
   children: ReactNode
 }
 

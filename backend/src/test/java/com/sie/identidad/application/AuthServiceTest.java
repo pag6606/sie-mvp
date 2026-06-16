@@ -26,13 +26,15 @@ class AuthServiceTest {
     private UsuarioRepository usuarioRepository;
     @Mock
     private JwtService jwtService;
+    @Mock
+    private com.sie.identidad.infrastructure.RepresentanteRepository representanteRepository;
 
     private AuthService authService;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(4);
 
     @BeforeEach
     void setUp() {
-        authService = new AuthService(usuarioRepository, encoder, jwtService);
+        authService = new AuthService(usuarioRepository, representanteRepository, encoder, jwtService);
     }
 
     @Test

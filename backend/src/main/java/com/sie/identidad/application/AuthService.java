@@ -4,6 +4,7 @@ import com.sie.identidad.application.dto.LoginRequest;
 import com.sie.identidad.application.dto.LoginResponse;
 import com.sie.identidad.domain.RolCodigo;
 import com.sie.identidad.domain.Usuario;
+import com.sie.identidad.infrastructure.RepresentanteRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.identidad.infrastructure.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class AuthService {
 
     private final UsuarioRepository usuarioRepository;
+    private final RepresentanteRepository representanteRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -53,6 +55,13 @@ public class AuthService {
         Set<String> roles = usuario.getUsuarioRoles().stream()
                 .map(ur -> ur.getRol().getCodigo().name())
                 .collect(Collectors.toSet());
+
+        if (roles.contains("PADRE")) {
+            var representante = representanteRepository.findByUsuarioId(usuario.getId());
+            if (representante.isEmpty() || !representante.get().isActivo()) {
+                throw new IllegalArgumentException("Cuenta no activada. Solicite a la secretaría la activación de su cuenta de representante.");
+            }
+        }
 
         String token = jwtService.generateToken(usuario.getId(), usuario.getEmail(), roles, usuario.getColegioId());
 

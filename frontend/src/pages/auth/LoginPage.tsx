@@ -10,6 +10,7 @@ export function rutaPorRol(roles: string[] | undefined): string | null {
   if (!roles || roles.length === 0) return null
   if (roles.includes('ADMINISTRADOR')) return '/admin'
   if (roles.includes('DOCENTE')) return '/docente'
+  if (roles.includes('PADRE')) return '/padre'
   return '/estudiante'
 }
 

@@ -1,0 +1,28 @@
+{
+  "name": "sis-mvp",
+  "version": "1.0.0",
+  "description": "> Un SIS que se adapta a cómo trabajan administrativos y docentes — no al revés.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pag6606/sie-mvp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pag6606/sie-mvp/issues"
+  },
+  "homepage": "https://github.com/pag6606/sie-mvp#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
+  }
+}

@@ -32,14 +32,14 @@ class CalificacionesServiceTest {
 
     @Test
     void registrarAsistencia_fechaFutura_lanzaExcepcion() {
-        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository, null);
         assertThrows(IllegalArgumentException.class,
                 () -> svc.registrarAsistencia(UUID.randomUUID(), LocalDate.now().plusDays(1), List.of(), null, UUID.randomUUID()));
     }
 
     @Test
     void definirEsquema_pesosNoSuman100_lanzaExcepcion() {
-        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository, null);
         var q = mockTypedQuery();
         when(em.createQuery(any(String.class), any())).thenReturn((jakarta.persistence.TypedQuery) q);
         when(q.setParameter(any(int.class), any())).thenReturn(q);
@@ -52,28 +52,28 @@ class CalificacionesServiceTest {
 
     @Test
     void dashboardCierres_vacio() {
-        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository, null);
         when(paraleloRepository.findByPeriodoId(any())).thenReturn(List.of());
         assertTrue(svc.dashboardCierres(UUID.randomUUID()).isEmpty());
     }
 
     @Test
     void miAsistencia_vacio() {
-        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository, null);
         when(matriculaRepository.findByEstudianteId(any())).thenReturn(List.of());
         assertTrue(svc.miAsistencia(UUID.randomUUID()).isEmpty());
     }
 
     @Test
     void misNotas_vacio() {
-        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository, null);
         when(matriculaRepository.findByEstudianteId(any())).thenReturn(List.of());
         assertTrue(svc.misNotas(UUID.randomUUID()).isEmpty());
     }
 
     @Test
     void obtenerNotas_sinEsquema_retornaVacio() {
-        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository, null);
         var q = mockTypedQuery();
         when(em.createQuery(any(String.class), any())).thenReturn((jakarta.persistence.TypedQuery) q);
         when(q.setParameter(any(int.class), any())).thenReturn(q);
@@ -83,7 +83,7 @@ class CalificacionesServiceTest {
 
     @Test
     void estaCerrada_false() {
-        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository, null);
         var q = mockStoredProcedureQuery();
         when(em.createNativeQuery(any(String.class))).thenReturn(q);
         when(q.setParameter(any(int.class), any())).thenReturn(q);
