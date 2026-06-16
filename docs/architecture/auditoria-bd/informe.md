@@ -15,7 +15,7 @@
 1. **IR-01 (Crítico · Probable)** — `matriculas.estudiante_id` no tiene FK declarada hacia `usuarios.id`. Tabla transaccional central del sistema; permite matrículas huérfanas si un estudiante es eliminado por código de la app.
 2. **IR-04 (Alto · Probable)** — La columna `colegio_id` aparece en 17 tablas sin un FK declarado a una tabla `colegios` (que, además, **no existe en el esquema**). Es la única defensa de aislamiento multi-tenant y reside en la capa de aplicación: cualquier bug en la lógica de tenancy filtra datos entre colegios.
 3. **IP-01 (Alto · Confirmado)** — Cuatro columnas FK sin índice: `usuario_roles.rol_id`, `horario_sesiones.seccion_id`, `componentes_evaluacion.esquema_id`, `notas.componente_id`. JOINs inversos y borrados en el padre hacen full-scan; en PostgreSQL los FK no auto-crean índice.
-4. **IR-08 (Alto · Confirmado)** — Once columnas de estado/tipo almacenadas como `VARCHAR` sin `CHECK`, `ENUM` ni tabla catálogo (`periodos.estado`, `secciones.estado`, `matriculas.estado`, `asistencias.estado`, `docente_secciones.rol`, `consentimientos.tipo`, `consentimientos.fuente`, `notificaciones.tipo`, `log_auditoria.accion`, `outbox.event_type`, `outbox.aggregate_type`).
+4. **IR-08 (Alto · Confirmado)** — Once columnas de estado/tipo almacenadas como `VARCHAR` sin `CHECK`, `ENUM` ni tabla catálogo (`periodos.estado`, `paralelos.estado`, `matriculas.estado`, `asistencias.estado`, `docente_secciones.rol`, `consentimientos.tipo`, `consentimientos.fuente`, `notificaciones.tipo`, `log_auditoria.accion`, `outbox.event_type`, `outbox.aggregate_type`).
 5. **S-02 (Alto · Probable)** — `usuarios.activation_token VARCHAR(255)` se añadió en V9 sin columna de expiración. Si la app no limpia el token tras activación o no valida TTL, una filtración (log, backup, dump) permite takeover de cuenta indefinidamente.
 
 **Recomendación principal (1 frase):** ejecutar el bloque 1 de `remediacion.sql` (crear tabla `colegios` + agregar FKs `colegio_id` + índices en FKs) en una ventana de mantenimiento corta, y en paralelo desplegar las queries de `verificacion-datos.sql` para confirmar o descartar los 9 hallazgos *Probable* y recalibrar el score.
@@ -69,15 +69,15 @@
 
 #### IR-02 🟠🟧 — `docente_secciones.docente_id` sin FK a `usuarios.id`
 - **Objeto(s):** `docente_secciones.docente_id`
-- **Evidencia:** V3 línea 43: `docente_id UUID NOT NULL,` *(no REFERENCES)*. Contexto: la sección "Identidad" define `usuarios` y asigna roles vía `usuario_roles`; un docente es un usuario con `rol.codigo = 'DOCENTE'`.
-- **Impacto:** permite asignar un docente inexistente a una sección; un docente retirado (soft-deleted) sigue apareciendo en nóminas. Tabla transaccional.
+- **Evidencia:** V3 línea 43: `docente_id UUID NOT NULL,` *(no REFERENCES)*. Contexto: la paralelo "Identidad" define `usuarios` y asigna roles vía `usuario_roles`; un docente es un usuario con `rol.codigo = 'DOCENTE'`.
+- **Impacto:** permite asignar un docente inexistente a una paralelo; un docente retirado (soft-deleted) sigue apareciendo en nóminas. Tabla transaccional.
 - **Remediación:** bloque `IR-02` en `remediacion.sql`.
 - **Verificación:** query `IR-02` en `verificacion-datos.sql`.
 
 #### IR-03 🟠✅ — Cuatro columnas "actor" sin FK a `usuarios.id`
 - **Objeto(s):** `log_auditoria.autor_id`, `cierre_secciones.cerrado_por`, `asistencias.registrado_por`, `notas.ingresado_por`
 - **Evidencia:** V1 línea 6: `autor_id UUID NOT NULL,` · V5 línea 43: `cerrado_por UUID NOT NULL` · V5 línea 7: `registrado_por UUID,` (nullable) · V5 línea 33: `ingresado_por UUID,` (nullable). Contraste con V7 línea 12 y V8 línea 14, que sí declaran `REFERENCES usuarios(id)`.
-- **Impacto:** el log de auditoría pierde trazabilidad real si `autor_id` apunta a un usuario borrado; cierres de sección sin responsable real; en calificaciones y asistencia, "registrado por" puede referenciar a nadie. Las dos NOT NULL (`autor_id`, `cerrado_por`) son más graves que las nullable.
+- **Impacto:** el log de auditoría pierde trazabilidad real si `autor_id` apunta a un usuario borrado; cierres de paralelo sin responsable real; en calificaciones y asistencia, "registrado por" puede referenciar a nadie. Las dos NOT NULL (`autor_id`, `cerrado_por`) son más graves que las nullable.
 - **Remediación:** bloque `IR-03` en `remediacion.sql`.
 - **Verificación:** query `IR-03` en `verificacion-datos.sql` (4 subqueries de huérfanos).
 
@@ -90,27 +90,27 @@
 - **Verificación:** query `IR-04` en `verificacion-datos.sql` (huérfanos por tabla).
 
 #### IR-05 🟠🟧 — Faltan UNIQUE en identificadores de negocio
-- **Objeto(s):** `secciones.codigo`, `componentes_evaluacion(esquema_id, nombre)`, `esquema_evaluacion.seccion_id`
+- **Objeto(s):** `paralelos.codigo`, `componentes_evaluacion(esquema_id, nombre)`, `esquema_evaluacion.seccion_id`
 - **Evidencia:**
-  - V3 línea 32: `codigo VARCHAR(50) NOT NULL,` *(no UNIQUE)* en `secciones`
+  - V3 línea 32: `codigo VARCHAR(50) NOT NULL,` *(no UNIQUE)* en `paralelos`
   - V5 líneas 21-24: `componentes_evaluacion` sin UNIQUE compuesto
   - V5 líneas 13-17: `esquema_evaluacion.seccion_id` no es UNIQUE (a diferencia de `cierre_secciones.seccion_id` que sí lo es)
-- **Impacto:** dos secciones con el mismo código en el mismo período/curso confunden reportes; dos componentes de evaluación con el mismo nombre en el mismo esquema generan promedios ambiguos; múltiples esquemas de evaluación para la misma sección fragmentan el cálculo de notas.
+- **Impacto:** dos paralelos con el mismo código en el mismo período/curso confunden reportes; dos componentes de evaluación con el mismo nombre en el mismo esquema generan promedios ambiguos; múltiples esquemas de evaluación para la misma paralelo fragmentan el cálculo de notas.
 - **Remediación:** bloque `IR-05` en `remediacion.sql`.
 - **Verificación:** query `IR-05` en `verificacion-datos.sql` (duplicados por agrupamiento).
 
 #### IR-06 🟡🟧 — Falta UNIQUE en `docente_secciones(seccion_id, docente_id, rol)`
 - **Objeto(s):** `docente_secciones`
 - **Evidencia:** V3 líneas 40-45. La PK es `id UUID` sintético; no hay constraint sobre la terna natural.
-- **Impacto:** un docente puede aparecer N veces asignado a la misma sección con el mismo rol (e.g. inserción duplicada por bug de UI), contando varias veces en nóminas o asistencia.
+- **Impacto:** un docente puede aparecer N veces asignado a la misma paralelo con el mismo rol (e.g. inserción duplicada por bug de UI), contando varias veces en nóminas o asistencia.
 - **Remediación:** bloque `IR-06` en `remediacion.sql`.
 - **Verificación:** query `IR-06` en `verificacion-datos.sql`.
 
 #### IR-07 🟡✅ — Faltan CHECK constraints de dominio
 - **Objeto(s) y reglas faltantes:**
   - `periodos`: `CHECK (fecha_fin > fecha_inicio)`, `CHECK (peso_quimestre BETWEEN 0 AND 100)`, `CHECK (fecha_cierre_q1 BETWEEN fecha_inicio AND fecha_fin)`, `CHECK (fecha_cierre_q2 BETWEEN fecha_inicio AND fecha_fin)`
-  - `cursos.creditos`: `CHECK (creditos > 0)`
-  - `secciones.capacidad`: `CHECK (capacidad > 0)`
+  - `asignaturas.horas_semanales`: `CHECK (horas_semanales > 0 AND horas_semanales <= 40)`
+  - `paralelos.capacidad`: `CHECK (capacidad > 0)`
   - `horario_sesiones`: `CHECK (hora_fin > hora_inicio)`
   - `componentes_evaluacion.peso_porcentaje`: `CHECK (peso_porcentaje BETWEEN 0 AND 100)`
   - `consentimientos`: `CHECK (fecha_revocacion IS NULL OR fecha_revocacion >= fecha_otorgamiento)`
@@ -122,7 +122,7 @@
 #### IR-08 🟠✅ — Once columnas de estado/tipo sin `CHECK`/catálogo
 - **Objeto(s):**
   - `periodos.estado` (V3)
-  - `secciones.estado` (V3)
+  - `paralelos.estado` (V3)
   - `matriculas.estado` (V4)
   - `asistencias.estado` (V5)
   - `docente_secciones.rol` (V3)
@@ -154,12 +154,12 @@
 - **Remediación:** evaluar extracción a tabla `representantes(id, colegio_id, cedula, nombre, email, telefono)` con FK desde `consentimientos.representante_id`. Anotar en `remediacion.sql` como **decisión de diseño** con DDL sugerido, pero NO ejecutar sin confirmar con product owner.
 - **Verificación:** query `N-01` en `verificacion-datos.sql` (¿hay representantes con múltiples consentimientos?).
 
-#### N-02 🟡🟧 — `cierre_secciones.colegio_id` desnormalizado de `secciones.colegio_id`
+#### N-02 🟡🟧 — `cierre_secciones.colegio_id` desnormalizado de `paralelos.colegio_id`
 - **Objeto(s):** `cierre_secciones`
-- **Evidencia:** V5 líneas 39-44. El campo `colegio_id` siempre puede derivarse vía `JOIN secciones ON secciones.id = cierre_secciones.seccion_id`.
-- **Impacto:** el `colegio_id` puede drift (e.g. si en una migración se mueve una sección a otro colegio, el cierre histórico queda con el colegio original; o al revés, si se actualiza incorrectamente el cierre sin tocar la sección, queda inconsistente). `cerrado_por` en cambio sí es snapshot legítimo.
-- **Remediación:** bloque `N-02` en `remediacion.sql`: trigger `BEFORE INSERT OR UPDATE` que sincronice `colegio_id` desde la sección, o columna generada. **No eliminar** sin un análisis de consultas existentes.
-- **Verificación:** query `N-02` en `verificacion-datos.sql` (¿hay cierres cuyo `colegio_id` no coincide con el de su sección?).
+- **Evidencia:** V5 líneas 39-44. El campo `colegio_id` siempre puede derivarse vía `JOIN paralelos ON paralelos.id = cierre_secciones.seccion_id`.
+- **Impacto:** el `colegio_id` puede drift (e.g. si en una migración se mueve una paralelo a otro colegio, el cierre histórico queda con el colegio original; o al revés, si se actualiza incorrectamente el cierre sin tocar la paralelo, queda inconsistente). `cerrado_por` en cambio sí es snapshot legítimo.
+- **Remediación:** bloque `N-02` en `remediacion.sql`: trigger `BEFORE INSERT OR UPDATE` que sincronice `colegio_id` desde la paralelo, o columna generada. **No eliminar** sin un análisis de consultas existentes.
+- **Verificación:** query `N-02` en `verificacion-datos.sql` (¿hay cierres cuyo `colegio_id` no coincide con el de su paralelo?).
 
 #### N-03 🟡🟧 — `notas.fecha_ingreso` vs `notas.created_at` redundantes
 - **Objeto(s):** `notas.fecha_ingreso`, `notas.created_at`
@@ -188,13 +188,13 @@
 #### IP-01 🟠✅ — Cuatro FKs sin índice en columnas referenciantes
 - **Objeto(s):**
   - `usuario_roles.rol_id` (FK a `roles.id`, V2)
-  - `horario_sesiones.seccion_id` (FK a `secciones.id`, V3)
+  - `horario_sesiones.seccion_id` (FK a `paralelos.id`, V3)
   - `componentes_evaluacion.esquema_id` (FK a `esquema_evaluacion.id`, V5)
   - `notas.componente_id` (FK a `componentes_evaluacion.id`, V5)
 - **Evidencia:** ninguna migración crea un índice explícito sobre estas columnas.
 - **Impacto:**
   - "Listar todos los usuarios con rol X" hace seq scan sobre `usuario_roles`.
-  - "Horario de la sección Y" hace seq scan sobre `horario_sesiones` (tabla que crece con el calendario académico).
+  - "Horario de la paralelo Y" hace seq scan sobre `horario_sesiones` (tabla que crece con el calendario académico).
   - Borrar un esquema de evaluación obliga a verificar la existencia de `componentes_evaluacion` con lock sobre toda la tabla.
   - El equipo de calificaciones con cientos de miles de `notas` sufrirá más en queries por `componente_id` (e.g. "todos los exámenes parciales rendidos").
 - **Remediación:** bloque `IP-01` en `remediacion.sql` (cuatro `CREATE INDEX` con `CONCURRENTLY`).
@@ -265,7 +265,7 @@
 - **Remediación:** documentar la convención y, en una refactorización mayor, unificar. La propuesta mínima es: prefijo del rol (`docente_id`, `estudiante_id`, `autor_id`) cuando el rol es semánticamente distinto; sufijo `_usuario_id` cuando es "cualquier usuario que hizo X". Anotar en `remediacion.sql` como bloque informativo — **no ejecutar renames sin coordinación con la app**.
 
 #### NC-02 🟡✅ — `codigo` con semántica de unicidad inconsistente
-- **Objeto(s):** `roles.codigo` UNIQUE, `cursos.codigo` UNIQUE, `periodos.codigo` UNIQUE, `secciones.codigo` NOT UNIQUE.
+- **Objeto(s):** `roles.codigo` UNIQUE, `asignaturas.codigo` UNIQUE, `periodos.codigo` UNIQUE, `paralelos.codigo` NOT UNIQUE.
 - **Evidencia:** V2 línea 20, V3 líneas 4 y 17, V3 línea 32.
 - **Impacto:** confunde al desarrollador que asume que "todos los códigos son únicos" cuando en realidad la unicidad depende del scope.
 - **Remediación:** documentar en comentarios de tabla o renombrar (`codigo_rol`, `codigo_curso`, `codigo_periodo`, `codigo_seccion`).
@@ -273,10 +273,10 @@
 #### NC-03 🔵✅ — Convención positiva: nombres de constraints explícitos
 - **Objeto(s):** `uq_usuarios_email_colegio`, `uq_matricula`, `uq_asistencia_dia`, `uq_nota`, `fk_notificaciones_usuario`, `fk_consentimiento_estudiante`.
 - **Evidencia:** V2 línea 12, V4 línea 12, V5 líneas 9 y 35, V7 línea 12, V8 línea 14.
-- **Anotado como fortaleza** (sección 3).
+- **Anotado como fortaleza** (paralelo 3).
 
 #### NC-04 🔵✅ — Naming snake_case + plural + español consistente
-- Ver sección 3 — fortaleza.
+- Ver paralelo 3 — fortaleza.
 
 ---
 
@@ -369,22 +369,22 @@
 | `roles`                  | V2        | bajo                    | `id UUID`        | *(referenciada por 1)*                                                                  | *(implícito por UNIQUE codigo)*                                                                              | NO          | NO                    |
 | `usuario_roles`          | V2        | medio                   | `(usuario_id, rol_id)` | `usuario_id→usuarios`, `rol_id→roles`                                                  | *(falta índice en `rol_id`)*                                                                                 | NO          | NO                    |
 | `periodos`               | V3 + V13  | bajo                    | `id UUID`        | *(referenciada por 2)*                                                                  | *(implícito por UNIQUE codigo)*                                                                              | SÍ          | SÍ                    |
-| `cursos`                 | V3        | bajo                    | `id UUID`        | *(referenciada por 1)*                                                                  | *(implícito por UNIQUE codigo)*                                                                              | SÍ          | SÍ                    |
-| `secciones`              | V3        | medio                   | `id UUID`        | `curso_id→cursos`, `periodo_id→periodos`                                                | `idx_secciones_periodo(periodo_id)`, `idx_secciones_curso(curso_id)`                                        | SÍ          | SÍ                    |
-| `docente_secciones`      | V3        | medio                   | `id UUID`        | `seccion_id→secciones`                                                                  | *(ninguno)*                                                                                                 | NO          | NO                    |
-| `horario_sesiones`       | V3        | alto                    | `id UUID`        | `seccion_id→secciones`                                                                  | *(falta índice en `seccion_id`)*                                                                             | NO          | NO                    |
-| `matriculas`             | V4        | alto                    | `id UUID`        | `seccion_id→secciones`                                                                  | `idx_matriculas_estudiante(estudiante_id)`, `idx_matriculas_seccion(seccion_id)`, `uq_matricula`            | SÍ          | SÍ                    |
+| `asignaturas`                 | V3        | bajo                    | `id UUID`        | *(referenciada por 1)*                                                                  | *(implícito por UNIQUE codigo)*                                                                              | SÍ          | SÍ                    |
+| `paralelos`              | V3        | medio                   | `id UUID`        | `curso_id→asignaturas`, `periodo_id→periodos`                                                | `idx_secciones_periodo(periodo_id)`, `idx_secciones_curso(curso_id)`                                        | SÍ          | SÍ                    |
+| `docente_secciones`      | V3        | medio                   | `id UUID`        | `seccion_id→paralelos`                                                                  | *(ninguno)*                                                                                                 | NO          | NO                    |
+| `horario_sesiones`       | V3        | alto                    | `id UUID`        | `seccion_id→paralelos`                                                                  | *(falta índice en `seccion_id`)*                                                                             | NO          | NO                    |
+| `matriculas`             | V4        | alto                    | `id UUID`        | `seccion_id→paralelos`                                                                  | `idx_matriculas_estudiante(estudiante_id)`, `idx_matriculas_seccion(seccion_id)`, `uq_matricula`            | SÍ          | SÍ                    |
 | `asistencias`            | V5 + V6   | muy alto                | `id UUID`        | `matricula_id→matriculas`                                                               | `idx_asistencias_matricula(matricula_id)`, `uq_asistencia_dia`                                               | SÍ          | SÍ                    |
-| `esquema_evaluacion`     | V5 + V6   | medio                   | `id UUID`        | `seccion_id→secciones`                                                                  | `idx_esquema_seccion(seccion_id)`                                                                            | SÍ          | SÍ                    |
+| `esquema_evaluacion`     | V5 + V6   | medio                   | `id UUID`        | `seccion_id→paralelos`                                                                  | `idx_esquema_seccion(seccion_id)`                                                                            | SÍ          | SÍ                    |
 | `componentes_evaluacion` | V5        | medio                   | `id UUID`        | `esquema_id→esquema_evaluacion`                                                         | *(falta índice en `esquema_id`)*                                                                             | NO          | NO                    |
 | `notas`                  | V5 + V6   | muy alto                | `id UUID`        | `matricula_id→matriculas`, `componente_id→componentes_evaluacion`                       | `idx_notas_matricula(matricula_id)`, `uq_nota`                                                               | SÍ          | SÍ                    |
-| `cierre_secciones`       | V5 + V6   | bajo                    | `id UUID`        | `seccion_id→secciones` (UNIQUE)                                                         | *(implícito por UNIQUE seccion_id)*                                                                          | SÍ          | SÍ                    |
+| `cierre_secciones`       | V5 + V6   | bajo                    | `id UUID`        | `seccion_id→paralelos` (UNIQUE)                                                         | *(implícito por UNIQUE seccion_id)*                                                                          | SÍ          | SÍ                    |
 | `notificaciones`         | V7        | medio                   | `id UUID`        | `usuario_id→usuarios`                                                                   | `idx_notificaciones_usuario(usuario_id, leida, created_at DESC)`, `idx_notificaciones_colegio(colegio_id)`   | SÍ          | SÍ                    |
 | `consentimientos`        | V8+V11+V12| medio                   | `id UUID`        | `estudiante_id→usuarios`                                                                | `idx_consentimiento_estudiante(estudiante_id)`, `idx_consentimiento_colegio(colegio_id)`                    | SÍ          | SÍ                    |
 
 **Notas del inventario:**
 - `colegio_id` aparece en 17 de las 18 tablas (excepto `usuario_roles`). En ningún caso tiene FK.
-- Las 4 tablas que reciben FKs desde otras (`usuarios`, `roles`, `cursos`, `periodos`, `secciones`, `matriculas`, `componentes_evaluacion`, `esquema_evaluacion`) son la columna vertebral referencial.
+- Las 4 tablas que reciben FKs desde otras (`usuarios`, `roles`, `asignaturas`, `periodos`, `paralelos`, `matriculas`, `componentes_evaluacion`, `esquema_evaluacion`) son la columna vertebral referencial.
 - Las tablas con campos de timestamp `created_at`/`updated_at`/`deleted_at` son 14 de 18; las que faltan (`log_auditoria`, `outbox`, `usuario_roles`, `roles`) son intencionales (logs inmutables, catálogos pequeños, M2M).
 
 ---
@@ -397,4 +397,4 @@
 2. Recalibrar el score: si los huérfanos son 0, el score verificado sube; si confirman las hipótesis, se mantiene el potencial.
 3. Priorizar el bloque 8 (creación de `colegios` + 17 FKs) con datos reales: sabremos qué tablas tienen `colegio_id` apuntando a IDs que no existen en `colegios` (si la tabla se crea primero con un `INSERT` de los valores distintos de `colegio_id`).
 
-Si en cambio prefiere avanzar sin esperar los datos, el orden de despliegue recomendado es el de la **sección 5**, empezando por el bloque 1 (índices) que es online-safe y de riesgo mínimo.
+Si en cambio prefiere avanzar sin esperar los datos, el orden de despliegue recomendado es el de la **paralelo 5**, empezando por el bloque 1 (índices) que es online-safe y de riesgo mínimo.

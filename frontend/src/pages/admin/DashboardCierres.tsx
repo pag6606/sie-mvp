@@ -6,7 +6,7 @@ import { PageHead } from '@/components/ghanima'
 import { usePeriodos } from '@/hooks/usePeriodos'
 import { LoadingSkeleton } from '@/components/UIPatterns'
 
-interface CierreStatus { seccionId: string; codigo: string; curso: string; estado: string }
+interface CierreStatus { paraleloId: string; codigo: string; curso: string; estado: string }
 
 const CierreRow = memo(function CierreRow({ c }: { c: CierreStatus }) {
   return (
@@ -49,7 +49,7 @@ export default function DashboardCierres() {
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
-          <PageHead eyebrow="Académico" title="Dashboard de Cierres" subtitle="Monitorea el estado de cierre de todas las secciones." />
+          <PageHead eyebrow="Académico" title="Dashboard de Cierres" subtitle="Monitorea el estado de cierre de todas las paralelos." />
           <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
         </div>
         <select value={selectedPeriodo} onChange={e => { setSelectedPeriodo(e.target.value); loadCierres(e.target.value) }} className="mb-6 rounded-md border border-input px-4 py-2 text-sm">
@@ -75,7 +75,7 @@ export default function DashboardCierres() {
             </div>
             {cierres.length === 0 ? (
               <div className="rounded-lg border bg-card p-12 text-center">
-                <p className="text-lg text-muted-foreground">No hay secciones (paralelos) en este período</p>
+                <p className="text-lg text-muted-foreground">No hay paralelos (paralelos) en este período</p>
               </div>
             ) : (
               <div className="overflow-x-auto rounded-lg border bg-card">
@@ -83,13 +83,13 @@ export default function DashboardCierres() {
                   <thead className="border-b bg-muted">
                     <tr>
                       <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Sección (paralelo)</th>
-                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Curso</th>
+                      <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Asignatura</th>
                       <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Estado</th>
                     </tr>
                   </thead>
                   <tbody>
                     {cierres.map(c => (
-                      <CierreRow key={c.seccionId} c={c} />
+                      <CierreRow key={c.paraleloId} c={c} />
                     ))}
                   </tbody>
                 </table>

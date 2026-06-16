@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Entity @Table(name = "componentes_evaluacion")
+@Entity @Table(name = "componentes_evaluacion", schema = "calificaciones")
 @Getter @Setter @NoArgsConstructor
 public class ComponenteEvaluacion {
 

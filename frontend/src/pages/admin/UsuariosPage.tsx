@@ -78,18 +78,18 @@ export default function UsuariosPage() {
             <form onSubmit={handleCrear} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="formEmailUsuario" className="block text-xs font-medium text-muted-foreground">Email</label>
+                  <label htmlFor="formEmailUsuario" className="block text-sm font-medium text-foreground mb-1.5">Email</label>
                   <input id="formEmailUsuario" value={formEmail} onChange={e => setFormEmail(e.target.value)} required
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" type="email" />
                 </div>
                 <div>
-                  <label htmlFor="formNombreUsuario" className="block text-xs font-medium text-muted-foreground">Nombre</label>
+                  <label htmlFor="formNombreUsuario" className="block text-sm font-medium text-foreground mb-1.5">Nombre</label>
                   <input id="formNombreUsuario" value={formNombre} onChange={e => setFormNombre(e.target.value)} required
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
                 </div>
               </div>
               <div>
-                <label htmlFor="formDateOfBirth" className="block text-xs font-medium text-muted-foreground">
+                <label htmlFor="formDateOfBirth" className="block text-sm font-medium text-foreground mb-1.5">
                   Fecha de nacimiento <span className="text-muted-foreground/50">(opcional)</span>
                 </label>
                 <input id="formDateOfBirth" type="date" value={formDateOfBirth}

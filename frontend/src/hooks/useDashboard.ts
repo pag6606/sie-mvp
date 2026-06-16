@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import api from '@/services/api'
 
 interface PeriodoInfo {
+  id: string
   codigo: string
   nombre: string
   estado: string
@@ -24,7 +25,7 @@ interface DashboardData {
   periodoActivo: PeriodoInfo | null
   totalEstudiantes: number
   totalMatriculados: number
-  seccionesActivas: number
+  paralelosActivas: number
   porcentajeAsistencia: number
   evolucionMatriculas: EvolucionMensual[]
   actividadReciente: ActividadReciente[]

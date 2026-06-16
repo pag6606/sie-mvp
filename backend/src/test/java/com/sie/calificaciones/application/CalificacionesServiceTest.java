@@ -1,8 +1,8 @@
 package com.sie.calificaciones.application;
 
-import com.sie.academico.domain.Curso;
-import com.sie.academico.domain.Seccion;
-import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.academico.domain.Asignatura;
+import com.sie.academico.domain.Paralelo;
+import com.sie.academico.infrastructure.ParaleloRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.matricula.domain.Matricula;
 import com.sie.matricula.infrastructure.MatriculaRepository;
@@ -26,20 +26,20 @@ import static org.mockito.Mockito.when;
 class CalificacionesServiceTest {
 
     @Mock EntityManager em;
-    @Mock SeccionRepository seccionRepository;
+    @Mock ParaleloRepository paraleloRepository;
     @Mock MatriculaRepository matriculaRepository;
     @Mock UsuarioRepository usuarioRepository;
 
     @Test
     void registrarAsistencia_fechaFutura_lanzaExcepcion() {
-        var svc = new CalificacionesService(em, seccionRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
         assertThrows(IllegalArgumentException.class,
                 () -> svc.registrarAsistencia(UUID.randomUUID(), LocalDate.now().plusDays(1), List.of(), null, UUID.randomUUID()));
     }
 
     @Test
     void definirEsquema_pesosNoSuman100_lanzaExcepcion() {
-        var svc = new CalificacionesService(em, seccionRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
         var q = mockTypedQuery();
         when(em.createQuery(any(String.class), any())).thenReturn((jakarta.persistence.TypedQuery) q);
         when(q.setParameter(any(int.class), any())).thenReturn(q);
@@ -52,28 +52,28 @@ class CalificacionesServiceTest {
 
     @Test
     void dashboardCierres_vacio() {
-        var svc = new CalificacionesService(em, seccionRepository, matriculaRepository, usuarioRepository);
-        when(seccionRepository.findByPeriodoId(any())).thenReturn(List.of());
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
+        when(paraleloRepository.findByPeriodoId(any())).thenReturn(List.of());
         assertTrue(svc.dashboardCierres(UUID.randomUUID()).isEmpty());
     }
 
     @Test
     void miAsistencia_vacio() {
-        var svc = new CalificacionesService(em, seccionRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
         when(matriculaRepository.findByEstudianteId(any())).thenReturn(List.of());
         assertTrue(svc.miAsistencia(UUID.randomUUID()).isEmpty());
     }
 
     @Test
     void misNotas_vacio() {
-        var svc = new CalificacionesService(em, seccionRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
         when(matriculaRepository.findByEstudianteId(any())).thenReturn(List.of());
         assertTrue(svc.misNotas(UUID.randomUUID()).isEmpty());
     }
 
     @Test
     void obtenerNotas_sinEsquema_retornaVacio() {
-        var svc = new CalificacionesService(em, seccionRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
         var q = mockTypedQuery();
         when(em.createQuery(any(String.class), any())).thenReturn((jakarta.persistence.TypedQuery) q);
         when(q.setParameter(any(int.class), any())).thenReturn(q);
@@ -83,7 +83,7 @@ class CalificacionesServiceTest {
 
     @Test
     void estaCerrada_false() {
-        var svc = new CalificacionesService(em, seccionRepository, matriculaRepository, usuarioRepository);
+        var svc = new CalificacionesService(em, paraleloRepository, matriculaRepository, usuarioRepository);
         var q = mockStoredProcedureQuery();
         when(em.createNativeQuery(any(String.class))).thenReturn(q);
         when(q.setParameter(any(int.class), any())).thenReturn(q);

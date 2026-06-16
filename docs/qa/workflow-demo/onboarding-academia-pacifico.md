@@ -7,8 +7,8 @@
 > - Escala de notas 0-10 (LOEI Art. 194) + rediseño NotasPage con barra de stats
 > - Pre-carga de 4 componentes estándar MINEDUC en esquema de evaluación
 > - `hasEsquema` en `SeccionResponse` + wizard guiado en dashboard docente
-> - Docente ve alumnos matriculados por sección con barra de progreso (`/api/me/secciones`)
-> - Validación de nota mínima 7.0 al cerrar sección (LOEI Art. 194)
+> - Docente ve alumnos matriculados por paralelo con barra de progreso (`/api/me/paralelos`)
+> - Validación de nota mínima 7.0 al cerrar paralelo (LOEI Art. 194)
 > - Dashboard estudiante con pestañas Horario/Notas + boletín PDF imprimible
 > - Recordatorio de cierre al docente vía email
 > - Endpoints self-service: `/api/me/calificaciones`, `/api/me/asistencia`
@@ -27,8 +27,8 @@
 | Dirección | Av. Malecón 456, Guayaquil |
 | Niveles | 1ro a 5to de Educación General Básica (EGB) |
 | Paralelos por nivel | A y B |
-| Total secciones (paralelos) | 10 |
-| Alumnos por sección | 20 |
+| Total paralelos (paralelos) | 10 |
+| Alumnos por paralelo | 20 |
 | Total alumnos | 200 |
 | Docentes | 10 |
 | Modelo | Mixto: titulares de aula (1ro) + por asignatura (2do-5to) |
@@ -134,19 +134,19 @@ Art. 42-43: La estructura de niveles EGB (1ro a 10mo) está definida por ley. Nu
 
 ---
 
-## Fase 2 — Crear Cursos
+## Fase 2 — Crear Asignaturas
 
 **Responsable:** Admin  
 **Duración:** 3 minutos  
-**Ruta:** Sidebar → "Cursos" (o botón "📚 Cursos" en dashboard)
+**Ruta:** Sidebar → "Asignaturas" (o botón "📚 Asignaturas" en dashboard)
 
-> ⚠️ Los cursos son prerequisito de las secciones. Sin curso creado, no se puede crear una sección (paralelo).
+> ⚠️ Los asignaturas son prerequisito de las paralelos. Sin curso creado, no se puede crear una paralelo (paralelo).
 
 ### Paso a paso
 
-1. Sidebar → **Cursos** (o `/admin/cursos`)
+1. Sidebar → **Asignaturas** (o `/admin/asignaturas`)
 2. Clic en **"+ Nuevo"**
-3. Crear cada uno de los 5 cursos:
+3. Crear cada uno de los 5 asignaturas:
 
 | # | Código | Nombre |
 |---|--------|--------|
@@ -157,7 +157,7 @@ Art. 42-43: La estructura de niveles EGB (1ro a 10mo) está definida por ley. Nu
 | 5 | `5EGB` | Quinto EGB |
 
 ### Validación
-- [ ] 5 cursos aparecen en la tabla
+- [ ] 5 asignaturas aparecen en la tabla
 - [ ] Los códigos siguen el estándar del Ministerio de Educación: `{número}EGB`
 
 ### LOEI relevante
@@ -165,7 +165,7 @@ Art. 42-43: La estructura de niveles EGB está definida por ley. Nuestro colegio
 
 ---
 
-## Fase 3 — Crear Secciones (paralelos)
+## Fase 3 — Crear Paralelos (paralelos)
 
 **Responsable:** Admin  
 **Duración:** 10 minutos  
@@ -174,10 +174,10 @@ Art. 42-43: La estructura de niveles EGB está definida por ley. Nuestro colegio
 ### Paso a paso
 
 1. En el wizard paso 2, seleccionar **"Empezar desde cero"**
-2. Clic en **"+ Nueva sección (paralelo)"**
-3. Crear cada una de las 10 secciones:
+2. Clic en **"+ Nueva paralelo (paralelo)"**
+3. Crear cada una de las 10 paralelos:
 
-| # | Código | Curso | Capacidad |
+| # | Código | Asignatura | Capacidad |
 |---|--------|-------|-----------|
 | 1 | `1EGB-A` | Primero EGB | 20 |
 | 2 | `1EGB-B` | Primero EGB | 20 |
@@ -259,7 +259,7 @@ Cada docente recibe un email con asunto "Activa tu cuenta en SIE". El flujo es:
 
 ---
 
-## Fase 5 — Asignar Docentes a Secciones (paralelos)
+## Fase 5 — Asignar Docentes a Paralelos (paralelos)
 
 **Responsable:** Admin  
 **Duración:** 10 minutos  
@@ -267,7 +267,7 @@ Cada docente recibe un email con asunto "Activa tu cuenta en SIE". El flujo es:
 
 ### Asignaciones
 
-| Sección | Docentes | Rol |
+| Paralelo | Docentes | Rol |
 |---------|----------|-----|
 | 1EGB-A | Laura Román | TITULAR |
 | 1EGB-A | Katty Navas | AUXILIAR |
@@ -290,13 +290,13 @@ Cada docente recibe un email con asunto "Activa tu cuenta en SIE". El flujo es:
 
 ### Paso a paso
 
-1. En la tabla del paso 3, para cada sección:
+1. En la tabla del paso 3, para cada paralelo:
    - Clic en botón **"+ Asignar docente"**
    - Seleccionar rol: **Titular**, **Auxiliar** o **Por materia** (radio buttons en el dropdown)
    - Seleccionar docente de la lista desplegable
    - Para remover un docente, clic en **×** junto al nombre en la columna Docentes
    - Si un docente ya está asignado y se le re-asigna con otro rol, el sistema actualiza el rol (no duplica)
-2. Marcar ✓ cada sección como revisada
+2. Marcar ✓ cada paralelo como revisada
 3. Clic en **Continuar**
 
 ---
@@ -450,13 +450,13 @@ POST /api/consentimientos/{estudianteId}/revocar → { mensaje: "Consentimiento 
 
 1. Sidebar → Matrícula
 2. Seleccionar período `COSTA-2026`
-3. Para cada sección, clic en **"+ Matricular estudiante"**
+3. Para cada paralelo, clic en **"+ Matricular estudiante"**
 4. Ingresar email del estudiante (`est-191` a `est-200`)
 5. Confirmar
 
-### Distribución por sección
+### Distribución por paralelo
 
-| Sección | Estudiantes (IDs) |
+| Paralelo | Estudiantes (IDs) |
 |---------|------------------|
 | 1EGB-A | est-001 a est-020 |
 | 1EGB-B | est-021 a est-040 |
@@ -480,14 +480,14 @@ POST /api/consentimientos/{estudianteId}/revocar → { mensaje: "Consentimiento 
 ### Paso a paso
 
 1. Wizard paso 4 — revisar resumen
-2. Verificar advertencia: "⚠️ Al abrir el período las secciones estarán disponibles para matrícula"
+2. Verificar advertencia: "⚠️ Al abrir el período las paralelos estarán disponibles para matrícula"
 3. Clic en **"Abrir período"**
 
 ### Validación
 - [ ] Redirige al dashboard con KPI cards actualizados
 - [ ] El período cambia de BORRADOR → ABIERTO
-- [ ] Las secciones pasan a estado ABIERTA
-- [ ] Los docentes ya pueden acceder a sus secciones
+- [ ] Las paralelos pasan a estado ABIERTA
+- [ ] Los docentes ya pueden acceder a sus paralelos
 
 ---
 
@@ -498,7 +498,7 @@ Cada docente inicia sesión con su email y la contraseña del correo de activaci
 ### 8.1 Configurar Esquema de Evaluación
 
 ```
-Docente Dashboard → Sección → "Esquema"
+Docente Dashboard → Paralelo → "Esquema"
 ```
 
 **Límite institucional:** ningún componente puede exceder el 40% (`EVALUACION_MAX_PESO_COMPONENTE`). La suma total debe ser exactamente 100%.
@@ -538,7 +538,7 @@ Ejemplo para 1EGB-A (Laura Román) — usando los valores pre-cargados:
 ### 8.2 Tomar Asistencia
 
 ```
-Docente Dashboard → Sección → "Tomar asistencia"
+Docente Dashboard → Paralelo → "Tomar asistencia"
 ```
 
 - Seleccionar fecha
@@ -551,7 +551,7 @@ Docente Dashboard → Sección → "Tomar asistencia"
 ### 8.3 Ingresar Notas
 
 ```
-Docente Dashboard → Sección → "Ver notas"
+Docente Dashboard → Paralelo → "Ver notas"
 ```
 
 - Tabla con estudiantes (filas) × componentes (columnas)
@@ -563,30 +563,30 @@ Docente Dashboard → Sección → "Ver notas"
 - Colores: verde (aprobado), ámbar (≥5.0), rojo (<5.0)
 - Guardar → Toast verde "Notas guardadas"
 
-### 8.4 Cerrar Sección (paralelo)
+### 8.4 Cerrar Paralelo (paralelo)
 
 ```
-Docente Dashboard → Sección → "Ver notas" → botón "Cerrar sección (paralelo)"
+Docente Dashboard → Paralelo → "Ver notas" → botón "Cerrar paralelo (paralelo)"
 ```
 
 **Validaciones del sistema al cerrar:**
 
 1. **Todos los estudiantes deben tener notas completas:** Si algún estudiante no tiene calificación en todos los componentes, el sistema rechaza el cierre con: `"Hay estudiantes sin todas las notas"`.
-2. **Nota mínima 7.0 (LOEI Art. 194):** Si algún estudiante tiene nota final menor a 7.0, el sistema rechaza el cierre con: `"X estudiante(s) no alcanzan la nota mínima de 7.0 (LOEI Art. 194)"`. **Todos los estudiantes deben aprobar para que la sección pueda cerrarse.**
+2. **Nota mínima 7.0 (LOEI Art. 194):** Si algún estudiante tiene nota final menor a 7.0, el sistema rechaza el cierre con: `"X estudiante(s) no alcanzan la nota mínima de 7.0 (LOEI Art. 194)"`. **Todos los estudiantes deben aprobar para que la paralelo pueda cerrarse.**
 3. Una vez cerrada, las notas son **inmutables** (`cierre_secciones` registra fecha y responsable).
 
 **Pantalla de confirmación:**
 - Advertencia: "Las notas serán definitivas, no podrán modificarse, se publicarán para los estudiantes"
-- Botón rojo: "Cerrar sección (paralelo)"
+- Botón rojo: "Cerrar paralelo (paralelo)"
 - El error del backend se muestra como `InlineError` si el cierre es rechazado
 
 > **ADR-007:** Después del cierre, las notas son inmutables. Cualquier corrección requiere rectificación.
 
 ### 8.5 Dashboard Docente — Wizard Guiado
 
-El dashboard del docente (`/docente`) muestra tarjetas por sección asignada (`GET /api/me/secciones`). Cada tarjeta incluye:
+El dashboard del docente (`/docente`) muestra tarjetas por paralelo asignada (`GET /api/me/paralelos`). Cada tarjeta incluye:
 
-- **Nombre de la sección** (ej. `1EGB-A`) y período
+- **Nombre de la paralelo** (ej. `1EGB-A`) y período
 - **Barra de progreso** de cupos (ocupados / capacidad total)
 - **Horario** (si está configurado)
 
@@ -597,7 +597,7 @@ El dashboard del docente (`/docente`) muestra tarjetas por sección asignada (`G
 
 **Cuando `hasEsquema = true`:**
 - Tres botones de acción: "Tomar asistencia", "Ver notas", "Esquema"
-- El botón "Cerrar sección" está dentro de NotasPage
+- El botón "Cerrar paralelo" está dentro de NotasPage
 
 ---
 
@@ -611,18 +611,18 @@ El dashboard del docente (`/docente`) muestra tarjetas por sección asignada (`G
 El dashboard del estudiante tiene dos pestañas:
 
 **Pestaña "Horario" (default sin notas):**
-- Muestra las secciones en las que el estudiante está matriculado
-- Cada sección muestra: código, nombre del curso, horario (día, hora inicio, hora fin, aula)
+- Muestra las paralelos en las que el estudiante está matriculado
+- Cada paralelo muestra: código, nombre del curso, horario (día, hora inicio, hora fin, aula)
 - Badge con el nombre del curso
 
 **Pestaña "Notas" (default si ya tiene notas):**
-- Por cada sección matriculada:
+- Por cada paralelo matriculada:
   - **Nota final** en un círculo coloreado (verde ≥7.0, rojo <7.0)
   - Desglose por componente (nombre, peso, valor /10)
   - **Asistencia** con barra de progreso (porcentaje, presentes/total)
 - Botón **"📄 Descargar boletín PDF"** → navega a `/estudiante/boletin`
 
-> **Nota:** Si la sección aún no ha sido cerrada por el docente, el estudiante no verá calificaciones. Las notas se publican al cerrar la sección.
+> **Nota:** Si la paralelo aún no ha sido cerrada por el docente, el estudiante no verá calificaciones. Las notas se publican al cerrar la paralelo.
 
 ### 9.2 Boletín Estudiantil PDF
 
@@ -633,8 +633,8 @@ El boletín es una página diseñada para impresión (`@media print`) que funcio
 
 - **Encabezado:** Logo institucional SIE + nombre del estudiante
 - **Cinta de resumen:** Promedio general, porcentaje de asistencia, estado (`APROBADO` si ≥7.0, `REPROBADO` si <7.0)
-- **Sección Calificaciones:** Tabla por curso con desglose de componentes (nombre, peso, valor /10) y nota final. Colores: verde ≥7.0, rojo <7.0.
-- **Sección Asistencia:** Barra de progreso con porcentaje, conteo de presentes / total sesiones
+- **Paralelo Calificaciones:** Tabla por curso con desglose de componentes (nombre, peso, valor /10) y nota final. Colores: verde ≥7.0, rojo <7.0.
+- **Paralelo Asistencia:** Barra de progreso con porcentaje, conteo de presentes / total sesiones
 - **Pie de página:** Identificador oficial (`BOL-{uuid}`), fecha de emisión, leyenda "Documento oficial generado por SIE"
 - **Botón "Imprimir / Guardar PDF":** Usa `window.print()` del navegador → guardar como PDF (cero dependencias server-side)
 - **Botón "Volver al panel":** Regresa al dashboard del estudiante
@@ -650,14 +650,14 @@ Menú de usuario (sidebar, avatar abajo) → **🛡 Privacidad (LOPDP)**
 ### 9.4 Política de Privacidad (público)
 
 - Visible en el footer del login: "© 2025 SIE · Política de Privacidad"
-- Página completa en `/privacidad` con 8 secciones (responsable, datos, finalidad, base legal, derechos ARCO, conservación, seguridad, contacto DPD)
+- Página completa en `/privacidad` con 8 paralelos (responsable, datos, finalidad, base legal, derechos ARCO, conservación, seguridad, contacto DPD)
 
 ### 9.5 Panel ARCO (admin)
 
 - `GET /api/consentimientos/{estudianteId}` — verificar si existe consentimiento
 - `POST /api/consentimientos` — registrar nuevo consentimiento (con `representanteNombre` + `representanteCedula`)
 - `POST /api/consentimientos/{id}/revocar` — revocar consentimiento existente
-- `DELETE /api/secciones/{seccionId}/docentes/{docenteId}` — remover docente de sección (nuevo)
+- `DELETE /api/paralelos/{seccionId}/docentes/{docenteId}` — remover docente de paralelo (nuevo)
 
 ---
 
@@ -671,7 +671,7 @@ Menú de usuario (sidebar, avatar abajo) → **🛡 Privacidad (LOPDP)**
 **Ruta:** Dashboard → "📊 Cierres"  
 **Endpoint:** `GET /api/admin/cierres/{periodoId}`
 
-Muestra el estado de cada sección:
+Muestra el estado de cada paralelo:
 
 | Estado | Significado |
 |--------|------------|
@@ -679,14 +679,14 @@ Muestra el estado de cada sección:
 | LISTA | Todos los componentes evaluados, todas las notas ≥7.0, listo para cerrar |
 | CERRADA | Notas definitivas publicadas, inmutables |
 
-### Acciones por sección
+### Acciones por paralelo
 
-- **Recordar al docente:** Botón "📧 Recordar" → `POST /api/admin/cierres/{seccionId}/recordar`. Envía un email de recordatorio al docente para que cierre su sección. No bloquea si el servicio de email falla.
-- **Cerrar período:** `POST /api/periodos/{id}/cerrar` — cierra administrativamente el período cuando todas las secciones están CERRADA.
+- **Recordar al docente:** Botón "📧 Recordar" → `POST /api/admin/cierres/{seccionId}/recordar`. Envía un email de recordatorio al docente para que cierre su paralelo. No bloquea si el servicio de email falla.
+- **Cerrar período:** `POST /api/periodos/{id}/cerrar` — cierra administrativamente el período cuando todas las paralelos están CERRADA.
 
 ### Paso a paso
 
-1. Revisar que todas las secciones estén LISTA o CERRADA
+1. Revisar que todas las paralelos estén LISTA o CERRADA
 2. Si alguna está PENDIENTE, usar **"📧 Recordar"** para notificar al docente
 3. Una vez todas cerradas, el período puede cerrarse administrativamente (`POST /api/periodos/{id}/cerrar`)
 
@@ -698,10 +698,10 @@ Muestra el estado de cada sección:
 |------|--------|--------|-----------|
 | 0 | Documentos legales + verificar RAT endpoint | 1-2 días | LOPDP Art. 10k, 21 |
 | 1 | Crear período COSTA-2026 | 2 min | LOEI Art. 42-43 |
-| 2 | Crear 5 cursos (1EGB-5EGB) | 3 min | LOEI Art. 42-43 |
-| 3 | Crear 10 secciones (paralelos) | 10 min | — |
+| 2 | Crear 5 asignaturas (1EGB-5EGB) | 3 min | LOEI Art. 42-43 |
+| 3 | Crear 10 paralelos (paralelos) | 10 min | — |
 | 4 | Crear 10 docentes (batch) | 2 min | — |
-| 5 | Asignar docentes a secciones | 10 min | — |
+| 5 | Asignar docentes a paralelos | 10 min | — |
 | 6.1 | Crear 200 estudiantes (UI wizard CSV) | 2 min | — |
 | 6.2 | Activar cuentas (vía email/Mailpit) | 5 min | — |
 | 6.3 | Registrar 200 consentimientos (UI + script masivo) | 5 min | LOPDP Art. 21, 25 |
@@ -711,7 +711,7 @@ Muestra el estado de cada sección:
 | 8.1 | Configurar esquema de evaluación (componentes pre-cargados) | 2 min | LOEI Art. 194 |
 | 8.2 | Tomar asistencia (diario, 4-5 meses) | 5 min/día | LOEI Art. 194 |
 | 8.3 | Ingresar notas (3 parciales + final, 4-5 meses) | 10 min/sesión | LOEI Art. 194 (escala 0-10) |
-| 8.4 | Cerrar sección (validación: todas notas ≥7.0) | 1 min/sección | LOEI Art. 194, ADR-007 |
+| 8.4 | Cerrar paralelo (validación: todas notas ≥7.0) | 1 min/paralelo | LOEI Art. 194, ADR-007 |
 | 8.5 | Dashboard docente — wizard guiado | continuo | — |
 | 9.1 | Dashboard estudiante (Horario + Notas) | continuo | — |
 | 9.2 | Boletín PDF imprimible | instantáneo | — |
@@ -750,28 +750,28 @@ Muestra el estado de cada sección:
 | `/api/consentimientos/{estudianteId}/revocar` | POST | Revocar consentimiento existente |
 | `/api/consentimientos/{estudianteId}/documento` | POST | Subir archivo de evidencia del consentimiento firmado (multipart) |
 
-### Períodos, Cursos y Secciones
+### Períodos, Asignaturas y Paralelos
 
 | Endpoint | Método | Propósito |
 |----------|--------|-----------|
 | `/api/periodos` | GET/POST | Listar / Crear período lectivo |
 | `/api/periodos/{id}/abrir` | POST | Abrir período (BORRADOR → ABIERTO) |
 | `/api/periodos/{id}/cerrar` | POST | Cerrar período administrativamente |
-| `/api/periodos/{origenId}/clonar-a/{destinoId}` | POST | Clonar estructura de período (cursos + secciones) |
-| `/api/cursos` | GET/POST | Listar / Crear cursos |
-| `/api/cursos/{id}` | PUT | Editar nombre de curso |
-| `/api/cursos/{id}/desactivar` | POST | Desactivar curso |
-| `/api/secciones` | GET/POST | Listar / Crear secciones (paralelos) |
-| `/api/secciones/{id}/docentes` | POST | Asignar docente a sección (upsert: actualiza rol si ya existe) |
-| `/api/secciones/{seccionId}/docentes/{docenteId}` | DELETE | Remover docente de sección |
-| `/api/secciones/{id}/horario` | PUT | Configurar horario de sesiones |
-| `/api/secciones/{id}/horario/ical` | GET | Exportar horario a iCal (.ics) |
+| `/api/periodos/{origenId}/clonar-a/{destinoId}` | POST | Clonar estructura de período (asignaturas + paralelos) |
+| `/api/asignaturas` | GET/POST | Listar / Crear asignaturas |
+| `/api/asignaturas/{id}` | PUT | Editar nombre de curso |
+| `/api/asignaturas/{id}/desactivar` | POST | Desactivar curso |
+| `/api/paralelos` | GET/POST | Listar / Crear paralelos (paralelos) |
+| `/api/paralelos/{id}/docentes` | POST | Asignar docente a paralelo (upsert: actualiza rol si ya existe) |
+| `/api/paralelos/{seccionId}/docentes/{docenteId}` | DELETE | Remover docente de paralelo |
+| `/api/paralelos/{id}/horario` | PUT | Configurar horario de sesiones |
+| `/api/paralelos/{id}/horario/ical` | GET | Exportar horario a iCal (.ics) |
 
 ### Matrícula
 
 | Endpoint | Método | Propósito |
 |----------|--------|-----------|
-| `/api/matriculas` | POST | Matricular estudiante en sección (con validación de cupos y consentimiento) |
+| `/api/matriculas` | POST | Matricular estudiante en paralelo (con validación de cupos y consentimiento) |
 | `/api/matriculas/importar-csv` | POST | Matrícula masiva desde CSV |
 | `/api/me/matriculas` | GET | Estudiante: ver sus matrículas |
 
@@ -779,13 +779,13 @@ Muestra el estado de cada sección:
 
 | Endpoint | Método | Propósito |
 |----------|--------|-----------|
-| `/api/me/secciones` | GET | Docente: listar secciones asignadas (con `hasEsquema`, horarios, cupos) |
-| `/api/secciones/{id}/esquema-evaluacion` | PUT | Definir / actualizar esquema de evaluación (componentes + pesos) |
-| `/api/secciones/{id}/asistencia` | GET | Obtener asistencia por rango de fechas |
-| `/api/secciones/{id}/asistencia` | POST | Registrar asistencia (bulk: fecha + lista de entradas) |
-| `/api/secciones/{id}/notas` | GET | Obtener notas de la sección (con nombre del estudiante) |
-| `/api/secciones/{id}/notas` | POST | Ingresar notas (bulk: lista de {matriculaId, componenteId, valor}) |
-| `/api/secciones/{id}/cerrar` | POST | Cerrar sección (validación: todas notas completas + todas ≥7.0) |
+| `/api/me/paralelos` | GET | Docente: listar paralelos asignadas (con `hasEsquema`, horarios, cupos) |
+| `/api/paralelos/{id}/esquema-evaluacion` | PUT | Definir / actualizar esquema de evaluación (componentes + pesos) |
+| `/api/paralelos/{id}/asistencia` | GET | Obtener asistencia por rango de fechas |
+| `/api/paralelos/{id}/asistencia` | POST | Registrar asistencia (bulk: fecha + lista de entradas) |
+| `/api/paralelos/{id}/notas` | GET | Obtener notas de la paralelo (con nombre del estudiante) |
+| `/api/paralelos/{id}/notas` | POST | Ingresar notas (bulk: lista de {matriculaId, componenteId, valor}) |
+| `/api/paralelos/{id}/cerrar` | POST | Cerrar paralelo (validación: todas notas completas + todas ≥7.0) |
 
 ### Calificaciones — Estudiante
 
@@ -798,8 +798,8 @@ Muestra el estado de cada sección:
 
 | Endpoint | Método | Propósito |
 |----------|--------|-----------|
-| `/api/admin/cierres/{periodoId}` | GET | Dashboard de estado de cierres (PENDIENTE/LISTA/CERRADA por sección) |
-| `/api/admin/cierres/{seccionId}/recordar` | POST | Enviar email recordatorio al docente para cerrar sección |
+| `/api/admin/cierres/{periodoId}` | GET | Dashboard de estado de cierres (PENDIENTE/LISTA/CERRADA por paralelo) |
+| `/api/admin/cierres/{seccionId}/recordar` | POST | Enviar email recordatorio al docente para cerrar paralelo |
 | `/api/admin/rat` | GET | Registro de Actividades del Tratamiento (LOPDP Art. 10k) |
 | `/api/dashboard/admin` | GET | KPIs agregados cross-context para admin |
 

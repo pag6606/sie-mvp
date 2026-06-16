@@ -23,17 +23,17 @@ const variantStyles = {
   info: {
     border: 'border-l-[#8A6A18]',
     bg: 'bg-[rgba(138,106,24,0.08)]',
-    icon: 'text-[#8A6A18]',
+    icon: 'text-[#0A0A0B]',
   },
   warn: {
     border: 'border-l-[#A8420A]',
     bg: 'bg-[rgba(226,94,16,0.06)]',
-    icon: 'text-[#A8420A]',
+    icon: 'text-[#0A0A0B]',
   },
   ok: {
     border: 'border-l-[#16724F]',
     bg: 'bg-[rgba(43,176,122,0.08)]',
-    icon: 'text-[#16724F]',
+    icon: 'text-[#0A0A0B]',
   },
 }
 

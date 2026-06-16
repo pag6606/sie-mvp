@@ -95,14 +95,14 @@ Una molécula compone 2+ átomos para cumplir una responsabilidad
 
 ### 1.3 Organismo (`components/ui/organisms/`)
 
-Un organismo es una sección compleja de UI que compone moléculas
+Un organismo es una paralelo compleja de UI que compone moléculas
 y átomos. Conoce el dominio de negocio y puede consumir hooks
 de datos.
 
 **Características obligatorias:**
 - Compone moléculas + átomos.
 - Puede consumir hooks de negocio (`useQuery`, contexto).
-- Representa una sección funcional completa de una página.
+- Representa una paralelo funcional completa de una página.
 - Puede tener estado interno significativo.
 - Prop `className` para ajustes de layout del padre.
 
@@ -154,7 +154,7 @@ inyecten organismos.
 - `PageHead` → encabezado de página con título, descripción,
   breadcrumbs y slot para acciones.
 - `FormGrid` → grid de 1 o 2 columnas para formularios,
-  con slots para secciones y sticky footer con acciones.
+  con slots para paralelos y sticky footer con acciones.
 - `ContentLayout` → layout genérico con área de filtros +
   contenido principal + panel lateral opcional.
 
@@ -482,7 +482,7 @@ recibida se aplica SIEMPRE al elemento raíz del componente.
 |-------|-----------------|-----------------|
 | Átomo | No | No |
 | Molécula | Solo estado UI local | No |
-| Organismo | Sí (estado de sección) | Sí (`useQuery`, hook store) |
+| Organismo | Sí (estado de paralelo) | Sí (`useQuery`, hook store) |
 | Template | Solo estado de layout | No |
 | Page | Sí | Sí |
 
@@ -534,7 +534,7 @@ El orden de migración de páginas es:
 2. **Páginas de auth restantes** — Activate, Reset, Privacy.
 3. **Dashboard Admin** — la página más compleja, Forza la
    creación de `DataTable`, `SectionCard`, `Kpi`.
-4. **Páginas Admin restantes** — Usuarios, Cursos, Secciones,
+4. **Páginas Admin restantes** — Usuarios, Asignaturas, Paralelos,
    Matrícula, etc.
 5. **Páginas Docente** — Asistencia, Notas, Cierre, Esquema.
 6. **Páginas Estudiante** — Dashboard, Boletín.

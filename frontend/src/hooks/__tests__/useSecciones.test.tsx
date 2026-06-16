@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useSecciones, useSeccionesPaginadas } from '@/hooks/useSecciones'
+import { useParalelos, useParalelosPaginadas } from '@/hooks/useParalelos'
 import api from '@/services/api'
 
 vi.mock('@/services/api')
@@ -18,7 +18,7 @@ const mockSecciones = [
   { id: '2', codigo: '2EGB-A', cursoId: '2', capacidad: 28, estado: 'ACTIVA', horarios: [], docentes: [] },
 ]
 
-describe('useSecciones', () => {
+describe('useParalelos', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -26,26 +26,26 @@ describe('useSecciones', () => {
   it('no se ejecuta sin periodoId', () => {
     vi.mocked(api.get).mockResolvedValue({ data: mockSecciones })
 
-    const { result } = renderHook(() => useSecciones(''), { wrapper })
+    const { result } = renderHook(() => useParalelos(''), { wrapper })
 
     expect(result.current.isPending).toBe(true)
     expect(result.current.fetchStatus).toBe('idle')
     expect(vi.mocked(api.get)).not.toHaveBeenCalled()
   })
 
-  it('carga secciones con periodoId', async () => {
+  it('carga paralelos con periodoId', async () => {
     vi.mocked(api.get).mockResolvedValue({ data: mockSecciones })
 
-    const { result } = renderHook(() => useSecciones('1'), { wrapper })
+    const { result } = renderHook(() => useParalelos('1'), { wrapper })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
     expect(result.current.data).toEqual(mockSecciones)
-    expect(vi.mocked(api.get)).toHaveBeenCalledWith('/secciones?periodoId=1&size=200')
+    expect(vi.mocked(api.get)).toHaveBeenCalledWith('/paralelos?periodoId=1&size=200')
   })
 })
 
-describe('useSeccionesPaginadas', () => {
+describe('useParalelosPaginadas', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -55,13 +55,13 @@ describe('useSeccionesPaginadas', () => {
       data: { content: mockSecciones, totalElements: 2, totalPages: 1, number: 0, size: 25 },
     })
 
-    const { result } = renderHook(() => useSeccionesPaginadas('1'), { wrapper })
+    const { result } = renderHook(() => useParalelosPaginadas('1'), { wrapper })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
     expect(result.current.data?.content).toEqual(mockSecciones)
     expect(result.current.page).toBe(0)
-    expect(vi.mocked(api.get)).toHaveBeenCalledWith('/secciones?periodoId=1&page=0&size=25')
+    expect(vi.mocked(api.get)).toHaveBeenCalledWith('/paralelos?periodoId=1&page=0&size=25')
   })
 
   it('cambia de pagina', async () => {
@@ -69,7 +69,7 @@ describe('useSeccionesPaginadas', () => {
       data: { content: mockSecciones, totalElements: 2, totalPages: 1, number: 0, size: 25 },
     })
 
-    const { result } = renderHook(() => useSeccionesPaginadas('1'), { wrapper })
+    const { result } = renderHook(() => useParalelosPaginadas('1'), { wrapper })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 

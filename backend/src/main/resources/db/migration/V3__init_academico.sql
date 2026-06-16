@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS cursos (
     deleted_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS secciones (
+CREATE TABLE IF NOT EXISTS paralelos (
     id UUID PRIMARY KEY,
     colegio_id UUID NOT NULL,
     curso_id UUID NOT NULL REFERENCES cursos(id),
@@ -39,19 +39,19 @@ CREATE TABLE IF NOT EXISTS secciones (
 
 CREATE TABLE IF NOT EXISTS docente_secciones (
     id UUID PRIMARY KEY,
-    seccion_id UUID NOT NULL REFERENCES secciones(id),
+    paralelo_id UUID NOT NULL REFERENCES paralelos(id),
     docente_id UUID NOT NULL,
     rol VARCHAR(20) NOT NULL DEFAULT 'TITULAR'
 );
 
 CREATE TABLE IF NOT EXISTS horario_sesiones (
     id UUID PRIMARY KEY,
-    seccion_id UUID NOT NULL REFERENCES secciones(id),
+    paralelo_id UUID NOT NULL REFERENCES paralelos(id),
     dia_semana VARCHAR(20) NOT NULL,
     hora_inicio TIME NOT NULL,
     hora_fin TIME NOT NULL,
     aula VARCHAR(50) NOT NULL
 );
 
-CREATE INDEX idx_secciones_periodo ON secciones(periodo_id);
-CREATE INDEX idx_secciones_curso ON secciones(curso_id);
+CREATE INDEX idx_paralelos_periodo ON paralelos(periodo_id);
+CREATE INDEX idx_paralelos_curso ON paralelos(curso_id);

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
-import { PageHead } from '@/components/ghanima'
+import { PageHead, Icons } from '@/components/ghanima'
 import { useUsuarios } from '@/hooks/useUsuarios'
 import { InlineError, LoadingSkeleton } from '@/components/UIPatterns'
 import { capitalizeWords } from '@/utils/text'
@@ -52,6 +52,20 @@ export default function ConsentimientosPage() {
     onError: (err: unknown) => {
       const apiErr = err as import('@/types/api').ApiError
       setRevokeError(apiErr?.response?.data?.mensaje || apiErr?.message || 'Error al revocar')
+    },
+  })
+
+  const { data: syncStatus, refetch: refetchSync } = useQuery({
+    queryKey: ['consentimientos', 'sync-status'],
+    queryFn: () => api.get('/consentimientos/sync-status').then(r => r.data),
+    refetchInterval: 30_000,
+  })
+
+  const syncRetry = useMutation({
+    mutationFn: () => api.post('/consentimientos/sync-retry'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['consentimientos'] })
+      refetchSync()
     },
   })
 
@@ -108,6 +122,27 @@ export default function ConsentimientosPage() {
           </button>
         </PageHead>
 
+        {syncStatus && syncStatus.pendientes > 0 && (
+          <div className="flex items-center gap-4 border border-[rgba(226,94,16,0.2)] bg-[rgba(226,94,16,0.06)] border-l-[3px] border-l-[#A8420A] p-4 mb-4">
+            <Icons.Alert className="w-4 h-4 text-[#A8420A] shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground">
+                {syncStatus.pendientes} pendiente{syncStatus.pendientes > 1 ? 's' : ''} de sincronización con LOPDP
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {syncStatus.sincronizados} sincronizado{syncStatus.sincronizados !== 1 ? 's' : ''} · Usa "Reintentar sync" para enviar los pendientes
+              </p>
+            </div>
+            <button
+              onClick={() => syncRetry.mutate()}
+              disabled={syncRetry.isPending}
+              className="bg-[#8A6A18] text-white px-4 py-2 font-mono text-[0.65rem] font-bold uppercase tracking-[0.16em] hover:bg-[#0A0A0B] transition-colors disabled:opacity-50 whitespace-nowrap"
+            >
+              {syncRetry.isPending ? 'Sincronizando...' : 'Reintentar sync'}
+            </button>
+          </div>
+        )}
+
         <div className="mb-4 flex gap-2">
           <button
             onClick={() => setTab('registrados')}
@@ -124,13 +159,13 @@ export default function ConsentimientosPage() {
         </div>
 
         {showForm && (
-          <div className="mb-6 rounded-lg border border-primary/20 bg-accent p-6">
+          <div className="mb-6 rounded-lg border border-[#8A6A18]/20 bg-white p-6">
             <h3 className="mb-4 font-medium text-foreground">Registrar consentimiento parental</h3>
             {formError && <InlineError message={formError} />}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="consEstudiante" className="block text-xs font-medium text-muted-foreground">Estudiante</label>
+                  <label htmlFor="consEstudiante" className="block text-sm font-medium text-foreground mb-1.5">Estudiante</label>
                   <select id="consEstudiante" value={formEstudianteId} onChange={e => setFormEstudianteId(e.target.value)}
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm">
                     <option value="">Seleccionar estudiante</option>
@@ -143,25 +178,25 @@ export default function ConsentimientosPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="consNombre" className="block text-xs font-medium text-muted-foreground">Nombre del representante *</label>
+                  <label htmlFor="consNombre" className="block text-sm font-medium text-foreground mb-1.5">Nombre del representante *</label>
                   <input id="consNombre" value={formNombre} onChange={e => setFormNombre(e.target.value)}
                     placeholder="María García López" required
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
                 </div>
                 <div>
-                  <label htmlFor="consCedula" className="block text-xs font-medium text-muted-foreground">Cédula del representante</label>
+                  <label htmlFor="consCedula" className="block text-sm font-medium text-foreground mb-1.5">Cédula del representante</label>
                   <input id="consCedula" value={formCedula} onChange={e => setFormCedula(e.target.value)}
                     placeholder="0912345678" maxLength={10}
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
                 </div>
                 <div>
-                  <label htmlFor="consEmail" className="block text-xs font-medium text-muted-foreground">Email del representante</label>
+                  <label htmlFor="consEmail" className="block text-sm font-medium text-foreground mb-1.5">Email del representante</label>
                   <input id="consEmail" type="email" value={formEmail} onChange={e => setFormEmail(e.target.value)}
                     placeholder="maria@padres.edu.ec"
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
                 </div>
                 <div className="md:col-span-2">
-                  <label htmlFor="consFile" className="block text-xs font-medium text-muted-foreground">Formulario firmado (PDF)</label>
+                  <label htmlFor="consFile" className="block text-sm font-medium text-foreground mb-1.5">Formulario firmado (PDF)</label>
                   <input id="consFile" type="file" accept=".pdf,image/*"
                     onChange={e => setFormFile(e.target.files?.[0] || null)}
                     className="mt-1 block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:text-primary-foreground hover:file:bg-primary/90" />

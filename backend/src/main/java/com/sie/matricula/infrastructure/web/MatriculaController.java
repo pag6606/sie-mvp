@@ -50,8 +50,8 @@ public class MatriculaController {
         return service.listarPorEstudiante(usuarioId);
     }
 
-    @GetMapping("/secciones/{id}/estudiantes")
-    public List<MatriculaResponse> estudiantesPorSeccion(@PathVariable UUID id) {
-        return service.listarPorSeccion(id);
+    @GetMapping("/paralelos/{id}/estudiantes")
+    public List<MatriculaResponse> estudiantesPorParalelo(@PathVariable UUID id) {
+        return service.listarPorParalelo(id);
     }
 }

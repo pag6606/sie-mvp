@@ -16,8 +16,8 @@ const MatriculaPage = lazy(() => import('@/pages/admin/MatriculaPage'))
 const ImportarCSV = lazy(() => import('@/pages/admin/ImportarCSV'))
 const ImportarUsuariosPage = lazy(() => import('@/pages/admin/ImportarUsuariosPage'))
 const UsuariosPage = lazy(() => import('@/pages/admin/UsuariosPage'))
-const SeccionesPage = lazy(() => import('@/pages/admin/SeccionesPage'))
-const CursosPage = lazy(() => import('@/pages/admin/CursosPage'))
+const ParalelosPage = lazy(() => import('@/pages/admin/ParalelosPage'))
+const AsignaturasPage = lazy(() => import('@/pages/admin/AsignaturasPage'))
 const ConsentimientosPage = lazy(() => import('@/pages/admin/ConsentimientosPage'))
 const AlertaTempranaPage = lazy(() => import('@/pages/admin/AlertaTempranaPage'))
 const DocenteDashboard = lazy(() => import('@/pages/docente/DocenteDashboard'))
@@ -46,15 +46,15 @@ export default function App() {
       <Route path="/admin/matricula/importar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><ImportarCSV /></Suspense>} />
       <Route path="/admin/usuarios" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><UsuariosPage /></Suspense>} />
       <Route path="/admin/usuarios/importar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><ImportarUsuariosPage /></Suspense>} />
-      <Route path="/admin/secciones" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><SeccionesPage /></Suspense>} />
-      <Route path="/admin/cursos" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><CursosPage /></Suspense>} />
+      <Route path="/admin/paralelos" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><ParalelosPage /></Suspense>} />
+      <Route path="/admin/asignaturas" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AsignaturasPage /></Suspense>} />
       <Route path="/admin/consentimientos" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><ConsentimientosPage /></Suspense>} />
       <Route path="/admin/alertas" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AlertaTempranaPage /></Suspense>} />
       <Route path="/docente" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><DocenteDashboard /></Suspense>} />
-      <Route path="/docente/:seccionId/asistencia" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AsistenciaPage /></Suspense>} />
-      <Route path="/docente/:seccionId/notas" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><NotasPage /></Suspense>} />
-      <Route path="/docente/:seccionId/cerrar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><CierrePage /></Suspense>} />
-      <Route path="/docente/:seccionId/esquema" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><EsquemaEvaluacionPage /></Suspense>} />
+      <Route path="/docente/:paraleloId/asistencia" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AsistenciaPage /></Suspense>} />
+      <Route path="/docente/:paraleloId/notas" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><NotasPage /></Suspense>} />
+      <Route path="/docente/:paraleloId/cerrar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><CierrePage /></Suspense>} />
+      <Route path="/docente/:paraleloId/esquema" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><EsquemaEvaluacionPage /></Suspense>} />
       <Route path="/estudiante" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><EstudianteDashboard /></Suspense>} />
       <Route path="/estudiante/boletin" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><BoletinPage /></Suspense>} />
     </Routes>

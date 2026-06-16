@@ -18,7 +18,7 @@
 - [ ] Terminal 3: `cd frontend && npm run dev -- --host`
 - [ ] Verificar: `curl http://localhost:8080/actuator/health` → UP
 - [ ] Verificar: `GET /api/periodos` → 2 períodos (COSTA-2026 EN_CURSO, DEMO-MANUAL BORRADOR)
-- [ ] Verificar: `GET /api/riesgo/dashboard?periodoId=...` → devuelve 6 secciones con 🔴🟡🟢
+- [ ] Verificar: `GET /api/riesgo/dashboard?periodoId=...` → devuelve 6 paralelos con 🔴🟡🟢
 - [ ] Abrir navegador en `http://localhost:5174` — pantalla de login lista
 - [ ] Cerrar TODAS las terminales excepto las 3 necesarias
 - [ ] Fondo de pantalla neutro, sin notificaciones
@@ -104,7 +104,7 @@
 
 ---
 
-*[AlertaTempranaPage carga — KPIs con números, tabla de secciones]*
+*[AlertaTempranaPage carga — KPIs con números, tabla de paralelos]*
 
 **PRESENTADOR:**
 
@@ -118,9 +118,9 @@
 
 > El Quimestre 1 cierra en 19 días. Esos estudiantes en rojo — si nadie actúa, reprueban.
 
-> *(señalar la tabla de secciones)*
+> *(señalar la tabla de paralelos)*
 
-> Veamos una sección. 8vo-A, Matemáticas.
+> Veamos una paralelo. 8vo-A, Matemáticas.
 
 *[Click en 8vo-A-MAT]*
 
@@ -235,17 +235,17 @@
 
 *[Click en "Siguiente"]*
 
-*[Wizard — Paso 2: Clonar secciones]*
+*[Wizard — Paso 2: Clonar paralelos]*
 
-> Normalmente, si ya tuvieron un período anterior cerrado, con un clic copian toda la estructura: cursos, secciones, horarios, docentes. Como es la primera vez en el sistema, empezamos desde cero.
+> Normalmente, si ya tuvieron un período anterior cerrado, con un clic copian toda la estructura: asignaturas, paralelos, horarios, docentes. Como es la primera vez en el sistema, empezamos desde cero.
 
 *[Click en "Empezar desde cero"]*
 
 *[Click en "Siguiente"]*
 
-*[Wizard — Paso 3: Revisar secciones]*
+*[Wizard — Paso 3: Revisar paralelos]*
 
-> Revisa las secciones, asigna docentes.
+> Revisa las paralelos, asigna docentes.
 
 *[Click en "Siguiente"]*
 

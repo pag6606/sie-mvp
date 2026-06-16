@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS matriculas (
     id UUID PRIMARY KEY,
     colegio_id UUID NOT NULL,
     estudiante_id UUID NOT NULL,
-    seccion_id UUID NOT NULL REFERENCES secciones(id),
+    seccion_id UUID NOT NULL REFERENCES paralelos(id),
     fecha TIMESTAMP NOT NULL DEFAULT NOW(),
     estado VARCHAR(20) NOT NULL DEFAULT 'ACTIVA',
     fecha_retiro TIMESTAMP,

@@ -20,8 +20,8 @@ interface SeccionDocente {
 
 function useMisSecciones() {
   return useQuery<SeccionDocente[]>({
-    queryKey: ['me', 'secciones'],
-    queryFn: () => api.get('/me/secciones').then(r => r.data),
+    queryKey: ['me', 'paralelos'],
+    queryFn: () => api.get('/me/paralelos').then(r => r.data),
   })
 }
 
@@ -106,7 +106,7 @@ const SeccionCard = memo(function SeccionCard({
 })
 
 export default function DocenteDashboard() {
-  const { data: secciones = [], isLoading: loading } = useMisSecciones()
+  const { data: paralelos = [], isLoading: loading } = useMisSecciones()
   const navigate = useNavigate()
 
   const handleNavigate = useCallback((to: string) => navigate(to), [navigate])
@@ -123,17 +123,17 @@ export default function DocenteDashboard() {
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
         <AlertaWidget />
-        <PageHead eyebrow="Docente" title="Mis Secciones" subtitle="Paralelos asignados para el período actual." />
+        <PageHead eyebrow="Docente" title="Mis Paralelos" subtitle="Paralelos asignados para el período actual." />
 
-        {secciones.length === 0 ? (
+        {paralelos.length === 0 ? (
           <EmptyState
             icon="📖"
-            title="Aún no tienes secciones (paralelos) asignadas"
+            title="Aún no tienes paralelos (paralelos) asignadas"
             description="Tu administrador te asignará cuando configure el período"
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {secciones.map(s => (
+            {paralelos.map(s => (
               <SeccionCard key={s.id} s={s} onNavigate={handleNavigate} />
             ))}
           </div>

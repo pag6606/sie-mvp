@@ -76,6 +76,16 @@ public class ConsentimientoController {
         return ResponseEntity.ok(Map.of("mensaje", "Consentimiento revocado"));
     }
 
+    @GetMapping("/sync-status")
+    public ConsentimientoService.SyncStatus syncStatus() {
+        return consentimientoService.contarPendientesSync();
+    }
+
+    @PostMapping("/sync-retry")
+    public ConsentimientoService.SyncStatus syncRetry() {
+        return consentimientoService.reintentarSync();
+    }
+
     @PostMapping("/{estudianteId}/documento")
     public ResponseEntity<Map<String, String>> uploadDocumento(
             @PathVariable UUID estudianteId,

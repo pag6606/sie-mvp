@@ -86,7 +86,7 @@ public class LopdpConsentClient {
 
         var student = Map.of(
                 "email", studentEmail != null ? studentEmail : "",
-                "name", studentName != null ? studentName : "",
+                "nombre", studentName != null ? studentName : "",
                 "dateOfBirth", studentDateOfBirth
         );
         var parent = Map.of(
@@ -131,22 +131,20 @@ public class LopdpConsentClient {
     }
 
     /* ============================================================
-     * CONSENT (con JWT del usuario o sesion)
+     * CONSENT — Admin sync endpoint (API key auth)
      * ============================================================ */
 
-    public ConsentResult grantConsent(String titularId, String purpose, boolean granted,
-                                       String consentLevel, String policyVersion,
-                                       String grantedBy, String documentUrl) {
+    public ConsentResult grantConsent(String studentEmail, String parentEmail, String purposeCode,
+                                       boolean granted, String consentLevel, String policyVersion,
+                                       String documentUrl) {
 
         var body = new HashMap<String, Object>();
-        body.put("titularId", titularId);
-        body.put("purpose", purpose);
+        body.put("studentEmail", studentEmail != null ? studentEmail : "");
+        body.put("parentEmail", parentEmail != null ? parentEmail : "");
+        body.put("purposeCode", purposeCode != null ? purposeCode : "ACADEMIC_RECORDS");
         body.put("granted", granted);
         body.put("consentLevel", consentLevel != null ? consentLevel : "EXPLICIT");
-        body.put("policyVersion", policyVersion != null ? policyVersion : "2026-01");
-        if (grantedBy != null && !grantedBy.isBlank()) {
-            body.put("grantedBy", grantedBy);
-        }
+        body.put("policyVersion", policyVersion != null ? policyVersion : "2025-01");
         if (documentUrl != null && !documentUrl.isBlank()) {
             body.put("documentUrl", documentUrl);
         }
@@ -155,21 +153,25 @@ public class LopdpConsentClient {
             rateLimiter.acquireConsent();
             @SuppressWarnings("unchecked")
             var response = restTemplate.postForEntity(
-                    lopdpBaseUrl + "/consents",
+                    lopdpBaseUrl + "/admin/sync/consent",
                     new HttpEntity<>(body, syncHeaders()),
                     Map.class).getBody();
             requireSuccess(response, "grantConsent");
             var data = extractData(response);
+            if (data == null) {
+                log.warn("LOPDP grantConsent returned null data for {}", studentEmail);
+                return new ConsentResult("", studentEmail, purposeCode, granted, "", LocalDateTime.now());
+            }
             return new ConsentResult(
-                    data.get("id").toString(),
-                    data.get("titularId").toString(),
-                    data.get("purpose").toString(),
+                    data.getOrDefault("id", "").toString(),
+                    data.getOrDefault("titularId", studentEmail).toString(),
+                    data.getOrDefault("purpose", purposeCode).toString(),
                     Boolean.TRUE.equals(data.get("granted")),
                     data.getOrDefault("ledgerHash", "").toString(),
                     LocalDateTime.now()
             );
         } catch (RestClientException e) {
-            log.error("LOPDP grantConsent failed for titular {} : {}", titularId, e.getMessage());
+            log.error("LOPDP grantConsent failed for {} : {}", studentEmail, e.getMessage());
             throw new LopdpUnavailableException("LOPDP grantConsent failed", e);
         }
     }

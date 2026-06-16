@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Entity @Table(name = "asistencias")
+@Entity @Table(name = "asistencias", schema = "calificaciones")
 @Getter @Setter @NoArgsConstructor
 public class Asistencia extends BaseEntity {
 

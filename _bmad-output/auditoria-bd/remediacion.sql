@@ -147,7 +147,7 @@ ALTER TABLE cursos
     ADD CONSTRAINT ck_cursos_creditos_positivo
     CHECK (creditos > 0);
 
-ALTER TABLE secciones
+ALTER TABLE paralelos
     ADD CONSTRAINT ck_secciones_capacidad_positiva
     CHECK (capacidad > 0);
 
@@ -194,10 +194,10 @@ ALTER TABLE usuarios
 -- deduplicar las filas que ya violen la unicidad antes de aplicar.
 -- =============================================================================
 
--- IR-05a: secciones único por (periodo_id, codigo) — ajusta el scope si tu
+-- IR-05a: paralelos único por (periodo_id, codigo) — ajusta el scope si tu
 -- dominio requiere (curso_id, periodo_id, codigo).
 -- ⚠ Antes de aplicar, decidir el scope con product owner.
-ALTER TABLE secciones
+ALTER TABLE paralelos
     ADD CONSTRAINT uq_secciones_periodo_codigo
     UNIQUE (periodo_id, codigo);
 
@@ -224,7 +224,7 @@ ALTER TABLE docente_secciones
 -- ⚠ Dominios ajustados tras verificacion-datos.sql con los VALORES REALES
 -- observados en la BD (no los asumidos en el informe original):
 --   periodos.estado:        ABIERTO, EN_CURSO  (no BORRADOR/ACTIVO)
---   secciones.estado:       EN_CURSO, BORRADOR (no ACTIVA)
+--   paralelos.estado:       EN_CURSO, BORRADOR (no ACTIVA)
 --   consentimientos.fuente: LOPDP               (faltaba en propuesta)
 -- Se mantienen valores futuros razonables (CERRADO, ARCHIVADO, etc.) para
 -- permitir evolución sin nueva migración.
@@ -234,7 +234,7 @@ ALTER TABLE periodos
     ADD CONSTRAINT ck_periodos_estado_dominio
     CHECK (estado IN ('BORRADOR', 'ABIERTO', 'EN_CURSO', 'CERRADO', 'ARCHIVADO'));
 
-ALTER TABLE secciones
+ALTER TABLE paralelos
     ADD CONSTRAINT ck_secciones_estado_dominio
     CHECK (estado IN ('BORRADOR', 'EN_CURSO', 'CERRADA', 'CANCELADA'));
 
@@ -270,7 +270,7 @@ ALTER TABLE notificaciones
 --     CHECK (accion IN ('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'EXPORT'));
 -- ALTER TABLE outbox
 --     ADD CONSTRAINT ck_outbox_event_type_dominio
---     CHECK (event_type IN ('matricula.creada', 'nota.registrada', 'seccion.cerrada', 'consentimiento.otorgado'));
+--     CHECK (event_type IN ('matricula.creada', 'nota.registrada', 'paralelo.cerrada', 'consentimiento.otorgado'));
 
 -- =============================================================================
 -- BLOQUE 7 · N-04 · Medio · Probable
@@ -322,7 +322,7 @@ CREATE TABLE IF NOT EXISTS colegios (
 --     SELECT colegio_id FROM roles UNION
 --     SELECT colegio_id FROM periodos UNION
 --     SELECT colegio_id FROM cursos UNION
---     SELECT colegio_id FROM secciones UNION
+--     SELECT colegio_id FROM paralelos UNION
 --     SELECT colegio_id FROM docente_secciones UNION
 --     SELECT colegio_id FROM matriculas UNION
 --     SELECT colegio_id FROM asistencias UNION
@@ -342,7 +342,7 @@ CREATE TABLE IF NOT EXISTS colegios (
 --     FOREIGN KEY (colegio_id) REFERENCES colegios(id) ON DELETE RESTRICT
 --     NOT VALID;
 -- ALTER TABLE usuarios VALIDATE CONSTRAINT fk_usuarios_colegio;
--- (... repetir para roles, periodos, cursos, secciones, docente_secciones,
+-- (... repetir para roles, periodos, cursos, paralelos, docente_secciones,
 --      matriculas, asistencias, esquema_evaluacion, notas, cierre_secciones,
 --      notificaciones, consentimientos, log_auditoria, outbox ...)
 
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS colegios (
 --     ALTER COLUMN colegio_id SET DEFAULT NULL;
 -- CREATE OR REPLACE FUNCTION sync_cierre_colegio_id() RETURNS TRIGGER AS $$
 -- BEGIN
---     NEW.colegio_id := (SELECT colegio_id FROM secciones WHERE id = NEW.seccion_id);
+--     NEW.colegio_id := (SELECT colegio_id FROM paralelos WHERE id = NEW.seccion_id);
 --     RETURN NEW;
 -- END $$ LANGUAGE plpgsql;
 -- CREATE TRIGGER trg_sync_cierre_colegio_id

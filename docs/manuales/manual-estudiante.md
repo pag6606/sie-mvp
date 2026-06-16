@@ -16,7 +16,7 @@
 
 Al ingresar ves un dashboard con **dos pestañas**:
 
-- 📅 **Horario** — visible por defecto si aún no hay notas publicadas. Muestra tus secciones matriculadas con horario. Botón "Exportar horario" descarga un archivo .ics para agregar a tu calendario (Google Calendar, Apple Calendar).
+- 📅 **Horario** — visible por defecto si aún no hay notas publicadas. Muestra tus paralelos matriculadas con horario. Botón "Exportar horario" descarga un archivo .ics para agregar a tu calendario (Google Calendar, Apple Calendar).
 - 📊 **Notas** — visible por defecto si ya hay notas publicadas. Muestra calificaciones, asistencia y botón de boletín.
 
 ### Ver tus notas
@@ -27,7 +27,7 @@ Al ingresar ves un dashboard con **dos pestañas**:
 - Toca una materia para ver el detalle: cada componente, su peso y tu nota
 
 ### ¿Cuándo aparecen las notas?
-- Solo verás notas de secciones que el docente ya **cerró**
+- Solo verás notas de paralelos que el docente ya **cerró**
 - Antes del cierre, las notas no son visibles
 - Cuando tu docente cierra, recibes una notificación: *"Tu boletín de 2026-1 está disponible"*
 
@@ -45,7 +45,7 @@ Al ingresar ves un dashboard con **dos pestañas**:
 
 ## 4. Mi asistencia
 
-En la sección **"Mi Asistencia"** ves por cada materia:
+En la paralelo **"Mi Asistencia"** ves por cada materia:
 
 - 📊 Barra de progreso visual
 - 🔢 Porcentaje acumulado
@@ -75,7 +75,7 @@ En la pestaña 📅 **Horario**, haz clic en **"Exportar horario"**. Se descarga
 ## Preguntas frecuentes
 
 **¿Por qué no veo mis notas todavía?**
-Tu docente aún no ha cerrado la sección. Las notas aparecen automáticamente cuando cierre.
+Tu docente aún no ha cerrado la paralelo. Las notas aparecen automáticamente cuando cierre.
 
 **¿Qué significa el color de mi nota?**
 Verde = aprobado, Amarillo = necesitas mejorar, Rojo = reprobado.

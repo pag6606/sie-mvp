@@ -22,30 +22,30 @@ function notaColor(valor: number | null): string {
 }
 
 export default function NotasPage() {
-  const { seccionId } = useParams()
+  const { paraleloId } = useParams()
   const [editing, setEditing] = useState<Record<string, number>>({})
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const { data: notas = [], isLoading: loading, isError, error: queryError } = useQuery<NotaEstudiante[]>({
-    queryKey: ['notas', seccionId],
-    queryFn: () => api.get(`/secciones/${seccionId}/notas`).then(r => r.data),
-    enabled: !!seccionId,
+    queryKey: ['notas', paraleloId],
+    queryFn: () => api.get(`/paralelos/${paraleloId}/notas`).then(r => r.data),
+    enabled: !!paraleloId,
   })
 
-  const { data: secciones = [] } = useQuery<{ id: string; codigo: string }[]>({
-    queryKey: ['me', 'secciones'],
-    queryFn: () => api.get('/me/secciones').then(r => r.data),
-    enabled: !!seccionId,
+  const { data: paralelos = [] } = useQuery<{ id: string; codigo: string }[]>({
+    queryKey: ['me', 'paralelos'],
+    queryFn: () => api.get('/me/paralelos').then(r => r.data),
+    enabled: !!paraleloId,
   })
-  const seccionCodigo = secciones.find(s => s.id === seccionId)?.codigo || seccionId?.slice(0, 8)
+  const paraleloCodigo = paralelos.find(s => s.id === paraleloId)?.codigo || paraleloId?.slice(0, 8)
 
   const guardarMutation = useMutation({
     mutationFn: (entries: { matriculaId: string; componenteId: string; valor: number }[]) =>
-      api.post(`/secciones/${seccionId}/notas`, { entries }),
+      api.post(`/paralelos/${paraleloId}/notas`, { entries }),
     onSuccess: () => {
       setEditing({})
-      queryClient.invalidateQueries({ queryKey: ['notas', seccionId] })
+      queryClient.invalidateQueries({ queryKey: ['notas', paraleloId] })
     },
     onError: () => {},
   })
@@ -77,14 +77,14 @@ export default function NotasPage() {
     pendientes: notas.filter(n => n.notaFinal == null).length,
   }
 
-  const handleCerrar = () => navigate(`/docente/${seccionId}/cerrar`)
+  const handleCerrar = () => navigate(`/docente/${paraleloId}/cerrar`)
 
   if (loading) return <LoadingSkeleton rows={4} />
 
   if (isError) return (
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
-        <InlineError message={(queryError as ApiError)?.response?.data?.mensaje || 'Error al cargar notas'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['notas', seccionId] })} />
+        <InlineError message={(queryError as ApiError)?.response?.data?.mensaje || 'Error al cargar notas'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['notas', paraleloId] })} />
       </div>
     </AppLayout>
   )
@@ -92,7 +92,7 @@ export default function NotasPage() {
   return (
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
-        <button onClick={() => navigate('/docente')} className="text-sm text-muted-foreground hover:underline mb-4 block">← Mis secciones</button>
+        <button onClick={() => navigate('/docente')} className="text-sm text-muted-foreground hover:underline mb-4 block">← Mis paralelos</button>
 
         {guardarMutation.isError && (
           <div className="mb-4">
@@ -106,7 +106,7 @@ export default function NotasPage() {
         )}
 
         <div className="mb-2 flex items-center justify-between">
-          <PageHead eyebrow="Docente" title={`Notas — ${seccionCodigo}`} className="mb-0" />
+          <PageHead eyebrow="Docente" title={`Notas — ${paraleloCodigo}`} className="mb-0" />
           <div className="flex gap-2">
             <button onClick={handleGuardar} disabled={guardarMutation.isPending || Object.keys(editing).length === 0}
               className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50">
@@ -167,7 +167,7 @@ export default function NotasPage() {
                 ))}
                 <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-primary border-l">
                   Final
-                  <span className="block text-[10px] text-primary/60">/10</span>
+                  <span className="block text-[10px] text-muted-foreground">/10</span>
                 </th>
               </tr>
             </thead>

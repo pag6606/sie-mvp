@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useCursos } from '@/hooks/useCursos'
+import { useAsignaturas } from '@/hooks/useAsignaturas'
 import api from '@/services/api'
 
 vi.mock('@/services/api')
@@ -18,20 +18,20 @@ const mockCursos = [
   { id: '2', codigo: '2EGB', nombre: 'Segundo EGB' },
 ]
 
-describe('useCursos', () => {
+describe('useAsignaturas', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it('devuelve la lista de cursos', async () => {
+  it('devuelve la lista de asignaturas', async () => {
     vi.mocked(api.get).mockResolvedValue({ data: mockCursos })
 
-    const { result } = renderHook(() => useCursos(), { wrapper })
+    const { result } = renderHook(() => useAsignaturas(), { wrapper })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
     expect(result.current.data).toEqual(mockCursos)
-    expect(vi.mocked(api.get)).toHaveBeenCalledWith('/cursos')
+    expect(vi.mocked(api.get)).toHaveBeenCalledWith('/asignaturas')
   })
 
   it('normaliza respuesta paginada', async () => {
@@ -39,7 +39,7 @@ describe('useCursos', () => {
       data: { content: mockCursos },
     })
 
-    const { result } = renderHook(() => useCursos(), { wrapper })
+    const { result } = renderHook(() => useAsignaturas(), { wrapper })
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true))
 

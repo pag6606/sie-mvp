@@ -31,11 +31,11 @@
 
 ---
 
-## Minuto 2-3: Drill-down por Sección — "¿Dónde está el problema?"
+## Minuto 2-3: Drill-down por Paralelo — "¿Dónde está el problema?"
 
-> *"Veamos en detalle. ¿Qué sección tiene más estudiantes en riesgo?"*
+> *"Veamos en detalle. ¿Qué paralelo tiene más estudiantes en riesgo?"*
 
-**Acción:** Click en una fila de la tabla de secciones (la que tenga más rojos)
+**Acción:** Click en una fila de la tabla de paralelos (la que tenga más rojos)
 
 > *"8vo-A Matemáticas. De 15 estudiantes, 1 está en riesgo medio. Veamos quién es."*
 

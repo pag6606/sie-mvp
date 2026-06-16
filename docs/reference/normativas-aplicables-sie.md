@@ -62,7 +62,7 @@
 |----------|--------------|----------------|
 | Art. 2(r) | Evaluación integral como proceso permanente y participativo | El módulo de calificaciones debe soportar evaluación continua, no solo exámenes finales |
 | Art. 2(w) | Calidad y calidez — educación pertinente con evaluaciones permanentes | Las evaluaciones deben ser configurables por el docente (no esquema rígido único) |
-| Art. 6(n) | Obligación del Estado: garantizar acceso gratuito a información relevante para la comunidad educativa | Portal público o sección de transparencia con indicadores |
+| Art. 6(n) | Obligación del Estado: garantizar acceso gratuito a información relevante para la comunidad educativa | Portal público o paralelo de transparencia con indicadores |
 | Art. 7(b) | Derecho de estudiantes: recibir apoyo pedagógico y tutorías académicas | Potencialmente fuera del MVP pero previsto en roadmap (fase 4: IA de tutoría) |
 | Art. 8(f) | Obligación de estudiantes: cuidar la infraestructura física y digital | No aplica directamente al SIE |
 | Art. 10(g) | Derecho de docentes: recibir incentivos por méritos académicos evaluados | Las notas y evaluaciones docentes pueden ser insumo para esto (fase futura) |
@@ -70,7 +70,7 @@
 | Art. 12(c) | Derecho de padres: participar en evaluación de docentes | Fuera del MVP |
 | Art. 19(e) | Objetivo del SNE: garantizar acceso plural y libre a información sobre educación para la salud | Fuera del MVP |
 | Art. 38 | Educación escolarizada es acumulativa, progresiva, conlleva título o certificado | El sistema debe generar certificados y boletines oficiales |
-| Art. 42-43 | Niveles educativos: EGB (10 años) y Bachillerato (3 años) | El catálogo de cursos debe reflejar la estructura de niveles oficial |
+| Art. 42-43 | Niveles educativos: EGB (10 años) y Bachillerato (3 años) | El catálogo de asignaturas debe reflejar la estructura de niveles oficial |
 
 ### 2.2 Requisitos institucionales
 

@@ -9,7 +9,7 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "horario_sesiones")
+@Table(name = "horario_sesiones", schema = "academico")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,7 +22,7 @@ public class HorarioSesion {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seccion_id", nullable = false)
-    private Seccion seccion;
+    private Paralelo paralelo;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "dia_semana", nullable = false)

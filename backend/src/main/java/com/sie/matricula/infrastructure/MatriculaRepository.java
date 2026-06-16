@@ -10,9 +10,9 @@ import java.util.UUID;
 
 @Repository
 public interface MatriculaRepository extends JpaRepository<Matricula, UUID> {
-    boolean existsByEstudianteIdAndSeccionId(UUID estudianteId, UUID seccionId);
+    boolean existsByEstudianteIdAndParaleloId(UUID estudianteId, UUID paraleloId);
     List<Matricula> findByEstudianteId(UUID estudianteId);
-    List<Matricula> findBySeccionId(UUID seccionId);
-    Optional<Matricula> findByEstudianteIdAndSeccionIdAndEstado(UUID estudianteId, UUID seccionId, com.sie.matricula.domain.EstadoMatricula estado);
-    long countBySeccionIdAndEstado(UUID seccionId, com.sie.matricula.domain.EstadoMatricula estado);
+    List<Matricula> findByParaleloId(UUID paraleloId);
+    Optional<Matricula> findByEstudianteIdAndParaleloIdAndEstado(UUID estudianteId, UUID paraleloId, com.sie.matricula.domain.EstadoMatricula estado);
+    long countByParaleloIdAndEstado(UUID paraleloId, com.sie.matricula.domain.EstadoMatricula estado);
 }

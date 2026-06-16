@@ -50,58 +50,63 @@ public class AcademicoController {
         return service.cerrarPeriodo(id);
     }
 
-    @GetMapping("/cursos")
-    public List<CursoResponse> listarCursos() {
-        return service.listarCursos();
+    @PostMapping("/periodos/{id}/iniciar")
+    public PeriodoResponse iniciarPeriodo(@PathVariable UUID id) {
+        return service.iniciarPeriodo(id);
     }
 
-    @PostMapping("/cursos")
-    public ResponseEntity<CursoResponse> crearCurso(@Valid @RequestBody CrearCursoRequest req,
+    @GetMapping("/asignaturas")
+    public List<AsignaturaResponse> listarAsignaturas() {
+        return service.listarAsignaturas();
+    }
+
+    @PostMapping("/asignaturas")
+    public ResponseEntity<AsignaturaResponse> crearAsignatura(@Valid @RequestBody CrearAsignaturaRequest req,
                                                      @RequestAttribute("colegioId") UUID colegioId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.crearCurso(req, colegioId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.crearAsignatura(req, colegioId));
     }
 
-    @PutMapping("/cursos/{id}")
-    public CursoResponse actualizarCurso(@PathVariable UUID id, @RequestBody Map<String, String> body) {
-        return service.actualizarCurso(id, body.get("nombre"));
+    @PutMapping("/asignaturas/{id}")
+    public AsignaturaResponse actualizarAsignatura(@PathVariable UUID id, @RequestBody Map<String, String> body) {
+        return service.actualizarAsignatura(id, body.get("nombre"));
     }
 
-    @PostMapping("/cursos/{id}/desactivar")
-    public ResponseEntity<Map<String, String>> desactivarCurso(@PathVariable UUID id) {
-        service.desactivarCurso(id);
-        return ResponseEntity.ok(Map.of("mensaje", "Curso desactivado"));
+    @PostMapping("/asignaturas/{id}/desactivar")
+    public ResponseEntity<Map<String, String>> desactivarAsignatura(@PathVariable UUID id) {
+        service.desactivarAsignatura(id);
+        return ResponseEntity.ok(Map.of("mensaje", "Asignatura desactivado"));
     }
 
-    @GetMapping("/secciones")
-    public Page<SeccionResponse> listarSecciones(@RequestParam UUID periodoId,
+    @GetMapping("/paralelos")
+    public Page<ParaleloResponse> listarParalelos(@RequestParam UUID periodoId,
             @PageableDefault(size = 25) Pageable pageable) {
-        return service.listarSecciones(periodoId, pageable);
+        return service.listarParalelos(periodoId, pageable);
     }
 
-    @PostMapping("/secciones")
-    public ResponseEntity<SeccionResponse> crearSeccion(@Valid @RequestBody CrearSeccionRequest req,
+    @PostMapping("/paralelos")
+    public ResponseEntity<ParaleloResponse> crearParalelo(@Valid @RequestBody CrearParaleloRequest req,
                                                          @RequestAttribute("colegioId") UUID colegioId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.crearSeccion(req, colegioId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.crearParalelo(req, colegioId));
     }
 
-    @PostMapping("/secciones/{id}/docentes")
-    public SeccionResponse asignarDocente(@PathVariable UUID id, @RequestBody DocenteAssignRequest req) {
+    @PostMapping("/paralelos/{id}/docentes")
+    public ParaleloResponse asignarDocente(@PathVariable UUID id, @RequestBody DocenteAssignRequest req) {
         return service.asignarDocente(id, req.docenteId(), req.rol());
     }
 
-    @DeleteMapping("/secciones/{seccionId}/docentes/{docenteId}")
-    public SeccionResponse removerDocente(@PathVariable UUID seccionId, @PathVariable UUID docenteId) {
-        return service.removerDocente(seccionId, docenteId);
+    @DeleteMapping("/paralelos/{paraleloId}/docentes/{docenteId}")
+    public ParaleloResponse removerDocente(@PathVariable UUID paraleloId, @PathVariable UUID docenteId) {
+        return service.removerDocente(paraleloId, docenteId);
     }
 
     @PostMapping("/periodos/{origenId}/clonar-a/{destinoId}")
-    public List<SeccionResponse> clonarPeriodo(@PathVariable UUID origenId, @PathVariable UUID destinoId) {
+    public List<ParaleloResponse> clonarPeriodo(@PathVariable UUID origenId, @PathVariable UUID destinoId) {
         return service.clonarPeriodo(origenId, destinoId);
     }
 
-    @GetMapping("/me/secciones")
-    public List<SeccionResponse> misSecciones(@RequestAttribute("usuarioId") UUID usuarioId) {
-        return service.listarSeccionesPorDocente(usuarioId);
+    @GetMapping("/me/paralelos")
+    public List<ParaleloResponse> misParaleloes(@RequestAttribute("usuarioId") UUID usuarioId) {
+        return service.listarParalelosPorDocente(usuarioId);
     }
 }
 

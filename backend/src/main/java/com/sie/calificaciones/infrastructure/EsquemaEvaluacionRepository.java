@@ -12,10 +12,10 @@ import java.util.UUID;
 @Repository
 public interface EsquemaEvaluacionRepository extends JpaRepository<EsquemaEvaluacion, UUID> {
 
-    Optional<EsquemaEvaluacion> findBySeccionId(UUID seccionId);
+    Optional<EsquemaEvaluacion> findByParaleloId(UUID paraleloId);
 
-    boolean existsBySeccionId(UUID seccionId);
+    boolean existsByParaleloId(UUID paraleloId);
 
-    @Query("SELECT e.seccionId FROM EsquemaEvaluacion e WHERE e.seccionId IN :seccionIds")
-    List<UUID> findSeccionIdsWithEsquema(List<UUID> seccionIds);
+    @Query("SELECT e.paraleloId FROM EsquemaEvaluacion e WHERE e.paraleloId IN :paraleloIds")
+    List<UUID> findParaleloIdsWithEsquema(List<UUID> paraleloIds);
 }

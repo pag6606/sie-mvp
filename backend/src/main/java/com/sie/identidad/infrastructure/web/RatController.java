@@ -29,7 +29,7 @@ public class RatController {
                                 "base_legal", "Obligación legal (Art. 7 LOPDP)"),
                         Map.of("actividad", "Matrícula de estudiantes",
                                 "datos", List.of("email estudiante", "sección asignada", "fecha matrícula"),
-                                "finalidad", "Inscripción de estudiantes en secciones",
+                                "finalidad", "Inscripción de estudiantes en paralelos",
                                 "base_legal", "Consentimiento parental (Art. 21 LOPDP para NNA)"),
                         Map.of("actividad", "Registro de calificaciones y asistencia",
                                 "datos", List.of("notas numéricas", "porcentaje de asistencia", "estado de cierre"),

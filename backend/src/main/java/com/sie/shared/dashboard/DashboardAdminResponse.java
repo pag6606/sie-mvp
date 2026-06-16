@@ -8,12 +8,12 @@ public record DashboardAdminResponse(
         PeriodoInfo periodoActivo,
         long totalEstudiantes,
         long totalMatriculados,
-        long seccionesActivas,
+        long paralelosActivas,
         double porcentajeAsistencia,
         List<EvolucionMensual> evolucionMatriculas,
         List<ActividadReciente> actividadReciente
 ) {
-    public record PeriodoInfo(String codigo, String nombre, String estado, LocalDate fechaInicio, LocalDate fechaFin) {}
+    public record PeriodoInfo(String id, String codigo, String nombre, String estado, LocalDate fechaInicio, LocalDate fechaFin) {}
     public record EvolucionMensual(String mes, long cantidad) {}
     public record ActividadReciente(String tipo, String descripcion, java.time.LocalDateTime fecha) {}
 }

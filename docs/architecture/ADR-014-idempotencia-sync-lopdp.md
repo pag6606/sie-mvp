@@ -22,7 +22,7 @@ En el código actual (`ConsentimientoService.java:66,110`), el campo `enrollment
 var enrollmentRef = "SIE-CONS-" + System.currentTimeMillis();
 ```
 
-Este valor **no es determinístico**: un retry ante fallo de red produce un `enrollmentRef` distinto. LOPDP confirma (respuesta técnica Sección A2) que implementa **SyncLog** con `enrollmentRef` como clave única de idempotencia: si recibe el mismo `enrollmentRef` dos veces, responde `200 OK` en lugar de `409 Conflict`.
+Este valor **no es determinístico**: un retry ante fallo de red produce un `enrollmentRef` distinto. LOPDP confirma (respuesta técnica Paralelo A2) que implementa **SyncLog** con `enrollmentRef` como clave única de idempotencia: si recibe el mismo `enrollmentRef` dos veces, responde `200 OK` en lugar de `409 Conflict`.
 
 Sin una estrategia de idempotencia correcta, los reintentos en batch (`importarCSV()` con 500+ registros) pueden duplicar registros de consentimiento en LOPDP.
 
@@ -110,5 +110,5 @@ SIE-{colegioId}-{estudianteId}-{representanteCedula}
 
 - `backend/src/main/java/com/sie/identidad/application/ConsentimientoService.java` — líneas 66, 110 (código a modificar)
 - `backend/src/main/java/com/sie/lopdp/LopdpConsentClient.java` — cliente HTTP
-- `docs/architecture/reference/requerimientos-tecnicos-lopdp.md` — Sección A2
+- `docs/architecture/reference/requerimientos-tecnicos-lopdp.md` — Paralelo A2
 - `docs/architecture/ADR-016` — Minimización de datos (relacionado)

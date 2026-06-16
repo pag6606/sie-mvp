@@ -81,6 +81,7 @@ podman run --rm \
 | ADR-014 | [`ADR-014-idempotencia-sync-lopdp.md`](ADR-014-idempotencia-sync-lopdp.md) | `enrollmentRef` determinístico (`SIE-{colegioId}-{estudianteId}-{cedula}`) para sync con LOPDP |
 | ADR-015 | [`ADR-015-rate-limiting-lopdp.md`](ADR-015-rate-limiting-lopdp.md) | Rate limiting con Guava `RateLimiter` (100/min enrollment, 30/min consent) y bulk endpoint para CSV |
 | ADR-016 | [`ADR-016-minimizacion-datos-lopdp.md`](ADR-016-minimizacion-datos-lopdp.md) | Eliminación de campos innecesarios y hardcode `dateOfBirth` en payloads a LOPDP |
+| ADR-017 | [`ADR-017-modulo-representantes-padres.md`](ADR-017-modulo-representantes-padres.md) | `Representante` como Aggregate Root en Identidad, `usuario_id` nullable, `IVinculacionResolver` en shared kernel |
 
 ### Decisiones adicionales (documento central)
 
@@ -148,7 +149,7 @@ podman run --rm \
 | Archivo | Descripción |
 |---------|-------------|
 | [`reference/normativas.md`](reference/normativas.md) | Análisis de normativas ecuatorianas aplicables: LOPDP (26 artículos), LOEI, Reglamento LOEI, checklist de cumplimiento |
-| [`reference/requerimientos-tecnicos-lopdp.md`](reference/requerimientos-tecnicos-lopdp.md) | Documento consolidado de preguntas y requerimientos técnicos para el equipo LOPDP (Secciones A-D, 14 preguntas, 11 obligaciones del lado SIE) |
+| [`reference/requerimientos-tecnicos-lopdp.md`](reference/requerimientos-tecnicos-lopdp.md) | Documento consolidado de preguntas y requerimientos técnicos para el equipo LOPDP (Paralelos A-D, 14 preguntas, 11 obligaciones del lado SIE) |
 | [`reference/requerimientos.pdf`](reference/requerimientos.pdf) | Documento de requerimientos funcionales MVP: 19 historias de usuario, 4 módulos, matriz de permisos, APIs |
 | [`../reference/`](../reference/) | Textos legales completos: LOEI, Reglamento LOEI, LOPDP, Guía DevPrivOps, Guía Protección de Datos desde el Diseño |
 

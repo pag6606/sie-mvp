@@ -16,7 +16,7 @@ Este documento consolida todas las preguntas pendientes, organizadas por priorid
 
 ---
 
-## Sección A — Preguntas Bloqueantes (P0)
+## Paralelo A — Preguntas Bloqueantes (P0)
 
 > Sin respuesta a estas preguntas, el desarrollo de la integración está bloqueado.
 
@@ -58,7 +58,7 @@ Este documento consolida todas las preguntas pendientes, organizadas por priorid
 
 ---
 
-## Sección B — Preguntas Críticas para Diseño (P1)
+## Paralelo B — Preguntas Críticas para Diseño (P1)
 
 > Podemos avanzar diseño con supuestos, pero las decisiones finales requieren estas respuestas.
 
@@ -100,7 +100,7 @@ Este documento consolida todas las preguntas pendientes, organizadas por priorid
 
 ---
 
-## Sección C — Preguntas para Planificación (P2)
+## Paralelo C — Preguntas para Planificación (P2)
 
 > No bloquean el desarrollo inmediato, pero deben responderse antes de salir a producción.
 
@@ -151,7 +151,7 @@ Este documento consolida todas las preguntas pendientes, organizadas por priorid
 
 ---
 
-## Sección D — Obligaciones LOPDP que Requieren Acción del SIE
+## Paralelo D — Obligaciones LOPDP que Requieren Acción del SIE
 
 > No son preguntas para LOPDP, sino confirmación de que el SIE ha identificado correctamente su alcance. Solicitamos al equipo LOPDP **validar esta lista** y señalar omisiones.
 
@@ -180,7 +180,7 @@ Solicitamos al equipo LOPDP:
 
 ---
 
-## Sección E — Plan de Trabajo Conjunto
+## Paralelo E — Plan de Trabajo Conjunto
 
 ### Corto plazo (próximos 5 días)
 
@@ -188,7 +188,7 @@ Solicitamos al equipo LOPDP:
 |--------|-------------|
 | Responder preguntas P0 (A1-A4) | Equipo LOPDP |
 | Iniciar implementación de D1 (CSV) y D4 (purga) en paralelo | Equipo SIE |
-| Programar reunión de 90 min para revisar Secciones A y B | Ambos equipos |
+| Programar reunión de 90 min para revisar Paralelos A y B | Ambos equipos |
 
 ### Mediano plazo (próximas 2 semanas)
 
@@ -204,7 +204,7 @@ Solicitamos al equipo LOPDP:
 | Acción | Responsable |
 |--------|-------------|
 | Responder preguntas P2 (C1-C5) | Equipo LOPDP |
-| Validar lista de obligaciones Sección D | Equipo LOPDP |
+| Validar lista de obligaciones Paralelo D | Equipo LOPDP |
 | Implementar D5-D11 según prioridad | Equipo SIE |
 | Prueba de carga conjunta con escenario de publicación de notas | Ambos equipos |
 

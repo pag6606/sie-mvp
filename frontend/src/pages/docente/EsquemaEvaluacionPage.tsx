@@ -17,13 +17,13 @@ const DEFAULT_COMPONENTES: Componente[] = [
 ]
 
 export default function EsquemaEvaluacionPage() {
-  const { seccionId } = useParams()
+  const { paraleloId } = useParams()
   const [componentes, setComponentes] = useState<Componente[]>(DEFAULT_COMPONENTES)
   const navigate = useNavigate()
   const suma = componentes.reduce((acc, c) => acc + c.peso, 0)
 
   const guardarMutation = useMutation({
-    mutationFn: () => api.put(`/secciones/${seccionId}/esquema-evaluacion`, { componentes }),
+    mutationFn: () => api.put(`/paralelos/${paraleloId}/esquema-evaluacion`, { componentes }),
     onSuccess: () => navigate('/docente'),
     onError: () => {},
   })
@@ -51,7 +51,7 @@ export default function EsquemaEvaluacionPage() {
   return (
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
-        <button onClick={() => navigate('/docente')} className="text-sm text-muted-foreground hover:underline mb-4 block">← Mis secciones</button>
+        <button onClick={() => navigate('/docente')} className="text-sm text-muted-foreground hover:underline mb-4 block">← Mis paralelos</button>
         <PageHead eyebrow="Docente" title="Esquema de Evaluación" subtitle="Cada componente no puede exceder el 40%. La suma debe ser 100%." />
         <p className="mb-2 text-xs text-muted-foreground">Cada componente no puede exceder el 40%. La suma total debe ser 100%.</p>
 

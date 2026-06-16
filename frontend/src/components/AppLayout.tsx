@@ -25,8 +25,8 @@ const NAV_ITEMS: Record<string, NavSection[]> = {
       items: [
         { label: 'Dashboard', Icon: Icons.Grid, href: '/admin' },
         { label: 'Usuarios', Icon: Icons.Users, href: '/admin/usuarios' },
-        { label: 'Cursos', Icon: Icons.Book, href: '/admin/cursos' },
-        { label: 'Secciones', Icon: Icons.Layers, href: '/admin/secciones' },
+        { label: 'Asignaturas', Icon: Icons.Book, href: '/admin/asignaturas' },
+        { label: 'Paralelos', Icon: Icons.Layers, href: '/admin/paralelos' },
         { label: 'Matrícula', Icon: Icons.Clipboard, href: '/admin/matricula' },
         { label: 'Consentimientos', Icon: Icons.Shield, href: '/admin/consentimientos' },
       ]
@@ -43,16 +43,7 @@ const NAV_ITEMS: Record<string, NavSection[]> = {
     {
       label: 'Mi docencia',
       items: [
-        { label: 'Mis secciones', Icon: Icons.Book, href: '/docente' },
-      ]
-    },
-    {
-      label: 'Acciones',
-      items: [
-        { label: 'Asistencia', Icon: Icons.Check, href: '/docente/asistencia' },
-        { label: 'Esquema evaluación', Icon: Icons.List, href: '/docente/esquema' },
-        { label: 'Ingresar notas', Icon: Icons.Edit, href: '/docente/notas' },
-        { label: 'Cerrar sección', Icon: Icons.X, href: '/docente/cerrar' },
+        { label: 'Mis paralelos', Icon: Icons.Book, href: '/docente' },
       ]
     },
   ],
@@ -141,7 +132,7 @@ export default function AppLayout({ role, children }: AppLayoutProps) {
                   onClick={() => setSidebarOpen(false)}
                   className={`flex items-center gap-2.5 py-2 px-3.5 text-[0.86rem] border-l-2 transition-colors ${
                     active
-                      ? 'text-[#8A6A18] bg-[rgba(138,106,24,0.08)] border-l-[#8A6A18] font-medium'
+                      ? 'text-[#0A0A0B] bg-[rgba(138,106,24,0.08)] border-l-[#8A6A18] font-medium'
                       : 'text-[rgba(10,10,11,0.72)] border-l-transparent hover:text-[#0A0A0B] hover:bg-[#F6F8FA]'
                   }`}
                   aria-current={active ? 'page' : undefined}

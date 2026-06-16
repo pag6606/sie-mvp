@@ -1,8 +1,8 @@
 package com.sie.matricula.application;
 
-import com.sie.academico.domain.Curso;
-import com.sie.academico.domain.Seccion;
-import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.academico.domain.Asignatura;
+import com.sie.academico.domain.Paralelo;
+import com.sie.academico.infrastructure.ParaleloRepository;
 import com.sie.identidad.application.ConsentimientoService;
 import com.sie.identidad.domain.Usuario;
 import com.sie.identidad.infrastructure.UsuarioRepository;
@@ -27,13 +27,13 @@ import static org.mockito.Mockito.*;
 class MatriculaServiceTest {
 
     @Mock MatriculaRepository matriculaRepository;
-    @Mock SeccionRepository seccionRepository;
+    @Mock ParaleloRepository paraleloRepository;
     @Mock UsuarioRepository usuarioRepository;
     @Mock ConsentimientoService consentimientoService;
     @Mock EntityManager em;
 
     private MatriculaService svc() {
-        return new MatriculaService(matriculaRepository, seccionRepository, usuarioRepository, consentimientoService, em);
+        return new MatriculaService(matriculaRepository, paraleloRepository, usuarioRepository, consentimientoService, em);
     }
 
     @Test
@@ -41,23 +41,23 @@ class MatriculaServiceTest {
         var svc = svc();
         UUID colegioId = UUID.randomUUID();
         UUID estudianteId = UUID.randomUUID();
-        UUID seccionId = UUID.randomUUID();
+        UUID paraleloId = UUID.randomUUID();
 
         Usuario estudiante = new Usuario();
         estudiante.setId(estudianteId); estudiante.setNombre("Ernesto"); estudiante.setActivo(true);
 
-        Curso curso = new Curso(); curso.setCodigo("MAT-101"); curso.setNombre("Matemáticas"); curso.setCreditos(3);
-        Seccion seccion = new Seccion(); seccion.setCurso(curso);
+        Asignatura asignatura = new Asignatura(); asignatura.setCodigo("MAT-101"); asignatura.setNombre("Matemáticas"); asignatura.setHorasSemanales(3);
+        Paralelo paralelo = new Paralelo(); paralelo.setAsignatura(asignatura);
 
         when(usuarioRepository.findById(estudianteId)).thenReturn(Optional.of(estudiante));
         when(consentimientoService.existeConsentimiento(estudianteId)).thenReturn(true);
-        when(seccionRepository.findById(seccionId)).thenReturn(Optional.of(seccion));
-        when(matriculaRepository.existsByEstudianteIdAndSeccionId(estudianteId, seccionId)).thenReturn(false);
+        when(paraleloRepository.findById(paraleloId)).thenReturn(Optional.of(paralelo));
+        when(matriculaRepository.existsByEstudianteIdAndParaleloId(estudianteId, paraleloId)).thenReturn(false);
         when(matriculaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        MatriculaResponse resp = svc.matricular(colegioId, new MatricularRequest(estudianteId, seccionId));
+        MatriculaResponse resp = svc.matricular(colegioId, new MatricularRequest(estudianteId, paraleloId));
         assertEquals(estudianteId, resp.estudianteId());
-        assertEquals(seccionId, resp.seccionId());
+        assertEquals(paraleloId, resp.paraleloId());
     }
 
     @Test
@@ -76,13 +76,13 @@ class MatriculaServiceTest {
         var svc = svc();
         UUID estudianteId = UUID.randomUUID();
         Usuario estudiante = new Usuario(); estudiante.setId(estudianteId); estudiante.setActivo(true);
-        Curso curso = new Curso(); curso.setNombre("M"); curso.setCreditos(3);
-        Seccion seccion = new Seccion(); seccion.setCurso(curso);
+        Asignatura asignatura = new Asignatura(); asignatura.setNombre("M"); asignatura.setHorasSemanales(3);
+        Paralelo paralelo = new Paralelo(); paralelo.setAsignatura(asignatura);
 
         when(usuarioRepository.findById(estudianteId)).thenReturn(Optional.of(estudiante));
         lenient().when(consentimientoService.existeConsentimiento(any())).thenReturn(true);
-        lenient().when(seccionRepository.findById(any())).thenReturn(Optional.of(seccion));
-        when(matriculaRepository.existsByEstudianteIdAndSeccionId(any(), any())).thenReturn(true);
+        lenient().when(paraleloRepository.findById(any())).thenReturn(Optional.of(paralelo));
+        when(matriculaRepository.existsByEstudianteIdAndParaleloId(any(), any())).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class,
                 () -> svc.matricular(UUID.randomUUID(), new MatricularRequest(estudianteId, UUID.randomUUID())));
@@ -107,10 +107,10 @@ class MatriculaServiceTest {
     }
 
     @Test
-    void listarPorSeccion_vacio() {
+    void listarPorParalelo_vacio() {
         var svc = svc();
-        when(matriculaRepository.findBySeccionId(any())).thenReturn(java.util.List.of());
-        assertTrue(svc.listarPorSeccion(UUID.randomUUID()).isEmpty());
+        when(matriculaRepository.findByParaleloId(any())).thenReturn(java.util.List.of());
+        assertTrue(svc.listarPorParalelo(UUID.randomUUID()).isEmpty());
     }
 
     @Test
@@ -122,12 +122,12 @@ class MatriculaServiceTest {
     }
 
     @Test
-    void matricular_seccionNoEncontrada_lanzaExcepcion() {
+    void matricular_paraleloNoEncontrada_lanzaExcepcion() {
         var svc = svc();
         Usuario estudiante = new Usuario(); estudiante.setActivo(true);
         when(usuarioRepository.findById(any())).thenReturn(Optional.of(estudiante));
         lenient().when(consentimientoService.existeConsentimiento(any())).thenReturn(true);
-        lenient().when(seccionRepository.findById(any())).thenReturn(Optional.empty());
+        lenient().when(paraleloRepository.findById(any())).thenReturn(Optional.empty());
         assertThrows(IllegalArgumentException.class,
                 () -> svc.matricular(UUID.randomUUID(), new MatricularRequest(UUID.randomUUID(), UUID.randomUUID())));
     }
@@ -136,17 +136,17 @@ class MatriculaServiceTest {
     void importarCSV_exitoso() throws Exception {
         var svc = svc();
         UUID colegioId = UUID.randomUUID();
-        String csv = "email_estudiante,codigo_seccion\nernesto@colegio.edu.ec,MAT-101-A\n";
+        String csv = "email_estudiante,codigo_paralelo\nernesto@colegio.edu.ec,MAT-101-A\n";
         var reader = new BufferedReader(new StringReader(csv));
 
         Usuario estudiante = new Usuario(); estudiante.setNombre("Ernesto");
-        Curso curso = new Curso(); curso.setNombre("M"); curso.setCreditos(3);
-        Seccion seccion = new Seccion(); seccion.setCurso(curso); seccion.setCodigo("MAT-101-A");
+        Asignatura asignatura = new Asignatura(); asignatura.setNombre("M"); asignatura.setHorasSemanales(3);
+        Paralelo paralelo = new Paralelo(); paralelo.setAsignatura(asignatura); paralelo.setCodigo("MAT-101-A");
 
         when(usuarioRepository.findByEmail("ernesto@colegio.edu.ec")).thenReturn(java.util.Optional.of(estudiante));
         when(consentimientoService.existeConsentimiento(any())).thenReturn(true);
-        when(seccionRepository.findAll()).thenReturn(java.util.List.of(seccion));
-        when(matriculaRepository.existsByEstudianteIdAndSeccionId(any(), any())).thenReturn(false);
+        when(paraleloRepository.findAll()).thenReturn(java.util.List.of(paralelo));
+        when(matriculaRepository.existsByEstudianteIdAndParaleloId(any(), any())).thenReturn(false);
         when(matriculaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         var result = svc.importarCSV(colegioId, reader);

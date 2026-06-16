@@ -19,9 +19,9 @@ export function usePeriodoEnProgreso(): PeriodoEnProgreso | null {
   const borrador = periodos?.find(p => p.estado === 'BORRADOR')
   const periodoId = borrador?.id ?? ''
 
-  const { data: secciones } = useQuery<SeccionDocente[]>({
-    queryKey: ['secciones', periodoId],
-    queryFn: () => api.get(`/secciones?periodoId=${periodoId}&size=200`).then(r => {
+  const { data: paralelos } = useQuery<SeccionDocente[]>({
+    queryKey: ['paralelos', periodoId],
+    queryFn: () => api.get(`/paralelos?periodoId=${periodoId}&size=200`).then(r => {
       const d = r.data
       return Array.isArray(d) ? d : (d.content || [])
     }),
@@ -31,8 +31,8 @@ export function usePeriodoEnProgreso(): PeriodoEnProgreso | null {
 
   if (!borrador) return null
 
-  const paso = determinarPaso(secciones)
-  const labels = ['', '', 'Secciones', 'Revisar', 'Confirmar']
+  const paso = determinarPaso(paralelos)
+  const labels = ['', '', 'Paralelos', 'Revisar', 'Confirmar']
   const rutas = ['', '', 'clonar', 'revisar', 'confirmar']
 
   return {
@@ -44,10 +44,10 @@ export function usePeriodoEnProgreso(): PeriodoEnProgreso | null {
   }
 }
 
-function determinarPaso(secciones: SeccionDocente[] | undefined): number {
-  if (!secciones || secciones.length === 0) return 2
+function determinarPaso(paralelos: SeccionDocente[] | undefined): number {
+  if (!paralelos || paralelos.length === 0) return 2
 
-  const todasRevisadas = secciones.every(
+  const todasRevisadas = paralelos.every(
     (s) => (s.docentes?.length ?? 0) > 0
   )
   return todasRevisadas ? 4 : 3

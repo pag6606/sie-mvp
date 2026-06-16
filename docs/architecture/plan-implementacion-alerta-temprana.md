@@ -194,7 +194,7 @@ ALTER TABLE esquema_evaluacion ADD COLUMN sub_periodo_id UUID REFERENCES sub_per
 
 | Método | Ruta | Response |
 |--------|------|----------|
-| `GET` | `/api/riesgo/dashboard?periodoId={uuid}` | `List<RiesgoDashboardResponse>` (agregado por sección) |
+| `GET` | `/api/riesgo/dashboard?periodoId={uuid}` | `List<RiesgoDashboardResponse>` (agregado por paralelo) |
 | `GET` | `/api/riesgo/seccion/{seccionId}` | `List<RiesgoEstudianteResponse>` |
 | `GET` | `/api/riesgo/estudiante/{estudianteId}?periodoId={uuid}` | `RiesgoEstudianteResponse` con urgencia y proyección |
 | `POST` | `/api/riesgo/recalcular/{periodoId}` | `204 No Content` |
@@ -255,9 +255,9 @@ public record RiesgoEstudianteResponse(
 | 3.2 | `RiskBadge.tsx` — componente de chip con color + ícono + texto | 0.5h |
 | 3.3 | `RiskGauge.tsx` — gráfico semicircular 0-100 con color dinámico | 1.5h |
 | 3.4 | `RiskCard.tsx` — tarjeta de estudiante con gauge + datos | 1h |
-| 3.5 | `AlertaTempranaPage.tsx` — vista principal con 2 tabs (Dashboard / Por Sección) | 3h |
+| 3.5 | `AlertaTempranaPage.tsx` — vista principal con 2 tabs (Dashboard / Por Paralelo) | 3h |
 | 3.6 | Integración en `AdminDashboard.tsx` (KPI resumen opcional + quick link) | 1h |
-| 3.7 | Integración en `DocenteDashboard.tsx` (widget de mis secciones) | 0.5h |
+| 3.7 | Integración en `DocenteDashboard.tsx` (widget de mis paralelos) | 0.5h |
 
 ### Día 4 — Pruebas y Ajustes (4-6h)
 
@@ -281,8 +281,8 @@ Se necesita un conjunto de datos realista que muestre el valor del sistema. Prep
 | Dato | Cantidad | Propósito en demo |
 |------|----------|-------------------|
 | Período activo "2026-A" en estado `EN_CURSO` | 1 | Contexto base |
-| Secciones con docente asignado | 6 (2 por grado: 8vo, 9no, 10mo) | Mostrar drill-down por sección |
-| Estudiantes matriculados | 90 (15 por sección) | Masa crítica para que los porcentajes tengan sentido |
+| Paralelos con docente asignado | 6 (2 por grado: 8vo, 9no, 10mo) | Mostrar drill-down por paralelo |
+| Estudiantes matriculados | 90 (15 por paralelo) | Masa crítica para que los porcentajes tengan sentido |
 | Esquemas de evaluación con 4 componentes c/u | 6 | Base para proyección de notas |
 | Notas parciales con variedad de escenarios | ~270 (50% cobertura) | Mostrar mezcla de 🟢🟡🔴 |
 | Asistencias con variedad (90%, 75%, 60%, 40%) | ~180 registros | Factor de riesgo por inasistencia |
@@ -302,7 +302,7 @@ Se necesita un conjunto de datos realista que muestre el valor del sistema. Prep
 **Script SQL de fixtures (carga mínima para demo):**
 - 1 período "COSTA-2026" con 2Q × 3P generados automáticamente
 - Sub-período activo: Q1P2 (50% transcurrido, fecha cierre en 15 días)
-- 6 secciones (2×8vo, 2×9no, 2×10mo)
+- 6 paralelos (2×8vo, 2×9no, 2×10mo)
 - 90 estudiantes con la distribución de perfiles de arriba
 - ~270 notas cargadas (50% de cobertura de componentes)
 - ~180 registros de asistencia
@@ -314,7 +314,7 @@ Se necesita un conjunto de datos realista que muestre el valor del sistema. Prep
 | `RiesgoService` | `SubPeriodoRepository` | Leer fechas, pesos y estado de parciales/quimestres | 🆕 Fase 0 |
 | `RiesgoService` | `CalificacionesService` | Leer notas y asistencias | ✅ Ya existe |
 | `RiesgoService` | `MatriculaRepository` | Leer matrículas activas | ✅ Ya existe |
-| `RiesgoService` | `SeccionRepository` | Leer secciones del período | ✅ Ya existe |
+| `RiesgoService` | `SeccionRepository` | Leer paralelos del período | ✅ Ya existe |
 | `RiesgoService` | `UsuarioRepository` | Leer nombres de estudiantes | ✅ Ya existe |
 | `RiesgoService` → RabbitMQ | `NotificacionService` | Publicar `RiesgoElevadoDetectadoEvent` | ✅ Ya existe (RabbitMQ + outbox configurados) |
 | RabbitMQ → `NotificacionService` | Frontend SSE | Push notificaciones en tiempo real | ✅ Ya existe (`NotificacionController` SSE) |
@@ -330,8 +330,8 @@ Se necesita un conjunto de datos realista que muestre el valor del sistema. Prep
            ├── Selector de período: "Costa 2026" (dropdown)
            ├── Barra de urgencia: "Q1 cierra en 15 días — 60% transcurrido"
            ├── KPI cards: 5 críticos, 12 en observación, 73 estables
-           ├── Tabla de secciones: riesgo promedio por sección
-           │   └── Click en sección → drill-down de estudiantes
+           ├── Tabla de paralelos: riesgo promedio por paralelo
+           │   └── Click en paralelo → drill-down de estudiantes
            └── Click en estudiante → tarjeta de detalle:
                ├── Gauge de riesgo 0-100
                ├── "Proyección final: 6.7/10"
@@ -345,7 +345,7 @@ Se necesita un conjunto de datos realista que muestre el valor del sistema. Prep
    └── Widget "Estado del Período"
        └── "Q1 cerrado — Q2 en curso. Cierre: 28-feb"
        └── "3 alumnos necesitan atención en 10mo A"
-       └── Click → AlertaTempranaPage filtrado por esa sección
+       └── Click → AlertaTempranaPage filtrado por esa paralelo
 ```
 
 ---
@@ -401,7 +401,7 @@ Se necesita un conjunto de datos realista que muestre el valor del sistema. Prep
 |--------|-------------|---------|------------|
 | División por cero en cálculo | Media | Alto | Guard clause en `RiesgoService`: si `totalComponentes == 0` o `totalSesiones == 0`, retornar `SIN_DATOS` |
 | Performance con 90 estudiantes | Baja | Bajo | Una sola native query JOIN. < 200ms garantizado |
-| Datos de fixtures poco realistas | Media | Alto | Validar con perfil de Academia del Pacífico (~500 alumnos, ~30 secciones). Preparar script de carga ANTES del día de demo |
+| Datos de fixtures poco realistas | Media | Alto | Validar con perfil de Academia del Pacífico (~500 alumnos, ~30 paralelos). Preparar script de carga ANTES del día de demo |
 | El director no entiende el scoring | Alta | Medio | NO explicar la fórmula. Mostrar el heat map y decir: "Este rojo es un alumno que posiblemente no termine el año." |
 | Fallo de proyector o internet en la demo | Baja | Alto | Tener screenshots de respaldo. La demo corre 100% local (localhost). |
 

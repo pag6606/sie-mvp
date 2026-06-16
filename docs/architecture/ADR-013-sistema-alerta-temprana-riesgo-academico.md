@@ -21,7 +21,7 @@ La funcionalidad de Alerta Temprana materializa esa ventaja: convierte al SIE de
 
 - **0 nuevas dependencias externas.** Sin APIs de OpenAI, sin servicios cloud adicionales, sin librerías de ML.
 - **0 cambios en el modelo de datos core.** Solo lectura de tablas existentes. Una tabla nueva opcional para historial de scores.
-- **Debe funcionar con los datos actuales de Academia del Pacífico** (~500 estudiantes, ~30 secciones, ~6 materias por grado).
+- **Debe funcionar con los datos actuales de Academia del Pacífico** (~500 estudiantes, ~30 paralelos, ~6 materias por grado).
 - **Debe estar listo para demo en 3-4 días de desarrollo.**
 
 ---
@@ -129,7 +129,7 @@ riskScore = ROUND(
 
 ```
 Docente ingresa nota en NotasPage
-  → POST /api/secciones/{id}/notas
+  → POST /api/paralelos/{id}/notas
     → CalificacionesService.ingresarNotas()
       → emite NotaModificadaEvent { seccionId, matriculaIds[] }
         → RiesgoService.recalcularAfectados(matriculaIds)
@@ -149,7 +149,7 @@ Docente ingresa nota en NotasPage
 
 ### Privacidad de alertas: docente vs administrativo
 
-El docente ve alertas individuales de SUS estudiantes con guías de acción. El administrativo ve datos agregados por sección (conteo por nivel, promedio de riesgo) sin exponer al docente individual. El drill-down del admin requiere justificación explícita ("Solicitar revisión pedagógica") y queda registrado en auditoría.
+El docente ve alertas individuales de SUS estudiantes con guías de acción. El administrativo ve datos agregados por paralelo (conteo por nivel, promedio de riesgo) sin exponer al docente individual. El drill-down del admin requiere justificación explícita ("Solicitar revisión pedagógica") y queda registrado en auditoría.
 
 ### Botón de "El docente discrepa"
 
@@ -201,7 +201,7 @@ El scoring es puramente algorítmico. Si en fase 2 se justifica ML para mejorar 
 ### 2. Dashboard integrado en página principal (RECHAZADA)
 
 **Pros:** Máxima visibilidad, el admin lo ve al instante.
-**Contras:** Cambia el tono emocional del dashboard de "todo está operativo" a "hay problemas". Fatiga de alertas. Riesgo de que el admin ignore otras secciones del dashboard.
+**Contras:** Cambia el tono emocional del dashboard de "todo está operativo" a "hay problemas". Fatiga de alertas. Riesgo de que el admin ignore otras paralelos del dashboard.
 **Decisión:** Página dedicada `/admin/alertas` accesible desde quick link + badge con contador en el navbar. El dashboard principal solo muestra un KPI resumen opcional y configurable.
 
 ### 3. Cálculo 100% on-the-fly sin persistencia (RECHAZADA)
@@ -215,7 +215,7 @@ El scoring es puramente algorítmico. Si en fase 2 se justifica ML para mejorar 
 ## Métricas de éxito (validar post-implementación)
 
 - [ ] Dashboard de alerta temprana carga en <500ms (P95) con 500 estudiantes
-- [ ] Cálculo de riesgo para sección de 30 estudiantes en <100ms
+- [ ] Cálculo de riesgo para paralelo de 30 estudiantes en <100ms
 - [ ] 0 NaN / divisiones por cero en cualquier combinación de datos de entrada
 - [ ] 0 dependencias nuevas en `pom.xml` (verificar con `mvn dependency:tree`)
 - [ ] 0 tablas core modificadas (verificar con `\dt` en psql antes y después)

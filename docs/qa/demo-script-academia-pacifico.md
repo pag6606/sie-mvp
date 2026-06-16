@@ -17,7 +17,7 @@ Terminal 3: cd frontend && npm run dev -- --host
 
 **Verificar:**
 - [ ] `curl http://localhost:8080/actuator/health` → UP
-- [ ] `GET /api/riesgo/dashboard?periodoId=...` → devuelve 6 secciones con 🔴🟡🟢
+- [ ] `GET /api/riesgo/dashboard?periodoId=...` → devuelve 6 paralelos con 🔴🟡🟢
 - [ ] Navegador: `http://localhost:5174` → login funciona
 - [ ] DOS períodos visibles en Swagger: COSTA-2026 (EN_CURSO) y DEMO-MANUAL (BORRADOR)
 
@@ -44,7 +44,7 @@ Terminal 3: cd frontend && npm run dev -- --host
 > *"Esto es Alerta Temprana. El sistema analiza las notas y asistencias que YA están ingresadas y calcula un semáforo."*
 
 **Señalar:**
-- 🟢 10-11 estudiantes estables por sección
+- 🟢 10-11 estudiantes estables por paralelo
 - 🟡 3-4 en observación
 - 🔴 1-2 en riesgo alto
 
@@ -74,7 +74,7 @@ Terminal 3: cd frontend && npm run dev -- --host
 
 *[Volver a la tabla de estudiantes de 8vo-A-MAT]*
 
-> *"Y no todos los rojos son iguales. Mire estos tres casos en la misma sección:"*
+> *"Y no todos los rojos son iguales. Mire estos tres casos en la misma paralelo:"*
 
 | Estudiante | Nota | Asistencia | Causa |
 |------------|------|-----------|-------|
@@ -97,9 +97,9 @@ Terminal 3: cd frontend && npm run dev -- --host
 **Paso 1 — Datos del período:**
 > *"Ella ingresa el código, nombre, fechas. También las fechas de cierre de cada quimestre — que es lo que usa la Alerta Temprana para calcular la urgencia."*
 
-**Paso 2 — Clonar secciones:** *[Mostrar que puede copiar del período anterior]*
+**Paso 2 — Clonar paralelos:** *[Mostrar que puede copiar del período anterior]*
 
-**Paso 3 — Revisar secciones:** *[Mostrar la lista con docentes asignados]*
+**Paso 3 — Revisar paralelos:** *[Mostrar la lista con docentes asignados]*
 
 **Paso 4 — Confirmar apertura:** *[No hacer clic en abrir — solo mostrar el resumen]*
 
@@ -116,7 +116,7 @@ Terminal 3: cd frontend && npm run dev -- --host
 
 **Señalar en DocenteDashboard:**
 - Estado del período
-- Sus secciones asignadas
+- Sus paralelos asignadas
 - Quick link a las mismas alertas
 
 > *"Diana no necesita ser científica de datos. El sistema le dice: 'estos 3 estudiantes necesitan atención esta semana'."*

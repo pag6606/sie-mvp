@@ -7,11 +7,11 @@ import { InlineError } from '@/components/UIPatterns'
 import { ApiError } from '@/types/api'
 
 export default function CierrePage() {
-  const { seccionId } = useParams()
+  const { paraleloId } = useParams()
   const navigate = useNavigate()
 
   const cerrarMutation = useMutation({
-    mutationFn: () => api.post(`/secciones/${seccionId}/cerrar`),
+    mutationFn: () => api.post(`/paralelos/${paraleloId}/cerrar`),
     onSuccess: () => navigate('/docente'),
     onError: () => {},
   })

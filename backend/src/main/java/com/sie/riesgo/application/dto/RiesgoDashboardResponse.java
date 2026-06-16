@@ -3,7 +3,7 @@ package com.sie.riesgo.application.dto;
 import java.util.UUID;
 
 public record RiesgoDashboardResponse(
-        UUID seccionId,
+        UUID paraleloId,
         String codigo,
         String cursoNombre,
         String docenteNombre,

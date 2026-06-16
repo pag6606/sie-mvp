@@ -11,7 +11,7 @@ import lombok.Setter;
 import java.util.UUID;
 
 @Entity
-@Table(name = "notificaciones")
+@Table(name = "notificaciones", schema = "shared")
 @Getter
 @Setter
 @NoArgsConstructor

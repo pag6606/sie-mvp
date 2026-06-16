@@ -121,7 +121,7 @@ FROM (
     UNION ALL SELECT colegio_id, 'roles' FROM roles
     UNION ALL SELECT colegio_id, 'periodos' FROM periodos
     UNION ALL SELECT colegio_id, 'cursos' FROM cursos
-    UNION ALL SELECT colegio_id, 'secciones' FROM secciones
+    UNION ALL SELECT colegio_id, 'paralelos' FROM paralelos
     UNION ALL SELECT colegio_id, 'matriculas' FROM matriculas
     UNION ALL SELECT colegio_id, 'asistencias' FROM asistencias
     UNION ALL SELECT colegio_id, 'esquema_evaluacion' FROM esquema_evaluacion
@@ -145,7 +145,7 @@ FROM (
     UNION ALL SELECT colegio_id FROM roles
     UNION ALL SELECT colegio_id FROM periodos
     UNION ALL SELECT colegio_id FROM cursos
-    UNION ALL SELECT colegio_id FROM secciones
+    UNION ALL SELECT colegio_id FROM paralelos
     UNION ALL SELECT colegio_id FROM matriculas
     UNION ALL SELECT colegio_id FROM asistencias
     UNION ALL SELECT colegio_id FROM esquema_evaluacion
@@ -162,17 +162,17 @@ LIMIT 50;
 -- IR-05 · Unicidad faltante en identificadores de negocio
 -- =============================================================================
 
--- IR-05a: secciones.codigo por (periodo_id, codigo)
+-- IR-05a: paralelos.codigo por (periodo_id, codigo)
 SELECT periodo_id, codigo, COUNT(*) AS duplicados
-FROM secciones
+FROM paralelos
 WHERE deleted_at IS NULL
 GROUP BY periodo_id, codigo
 HAVING COUNT(*) > 1
 ORDER BY duplicados DESC;
 
--- IR-05a': secciones.codigo global (por si el scope correcto fuera solo codigo)
+-- IR-05a': paralelos.codigo global (por si el scope correcto fuera solo codigo)
 SELECT codigo, COUNT(*) AS duplicados
-FROM secciones
+FROM paralelos
 WHERE deleted_at IS NULL
 GROUP BY codigo
 HAVING COUNT(*) > 1;
@@ -233,7 +233,7 @@ LIMIT 20;
 
 -- capacidad no positiva
 SELECT id, codigo, capacidad
-FROM secciones
+FROM paralelos
 WHERE capacidad <= 0
 LIMIT 20;
 
@@ -278,9 +278,9 @@ FROM periodos
 GROUP BY estado
 ORDER BY filas DESC;
 
--- secciones.estado
+-- paralelos.estado
 SELECT estado, COUNT(*) AS filas
-FROM secciones
+FROM paralelos
 GROUP BY estado
 ORDER BY filas DESC;
 
@@ -361,14 +361,14 @@ ORDER BY consentimientos DESC
 LIMIT 20;
 
 -- =============================================================================
--- N-02 · cierre_secciones.colegio_id vs secciones.colegio_id (drift)
+-- N-02 · cierre_secciones.colegio_id vs paralelos.colegio_id (drift)
 -- =============================================================================
 
 SELECT cs.id AS cierre_id, cs.colegio_id AS cierre_colegio,
        s.colegio_id AS seccion_colegio,
        cs.seccion_id
 FROM cierre_secciones cs
-JOIN secciones s ON s.id = cs.seccion_id
+JOIN paralelos s ON s.id = cs.seccion_id
 WHERE cs.colegio_id IS DISTINCT FROM s.colegio_id
 LIMIT 20;
 

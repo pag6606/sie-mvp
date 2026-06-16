@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import api from '@/services/api';
 
 export interface RiesgoDashboard {
-  seccionId: string;
+  paraleloId: string;
   codigo: string;
   cursoNombre: string;
   docenteNombre: string;
@@ -43,16 +43,16 @@ export function useRiesgoDashboard(periodoId: string | undefined) {
   });
 }
 
-export function useRiesgoSeccion(seccionId: string | null) {
+export function useRiesgoSeccion(paraleloId: string | null) {
   return useQuery({
-    queryKey: ['riesgo', 'seccion', seccionId],
+    queryKey: ['riesgo', 'paralelo', paraleloId],
     queryFn: async () => {
       const { data } = await api.get<RiesgoEstudiante[]>(
-        `/riesgo/seccion/${seccionId}`
+        `/riesgo/paralelo/${paraleloId}`
       );
       return data;
     },
-    enabled: !!seccionId,
+    enabled: !!paraleloId,
   });
 }
 

@@ -19,7 +19,7 @@ public class CalificacionesController {
     private final CalificacionesService service;
     private final EmailService emailService;
 
-    @PostMapping("/secciones/{id}/asistencia")
+    @PostMapping("/paralelos/{id}/asistencia")
     public ResponseEntity<Map<String, String>> registrarAsistencia(@PathVariable UUID id,
             @RequestBody AsistenciaBulkRequest req, @RequestAttribute("usuarioId") UUID usuarioId,
             @RequestAttribute("colegioId") UUID colegioId) {
@@ -27,21 +27,21 @@ public class CalificacionesController {
         return ResponseEntity.ok(Map.of("mensaje", "Asistencia registrada"));
     }
 
-    @GetMapping("/secciones/{id}/asistencia")
+    @GetMapping("/paralelos/{id}/asistencia")
     public List<AsistenciaResponse> obtenerAsistencia(@PathVariable UUID id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
         return service.obtenerAsistencia(id, desde, hasta);
     }
 
-    @PutMapping("/secciones/{id}/esquema-evaluacion")
+    @PutMapping("/paralelos/{id}/esquema-evaluacion")
     public ResponseEntity<Map<String, String>> definirEsquema(@PathVariable UUID id,
             @RequestBody EsquemaRequest req, @RequestAttribute("colegioId") UUID colegioId) {
         service.definirEsquema(id, req.componentes(), colegioId);
         return ResponseEntity.ok(Map.of("mensaje", "Esquema guardado"));
     }
 
-    @PostMapping("/secciones/{id}/notas")
+    @PostMapping("/paralelos/{id}/notas")
     public ResponseEntity<Map<String, String>> ingresarNotas(@PathVariable UUID id,
             @RequestBody NotasBulkRequest req, @RequestAttribute("usuarioId") UUID usuarioId,
             @RequestAttribute("colegioId") UUID colegioId) {
@@ -49,15 +49,15 @@ public class CalificacionesController {
         return ResponseEntity.ok(Map.of("mensaje", "Notas guardadas"));
     }
 
-    @GetMapping("/secciones/{id}/notas")
+    @GetMapping("/paralelos/{id}/notas")
     public List<NotaResponse> obtenerNotas(@PathVariable UUID id) {
         return service.obtenerNotas(id);
     }
 
-    @PostMapping("/secciones/{id}/cerrar")
-    public ResponseEntity<Map<String, String>> cerrarSeccion(@PathVariable UUID id,
+    @PostMapping("/paralelos/{id}/cerrar")
+    public ResponseEntity<Map<String, String>> cerrarParalelo(@PathVariable UUID id,
             @RequestAttribute("usuarioId") UUID usuarioId, @RequestAttribute("colegioId") UUID colegioId) {
-        service.cerrarSeccion(id, usuarioId, colegioId);
+        service.cerrarParalelo(id, usuarioId, colegioId);
         return ResponseEntity.ok(Map.of("mensaje", "Sección cerrada"));
     }
 
@@ -76,12 +76,12 @@ public class CalificacionesController {
         return service.miAsistencia(usuarioId);
     }
 
-    @PostMapping("/admin/cierres/{seccionId}/recordar")
-    public ResponseEntity<Map<String, String>> recordarCierre(@PathVariable UUID seccionId) {
+    @PostMapping("/admin/cierres/{paraleloId}/recordar")
+    public ResponseEntity<Map<String, String>> recordarCierre(@PathVariable UUID paraleloId) {
         // Send reminder — email is configured per environment (Mailpit in dev)
         // Doesn't block if email fails
         try {
-            emailService.sendClosingReminder("docente@sistema", "Sección " + seccionId);
+            emailService.sendClosingReminder("docente@sistema", "Sección " + paraleloId);
         } catch (Exception ignored) {}
         return ResponseEntity.ok(Map.of("mensaje", "Recordatorio enviado"));
     }

@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity @Table(name = "notas")
+@Entity @Table(name = "notas", schema = "calificaciones")
 @Getter @Setter @NoArgsConstructor
 public class Nota extends BaseEntity {
 

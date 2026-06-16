@@ -104,21 +104,21 @@ class LopdpConsentClientTest {
         @Test
         @DisplayName("Happy path — otorga consentimiento y retorna ledger hash")
         void grantConsent_exitoso() {
-            mockServer.expect(requestTo(BASE_URL + "/consents"))
+            mockServer.expect(requestTo(BASE_URL + "/admin/sync/consent"))
                     .andExpect(method(HttpMethod.POST))
-                    .andExpect(jsonPath("$.titularId").value("s-111"))
-                    .andExpect(jsonPath("$.purpose").value("ACADEMIC_RECORDS"))
+                    .andExpect(jsonPath("$.studentEmail").value("s@test.ec"))
+                    .andExpect(jsonPath("$.parentEmail").value("p@test.ec"))
+                    .andExpect(jsonPath("$.purposeCode").value("ACADEMIC_RECORDS"))
                     .andExpect(jsonPath("$.granted").value("true"))
                     .andExpect(jsonPath("$.consentLevel").value("EXPLICIT"))
                     .andRespond(withSuccess("""
-                        {"success":true,"data":{"id":"c-444","titularId":"s-111","purpose":"ACADEMIC_RECORDS","granted":true,"ledgerHash":"abc123def"}}
+                        {"success":true,"data":{"id":"c-444","titularId":"s@test.ec","purpose":"ACADEMIC_RECORDS","granted":true,"ledgerHash":"abc123def"}}
                         """, MediaType.APPLICATION_JSON));
 
-            var result = client.grantConsent("s-111", "ACADEMIC_RECORDS", true,
-                    "EXPLICIT", "2026-01", "p-222", "/docs/consent.pdf");
+            var result = client.grantConsent("s@test.ec", "p@test.ec", "ACADEMIC_RECORDS", true,
+                    "EXPLICIT", "2025-01", "/docs/consent.pdf");
 
             assertEquals("c-444", result.id());
-            assertEquals("s-111", result.titularId());
             assertTrue(result.granted());
             assertEquals("abc123def", result.ledgerHash());
             mockServer.verify();
@@ -127,14 +127,14 @@ class LopdpConsentClientTest {
         @Test
         @DisplayName("Revocar consentimiento (granted=false)")
         void grantConsent_revocar() {
-            mockServer.expect(requestTo(BASE_URL + "/consents"))
+            mockServer.expect(requestTo(BASE_URL + "/admin/sync/consent"))
                     .andExpect(jsonPath("$.granted").value("false"))
                     .andRespond(withSuccess("""
-                        {"success":true,"data":{"id":"c-555","titularId":"s-111","purpose":"ACADEMIC_RECORDS","granted":false,"ledgerHash":"rev456"}}
+                        {"success":true,"data":{"id":"c-555","titularId":"s@test.ec","purpose":"ACADEMIC_RECORDS","granted":false,"ledgerHash":"rev456"}}
                         """, MediaType.APPLICATION_JSON));
 
-            var result = client.grantConsent("s-111", "ACADEMIC_RECORDS", false,
-                    "STANDARD", "2026-01", null, null);
+            var result = client.grantConsent("s@test.ec", "p@test.ec", "ACADEMIC_RECORDS", false,
+                    "STANDARD", "2025-01", null);
 
             assertFalse(result.granted());
             assertEquals("rev456", result.ledgerHash());

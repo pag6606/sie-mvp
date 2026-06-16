@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "consentimientos")
+@Table(name = "consentimientos", schema = "identidad")
 @Getter
 @Setter
 @NoArgsConstructor

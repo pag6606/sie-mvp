@@ -2,30 +2,36 @@ package com.sie.academico.application;
 
 import com.sie.academico.application.dto.*;
 import com.sie.academico.domain.*;
-import com.sie.academico.infrastructure.CursoRepository;
+import com.sie.academico.infrastructure.AsignaturaRepository;
 import com.sie.academico.infrastructure.PeriodoRepository;
-import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.academico.infrastructure.ParaleloRepository;
 import com.sie.calificaciones.infrastructure.EsquemaEvaluacionRepository;
 import com.sie.matricula.domain.EstadoMatricula;
 import com.sie.matricula.infrastructure.MatriculaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AcademicoService {
 
     private final PeriodoRepository periodoRepository;
-    private final CursoRepository cursoRepository;
-    private final SeccionRepository seccionRepository;
+    private final AsignaturaRepository asignaturaRepository;
+    private final ParaleloRepository paraleloRepository;
     private final MatriculaRepository matriculaRepository;
     private final EsquemaEvaluacionRepository esquemaRepository;
 
@@ -60,66 +66,87 @@ public class AcademicoService {
         return toResponse(periodoRepository.save(p));
     }
 
-    // ── Cursos ──
+    public PeriodoResponse iniciarPeriodo(UUID id) {
+        Periodo p = periodoRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Período no encontrado"));
+        p.iniciarCurso();
+        return toResponse(periodoRepository.save(p));
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    @Scheduled(cron = "0 0 2 * * *")
+    @Transactional
+    public void iniciarPeriodosAutomaticamente() {
+        List<Periodo> abiertos = periodoRepository.findByEstado(EstadoPeriodo.ABIERTO);
+        LocalDate hoy = LocalDate.now();
+        for (Periodo p : abiertos) {
+            if (!p.getFechaInicio().isAfter(hoy)) {
+                p.iniciarCurso();
+                periodoRepository.save(p);
+                log.info("Período {} → EN_CURSO (automático)", p.getCodigo());
+            }
+        }
+    }
+
+    // ── Asignaturas ──
 
     @Transactional
-    public CursoResponse crearCurso(CrearCursoRequest req, UUID colegioId) {
-        if (cursoRepository.existsByCodigo(req.codigo()))
+    public AsignaturaResponse crearAsignatura(CrearAsignaturaRequest req, UUID colegioId) {
+        if (asignaturaRepository.existsByCodigo(req.codigo()))
             throw new IllegalArgumentException("El código ya existe");
-        Curso c = new Curso();
+        Asignatura c = new Asignatura();
         c.setCodigo(req.codigo()); c.setNombre(req.nombre());
-        c.setDescripcion(req.descripcion()); c.setCreditos(req.creditos());
+        c.setDescripcion(req.descripcion()); c.setHorasSemanales(req.horasSemanales());
         c.setColegioId(colegioId);
-        return toResponse(cursoRepository.save(c));
+        return toResponse(asignaturaRepository.save(c));
     }
 
-    public List<CursoResponse> listarCursos() {
-        return cursoRepository.findAll().stream().map(this::toResponse).toList();
+    public List<AsignaturaResponse> listarAsignaturas() {
+        return asignaturaRepository.findAll().stream().map(this::toResponse).toList();
     }
 
     @Transactional
-    public CursoResponse actualizarCurso(UUID id, String nombre) {
-        Curso c = cursoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado"));
+    public AsignaturaResponse actualizarAsignatura(UUID id, String nombre) {
+        Asignatura c = asignaturaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Asignatura no encontrada"));
         c.setNombre(nombre);
-        return toResponse(cursoRepository.save(c));
+        return toResponse(asignaturaRepository.save(c));
     }
 
     @Transactional
-    public void desactivarCurso(UUID id) {
-        Curso c = cursoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Curso no encontrado"));
+    public void desactivarAsignatura(UUID id) {
+        Asignatura c = asignaturaRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Asignatura no encontrada"));
         c.setActivo(false);
-        cursoRepository.save(c);
+        asignaturaRepository.save(c);
     }
 
     // ── Secciones ──
 
     @Transactional
-    public SeccionResponse crearSeccion(CrearSeccionRequest req, UUID colegioId) {
-        Curso curso = cursoRepository.findById(req.cursoId()).orElseThrow(() -> new IllegalArgumentException("Curso no encontrado"));
+    public ParaleloResponse crearParalelo(CrearParaleloRequest req, UUID colegioId) {
+        Asignatura asignatura = asignaturaRepository.findById(req.asignaturaId()).orElseThrow(() -> new IllegalArgumentException("Asignatura no encontrada"));
         Periodo periodo = periodoRepository.findById(req.periodoId()).orElseThrow(() -> new IllegalArgumentException("Período no encontrado"));
 
-        Seccion s = new Seccion();
-        s.setCodigo(req.codigo()); s.setCurso(curso); s.setPeriodo(periodo);
+        Paralelo s = new Paralelo();
+        s.setCodigo(req.codigo()); s.setAsignatura(asignatura); s.setPeriodo(periodo);
         s.setCapacidad(req.capacidad()); s.setColegioId(colegioId);
 
         if (req.horarios() != null) {
             req.horarios().forEach(h -> {
             HorarioSesion hs = new HorarioSesion();
-            hs.setSeccion(s); hs.setDiaSemana(DayOfWeek.valueOf(h.diaSemana().toUpperCase()));
+            hs.setParalelo(s); hs.setDiaSemana(DayOfWeek.valueOf(h.diaSemana().toUpperCase()));
             hs.setHoraInicio(LocalTime.parse(h.horaInicio())); hs.setHoraFin(LocalTime.parse(h.horaFin()));
             hs.setAula(h.aula());
                 s.getHorarios().add(hs);
             });
         }
 
-        return toResponse(seccionRepository.save(s));
+        return toResponse(paraleloRepository.save(s));
     }
 
     @Transactional
-    public SeccionResponse asignarDocente(UUID seccionId, UUID docenteId, String rol) {
-        Seccion s = seccionRepository.findById(seccionId)
+    public ParaleloResponse asignarDocente(UUID seccionId, UUID docenteId, String rol) {
+        Paralelo s = paraleloRepository.findById(seccionId)
                 .orElseThrow(() -> new IllegalArgumentException("Sección no encontrada"));
         s.getDocentes().stream()
                 .filter(d -> d.getDocenteId().equals(docenteId))
@@ -127,67 +154,67 @@ public class AcademicoService {
                 .ifPresentOrElse(
                         d -> d.setRol(rol),
                         () -> {
-                            DocenteSeccion ds = new DocenteSeccion();
-                            ds.setSeccion(s); ds.setDocenteId(docenteId); ds.setRol(rol);
+                            DocenteParalelo ds = new DocenteParalelo();
+                            ds.setParalelo(s); ds.setDocenteId(docenteId); ds.setRol(rol);
                             s.getDocentes().add(ds);
                         });
-        return toResponse(seccionRepository.save(s));
+        return toResponse(paraleloRepository.save(s));
     }
 
     @Transactional
-    public SeccionResponse removerDocente(UUID seccionId, UUID docenteId) {
-        Seccion s = seccionRepository.findById(seccionId)
+    public ParaleloResponse removerDocente(UUID seccionId, UUID docenteId) {
+        Paralelo s = paraleloRepository.findById(seccionId)
                 .orElseThrow(() -> new IllegalArgumentException("Sección no encontrada"));
         s.getDocentes().removeIf(d -> d.getDocenteId().equals(docenteId));
-        return toResponse(seccionRepository.save(s));
+        return toResponse(paraleloRepository.save(s));
     }
 
     @Transactional
-    public List<SeccionResponse> clonarPeriodo(UUID origenId, UUID destinoId) {
-        List<Seccion> origen = seccionRepository.findByPeriodoId(origenId);
+    public List<ParaleloResponse> clonarPeriodo(UUID origenId, UUID destinoId) {
+        List<Paralelo> origen = paraleloRepository.findByPeriodoId(origenId);
         Periodo destino = periodoRepository.findById(destinoId).orElseThrow(() -> new IllegalArgumentException("Período destino no encontrado"));
 
-        List<Seccion> clonadas = origen.stream().map(orig -> {
-            Seccion s = new Seccion();
-            s.setCodigo(orig.getCodigo()); s.setCurso(orig.getCurso()); s.setPeriodo(destino);
+        List<Paralelo> clonadas = origen.stream().map(orig -> {
+            Paralelo s = new Paralelo();
+            s.setCodigo(orig.getCodigo()); s.setAsignatura(orig.getAsignatura()); s.setPeriodo(destino);
             s.setCapacidad(orig.getCapacidad()); s.setColegioId(destino.getColegioId());
             orig.getHorarios().forEach(h -> {
                 HorarioSesion hs = new HorarioSesion();
-                hs.setSeccion(s); hs.setDiaSemana(h.getDiaSemana());
+                hs.setParalelo(s); hs.setDiaSemana(h.getDiaSemana());
                 hs.setHoraInicio(h.getHoraInicio()); hs.setHoraFin(h.getHoraFin()); hs.setAula(h.getAula());
                 s.getHorarios().add(hs);
             });
             orig.getDocentes().forEach(d -> {
-                DocenteSeccion ds = new DocenteSeccion();
-                ds.setSeccion(s); ds.setDocenteId(d.getDocenteId()); ds.setRol(d.getRol());
+                DocenteParalelo ds = new DocenteParalelo();
+                ds.setParalelo(s); ds.setDocenteId(d.getDocenteId()); ds.setRol(d.getRol());
                 s.getDocentes().add(ds);
             });
             return s;
         }).toList();
 
-        return seccionRepository.saveAll(clonadas).stream().map(this::toResponse).toList();
+        return paraleloRepository.saveAll(clonadas).stream().map(this::toResponse).toList();
     }
 
-    public Page<SeccionResponse> listarSecciones(UUID periodoId, Pageable pageable) {
-        return seccionRepository.findByPeriodoId(periodoId, pageable).map(this::toResponse);
+    public Page<ParaleloResponse> listarParalelos(UUID periodoId, Pageable pageable) {
+        return paraleloRepository.findByPeriodoId(periodoId, pageable).map(this::toResponse);
     }
 
-    public List<SeccionResponse> listarSecciones(UUID periodoId) {
-        List<Seccion> secciones = seccionRepository.findByPeriodoId(periodoId);
-        var idsConEsquema = new HashSet<>(esquemaRepository.findSeccionIdsWithEsquema(
-                secciones.stream().map(Seccion::getId).toList()));
-        return secciones.stream()
+    public List<ParaleloResponse> listarParalelos(UUID periodoId) {
+        List<Paralelo> paralelos = paraleloRepository.findByPeriodoId(periodoId);
+        var idsConEsquema = new HashSet<>(esquemaRepository.findParaleloIdsWithEsquema(
+                paralelos.stream().map(Paralelo::getId).toList()));
+        return paralelos.stream()
                 .map(s -> toResponse(s, idsConEsquema.contains(s.getId())))
                 .toList();
     }
 
-    public List<SeccionResponse> listarSeccionesPorDocente(UUID docenteId) {
-        List<Seccion> secciones = seccionRepository.findAll().stream()
+    public List<ParaleloResponse> listarParalelosPorDocente(UUID docenteId) {
+        List<Paralelo> paralelos = paraleloRepository.findAll().stream()
                 .filter(s -> s.getDocentes().stream().anyMatch(d -> d.getDocenteId().equals(docenteId)))
                 .toList();
-        var idsConEsquema = new HashSet<>(esquemaRepository.findSeccionIdsWithEsquema(
-                secciones.stream().map(Seccion::getId).toList()));
-        return secciones.stream()
+        var idsConEsquema = new HashSet<>(esquemaRepository.findParaleloIdsWithEsquema(
+                paralelos.stream().map(Paralelo::getId).toList()));
+        return paralelos.stream()
                 .map(s -> toResponse(s, idsConEsquema.contains(s.getId())))
                 .toList();
     }
@@ -198,20 +225,20 @@ public class AcademicoService {
         return new PeriodoResponse(p.getId(), p.getCodigo(), p.getNombre(), p.getFechaInicio(), p.getFechaFin(), p.getEstado(), p.getFechaCierreQ1(), p.getFechaCierreQ2(), p.getPesoQuimestre());
     }
 
-    private CursoResponse toResponse(Curso c) {
-        return new CursoResponse(c.getId(), c.getCodigo(), c.getNombre(), c.getDescripcion(), c.getCreditos(), c.isActivo());
+    private AsignaturaResponse toResponse(Asignatura c) {
+        return new AsignaturaResponse(c.getId(), c.getCodigo(), c.getNombre(), c.getDescripcion(), c.getHorasSemanales(), c.isActivo());
     }
 
-    private SeccionResponse toResponse(Seccion s, boolean hasEsquema) {
-        int ocupados = (int) matriculaRepository.countBySeccionIdAndEstado(s.getId(), EstadoMatricula.ACTIVA);
-        return new SeccionResponse(s.getId(), s.getCodigo(), s.getCurso().getId(), s.getPeriodo().getId(),
+    private ParaleloResponse toResponse(Paralelo s, boolean hasEsquema) {
+        int ocupados = (int) matriculaRepository.countByParaleloIdAndEstado(s.getId(), EstadoMatricula.ACTIVA);
+        return new ParaleloResponse(s.getId(), s.getCodigo(), s.getAsignatura().getId(), s.getPeriodo().getId(),
                 s.getCapacidad(), ocupados, s.getCapacidad() - ocupados,
-                s.getEstado().name(), hasEsquema,
+                hasEsquema,
                 s.getDocentes().stream().map(d -> new DocenteInfo(d.getDocenteId(), d.getRol())).toList(),
                 s.getHorarios().stream().map(h -> new HorarioInfo(h.getDiaSemana().name(), h.getHoraInicio().toString(), h.getHoraFin().toString(), h.getAula())).toList());
     }
 
-    private SeccionResponse toResponse(Seccion s) {
-        return toResponse(s, esquemaRepository.existsBySeccionId(s.getId()));
+    private ParaleloResponse toResponse(Paralelo s) {
+        return toResponse(s, esquemaRepository.existsByParaleloId(s.getId()));
     }
 }

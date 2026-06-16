@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "matriculas")
+@Table(name = "matriculas", schema = "matricula")
 @Getter @Setter @NoArgsConstructor
 public class Matricula extends BaseEntity {
 
@@ -17,7 +17,7 @@ public class Matricula extends BaseEntity {
     private java.util.UUID estudianteId;
 
     @Column(name = "seccion_id", nullable = false)
-    private java.util.UUID seccionId;
+    private java.util.UUID paraleloId;
 
     @Column(nullable = false)
     private LocalDateTime fecha = LocalDateTime.now();

@@ -1,6 +1,6 @@
 package com.sie.matricula.application;
 
-import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.academico.infrastructure.ParaleloRepository;
 import com.sie.identidad.application.ConsentimientoService;
 import com.sie.identidad.domain.Usuario;
 import com.sie.identidad.infrastructure.UsuarioRepository;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class MatriculaService {
 
     private final MatriculaRepository matriculaRepository;
-    private final SeccionRepository seccionRepository;
+    private final ParaleloRepository paraleloRepository;
     private final UsuarioRepository usuarioRepository;
     private final ConsentimientoService consentimientoService;
     private final EntityManager em;
@@ -40,22 +40,22 @@ public class MatriculaService {
                 "No se puede matricular: el estudiante no tiene consentimiento parental registrado (LOPDP Art. 21).");
         }
 
-        var seccion = seccionRepository.findById(req.seccionId())
+        var paralelo = paraleloRepository.findById(req.paraleloId())
                 .orElseThrow(() -> new IllegalArgumentException("Sección no encontrada"));
 
-        if (matriculaRepository.existsByEstudianteIdAndSeccionId(req.estudianteId(), req.seccionId()))
+        if (matriculaRepository.existsByEstudianteIdAndParaleloId(req.estudianteId(), req.paraleloId()))
             throw new IllegalArgumentException("El estudiante ya está matriculado en esta sección");
 
         Matricula m = new Matricula();
         m.setEstudianteId(req.estudianteId());
-        m.setSeccionId(req.seccionId());
+        m.setParaleloId(req.paraleloId());
         m.setColegioId(colegioId);
         m = matriculaRepository.save(m);
 
         auditLog("MATRICULA", m.getId(), "CREAR", req.estudianteId(), colegioId,
-                String.format("Estudiante %s matriculado en sección %s", req.estudianteId(), req.seccionId()));
+                String.format("Estudiante %s matriculado en sección %s", req.estudianteId(), req.paraleloId()));
 
-        return toResponse(m, estudiante.getNombre(), seccion.getCurso().getNombre());
+        return toResponse(m, estudiante.getNombre(), paralelo.getAsignatura().getNombre());
     }
 
     @Transactional
@@ -73,7 +73,7 @@ public class MatriculaService {
             try {
                 String[] parts = line.split(",");
                 String email = parts[0].trim();
-                String codigoSeccion = parts[1].trim();
+                String codigoParalelo = parts[1].trim();
 
                 var usuario = usuarioRepository.findByEmail(email).orElse(null);
                 if (usuario == null) { result.errores.add(new ErrorLinea(result.total, "Estudiante no encontrado: " + email)); result.total++; return; }
@@ -82,16 +82,16 @@ public class MatriculaService {
                     result.errores.add(new ErrorLinea(result.total, "Sin consentimiento parental registrado (LOPDP Art. 21): " + email)); result.total++; return;
                 }
 
-                var secciones = seccionRepository.findAll().stream()
-                        .filter(s -> s.getCodigo().equals(codigoSeccion)).findFirst().orElse(null);
-                if (secciones == null) { result.errores.add(new ErrorLinea(result.total, "Sección no encontrada: " + codigoSeccion)); result.total++; return; }
+                var paralelos = paraleloRepository.findAll().stream()
+                        .filter(s -> s.getCodigo().equals(codigoParalelo)).findFirst().orElse(null);
+                if (paralelos == null) { result.errores.add(new ErrorLinea(result.total, "Sección no encontrada: " + codigoParalelo)); result.total++; return; }
 
-                if (matriculaRepository.existsByEstudianteIdAndSeccionId(usuario.getId(), secciones.getId())) {
+                if (matriculaRepository.existsByEstudianteIdAndParaleloId(usuario.getId(), paralelos.getId())) {
                     result.existentes++; result.total++; return;
                 }
 
                 Matricula m = new Matricula();
-                m.setEstudianteId(usuario.getId()); m.setSeccionId(secciones.getId()); m.setColegioId(colegioId);
+                m.setEstudianteId(usuario.getId()); m.setParaleloId(paralelos.getId()); m.setColegioId(colegioId);
                 matriculaRepository.save(m);
                 result.matriculados++;
             } catch (Exception e) {
@@ -109,17 +109,17 @@ public class MatriculaService {
                 .toList();
     }
 
-    public List<MatriculaResponse> listarPorSeccion(UUID seccionId) {
-        var seccion = seccionRepository.findById(seccionId).orElse(null);
-        return matriculaRepository.findBySeccionId(seccionId).stream()
+    public List<MatriculaResponse> listarPorParalelo(UUID paraleloId) {
+        var paralelo = paraleloRepository.findById(paraleloId).orElse(null);
+        return matriculaRepository.findByParaleloId(paraleloId).stream()
                 .map(m -> {
                     var estudiante = usuarioRepository.findById(m.getEstudianteId()).orElse(null);
-                    return toResponse(m, estudiante != null ? estudiante.getNombre() : "", seccion != null ? seccion.getCurso().getNombre() : "");
+                    return toResponse(m, estudiante != null ? estudiante.getNombre() : "", paralelo != null ? paralelo.getAsignatura().getNombre() : "");
                 }).toList();
     }
 
-    private MatriculaResponse toResponse(Matricula m, String nombre, String curso) {
-        return new MatriculaResponse(m.getId(), m.getEstudianteId(), m.getSeccionId(), m.getEstado(), m.getFecha(), nombre, curso);
+    private MatriculaResponse toResponse(Matricula m, String nombre, String asignatura) {
+        return new MatriculaResponse(m.getId(), m.getEstudianteId(), m.getParaleloId(), m.getEstado(), m.getFecha(), nombre, asignatura);
     }
 
     private void auditLog(String entidad, UUID entidadId, String accion, UUID autorId, UUID colegioId, String detalle) {

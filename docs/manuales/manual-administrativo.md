@@ -21,21 +21,21 @@ El sistema te guía en **4 pasos**:
 - Ingresa: código (ej: `2026-2`), nombre, fecha de inicio y fin
 - Haz clic en **"Continuar"**
 
-### Paso 2 — Secciones
+### Paso 2 — Paralelos
 - El sistema pregunta: *¿Copiar estructura del período anterior o empezar desde cero?*
 - **Recomendado:** copiar la estructura del período anterior
-- Si empiezas desde cero, deberás crear cada sección manualmente
+- Si empiezas desde cero, deberás crear cada paralelo manualmente
 
 ### Paso 3 — Revisar y ajustar
-- Revisa cada sección clonada
+- Revisa cada paralelo clonada
 - Si alguna necesita cambios (docente, aula), edítala en línea
-- Marca **✓** cada sección revisada
-- La barra de progreso muestra cuántas secciones has revisado
+- Marca **✓** cada paralelo revisada
+- La barra de progreso muestra cuántas paralelos has revisado
 
 ### Paso 4 — Confirmar y abrir
-- Revisa el resumen final: secciones, cursos, docentes
+- Revisa el resumen final: paralelos, asignaturas, docentes
 - Haz clic en **"Abrir período"**
-- **⚠️ Esta acción no se puede deshacer.** Las secciones quedarán disponibles para matrícula
+- **⚠️ Esta acción no se puede deshacer.** Las paralelos quedarán disponibles para matrícula
 
 ---
 
@@ -55,8 +55,8 @@ Desde el dashboard, accede a **"Gestionar usuarios"**:
 ### Matrícula individual
 - Ve a **"Matricular estudiante"**
 - Busca al estudiante por email o nombre
-- Selecciona la sección (muestra cupos disponibles)
-- Confirma — el sistema valida que el estudiante esté activo, la sección abierta y haya cupo
+- Selecciona la paralelo (muestra cupos disponibles)
+- Confirma — el sistema valida que el estudiante esté activo, la paralelo abierta y haya cupo
 
 ### Importación masiva CSV
 - Prepara un archivo CSV con columnas: `email_estudiante`, `codigo_seccion`
@@ -73,7 +73,7 @@ Desde el dashboard, accede a **"Gestionar usuarios"**:
 
 Cuando el período está en curso:
 
-- El dashboard muestra el estado de cada sección:
+- El dashboard muestra el estado de cada paralelo:
   - **PENDIENTE** — faltan notas por ingresar
   - **LISTA** — todas las notas ingresadas, esperando cierre del docente
   - **CERRADA** — el docente ya cerró
@@ -84,18 +84,18 @@ Cuando el período está en curso:
 
 ## 6. Cierre del período
 
-Cuando **todas** las secciones están cerradas:
+Cuando **todas** las paralelos están cerradas:
 - El sistema te permite **cerrar el período**
 - Las notas se convierten en registro oficial e inmutable
 - Los estudiantes pueden consultar sus resultados
 
 ---
 
-## 7. Ver secciones y gestionar usuarios
+## 7. Ver paralelos y gestionar usuarios
 
 Desde el dashboard puedes acceder a:
 
-- **Ver secciones** — listado completo de secciones del período con capacidad, estado y horario. Filtrable por período.
+- **Ver paralelos** — listado completo de paralelos del período con capacidad, estado y horario. Filtrable por período.
 - **Gestionar usuarios** — crear nuevos usuarios (email, nombre, rol), ver lista, desactivar. El sistema envía email de activación automático.
 
 ---
@@ -106,7 +106,7 @@ Desde el dashboard puedes acceder a:
 |--------|------|
 | Dashboard | `/admin` |
 | Configurar período | Botón destacado en dashboard |
-| Ver secciones | Link rápido "Ver secciones" |
+| Ver paralelos | Link rápido "Ver paralelos" |
 | Gestionar usuarios | Link rápido "Gestionar usuarios" |
 | Dashboard de cierres | Link "Dashboard de cierres" |
 | Matricular estudiantes | Link "Matricular estudiantes" |

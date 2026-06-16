@@ -59,7 +59,7 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
 
     private final Random rng = new Random(42);
     private final Map<String, UUID> cursoIds = new HashMap<>();
-    private final Map<String, UUID> seccionIds = new LinkedHashMap<>();
+    private final Map<String, UUID> paraleloIds = new LinkedHashMap<>();
     private final Map<String, UUID> estudianteIds = new LinkedHashMap<>();
     private UUID periodoId;
     private UUID docenteId;
@@ -75,15 +75,15 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
 
         createPeriodo();
         createCursos();
-        createSecciones();
+        createParaleloes();
         createEstudiantes();
         enrollEstudiantes();
         assignDocente();
         createEsquemasYNotas();
         createAsistencias();
 
-        log.info("DemoRiskDataSeeder: COMPLETADO. {} cursos, {} secciones, {} estudiantes.",
-                CURSO_NOMBRES.length, seccionIds.size(), estudianteIds.size());
+        log.info("DemoRiskDataSeeder: COMPLETADO. {} asignaturas, {} paralelos, {} estudiantes.",
+                CURSO_NOMBRES.length, paraleloIds.size(), estudianteIds.size());
     }
 
     private boolean dataAlreadyExists() {
@@ -111,35 +111,35 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
     // ── CURSOS ──
     private void createCursos() {
         for (int i = 0; i < CURSO_NOMBRES.length; i++) {
-            Curso c = new Curso();
+            Asignatura c = new Asignatura();
             c.setColegioId(COLEGIO_ID);
             c.setCodigo(CURSO_CODES[i]);
             c.setNombre(CURSO_NOMBRES[i]);
-            c.setDescripcion("Curso de " + CURSO_NOMBRES[i]);
-            c.setCreditos(4);
+            c.setDescripcion("Asignatura de " + CURSO_NOMBRES[i]);
+            c.setHorasSemanales(4);
             c.setActivo(true);
             em.persist(c);
             cursoIds.put(CURSO_CODES[i], c.getId());
         }
     }
 
-    // ── SECCIONES (6: una por grado+paralelo con 1 curso c/u) ──
-    private void createSecciones() {
+    // ── PARALELOES (6: una por grado+paralelo con 1 asignatura c/u) ──
+    private void createParaleloes() {
         int[] cursoAsignado = {0, 1, 2, 3, 4, 5}; // MAT, LEN, CN, ES, ING, COM
         int idx = 0;
         for (String grado : GRADOS) {
             for (String paralelo : PARALELOS) {
                 String codigo = grado + "-" + paralelo;
                 int cursoIdx = cursoAsignado[idx % cursoAsignado.length];
-                Seccion s = new Seccion();
+                Paralelo s = new Paralelo();
                 s.setColegioId(COLEGIO_ID);
-                s.setCurso(em.find(Curso.class, cursoIds.get(CURSO_CODES[cursoIdx])));
+                s.setAsignatura(em.find(Asignatura.class, cursoIds.get(CURSO_CODES[cursoIdx])));
                 s.setPeriodo(em.find(Periodo.class, periodoId));
                 s.setCodigo(codigo + "-" + CURSO_CODES[cursoIdx]);
                 s.setCapacidad(20);
-                s.setEstado(EstadoSeccion.EN_CURSO);
+                
                 em.persist(s);
-                seccionIds.put(s.getCodigo(), s.getId());
+                paraleloIds.put(s.getCodigo(), s.getId());
                 idx++;
             }
         }
@@ -173,19 +173,19 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         }
     }
 
-    // ── MATRÍCULAS (15 estudiantes × 6 pares de secciones = 90, distribuidos equitativamente) ──
+    // ── MATRÍCULAS (15 estudiantes × 6 pares de paralelos = 90, distribuidos equitativamente) ──
     private void enrollEstudiantes() {
-        List<UUID> sIds = new ArrayList<>(seccionIds.values());
+        List<UUID> sIds = new ArrayList<>(paraleloIds.values());
         List<String> eNombres = new ArrayList<>(estudianteIds.keySet());
 
         int idx = 0;
         for (int s = 0; s < 6; s++) {
-            UUID seccionId = sIds.get(s);
+            UUID paraleloId = sIds.get(s);
             for (int e = 0; e < 15; e++) {
                 Matricula m = new Matricula();
                 m.setColegioId(COLEGIO_ID);
                 m.setEstudianteId(estudianteIds.get(eNombres.get(idx)));
-                m.setSeccionId(seccionId);
+                m.setParaleloId(paraleloId);
                 m.setFecha(LocalDateTime.of(2026, 5, 4, 8, 0));
                 m.setEstado(EstadoMatricula.ACTIVA);
                 em.persist(m);
@@ -194,7 +194,7 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         }
     }
 
-    // ── DOCENTE (Diana a todas las secciones) ──
+    // ── DOCENTE (Diana a todas las paralelos) ──
     private void assignDocente() {
         List<Usuario> docentes = em.createQuery(
                 "SELECT u FROM Usuario u JOIN u.usuarioRoles ur JOIN ur.rol r WHERE r.codigo = :codigo AND u.colegioId = :colegio",
@@ -205,9 +205,9 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         if (docentes.isEmpty()) return;
         docenteId = docentes.get(0).getId();
 
-        for (UUID seccionId : seccionIds.values()) {
-            DocenteSeccion ds = new DocenteSeccion();
-            ds.setSeccion(em.find(Seccion.class, seccionId));
+        for (UUID paraleloId : paraleloIds.values()) {
+            DocenteParalelo ds = new DocenteParalelo();
+            ds.setParalelo(em.find(Paralelo.class, paraleloId));
             ds.setDocenteId(docenteId);
             ds.setRol("TITULAR");
             em.persist(ds);
@@ -238,11 +238,11 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         List<String> eNombres = new ArrayList<>(estudianteIds.keySet());
 
         int eIdx = 0;
-        for (UUID seccionId : seccionIds.values()) {
+        for (UUID paraleloId : paraleloIds.values()) {
             // Crear esquema
             EsquemaEvaluacion ee = new EsquemaEvaluacion();
             ee.setColegioId(COLEGIO_ID);
-            ee.setSeccionId(seccionId);
+            ee.setParaleloId(paraleloId);
             ee.setCongelado(false);
             em.persist(ee);
 
@@ -261,9 +261,9 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
 
             // Obtener matrículas de esta sección
             List<Matricula> matriculas = em.createQuery(
-                    "SELECT m FROM Matricula m WHERE m.seccionId = :seccionId AND m.estado = 'ACTIVA' ORDER BY m.estudianteId",
+                    "SELECT m FROM Matricula m WHERE m.paraleloId = :paraleloId AND m.estado = 'ACTIVA' ORDER BY m.estudianteId",
                     Matricula.class)
-                    .setParameter("seccionId", seccionId).getResultList();
+                    .setParameter("paraleloId", paraleloId).getResultList();
 
             // Crear notas según perfil
             for (int i = 0; i < matriculas.size() && i < perfiles.length; i++) {
@@ -300,11 +300,11 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         LocalDate inicio = LocalDate.of(2026, 5, 4);
         UUID adminId = getAdminId();
 
-        for (UUID seccionId : seccionIds.values()) {
+        for (UUID paraleloId : paraleloIds.values()) {
             List<Matricula> matriculas = em.createQuery(
-                    "SELECT m FROM Matricula m WHERE m.seccionId = :seccionId AND m.estado = 'ACTIVA' ORDER BY m.estudianteId",
+                    "SELECT m FROM Matricula m WHERE m.paraleloId = :paraleloId AND m.estado = 'ACTIVA' ORDER BY m.estudianteId",
                     Matricula.class)
-                    .setParameter("seccionId", seccionId).getResultList();
+                    .setParameter("paraleloId", paraleloId).getResultList();
 
             for (int i = 0; i < matriculas.size() && i < perfilesAsistencia.length; i++) {
                 double tasa = perfilesAsistencia[i];

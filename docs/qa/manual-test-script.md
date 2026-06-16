@@ -25,7 +25,7 @@ Antes de empezar, el tester debe verificar:
 
 1. **UA-01 a UA-02** (30 min) — Login + navegación. Si falla, abortar y reportar a Amelia.
 2. **UA-03 a UA-04** (30 min) — Dashboard + wizard de período. Necesario para tener contexto académico.
-3. **UA-05 a UA-06** (30 min) — Cursos + usuarios. Verificar LOPDP.
+3. **UA-05 a UA-06** (30 min) — Asignaturas + usuarios. Verificar LOPDP.
 4. **UA-07** (15 min) — Matrícula individual.
 5. **UA-08 a UA-13** (45 min) — Flujo docente completo (asistencia, notas, cierre).
 6. **UA-14** (10 min) — Flujo estudiante.
@@ -72,16 +72,16 @@ Severidad: Bloqueante | Mayor | Menor | Cosmético
 
 ---
 
-## Normativa aplicable por sección
+## Normativa aplicable por paralelo
 
 Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para auditores legales y para que el tester entienda el "por qué" de cada caso.
 
-| Sección | Normativa | Artículos relevantes |
+| Paralelo | Normativa | Artículos relevantes |
 |---------|-----------|----------------------|
 | UA-01 Login | LOPDP | Art. 33 (consentimiento informado) |
 | UA-02 Sidebar/Nav | LOPDP | Art. 5 (principios de protección) |
 | UA-03-04 Período académico | LOEI + Reglamento | Art. 25 (régimen escolar), Art. 91 (matrícula) |
-| UA-05 Cursos | LOEI | Art. 11 (currículo nacional) |
+| UA-05 Asignaturas | LOEI | Art. 11 (currículo nacional) |
 | UA-06 Usuarios | LOPDP + CNIA | Arts. 8-15 (derechos del titular), Art. 49 (protección NNA) |
 | UA-07 Matrícula | LOEI + Reg. | Arts. 86-91 (proceso de matrícula) |
 | UA-08 Cierres | LOEI + Reg. | Art. 195 (régimen académico), Acuerdo MINEDUC |
@@ -116,12 +116,12 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] Clic en "Iniciar sesión"
 - [ ] **AC:** Redirige a `/admin`, se ve el sidebar con Dashboard, Usuarios, Académico, Matrícula
 - [ ] **AC:** El sidebar muestra avatar del admin en la parte inferior
-- [ ] **AC:** Sidebar muestra: Dashboard, Usuarios, Secciones (paralelos), Matrícula
+- [ ] **AC:** Sidebar muestra: Dashboard, Usuarios, Paralelos (paralelos), Matrícula
 
 ### UA-01.2 Login exitoso Docente
 - [ ] Cerrar sesión (clic en avatar → Cerrar sesión → Confirmar)
 - [ ] Ingresar `diana@colegio.edu.ec` / `Docente1!`
-- [ ] **AC:** Redirige a `/docente`, sidebar muestra solo "Mis Secciones (paralelos)"
+- [ ] **AC:** Redirige a `/docente`, sidebar muestra solo "Mis Paralelos (paralelos)"
 
 ### UA-01.3 Login exitoso Estudiante
 - [ ] Cerrar sesión
@@ -169,8 +169,8 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] Login como Admin
 - [ ] Clic en "Usuarios" en el sidebar
 - [ ] **AC:** Navega a `/admin/usuarios`, el ítem queda activo (fondo índigo claro)
-- [ ] Clic en "Secciones (paralelos)" en el sidebar
-- [ ] **AC:** Navega a `/admin/secciones`
+- [ ] Clic en "Paralelos (paralelos)" en el sidebar
+- [ ] **AC:** Navega a `/admin/paralelos`
 - [ ] Clic en "Matrícula"
 - [ ] **AC:** Navega a `/admin/matricula`
 - [ ] Clic en "Dashboard"
@@ -208,7 +208,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 
 ### UA-03.1 KPI Cards
 - [ ] Login como Admin
-- [ ] **AC:** Se muestran 3 tarjetas KPI: "Estudiantes", "Secciones activas (paralelos)", "% Asistencia"
+- [ ] **AC:** Se muestran 3 tarjetas KPI: "Estudiantes", "Paralelos activas (paralelos)", "% Asistencia"
 - [ ] **AC:** Cada tarjeta tiene ícono, etiqueta y valor numérico
 
 ### UA-03.2 Gráfico de evolución
@@ -229,7 +229,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] **AC:** Navega a `/admin/periodos/nuevo`
 
 ### UA-03.6 Accesos rápidos
-- [ ] Verificar botones: "📚 Cursos", "📋 Secciones", "👥 Usuarios", "📊 Cierres", "📝 Matrícula"
+- [ ] Verificar botones: "📚 Asignaturas", "📋 Paralelos", "👥 Usuarios", "📊 Cierres", "📝 Matrícula"
 - [ ] Clic en cada uno — verifica navegación correcta
 
 ---
@@ -245,14 +245,14 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] Clic en "Continuar"
 - [ ] **AC:** Navega a `/clonar`
 
-### UA-04.2 Paso 2 — Clonar secciones
+### UA-04.2 Paso 2 — Clonar paralelos
 - [ ] Si hay período anterior cerrado, verificar opción "Copiar estructura de [código]" con badge "Recomendado"
 - [ ] Clic en "Empezar desde cero"
 - [ ] **AC:** Navega a `/revisar`
 
-### UA-04.3 Paso 3 — Revisar secciones
-- [ ] **AC:** Muestra tabla de secciones con docentes asignados
-- [ ] Verificar que se pueden agregar secciones y cursos nuevos
+### UA-04.3 Paso 3 — Revisar paralelos
+- [ ] **AC:** Muestra tabla de paralelos con docentes asignados
+- [ ] Verificar que se pueden agregar paralelos y asignaturas nuevos
 
 ### UA-04.4 Paso 4 — Confirmar apertura
 - [ ] Navegar a `/confirmar`
@@ -262,26 +262,26 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 
 ---
 
-## UA-05 — Gestión de Cursos
+## UA-05 — Gestión de Asignaturas
 
 > **Normativa:** LOEI Art. 11 (currículo nacional) + lineamientos MINEDUC.
 
 ### UA-05.1 Crear curso
-- [ ] Dashboard Admin → "📚 Cursos" (o sidebar Académico)
-- [ ] **AC:** URL contiene `/cursos`
+- [ ] Dashboard Admin → "📚 Asignaturas" (o sidebar Académico)
+- [ ] **AC:** URL contiene `/asignaturas`
 - [ ] Clic en "+ Nuevo"
-- [ ] Llenar Código = `QA-001`, Nombre = `Curso QA`
+- [ ] Llenar Código = `QA-001`, Nombre = `Asignatura QA`
 - [ ] Clic en "Crear"
 - [ ] **AC:** El curso aparece en la tabla
 
 ### UA-05.2 Editar curso
 - [ ] Clic en botón editar (lápiz) de un curso existente
-- [ ] Cambiar nombre a `Curso QA Editado`
+- [ ] Cambiar nombre a `Asignatura QA Editado`
 - [ ] Clic en ✓
 - [ ] **AC:** El nombre se actualiza en la tabla
 
 ### UA-05.3 Estado vacío
-- [ ] Si no hay cursos, verificar que aparece mensaje "Crea el primer curso con el botón + Nuevo"
+- [ ] Si no hay asignaturas, verificar que aparece mensaje "Crea el primer curso con el botón + Nuevo"
 - [ ] **AC:** Muestra estado vacío con CTA
 
 ---
@@ -332,16 +332,16 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 
 > **Normativa:** LOEI Arts. 86-91 (proceso de matrícula) + Reglamento General a la LOEI.
 
-### UA-07.1 Listar secciones para matrícula
+### UA-07.1 Listar paralelos para matrícula
 - [ ] Sidebar → Matrícula (o botón "📝 Matrícula")
 - [ ] **AC:** URL `/admin/matricula`
-- [ ] **AC:** Selector de período, tabla de secciones con conteo de matriculados
+- [ ] **AC:** Selector de período, tabla de paralelos con conteo de matriculados
 
 ### UA-07.2 Matricular estudiante
-- [ ] Clic en "Matricular estudiante" en una sección
+- [ ] Clic en "Matricular estudiante" en una paralelo
 - [ ] Ingresar email del estudiante
 - [ ] Clic en "Confirmar"
-- [ ] **AC:** El contador de la sección incrementa
+- [ ] **AC:** El contador de la paralelo incrementa
 
 ### UA-07.3 Importar CSV
 - [ ] Clic en "Importar CSV"
@@ -353,7 +353,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] **AC:** Si hay errores, muestra lista con línea y motivo
 
 ### UA-07.4 Estado vacío matrícula
-- [ ] Si no hay secciones en el período seleccionado
+- [ ] Si no hay paralelos en el período seleccionado
 - [ ] **AC:** Muestra mensaje de estado vacío
 
 ---
@@ -365,7 +365,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 ### UA-08.1 Ver cierres
 - [ ] Dashboard Admin → "📊 Cierres" (o sidebar)
 - [ ] **AC:** URL `/admin/cierres`
-- [ ] **AC:** Selector de período y tabla con columnas: Sección, Curso, Estado
+- [ ] **AC:** Selector de período y tabla con columnas: Paralelo, Asignatura, Estado
 - [ ] **AC:** Tarjetas KPI: Pendientes, Listas, Cerradas
 - [ ] **AC:** Badges de estado: PENDIENTE (ámbar), LISTA (azul), CERRADA (verde)
 
@@ -375,15 +375,15 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 
 > **Normativa:** LOEI Art. 11 (deberes de los docentes) + Reglamento General a la LOEI.
 
-### UA-09.1 Ver mis secciones
+### UA-09.1 Ver mis paralelos
 - [ ] Login como Docente
 - [ ] **AC:** URL `/docente`
-- [ ] **AC:** Título "Mis Secciones (paralelos)"
-- [ ] **AC:** Sidebar muestra solo "Mis Secciones"
+- [ ] **AC:** Título "Mis Paralelos (paralelos)"
+- [ ] **AC:** Sidebar muestra solo "Mis Paralelos"
 
-### UA-09.2 Tarjetas de sección (paralelo)
-- [ ] **AC:** Cada sección (paralelo) muestra: código, horario, aula, capacidad
-- [ ] **AC:** 3 botones por sección: "Tomar asistencia", "Ver notas", "Esquema"
+### UA-09.2 Tarjetas de paralelo (paralelo)
+- [ ] **AC:** Cada paralelo (paralelo) muestra: código, horario, aula, capacidad
+- [ ] **AC:** 3 botones por paralelo: "Tomar asistencia", "Ver notas", "Esquema"
 
 ### UA-09.3 Navegar a asistencia
 - [ ] Clic en "Tomar asistencia"
@@ -410,8 +410,8 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] **AC:** Aparece toast verde "Asistencia guardada" (esquina inferior derecha)
 - [ ] **AC:** El toast desaparece después de 4 segundos
 
-### UA-10.4 Volver a secciones
-- [ ] Clic en "← Mis secciones"
+### UA-10.4 Volver a paralelos
+- [ ] Clic en "← Mis paralelos"
 - [ ] **AC:** Navega de vuelta a `/docente`
 
 ---
@@ -421,7 +421,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 > **Normativa:** LOEI + Reglamento de evaluación (Acuerdo Ministerial vigente).
 
 ### UA-11.1 Configurar esquema
-- [ ] Desde dashboard docente, clic en "Esquema" de una sección
+- [ ] Desde dashboard docente, clic en "Esquema" de una paralelo
 - [ ] **AC:** URL `/docente/{id}/esquema`
 - [ ] **AC:** Muestra texto "Cada componente no puede exceder el 40%. La suma total debe ser 100%."
 - [ ] **AC:** Formulario con campos: Nombre del componente, Peso (%)
@@ -456,7 +456,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 > **Normativa:** LOEI + Reglamento de evaluación (rúbrica oficial MINEDUC).
 
 ### UA-12.1 Ver tabla de notas
-- [ ] Desde dashboard docente, clic en "Ver notas" de una sección
+- [ ] Desde dashboard docente, clic en "Ver notas" de una paralelo
 - [ ] **AC:** URL `/docente/{id}/notas`
 - [ ] **AC:** Tabla con estudiantes (filas) × componentes (columnas)
 - [ ] **AC:** Columna "Nota Final" (calculada automáticamente con pesos)
@@ -472,24 +472,24 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] **AC:** Las celdas editadas mantienen sus valores
 
 ### UA-12.4 Navegar a cierre
-- [ ] Clic en "Cerrar sección"
+- [ ] Clic en "Cerrar paralelo"
 - [ ] **AC:** Navega a `/docente/{id}/cerrar`
 
 ---
 
-## UA-13 — Docente: Cierre de Sección
+## UA-13 — Docente: Cierre de Paralelo
 
 > **Normativa:** LOEI Art. 195 (régimen académico) + Acuerdo MINEDUC sobre cierre de períodos lectivos.
 
 ### UA-13.1 Confirmar cierre
-- [ ] **AC:** Página centrada con título "Cerrar sección"
+- [ ] **AC:** Página centrada con título "Cerrar paralelo"
 - [ ] **AC:** Advertencia: "Las notas serán definitivas", "No podrán modificarse", "Se publicarán para los estudiantes"
-- [ ] **AC:** Botones "Volver" y "Cerrar sección"
+- [ ] **AC:** Botones "Volver" y "Cerrar paralelo"
 
 ### UA-13.2 Ejecutar cierre
-- [ ] Clic en "Cerrar sección"
+- [ ] Clic en "Cerrar paralelo"
 - [ ] **AC:** Redirige al dashboard docente
-- [ ] **AC:** La sección ya no aparece en "Mis Secciones" (estado CERRADA)
+- [ ] **AC:** La paralelo ya no aparece en "Mis Paralelos" (estado CERRADA)
 
 ---
 
@@ -529,9 +529,9 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] **AC:** Tienen `role="status"` y texto "Cargando..." para lectores de pantalla
 
 ### UA-15.3 Empty states
-- [ ] Navegar a una lista sin datos (ej. `/admin/secciones` sin secciones creadas)
+- [ ] Navegar a una lista sin datos (ej. `/admin/paralelos` sin paralelos creadas)
 - [ ] **AC:** Muestra contenedor con borde punteado, ícono, título y CTA
-- [ ] Ejemplo: "Aún no hay secciones. [Crear primera sección]"
+- [ ] Ejemplo: "Aún no hay paralelos. [Crear primera paralelo]"
 
 ### UA-15.4 Modal de confirmación
 - [ ] Ejecutar acción destructiva (cerrar sesión, eliminar)
@@ -706,7 +706,7 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] En paso 3, **AC:** subheader dice "📨 200 emails de activación en cola (verificables en Mailpit en dev)"
 - [ ] **AC:** NO dice "enviados" en ningún lugar del paso 3
 - [ ] Clic en "📋 Descargar reporte (CSV)" → abrir el archivo descargado
-- [ ] **AC:** Dentro del reporte, sección "Resumen" dice "Emails de activación en cola: 200" (no "enviados")
+- [ ] **AC:** Dentro del reporte, paralelo "Resumen" dice "Emails de activación en cola: 200" (no "enviados")
 - [ ] **Razón normativa:** refleja la realidad MVP. El admin debe verificar en Mailpit; el sistema no garantiza entrega.
 
 ### UA-17.15 (C5) Paridad frontend↔backend — cambiar fixture rompe ambos tests
@@ -882,12 +882,12 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 | UA-03.5 | Configurar período | | |
 | UA-03.6 | Accesos rápidos | | |
 | UA-04.1 | Crear período | | |
-| UA-04.2 | Clonar secciones | | |
-| UA-04.3 | Revisar secciones | | |
+| UA-04.2 | Clonar paralelos | | |
+| UA-04.3 | Revisar paralelos | | |
 | UA-04.4 | Confirmar apertura | | |
 | UA-05.1 | Crear curso | | |
 | UA-05.2 | Editar curso | | |
-| UA-05.3 | Estado vacío cursos | | |
+| UA-05.3 | Estado vacío asignaturas | | |
 | UA-06.1 | Listar usuarios | | |
 | UA-06.2 | Crear usuario | | |
 | UA-06.3 | Búsqueda en tabla | | |
@@ -900,12 +900,12 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 | UA-07.4 | Estado vacío matrícula | | |
 | UA-08.1 | Dashboard cierres | | |
 | UA-09.1 | Dashboard docente | | |
-| UA-09.2 | Tarjetas sección | | |
+| UA-09.2 | Tarjetas paralelo | | |
 | UA-09.3 | Navegar asistencia | | |
 | UA-10.1 | Lista estudiantes | | |
 | UA-10.2 | Marcar asistencia | | |
 | UA-10.3 | Guardar asistencia | | |
-| UA-10.4 | Volver secciones | | |
+| UA-10.4 | Volver paralelos | | |
 | UA-11.1 | Configurar esquema | | |
 | UA-11.2 | Agregar/quitar componente | | |
 | UA-11.3 | Validación 100% | | |
@@ -971,8 +971,8 @@ Este manual fue actualizado el 2026-06-08 con consentimiento parental. Cambios:
 - **UA-18.1 a 18.6**: **6 casos nuevos** de consentimiento parental (LOPDP Art. 21, 25) — registro, verificación, bloqueo de matrícula, revocación, trazabilidad con `representanteNombre`/`representanteCedula`, y flujo masivo para 200 estudiantes
 - **Todos los checkboxes** reseteados a `[ ]` para ejecución limpia
 - **Tabla de resultados** vacía (sin datos pre-cargados)
-- **Sección "Cómo ejecutar la prueba completa"** con checklist pre-test y orden recomendado
-- **Sección "Normativa aplicable"** con LOPDP/LOEI/CNIA por sección
+- **Paralelo "Cómo ejecutar la prueba completa"** con checklist pre-test y orden recomendado
+- **Paralelo "Normativa aplicable"** con LOPDP/LOEI/CNIA por paralelo
 - **Versión** bumped de 0.2.0 → 0.1.0 (alineado con el primer release oficial)
 
 ## Trazabilidad fixes → casos

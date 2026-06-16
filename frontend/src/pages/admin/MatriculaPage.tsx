@@ -5,7 +5,7 @@ import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
 import { PageHead, Icons } from '@/components/ghanima'
 import { usePeriodos } from '@/hooks/usePeriodos'
-import { useSecciones } from '@/hooks/useSecciones'
+import { useParalelos } from '@/hooks/useParalelos'
 import { useUsuarios } from '@/hooks/useUsuarios'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
 import { ApiError } from '@/types/api'
@@ -26,7 +26,7 @@ export default function MatriculaPage() {
     }
   }, [periodos, selectedPeriodo])
 
-  const { data: secciones = [], isLoading } = useSecciones(selectedPeriodo)
+  const { data: paralelos = [], isLoading } = useParalelos(selectedPeriodo)
   const { data: usuarios = [] } = useUsuarios()
 
   const estudiantes = useMemo(
@@ -51,11 +51,11 @@ export default function MatriculaPage() {
     if (!formSeccionId) { setFormError('Selecciona una sección'); return }
     setFormSaving(true)
     try {
-      await api.post('/matriculas', { estudianteId: formEstudianteId, seccionId: formSeccionId })
+      await api.post('/matriculas', { estudianteId: formEstudianteId, paraleloId: formSeccionId })
       setShowForm(false)
       setFormEstudianteId('')
       setFormSeccionId('')
-      queryClient.invalidateQueries({ queryKey: ['secciones', selectedPeriodo] })
+      queryClient.invalidateQueries({ queryKey: ['paralelos', selectedPeriodo] })
     } catch (err: unknown) {
       const apiErr = err as ApiError
       setFormError(apiErr.response?.data?.mensaje || 'Error al matricular')
@@ -68,7 +68,7 @@ export default function MatriculaPage() {
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
         <div className="mb-8 flex items-center justify-between">
-          <PageHead eyebrow="Gestión" title="Matrícula" subtitle="Matricula estudiantes en las secciones del período activo." />
+          <PageHead eyebrow="Gestión" title="Matrícula" subtitle="Matricula estudiantes en las paralelos del período activo." />
           <button onClick={() => navigate('/admin')} className="text-sm text-muted-foreground hover:underline">← Dashboard</button>
         </div>
 
@@ -87,13 +87,13 @@ export default function MatriculaPage() {
         </div>
 
         {showForm && (
-          <div className="mb-6 rounded-lg border border-primary/20 bg-accent p-6">
+          <div className="mb-6 rounded-lg border border-[#8A6A18]/20 bg-white p-6">
             <h3 className="mb-4 font-medium text-foreground">Matricular estudiante</h3>
             {formError && <InlineError message={formError} />}
             <form onSubmit={handleMatricular} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="formEstudiante" className="block text-xs font-medium text-muted-foreground">Estudiante</label>
+                  <label htmlFor="formEstudiante" className="block text-sm font-medium text-foreground mb-1.5">Estudiante</label>
                   <select id="formEstudiante" value={formEstudianteId} onChange={e => setFormEstudianteId(e.target.value)} required
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm">
                     <option value="">Seleccionar estudiante</option>
@@ -103,11 +103,11 @@ export default function MatriculaPage() {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="formSeccionMatricula" className="block text-xs font-medium text-muted-foreground">Sección (paralelo)</label>
+                  <label htmlFor="formSeccionMatricula" className="block text-sm font-medium text-foreground mb-1.5">Sección (paralelo)</label>
                   <select id="formSeccionMatricula" value={formSeccionId} onChange={e => setFormSeccionId(e.target.value)} required
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm">
                     <option value="">Seleccionar</option>
-                    {secciones.map(s => (
+                    {paralelos.map(s => (
                       <option key={s.id} value={s.id} disabled={s.cuposDisponibles <= 0}>
                         {s.codigo} — {s.cuposOcupados}/{s.capacidad} ocupados ({s.cuposDisponibles} disponibles)
                       </option>
@@ -129,13 +129,13 @@ export default function MatriculaPage() {
 
         {isLoading ? (
           <LoadingSkeleton rows={3} />
-        ) : secciones.length === 0 ? (
+        ) : paralelos.length === 0 ? (
           <div className="rounded-lg border bg-card p-12 text-center">
-            <p className="text-lg text-muted-foreground">No hay secciones en este período</p>
+            <p className="text-lg text-muted-foreground">No hay paralelos en este período</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {secciones.map(s => {
+            {paralelos.map(s => {
               const llena = s.cuposDisponibles <= 0
               return (
                 <div key={s.id} className={`rounded-lg border bg-card p-5 ${llena ? 'opacity-60' : ''}`}>

@@ -80,8 +80,8 @@ public class ConsentimientoService {
 
                 var policyVersion = lopdpClient.get().getActivePolicyVersion();
                 lopdpClient.get().grantConsent(
-                        enrollResult.studentId(), "ACADEMIC_RECORDS", true,
-                        "EXPLICIT", policyVersion, enrollResult.parentId(), documentoUrl);
+                        studentEmail, representanteEmail, "ACADEMIC_RECORDS", true,
+                        "EXPLICIT", policyVersion, documentoUrl);
 
                 c.setFuente("LOPDP");
                 consentimientoRepository.save(c);
@@ -117,9 +117,11 @@ public class ConsentimientoService {
 
         if (lopdpEnabled && lopdpClient.isPresent()) {
             try {
+                var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
+                var studentEmail = estudiante != null ? estudiante.getEmail() : "";
                 var policyVersion = lopdpClient.get().getActivePolicyVersion();
-                lopdpClient.get().grantConsent(estudianteId.toString(), "ACADEMIC_RECORDS", false,
-                        "EXPLICIT", policyVersion, null, null);
+                lopdpClient.get().grantConsent(studentEmail, c.getRepresentanteEmail(),
+                        "ACADEMIC_RECORDS", false, "EXPLICIT", policyVersion, null);
             } catch (Exception e) {
                 log.warn("LOPDP revoke failed for estudiante {}, revoking locally: {}", estudianteId, e.getMessage());
             }
@@ -199,5 +201,71 @@ public class ConsentimientoService {
                 c.getRepresentanteNombre(),
                 c.getRepresentanteCedula()
         );
+    }
+
+    public record SyncStatus(long pendientes, long sincronizados) {}
+
+    public SyncStatus contarPendientesSync() {
+        long sincronizados = consentimientoRepository.countByFuenteAndAceptadoTrue("LOPDP");
+        long pendientes = consentimientoRepository.countByFuenteAndAceptadoTrue("SIE_LOCAL");
+        return new SyncStatus(pendientes, sincronizados);
+    }
+
+    @Transactional
+    public SyncStatus reintentarSync() {
+        if (!lopdpEnabled || lopdpClient.isEmpty()) {
+            return contarPendientesSync();
+        }
+
+        var pendientes = consentimientoRepository.findByFuenteAndAceptadoTrue("SIE_LOCAL");
+        int reintentados = 0;
+
+        for (var c : pendientes) {
+            try {
+                var estudiante = usuarioRepository.findById(c.getEstudianteId()).orElse(null);
+                if (estudiante == null) continue;
+
+                var studentEmail = estudiante.getEmail();
+                var studentName = estudiante.getNombre();
+                var dob = estudiante.getDateOfBirth() != null
+                        ? estudiante.getDateOfBirth().toString()
+                        : "2010-01-01";
+                var isMinor = estudiante.getDateOfBirth() != null
+                        && java.time.Period.between(estudiante.getDateOfBirth(), java.time.LocalDate.now()).getYears() < 18;
+
+                var enrollmentRef = c.getEnrollmentRef() != null ? c.getEnrollmentRef()
+                        : String.format("SIE-%s-%s-%s", c.getColegioId(), c.getEstudianteId(),
+                                c.getRepresentanteCedula() != null ? c.getRepresentanteCedula() : "sin-cedula");
+
+                // Intentar enroll. Si ya existe (409), es OK — continuar con consent.
+                try {
+                    lopdpClient.get().enroll(
+                            studentEmail, studentName, dob,
+                            c.getRepresentanteEmail(), c.getRepresentanteNombre(),
+                            "LEGAL_GUARDIAN", enrollmentRef, isMinor);
+                } catch (LopdpUnavailableException e) {
+                    if (e.getMessage() != null && e.getMessage().contains("ERR_DUPLICATE_ENROLLMENT")) {
+                        log.info("Enrollment ya existente en LOPDP para {}, continuando con consent", studentEmail);
+                    } else {
+                        throw e;
+                    }
+                }
+
+                var policyVersion = lopdpClient.get().getActivePolicyVersion();
+                lopdpClient.get().grantConsent(
+                        studentEmail, c.getRepresentanteEmail(), "ACADEMIC_RECORDS", true,
+                        "EXPLICIT", policyVersion, c.getDocumentoUrl());
+
+                c.setFuente("LOPDP");
+                c.setEnrollmentRef(enrollmentRef);
+                consentimientoRepository.save(c);
+                reintentados++;
+            } catch (Exception e) {
+                log.warn("Reintento sync fallido para estudiante {}: {}", c.getEstudianteId(), e.getMessage());
+            }
+        }
+
+        log.info("Reintento sync completado: {}/{} consentimientos sincronizados", reintentados, pendientes.size());
+        return contarPendientesSync();
     }
 }

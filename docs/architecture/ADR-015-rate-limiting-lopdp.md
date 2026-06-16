@@ -10,7 +10,7 @@
 
 ## Contexto
 
-El equipo LOPDP ha documentado los siguientes rate limits en su API (respuesta técnica Sección B1):
+El equipo LOPDP ha documentado los siguientes rate limits en su API (respuesta técnica Paralelo B1):
 
 | Endpoint | Límite | Burst |
 |----------|--------|-------|
@@ -131,5 +131,5 @@ lopdp:
 
 - `backend/src/main/java/com/sie/lopdp/LopdpConsentClient.java` — cliente a modificar
 - `backend/src/main/java/com/sie/matricula/application/MatriculaService.java` — `importarCSV()`
-- `docs/architecture/reference/requerimientos-tecnicos-lopdp.md` — Sección B1
+- `docs/architecture/reference/requerimientos-tecnicos-lopdp.md` — Paralelo B1
 - `docs/architecture/ADR-014` — Idempotencia (relacionado, mismo flujo)

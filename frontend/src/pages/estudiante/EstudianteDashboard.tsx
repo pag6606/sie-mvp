@@ -6,7 +6,7 @@ import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
 import { PageHead } from '@/components/ghanima'
 
-interface MatriculaData { id: string; estudianteId: string; seccionId: string; estudianteNombre: string; cursoNombre: string }
+interface MatriculaData { id: string; estudianteId: string; paraleloId: string; estudianteNombre: string; cursoNombre: string }
 interface NotaResp { cursoNombre?: string; notaFinal: number; componentes: { nombre: string; peso: number; valor: number }[] }
 interface AsistenciaResp { cursoNombre?: string; porcentaje: number; totalSesiones: number; presentes: number }
 
@@ -80,7 +80,7 @@ function HorarioTab({ matriculas }: { matriculas: MatriculaData[] }) {
       {matriculas.length === 0 ? (
         <div className="rounded-xl bg-card border p-8 text-center">
           <p className="text-5xl mb-3">📚</p>
-          <p className="text-foreground font-medium">Sin secciones</p>
+          <p className="text-foreground font-medium">Sin paralelos</p>
           <p className="text-sm text-muted-foreground mt-1">
             Aún no estás matriculado en ningún paralelo
           </p>
@@ -133,9 +133,9 @@ function NotasTab({ notas, asistencia, onBoletin }: { notas: NotaResp[]; asisten
                   </div>
                 </div>
                 <div className={`shrink-0 rounded-full w-14 h-14 flex items-center justify-center text-xl font-extrabold ${
-                  n.notaFinal >= 7 ? 'bg-success/10 text-success' :
-                  n.notaFinal >= 5 ? 'bg-warning/10 text-warning' :
-                  'bg-destructive/10 text-destructive'
+                  n.notaFinal >= 7 ? 'bg-success text-success-foreground' :
+                  n.notaFinal >= 5 ? 'bg-warning text-warning-foreground' :
+                  'bg-destructive text-destructive-foreground'
                 }`}>
                   {n.notaFinal}
                 </div>
@@ -190,7 +190,7 @@ function NotasTab({ notas, asistencia, onBoletin }: { notas: NotaResp[]; asisten
           <p className="text-3xl mb-2">📋</p>
           <p className="text-foreground font-medium text-sm">Sin registros de asistencia</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Tu docente aún no ha tomado asistencia en tus secciones
+            Tu docente aún no ha tomado asistencia en tus paralelos
           </p>
         </div>
       )}

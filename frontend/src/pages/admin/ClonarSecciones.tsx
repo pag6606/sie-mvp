@@ -5,11 +5,11 @@ import AppLayout from '@/components/AppLayout'
 import { PageHead } from '@/components/ghanima'
 import ProgressBar from '@/components/ProgressBar'
 import { usePeriodos, Periodo } from '@/hooks/usePeriodos'
-import { useSecciones } from '@/hooks/useSecciones'
+import { useParalelos } from '@/hooks/useParalelos'
 
 const STEPS = [
   { label: 'Crear período', done: true },
-  { label: 'Secciones' },
+  { label: 'Paralelos' },
   { label: 'Revisar' },
   { label: 'Confirmar' },
 ]
@@ -21,10 +21,10 @@ export default function ClonarSecciones() {
   const { data: periodos } = usePeriodos()
   const cerrados = periodos?.filter(p => p.estado === 'CERRADO') || []
   const origenId = cerrados[0]?.id
-  const { data: seccionesAnteriores } = useSecciones(origenId || '')
+  const { data: seccionesAnteriores } = useParalelos(origenId || '')
 
   const periodoAnterior = cerrados.length > 0 && seccionesAnteriores
-    ? { codigo: cerrados[0].codigo, secciones: seccionesAnteriores.length }
+    ? { codigo: cerrados[0].codigo, paralelos: seccionesAnteriores.length }
     : null
 
   const mutation = useMutation({
@@ -49,12 +49,12 @@ export default function ClonarSecciones() {
         <ProgressBar steps={STEPS} current={1} />
 
         <div className="rounded-lg border bg-card p-8">
-          <PageHead eyebrow="Wizard" title="Configurar secciones" subtitle="Clona las secciones del período anterior o crea nuevas manualmente." />
+          <PageHead eyebrow="Wizard" title="Configurar paralelos" subtitle="Clona las paralelos del período anterior o crea nuevas manualmente." />
 
           <div className="mb-6 rounded-lg border border-warning bg-warning/10 p-4 text-sm text-warning">
-            ⚠️ Antes de continuar, asegúrate de haber creado los cursos en{' '}
-            <a href="/admin/cursos" className="font-semibold underline">📘 Cursos</a>.
-            Sin cursos no podrás crear secciones.
+            ⚠️ Antes de continuar, asegúrate de haber creado los asignaturas en{' '}
+            <a href="/admin/asignaturas" className="font-semibold underline">📘 Cursos</a>.
+            Sin asignaturas no podrás crear paralelos.
           </div>
 
           {periodoAnterior ? (
@@ -65,7 +65,7 @@ export default function ClonarSecciones() {
               className="mb-4 w-full cursor-pointer rounded-lg border-2 border-blue-200 bg-blue-50 p-6 text-left hover:border-blue-400"
             >
               <p className="text-lg font-medium text-foreground"><span aria-hidden="true">📦</span> Copiar estructura de {periodoAnterior.codigo}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{periodoAnterior.secciones} secciones</p>
+              <p className="mt-1 text-sm text-muted-foreground">{periodoAnterior.paralelos} paralelos</p>
               <span className="mt-2 inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Recomendado</span>
             </button>
           ) : null}
@@ -76,10 +76,10 @@ export default function ClonarSecciones() {
             className="w-full cursor-pointer rounded-lg border border-gray-200 p-6 text-left hover:border-gray-400"
           >
             <p className="text-lg font-medium text-foreground"><span aria-hidden="true">✨</span> Empezar desde cero</p>
-            <p className="mt-1 text-sm text-muted-foreground">Crear secciones (paralelos) manualmente</p>
+            <p className="mt-1 text-sm text-muted-foreground">Crear paralelos (paralelos) manualmente</p>
           </button>
 
-          {mutation.isPending && <p className="mt-4 text-center text-primary">Clonando secciones (paralelos)...</p>}
+          {mutation.isPending && <p className="mt-4 text-center text-primary">Clonando paralelos (paralelos)...</p>}
         </div>
       </div>
     </AppLayout>

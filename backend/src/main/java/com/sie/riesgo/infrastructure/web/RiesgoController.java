@@ -26,11 +26,11 @@ public class RiesgoController {
         return ResponseEntity.ok(riesgoService.getDashboard(periodoId, colegioId));
     }
 
-    @GetMapping("/seccion/{seccionId}")
-    public ResponseEntity<List<RiesgoEstudianteResponse>> getRiesgoSeccion(
-            @PathVariable UUID seccionId,
+    @GetMapping("/paralelo/{paraleloId}")
+    public ResponseEntity<List<RiesgoEstudianteResponse>> getRiesgoParalelo(
+            @PathVariable UUID paraleloId,
             @RequestAttribute("colegioId") UUID colegioId) {
-        return ResponseEntity.ok(riesgoService.getRiesgoSeccion(seccionId, colegioId));
+        return ResponseEntity.ok(riesgoService.getRiesgoParalelo(paraleloId, colegioId));
     }
 
     @GetMapping("/estudiante/{estudianteId}")

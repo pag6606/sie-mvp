@@ -13,14 +13,14 @@
     --popover-foreground: 240 10% 4%;
 
     /* Acento primario → deep gold Ghanima (#8A6A18) */
-    --primary: 46 59% 34%;             /* #8A6A18 — gold-deep, base de botones */
+    --primary: 46 59% 34%;             /* #8A6A18 — gold-deep identidad del sistema */
     --primary-foreground: 210 27% 98%; /* #EEF1F4 — paper */
 
     --secondary: 210 20% 96%;          /* #F6F8FA (surface-2) */
     --secondary-foreground: 240 10% 4%;
 
     --muted: 210 20% 96%;
-    --muted-foreground: 240 5% 45%;
+    --muted-foreground: 240 6% 25%;
 
     --accent: 46 59% 34%;              /* gold-deep */
     --accent-foreground: 210 27% 98%;

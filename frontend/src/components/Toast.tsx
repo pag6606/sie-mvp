@@ -23,10 +23,10 @@ export function useToast() {
 }
 
 const STYLES: Record<ToastType, string> = {
-  success: 'border-success bg-success/10 text-success',
-  error: 'border-destructive bg-destructive/10 text-destructive',
-  info: 'border-primary bg-primary/10 text-primary',
-  warning: 'border-warning bg-warning/10 text-warning',
+  success: 'border-success bg-success text-success-foreground',
+  error: 'border-destructive bg-destructive text-destructive-foreground',
+  info: 'border-primary bg-primary text-primary-foreground',
+  warning: 'border-warning bg-warning text-warning-foreground',
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "log_auditoria")
+@Table(name = "log_auditoria", schema = "shared")
 @Getter
 @Setter
 public class AuditLog {

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS asistencias (
 CREATE TABLE IF NOT EXISTS esquema_evaluacion (
     id UUID PRIMARY KEY,
     colegio_id UUID NOT NULL,
-    seccion_id UUID NOT NULL REFERENCES secciones(id),
+    seccion_id UUID NOT NULL REFERENCES paralelos(id),
     congelado BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS notas (
 CREATE TABLE IF NOT EXISTS cierre_secciones (
     id UUID PRIMARY KEY,
     colegio_id UUID NOT NULL,
-    seccion_id UUID UNIQUE NOT NULL REFERENCES secciones(id),
+    seccion_id UUID UNIQUE NOT NULL REFERENCES paralelos(id),
     fecha TIMESTAMP NOT NULL DEFAULT NOW(),
     cerrado_por UUID NOT NULL
 );

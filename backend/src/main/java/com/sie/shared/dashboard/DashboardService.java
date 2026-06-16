@@ -1,11 +1,11 @@
 package com.sie.shared.dashboard;
 
 import com.sie.academico.domain.EstadoPeriodo;
-import com.sie.academico.domain.EstadoSeccion;
+
 import com.sie.academico.domain.Periodo;
-import com.sie.academico.domain.Seccion;
+import com.sie.academico.domain.Paralelo;
 import com.sie.academico.infrastructure.PeriodoRepository;
-import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.academico.infrastructure.ParaleloRepository;
 import com.sie.calificaciones.domain.Asistencia;
 import com.sie.calificaciones.domain.EstadoAsistencia;
 import com.sie.matricula.domain.Matricula;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class DashboardService {
 
     private final PeriodoRepository periodoRepository;
-    private final SeccionRepository seccionRepository;
+    private final ParaleloRepository paraleloRepository;
     private final MatriculaRepository matriculaRepository;
     private final EntityManager em;
 
@@ -39,7 +39,7 @@ public class DashboardService {
         UUID periodoId = periodoActivo != null ? periodoActivo.getId() : null;
         long totalEstudiantes = contarEstudiantes(colegioId);
         long totalMatriculados = contarMatriculasActivas(colegioId);
-        long seccionesActivas = contarSeccionesActivas(colegioId);
+        long paralelosActivas = contarParaleloesActivas(colegioId);
         double porcentajeAsistencia = calcularAsistenciaPromedio(colegioId, periodoId);
         var evolucion = evolucionMensualMatriculas(colegioId);
         var actividad = actividadReciente(colegioId, periodoId);
@@ -47,13 +47,14 @@ public class DashboardService {
         return new DashboardAdminResponse(
                 periodoActivo != null
                         ? new DashboardAdminResponse.PeriodoInfo(
+                                periodoActivo.getId().toString(),
                                 periodoActivo.getCodigo(), periodoActivo.getNombre(),
                                 periodoActivo.getEstado().name(),
                                 periodoActivo.getFechaInicio(), periodoActivo.getFechaFin())
                         : null,
                 totalEstudiantes,
                 totalMatriculados,
-                seccionesActivas,
+                paralelosActivas,
                 Math.round(porcentajeAsistencia * 10.0) / 10.0,
                 evolucion,
                 actividad
@@ -76,35 +77,34 @@ public class DashboardService {
                 .getSingleResult();
     }
 
-    private long contarSeccionesActivas(UUID colegioId) {
+    private long contarParaleloesActivas(UUID colegioId) {
         return em.createQuery(
-                        "SELECT COUNT(s) FROM Seccion s WHERE s.colegioId = :colegioId AND s.estado <> :cerrada AND s.deletedAt IS NULL",
+                        "SELECT COUNT(s) FROM Paralelo s WHERE s.colegioId = :colegioId AND s.deletedAt IS NULL",
                         Long.class)
                 .setParameter("colegioId", colegioId)
-                .setParameter("cerrada", EstadoSeccion.CERRADA)
                 .getSingleResult();
     }
 
     private double calcularAsistenciaPromedio(UUID colegioId, UUID periodoId) {
         if (periodoId == null) return 0;
-        List<UUID> seccionIds = em.createQuery(
-                        "SELECT s.id FROM Seccion s WHERE s.colegioId = :colegioId AND s.periodo.id = :periodoId AND s.deletedAt IS NULL",
+        List<UUID> paraleloIds = em.createQuery(
+                        "SELECT s.id FROM Paralelo s WHERE s.colegioId = :colegioId AND s.periodo.id = :periodoId AND s.deletedAt IS NULL",
                         UUID.class)
                 .setParameter("colegioId", colegioId)
                 .setParameter("periodoId", periodoId)
                 .getResultList();
 
-        if (seccionIds.isEmpty()) return 0;
+        if (paraleloIds.isEmpty()) return 0;
 
         long total = 0;
         long presentes = 0;
-        for (UUID sid : seccionIds) {
+        for (UUID sid : paraleloIds) {
             List<Asistencia> asistencias = em.createQuery(
                             "SELECT a FROM Asistencia a WHERE a.colegioId = :colegioId AND a.matriculaId IN " +
-                                    "(SELECT m.id FROM Matricula m WHERE m.seccionId = :seccionId) AND a.deletedAt IS NULL",
+                                    "(SELECT m.id FROM Matricula m WHERE m.paraleloId = :paraleloId) AND a.deletedAt IS NULL",
                             Asistencia.class)
                     .setParameter("colegioId", colegioId)
-                    .setParameter("seccionId", sid)
+                    .setParameter("paraleloId", sid)
                     .getResultList();
             total += asistencias.size();
             presentes += asistencias.stream().filter(a -> a.getEstado() != EstadoAsistencia.AUSENTE).count();

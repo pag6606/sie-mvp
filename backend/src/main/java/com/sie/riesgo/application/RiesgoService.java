@@ -30,15 +30,15 @@ public class RiesgoService {
 
     // ── Dashboard: agregado por sección ──
     public List<RiesgoDashboardResponse> getDashboard(UUID periodoId, UUID colegioId) {
-        List<Seccion> secciones = em.createQuery(
-                "SELECT s FROM Seccion s WHERE s.periodo.id = :periodoId AND s.colegioId = :colegioId AND s.estado = 'EN_CURSO'",
-                Seccion.class)
+        List<Paralelo> paralelos = em.createQuery(
+                "SELECT s FROM Paralelo s WHERE s.periodo.id = :periodoId AND s.colegioId = :colegioId",
+                Paralelo.class)
                 .setParameter("periodoId", periodoId).setParameter("colegioId", colegioId)
                 .getResultList();
 
         List<RiesgoDashboardResponse> result = new ArrayList<>();
-        for (Seccion s : secciones) {
-            List<RiesgoEstudianteResponse> estudiantes = getRiesgoSeccion(s.getId(), colegioId);
+        for (Paralelo s : paralelos) {
+            List<RiesgoEstudianteResponse> estudiantes = getRiesgoParalelo(s.getId(), colegioId);
             int alto = 0, medio = 0, bajo = 0, sin = 0;
             double suma = 0; int count = 0;
             for (RiesgoEstudianteResponse e : estudiantes) {
@@ -50,7 +50,7 @@ public class RiesgoService {
                 }
                 if (e.riesgoScore() >= 0) { suma += e.riesgoScore(); count++; }
             }
-            String cursoNombre = s.getCurso() != null ? s.getCurso().getNombre() : "";
+            String cursoNombre = s.getAsignatura() != null ? s.getAsignatura().getNombre() : "";
             result.add(new RiesgoDashboardResponse(
                     s.getId(), s.getCodigo(), cursoNombre, getDocenteNombre(s.getId()),
                     estudiantes.size(), count > 0 ? suma / count : 0,
@@ -60,20 +60,20 @@ public class RiesgoService {
     }
 
     // ── Riesgo por sección ──
-    public List<RiesgoEstudianteResponse> getRiesgoSeccion(UUID seccionId, UUID colegioId) {
+    public List<RiesgoEstudianteResponse> getRiesgoParalelo(UUID paraleloId, UUID colegioId) {
         List<Matricula> matriculas = em.createQuery(
-                "SELECT m FROM Matricula m WHERE m.seccionId = :seccionId AND m.estado = 'ACTIVA' AND m.colegioId = :colegioId",
+                "SELECT m FROM Matricula m WHERE m.paraleloId = :paraleloId AND m.estado = 'ACTIVA' AND m.colegioId = :colegioId",
                 Matricula.class)
-                .setParameter("seccionId", seccionId).setParameter("colegioId", colegioId)
+                .setParameter("paraleloId", paraleloId).setParameter("colegioId", colegioId)
                 .getResultList();
 
-        Seccion seccion = em.find(Seccion.class, seccionId);
-        Periodo periodo = seccion != null ? seccion.getPeriodo() : null;
+        Paralelo paralelo = em.find(Paralelo.class, paraleloId);
+        Periodo periodo = paralelo != null ? paralelo.getPeriodo() : null;
         if (periodo == null) return List.of();
 
         List<RiesgoEstudianteResponse> result = new ArrayList<>();
         for (Matricula m : matriculas) {
-            result.add(calcularRiesgoEstudiante(m, seccion, periodo, colegioId));
+            result.add(calcularRiesgoEstudiante(m, paralelo, periodo, colegioId));
         }
         return result;
     }
@@ -89,10 +89,10 @@ public class RiesgoService {
         Periodo periodo = em.find(Periodo.class, periodoId);
         if (periodo == null || matriculas.isEmpty()) return null;
 
-        // Devolver el peor riesgo entre todas las secciones del estudiante
+        // Devolver el peor riesgo entre todas las paralelos del estudiante
         return matriculas.stream()
                 .map(m -> {
-                    Seccion s = em.find(Seccion.class, m.getSeccionId());
+                    Paralelo s = em.find(Paralelo.class, m.getParaleloId());
                     return calcularRiesgoEstudiante(m, s, periodo, colegioId);
                 })
                 .filter(Objects::nonNull)
@@ -101,14 +101,14 @@ public class RiesgoService {
     }
 
     // ── Cálculo individual ──
-    private RiesgoEstudianteResponse calcularRiesgoEstudiante(Matricula mat, Seccion seccion, Periodo periodo, UUID colegioId) {
+    private RiesgoEstudianteResponse calcularRiesgoEstudiante(Matricula mat, Paralelo paralelo, Periodo periodo, UUID colegioId) {
         String nombre = getEstudianteNombre(mat.getEstudianteId());
 
         // Obtener notas y componentes
         EsquemaEvaluacion esquema = em.createQuery(
-                "SELECT e FROM EsquemaEvaluacion e WHERE e.seccionId = :seccionId AND e.colegioId = :colegioId",
+                "SELECT e FROM EsquemaEvaluacion e WHERE e.paraleloId = :paraleloId AND e.colegioId = :colegioId",
                 EsquemaEvaluacion.class)
-                .setParameter("seccionId", seccion.getId()).setParameter("colegioId", colegioId)
+                .setParameter("paraleloId", paralelo.getId()).setParameter("colegioId", colegioId)
                 .getResultStream().findFirst().orElse(null);
 
         List<ComponenteEvaluacion> componentes = esquema != null ? em.createQuery(
@@ -217,10 +217,10 @@ public class RiesgoService {
         return usuarios.isEmpty() ? "Desconocido" : usuarios.get(0).getNombre();
     }
 
-    private String getDocenteNombre(UUID seccionId) {
-        List<DocenteSeccion> ds = em.createQuery(
-                "SELECT d FROM DocenteSeccion d WHERE d.seccion.id = :seccionId", DocenteSeccion.class)
-                .setParameter("seccionId", seccionId).getResultList();
+    private String getDocenteNombre(UUID paraleloId) {
+        List<DocenteParalelo> ds = em.createQuery(
+                "SELECT d FROM DocenteParalelo d WHERE d.paralelo.id = :paraleloId", DocenteParalelo.class)
+                .setParameter("paraleloId", paraleloId).getResultList();
         if (ds.isEmpty()) return "";
         List<Usuario> usuarios = em.createQuery(
                 "SELECT u FROM Usuario u WHERE u.id = :id", Usuario.class)

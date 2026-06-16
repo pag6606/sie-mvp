@@ -36,15 +36,15 @@ function fechaSiguiente(f: string) {
 function esHoy(f: string) { return f === new Date().toISOString().slice(0, 10) }
 
 export default function AsistenciaPage() {
-  const { seccionId } = useParams()
+  const { paraleloId } = useParams()
   const [fecha, setFecha] = useState(new Date().toISOString().slice(0, 10))
   const [estados, setEstados] = useState<Record<string, string>>({})
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const { data: estudiantes = [], isLoading: loading, isError, error: queryError } = useQuery<Estudiante[]>({
-    queryKey: ['asistencia', seccionId, fecha],
-    queryFn: () => api.get(`/secciones/${seccionId}/asistencia?desde=${fecha}&hasta=${fecha}`)
+    queryKey: ['asistencia', paraleloId, fecha],
+    queryFn: () => api.get(`/paralelos/${paraleloId}/asistencia?desde=${fecha}&hasta=${fecha}`)
       .then(r => (r.data as AsistenciaResponse[]).map((a) => ({
         matriculaId: a.matriculaId,
         estudianteId: a.estudianteId,
@@ -53,13 +53,13 @@ export default function AsistenciaPage() {
         totalSesiones: a.totalSesiones,
         presentes: a.presentes,
       }))),
-    enabled: !!seccionId,
+    enabled: !!paraleloId,
   })
 
   const guardarMutation = useMutation({
     mutationFn: (entries: { matriculaId: string; estado: string }[]) =>
-      api.post(`/secciones/${seccionId}/asistencia`, { fecha, entries }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['asistencia', seccionId] }),
+      api.post(`/paralelos/${paraleloId}/asistencia`, { fecha, entries }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['asistencia', paraleloId] }),
     onError: () => {},
   })
 
@@ -86,7 +86,7 @@ export default function AsistenciaPage() {
   if (isError) return (
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
-        <InlineError message={(queryError as ApiError)?.response?.data?.mensaje || 'Error al cargar asistencia'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['asistencia', seccionId, fecha] })} />
+        <InlineError message={(queryError as ApiError)?.response?.data?.mensaje || 'Error al cargar asistencia'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['asistencia', paraleloId, fecha] })} />
       </div>
     </AppLayout>
   )
@@ -94,7 +94,7 @@ export default function AsistenciaPage() {
   return (
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
-        <button onClick={() => navigate('/docente')} className="text-sm text-muted-foreground hover:underline mb-4 block">← Mis secciones</button>
+        <button onClick={() => navigate('/docente')} className="text-sm text-muted-foreground hover:underline mb-4 block">← Mis paralelos</button>
 
         {guardarMutation.isError && (
           <div className="mb-4">

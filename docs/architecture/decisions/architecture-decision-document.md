@@ -171,7 +171,7 @@ backend/
 
 **Status:** Accepted
 
-**Decision:** Tras el cierre de sección, las notas son inmutables. Cualquier modificación requiere un workflow de rectificación (fase 2). El cierre emite `SecciónCerrada` que dispara: (a) publicación de notas al estudiante, (b) actualización del dashboard de cierres del admin.
+**Decision:** Tras el cierre de paralelo, las notas son inmutables. Cualquier modificación requiere un workflow de rectificación (fase 2). El cierre emite `SecciónCerrada` que dispara: (a) publicación de notas al estudiante, (b) actualización del dashboard de cierres del admin.
 
 **Rationale:**
 - El cierre es el evento más crítico del sistema — convierte información operativa en registro académico oficial
@@ -227,8 +227,8 @@ backend/
 **Decision:** Implementar `GET /api/dashboard/admin` como servicio de orquestacion dedicado (`DashboardService`) que consume los puertos publicos de cada bounded context via casos de uso (interfaces de servicio, no repositorios directamente). No se usa read model desnormalizado (CQRS) en esta fase.
 
 **Context:**
-- La Propuesta 1 de UI requiere un dashboard administrativo con KPIs agregados: total de alumnos, secciones activas, porcentaje de asistencia, periodo activo, y grafico de evolucion mensual de matriculas.
-- Estos datos residen en 3 bounded contexts distintos (matricula → alumnos, academico → secciones, calificaciones → asistencia).
+- La Propuesta 1 de UI requiere un dashboard administrativo con KPIs agregados: total de alumnos, paralelos activas, porcentaje de asistencia, periodo activo, y grafico de evolucion mensual de matriculas.
+- Estos datos residen en 3 bounded contexts distintos (matricula → alumnos, academico → paralelos, calificaciones → asistencia).
 - Acceder directamente a repositorios de otros modulos viola la arquitectura hexagonal establecida en ADR-003.
 
 **Options considered:**

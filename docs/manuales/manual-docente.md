@@ -1,6 +1,6 @@
 # Manual de Usuario — Docente
 
-> **Perfil:** Diana, profesora. Responsable de tomar asistencia, definir evaluación, ingresar notas y cerrar sus secciones.
+> **Perfil:** Diana, profesora. Responsable de tomar asistencia, definir evaluación, ingresar notas y cerrar sus paralelos.
 
 ---
 
@@ -9,13 +9,13 @@
 1. Abre `http://localhost:5173` en tu navegador (funciona en computadora y tablet)
 2. Ingresa con el email y contraseña que recibiste por correo
 3. La primera vez verás una pantalla de bienvenida que te muestra cómo funciona el sistema
-4. Cuando el administrador te asigne secciones, aparecerán en tu dashboard
+4. Cuando el administrador te asigne paralelos, aparecerán en tu dashboard
 
 ---
 
-## 2. Tus secciones (pantalla principal)
+## 2. Tus paralelos (pantalla principal)
 
-Al ingresar, ves **"Mis Secciones"** con todas las clases a tu cargo. Cada tarjeta muestra:
+Al ingresar, ves **"Mis Paralelos"** con todas las clases a tu cargo. Cada tarjeta muestra:
 
 - 📘 Nombre del curso y código
 - 📅 Horario y aula
@@ -29,7 +29,7 @@ Al ingresar, ves **"Mis Secciones"** con todas las clases a tu cargo. Cada tarje
 
 ## 3. Registrar asistencia
 
-1. Haz clic en **"Tomar asistencia"** en la sección que quieras
+1. Haz clic en **"Tomar asistencia"** en la paralelo que quieras
 2. Verás la lista de estudiantes con un selector rápido:
    - ✓ **Presente** (verde)
    - ✗ **Ausente** (rojo)
@@ -50,7 +50,7 @@ Al ingresar, ves **"Mis Secciones"** con todas las clases a tu cargo. Cada tarje
 
 Antes de ingresar notas, define cómo se calculará la nota final:
 
-1. En tu sección, ve a **"Esquema de evaluación"**
+1. En tu paralelo, ve a **"Esquema de evaluación"**
 2. Agrega componentes (ej: Parcial 1, Proyecto, Examen Final)
 3. Asigna un peso porcentual a cada uno
 4. **La suma debe ser exactamente 100%** — el sistema valida en vivo
@@ -62,7 +62,7 @@ Antes de ingresar notas, define cómo se calculará la nota final:
 
 ## 5. Ingresar notas
 
-1. Ve a **"Ver notas"** en tu sección
+1. Ve a **"Ver notas"** en tu paralelo
 2. Verás una grilla: **estudiante × componente**
 3. Haz clic en cualquier celda, escribe la nota (0-10)
 4. Presiona **Tab** para pasar al siguiente estudiante
@@ -74,25 +74,25 @@ Antes de ingresar notas, define cómo se calculará la nota final:
 
 ---
 
-## 6. Cerrar la sección
+## 6. Cerrar la paralelo
 
 Cuando todos los estudiantes tienen todas las notas:
 
-1. Haz clic en **"Cerrar"** en la sección
-2. Revisa el resumen: número de estudiantes, promedio de la sección
+1. Haz clic en **"Cerrar"** en la paralelo
+2. Revisa el resumen: número de estudiantes, promedio de la paralelo
 3. El sistema te advierte: *"Las notas serán definitivas y no podrán modificarse"*
 4. Confirma el cierre
 
 **Después del cierre:**
 - Los estudiantes pueden ver sus notas inmediatamente
 - No podrás modificar las notas sin un proceso de rectificación (consulta al administrador)
-- La sección aparece como **CERRADA** en tu dashboard
+- La paralelo aparece como **CERRADA** en tu dashboard
 
 ---
 
 ## 7. Lista de estudiantes
 
-En cualquier sección puedes:
+En cualquier paralelo puedes:
 - Ver la lista completa con foto (si está cargada) y nombre
 - Ver el % de asistencia de cada estudiante
 - Exportar a **PDF** (lista imprimible para el aula)
@@ -104,9 +104,9 @@ En cualquier sección puedes:
 
 | Acción | Cómo llegar |
 |--------|------------|
-| Mis secciones | Pantalla principal al ingresar |
-| Tomar asistencia | Botón en cada tarjeta de sección |
-| Ingresar notas | Botón "Ver notas" en cada sección |
-| Cerrar sección | Botón "Cerrar" (solo visible cuando está lista) |
+| Mis paralelos | Pantalla principal al ingresar |
+| Tomar asistencia | Botón en cada tarjeta de paralelo |
+| Ingresar notas | Botón "Ver notas" en cada paralelo |
+| Cerrar paralelo | Botón "Cerrar" (solo visible cuando está lista) |
 
 **¿Algo no funciona?** El sistema te dice exactamente qué falta. Si ves **— ⚠** junto a un estudiante, significa que te falta ingresar una nota. Si el botón "Cerrar" está deshabilitado, revisa que todos tengan todas las notas.

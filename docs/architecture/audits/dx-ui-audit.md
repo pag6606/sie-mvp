@@ -57,7 +57,7 @@ Tras la implementación de los Epics 5 y 6 (13 stories, ~60h), el frontend del S
 // src/pages/admin/RevisarSecciones.tsx — importa useQueryClient sin hook intermedio
 import { useQueryClient } from '@tanstack/react-query'
 const queryClient = useQueryClient()
-queryClient.invalidateQueries({ queryKey: ['secciones', periodoId] })
+queryClient.invalidateQueries({ queryKey: ['paralelos', periodoId] })
 ```
 
 Este patrón se repite en `UsuariosPage.tsx`, `NotasPage.tsx`, `AsistenciaPage.tsx`. La invalidación de caché está dispersa sin una capa de abstracción.
@@ -111,9 +111,9 @@ TanStack Query v5 activa `structuralSharing` por defecto, lo cual es correcto. P
 
 | Escala | Impacto | Síntoma esperado |
 |--------|---------|-----------------|
-| 10 usuarios | Invisible | Pocas secciones/usuarios |
-| 1.000 usuarios | Medio | Dashboard de cierres con 100+ secciones tarda en renderizar |
-| 10.000 usuarios | Alto | Múltiples instituciones → cientos de secciones sin paginar |
+| 10 usuarios | Invisible | Pocas paralelos/usuarios |
+| 1.000 usuarios | Medio | Dashboard de cierres con 100+ paralelos tarda en renderizar |
+| 10.000 usuarios | Alto | Múltiples instituciones → cientos de paralelos sin paginar |
 
 **Recomendación**: Extender `useSeccionesPaginadas` a `DashboardCierres` y `DocenteDashboard`. Crear `usePeriodosPaginados` si el historial de períodos crece.
 
@@ -159,9 +159,9 @@ TanStack Query v5 activa `structuralSharing` por defecto, lo cual es correcto. P
 
 #### Sin toast/snackbar para confirmaciones · 🟡 Medio
 
-**Evidencia**: Las operaciones exitosas (guardar asistencia, crear sección, matricular) no muestran confirmación visual persistente. El éxito se infiere por el cambio de estado (la tabla se actualiza) pero no hay feedback explícito.
+**Evidencia**: Las operaciones exitosas (guardar asistencia, crear paralelo, matricular) no muestran confirmación visual persistente. El éxito se infiere por el cambio de estado (la tabla se actualiza) pero no hay feedback explícito.
 
-**Recomendación**: Implementar un sistema de toast simple (componente + contexto) para confirmaciones "Asistencia guardada", "Sección creada", etc.
+**Recomendación**: Implementar un sistema de toast simple (componente + contexto) para confirmaciones "Asistencia guardada", "Paralelo creada", etc.
 
 **Esfuerzo estimado**: 3 horas
 

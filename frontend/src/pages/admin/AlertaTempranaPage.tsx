@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { usePeriodos } from '@/hooks/usePeriodos';
 import { useRiesgoDashboard, useRiesgoSeccion, type RiesgoDashboard, type RiesgoEstudiante } from '@/hooks/useRiesgoAcademico';
 import { RiskBadge } from '@/components/RiskBadge'
-import { Gauge } from '@/components/ghanima'
+import { Gauge, PageHead } from '@/components/ghanima'
+import AppLayout from '@/components/AppLayout'
 import { LoadingSkeleton } from '@/components/UIPatterns'
 
 export default function AlertaTempranaPage() {
@@ -50,15 +51,13 @@ export default function AlertaTempranaPage() {
   ));
 
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Alerta Temprana</h1>
-          <p className="text-sm text-muted-foreground">
-            {periodo.nombre} — {q1cerrado ? 'Q2 en curso' : 'Q1 en curso'} · Cierre en {diasParaCierre} días
-          </p>
-        </div>
-      </div>
+    <AppLayout role="admin">
+      <div className="p-6 md:p-8 space-y-6">
+        <PageHead
+          eyebrow="Sistema"
+          title="Alerta Temprana"
+          subtitle={`${periodo.nombre} — ${q1cerrado ? 'Q2 en curso' : 'Q1 en curso'} · Cierre en ${diasParaCierre} días`}
+        />
 
       {loadingDashboard ? (
         <LoadingSkeleton rows={3} />
@@ -104,9 +103,9 @@ export default function AlertaTempranaPage() {
                   <tbody>
                     {dashboard?.map((s: RiesgoDashboard) => (
                       <tr
-                        key={s.seccionId}
-                        className={`border-b cursor-pointer hover:bg-muted/30 transition-colors ${selectedSeccion === s.seccionId ? 'bg-muted/50' : ''}`}
-                        onClick={() => setSelectedSeccion(s.seccionId === selectedSeccion ? null : s.seccionId)}
+                        key={s.paraleloId}
+                        className={`border-b cursor-pointer hover:bg-muted/30 transition-colors ${selectedSeccion === s.paraleloId ? 'bg-muted/50' : ''}`}
+                        onClick={() => setSelectedSeccion(s.paraleloId === selectedSeccion ? null : s.paraleloId)}
                       >
                         <td className="px-4 py-2 font-medium">{s.codigo}</td>
                         <td className="px-4 py-2 text-muted-foreground">{s.docenteNombre}</td>
@@ -230,7 +229,8 @@ export default function AlertaTempranaPage() {
           </div>
         </>
       )}
-    </div>
+      </div>
+    </AppLayout>
   );
 }
 

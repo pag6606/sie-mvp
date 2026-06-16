@@ -1,8 +1,11 @@
 import { useNavigate } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { usePeriodoEnProgreso } from '@/hooks/usePeriodoEnProgreso'
 import { useDashboard } from '@/hooks/useDashboard'
 import AppLayout from '@/components/AppLayout'
 import { PageHead, Callout, Icons } from '@/components/ghanima'
+import { InlineError } from '@/components/UIPatterns'
+import api from '@/services/api'
 import { Line } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -19,7 +22,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, 
 const KPI_CARDS = [
   { key: 'totalEstudiantes' as const, label: 'Estudiantes', sub: 'registrados', Icon: Icons.Users, color: 'text-primary', bg: 'bg-primary/5' },
   { key: 'totalMatriculados' as const, label: 'Matriculados', sub: 'activos', Icon: Icons.Check, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  { key: 'seccionesActivas' as const, label: 'Secciones', sub: 'activas', Icon: Icons.Layers, color: 'text-blue-600', bg: 'bg-blue-50' },
+  { key: 'paralelosActivas' as const, label: 'Paralelos', sub: 'activas', Icon: Icons.Layers, color: 'text-blue-600', bg: 'bg-blue-50' },
   { key: 'porcentajeAsistencia' as const, label: 'Asistencia', sub: 'promedio', Icon: Icons.Chart, color: 'text-amber-600', bg: 'bg-amber-50', suffix: '%' },
 ]
 
@@ -37,6 +40,21 @@ export default function AdminDashboard() {
   const enProgreso = usePeriodoEnProgreso()
   const navigate = useNavigate()
 
+  const { data: syncStatus } = useQuery({
+    queryKey: ['consentimientos', 'sync-status'],
+    queryFn: () => api.get('/consentimientos/sync-status').then(r => r.data),
+    refetchInterval: 60_000,
+  })
+
+  const queryClient = useQueryClient()
+  const iniciarMutation = useMutation({
+    mutationFn: (id: string) => api.post(`/periodos/${id}/iniciar`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard', 'admin'] })
+      queryClient.invalidateQueries({ queryKey: ['periodos'] })
+    },
+  })
+
   return (
     <AppLayout role="admin">
       <div className="mx-auto max-w-5xl space-y-6 p-6 md:p-8">
@@ -45,6 +63,26 @@ export default function AdminDashboard() {
           title={dashboard?.periodoActivo ? `${dashboard.periodoActivo.codigo} — ${dashboard.periodoActivo.nombre}` : 'Dashboard'}
           subtitle={dashboard?.periodoActivo ? `${dashboard.periodoActivo.fechaInicio} → ${dashboard.periodoActivo.fechaFin}` : undefined}
         />
+
+        {dashboard?.periodoActivo?.estado === 'ABIERTO' && (
+          <Callout
+            variant="info"
+            title={`Período listo para iniciar — ${dashboard.periodoActivo.codigo}`}
+            subtitle="La fecha de inicio ya fue alcanzada. Inicia el período para activar Alerta Temprana."
+            action={
+              <button
+                onClick={() => iniciarMutation.mutate(dashboard.periodoActivo!.id)}
+                disabled={iniciarMutation.isPending}
+                className="bg-[#16724F] text-white px-4 py-2 font-mono text-xs font-bold uppercase tracking-[0.18em] hover:bg-[#0A0A0B] transition-colors disabled:opacity-50"
+              >
+                {iniciarMutation.isPending ? 'Iniciando...' : 'Iniciar período →'}
+              </button>
+            }
+          />
+        )}
+        {iniciarMutation.isError && (
+          <InlineError message={(iniciarMutation.error as { response?: { data?: { mensaje?: string } } })?.response?.data?.mensaje || 'Error al iniciar el período'} />
+        )}
 
         {enProgreso && (
           <Callout
@@ -60,6 +98,26 @@ export default function AdminDashboard() {
               </button>
             }
           />
+        )}
+
+        {syncStatus && syncStatus.pendientes > 0 && (
+          <div className="flex items-center gap-4 border border-[rgba(226,94,16,0.2)] bg-[rgba(226,94,16,0.06)] border-l-[3px] border-l-[#A8420A] p-4 mb-4">
+            <Icons.Alert className="w-4 h-4 text-[#A8420A] shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground">
+                {syncStatus.pendientes} consentimiento{syncStatus.pendientes > 1 ? 's' : ''} pendiente{syncStatus.pendientes > 1 ? 's' : ''} de sincronización con LOPDP
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                El servicio LOPDP no estaba disponible al registrar. Los datos están guardados localmente.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/admin/consentimientos')}
+              className="text-xs font-medium text-[#A8420A] hover:underline whitespace-nowrap"
+            >
+              Revisar →
+            </button>
+          </div>
         )}
 
         <div className="grid grid-cols-2 sm:grid-cols-4 border border-[rgba(10,10,11,0.1)] bg-[rgba(10,10,11,0.1)]" style={{ gap: '1px' }}>
@@ -139,7 +197,7 @@ export default function AdminDashboard() {
             </h2>
             <p className="mt-2 text-muted-foreground">
               {dashboard?.periodoActivo
-                ? 'Crea secciones (paralelos), asigna docentes y abre la matrícula en 4 pasos'
+                ? 'Crea paralelos, asigna docentes y abre la matrícula en 4 pasos'
                 : 'Configura tu primer período académico en 4 pasos guiados'}
             </p>
             <button
@@ -154,8 +212,8 @@ export default function AdminDashboard() {
 
         <div className="flex flex-wrap gap-3">
           {[
-            { path: '/admin/cursos', label: 'Cursos', Icon: Icons.Book },
-            { path: '/admin/secciones', label: 'Secciones', Icon: Icons.Layers },
+            { path: '/admin/asignaturas', label: 'Asignaturas', Icon: Icons.Book },
+            { path: '/admin/paralelos', label: 'Paralelos', Icon: Icons.Layers },
             { path: '/admin/usuarios', label: 'Usuarios', Icon: Icons.Users },
             { path: '/admin/cierres', label: 'Cierres', Icon: Icons.Chart },
             { path: '/admin/matricula', label: 'Matrícula', Icon: Icons.Clipboard },

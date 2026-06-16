@@ -1,8 +1,8 @@
 package com.sie.calificaciones.application;
 
 import com.sie.calificaciones.domain.*;
-import com.sie.academico.domain.Seccion;
-import com.sie.academico.infrastructure.SeccionRepository;
+import com.sie.academico.domain.Paralelo;
+import com.sie.academico.infrastructure.ParaleloRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.matricula.domain.Matricula;
 import com.sie.matricula.infrastructure.MatriculaRepository;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class CalificacionesService {
 
     private final EntityManager em;
-    private final SeccionRepository seccionRepository;
+    private final ParaleloRepository paraleloRepository;
     private final MatriculaRepository matriculaRepository;
     private final UsuarioRepository usuarioRepository;
 
@@ -33,7 +33,7 @@ public class CalificacionesService {
     // ── Asistencia ──
 
     @Transactional
-    public void registrarAsistencia(UUID seccionId, LocalDate fecha, List<AsistenciaEntry> entries, UUID registradoPor, UUID colegioId) {
+    public void registrarAsistencia(UUID paraleloId, LocalDate fecha, List<AsistenciaEntry> entries, UUID registradoPor, UUID colegioId) {
         if (fecha.isAfter(LocalDate.now())) throw new IllegalArgumentException("No se puede registrar asistencia a futuro");
 
         entries.forEach(e -> {
@@ -49,8 +49,8 @@ public class CalificacionesService {
         });
     }
 
-    public List<AsistenciaResponse> obtenerAsistencia(UUID seccionId, LocalDate desde, LocalDate hasta) {
-        var matriculas = matriculaRepository.findBySeccionId(seccionId);
+    public List<AsistenciaResponse> obtenerAsistencia(UUID paraleloId, LocalDate desde, LocalDate hasta) {
+        var matriculas = matriculaRepository.findByParaleloId(paraleloId);
         return matriculas.stream().map(m -> {
             var q = em.createQuery("SELECT a FROM Asistencia a WHERE a.matriculaId=?1 AND a.fecha BETWEEN ?2 AND ?3", Asistencia.class);
             q.setParameter(1, m.getId()); q.setParameter(2, desde); q.setParameter(3, hasta);
@@ -64,9 +64,9 @@ public class CalificacionesService {
     // ── Esquema de Evaluación ──
 
     @Transactional
-    public EsquemaEvaluacion definirEsquema(UUID seccionId, List<ComponenteEntry> componentes, UUID colegioId) {
-        var q = em.createQuery("SELECT e FROM EsquemaEvaluacion e WHERE e.seccionId=?1", EsquemaEvaluacion.class);
-        q.setParameter(1, seccionId);
+    public EsquemaEvaluacion definirEsquema(UUID paraleloId, List<ComponenteEntry> componentes, UUID colegioId) {
+        var q = em.createQuery("SELECT e FROM EsquemaEvaluacion e WHERE e.paraleloId=?1", EsquemaEvaluacion.class);
+        q.setParameter(1, paraleloId);
         var existente = q.getResultStream().findFirst();
 
         if (existente.isPresent() && existente.get().isCongelado())
@@ -84,7 +84,7 @@ public class CalificacionesService {
         }
 
         EsquemaEvaluacion esquema = existente.orElseGet(() -> {
-            var e = new EsquemaEvaluacion(); e.setSeccionId(seccionId); e.setColegioId(colegioId); return e;
+            var e = new EsquemaEvaluacion(); e.setParaleloId(paraleloId); e.setColegioId(colegioId); return e;
         });
 
         esquema.getComponentes().clear();
@@ -101,7 +101,7 @@ public class CalificacionesService {
     // ── Notas ──
 
     @Transactional
-    public void ingresarNotas(UUID seccionId, List<NotaEntry> entries, UUID ingresadoPor, UUID colegioId) {
+    public void ingresarNotas(UUID paraleloId, List<NotaEntry> entries, UUID ingresadoPor, UUID colegioId) {
         var maxNota = new BigDecimal("10");
         var minNota = BigDecimal.ZERO;
         entries.forEach(e -> {
@@ -118,15 +118,15 @@ public class CalificacionesService {
             q.setParameter(i++, e.valor()); q.setParameter(i++, ingresadoPor);
             q.executeUpdate();
         });
-        congelarEsquema(seccionId);
+        congelarEsquema(paraleloId);
     }
 
-    public List<NotaResponse> obtenerNotas(UUID seccionId) {
-        var esquema = em.createQuery("SELECT e FROM EsquemaEvaluacion e WHERE e.seccionId=?1", EsquemaEvaluacion.class)
-                .setParameter(1, seccionId).getResultStream().findFirst().orElse(null);
+    public List<NotaResponse> obtenerNotas(UUID paraleloId) {
+        var esquema = em.createQuery("SELECT e FROM EsquemaEvaluacion e WHERE e.paraleloId=?1", EsquemaEvaluacion.class)
+                .setParameter(1, paraleloId).getResultStream().findFirst().orElse(null);
         if (esquema == null) return List.of();
 
-        var matriculas = matriculaRepository.findBySeccionId(seccionId);
+        var matriculas = matriculaRepository.findByParaleloId(paraleloId);
         return matriculas.stream().map(m -> {
             var q = em.createQuery("SELECT n FROM Nota n WHERE n.matriculaId=?1", Nota.class);
             q.setParameter(1, m.getId());
@@ -150,8 +150,8 @@ public class CalificacionesService {
     // ── Cierre ──
 
     @Transactional
-    public void cerrarSeccion(UUID seccionId, UUID cerradoPor, UUID colegioId) {
-        var notas = obtenerNotas(seccionId);
+    public void cerrarParalelo(UUID paraleloId, UUID cerradoPor, UUID colegioId) {
+        var notas = obtenerNotas(paraleloId);
         if (notas.stream().anyMatch(n -> n.notaFinal() == null))
             throw new IllegalStateException("Hay estudiantes sin todas las notas");
 
@@ -164,23 +164,23 @@ public class CalificacionesService {
 
         var q = em.createNativeQuery("INSERT INTO cierre_secciones (id, colegio_id, seccion_id, cerrado_por) VALUES (?1,?2,?3,?4)");
         q.setParameter(1, UUID.randomUUID()); q.setParameter(2, colegioId);
-        q.setParameter(3, seccionId); q.setParameter(4, cerradoPor);
+        q.setParameter(3, paraleloId); q.setParameter(4, cerradoPor);
         q.executeUpdate();
     }
 
-    public boolean estaCerrada(UUID seccionId) {
+    public boolean estaCerrada(UUID paraleloId) {
         var q = em.createNativeQuery("SELECT COUNT(*) FROM cierre_secciones WHERE seccion_id=?1");
-        q.setParameter(1, seccionId);
+        q.setParameter(1, paraleloId);
         return ((Number) q.getSingleResult()).intValue() > 0;
     }
 
     public List<CierreStatusResponse> dashboardCierres(UUID periodoId) {
-        var secciones = seccionRepository.findByPeriodoId(periodoId);
-        return secciones.stream().map(s -> {
+        var paralelos = paraleloRepository.findByPeriodoId(periodoId);
+        return paralelos.stream().map(s -> {
             var notas = obtenerNotas(s.getId());
             var cerrada = estaCerrada(s.getId());
             var estado = cerrada ? "CERRADA" : notas.stream().allMatch(n -> n.notaFinal() != null) ? "LISTA" : "PENDIENTE";
-            return new CierreStatusResponse(s.getId(), s.getCodigo(), s.getCurso().getNombre(), estado);
+            return new CierreStatusResponse(s.getId(), s.getCodigo(), s.getAsignatura().getNombre(), estado);
         }).toList();
     }
 
@@ -188,14 +188,14 @@ public class CalificacionesService {
 
     public List<NotaResponse> misNotas(UUID estudianteId) {
         return matriculaRepository.findByEstudianteId(estudianteId).stream()
-                .flatMap(m -> obtenerNotas(m.getSeccionId()).stream()
+                .flatMap(m -> obtenerNotas(m.getParaleloId()).stream()
                         .filter(n -> n.estudianteId().equals(estudianteId))) // filter to this student
                 .toList();
     }
 
     public List<AsistenciaResponse> miAsistencia(UUID estudianteId) {
         return matriculaRepository.findByEstudianteId(estudianteId).stream()
-                .flatMap(m -> obtenerAsistencia(m.getSeccionId(), LocalDate.now().minusYears(1), LocalDate.now()).stream())
+                .flatMap(m -> obtenerAsistencia(m.getParaleloId(), LocalDate.now().minusYears(1), LocalDate.now()).stream())
                 .toList();
     }
 
@@ -205,9 +205,9 @@ public class CalificacionesService {
                 .orElse("Estudiante");
     }
 
-    private void congelarEsquema(UUID seccionId) {
-        em.createQuery("UPDATE EsquemaEvaluacion e SET e.congelado=true WHERE e.seccionId=?1")
-                .setParameter(1, seccionId).executeUpdate();
+    private void congelarEsquema(UUID paraleloId) {
+        em.createQuery("UPDATE EsquemaEvaluacion e SET e.congelado=true WHERE e.paraleloId=?1")
+                .setParameter(1, paraleloId).executeUpdate();
     }
 
     // ── DTOs ──
@@ -218,5 +218,5 @@ public class CalificacionesService {
     public record NotaEntry(UUID matriculaId, UUID componenteId, BigDecimal valor) {}
     public record ComponenteNota(UUID componenteId, String nombre, BigDecimal peso, BigDecimal valor) {}
     public record NotaResponse(UUID matriculaId, UUID estudianteId, String estudianteNombre, BigDecimal notaFinal, List<ComponenteNota> componentes) {}
-    public record CierreStatusResponse(UUID seccionId, String codigo, String curso, String estado) {}
+    public record CierreStatusResponse(UUID paraleloId, String codigo, String asignatura, String estado) {}
 }
