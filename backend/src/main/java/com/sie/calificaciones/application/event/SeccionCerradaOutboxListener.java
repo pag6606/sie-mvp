@@ -6,6 +6,7 @@ import com.sie.shared.outbox.EventoSalienteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -20,7 +21,7 @@ public class SeccionCerradaOutboxListener {
     private final EventoSalienteRepository outboxRepository;
     private final RepresentanteEstudianteRepository vinculacionRepository;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void onSeccionCerrada(SeccionCerradaEvent event) {
         for (UUID estudianteId : event.estudianteIds()) {

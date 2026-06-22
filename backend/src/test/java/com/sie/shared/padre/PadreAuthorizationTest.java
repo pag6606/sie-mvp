@@ -1,8 +1,10 @@
 package com.sie.shared.padre;
 
 import com.sie.calificaciones.application.CalificacionesService;
+import com.sie.identidad.application.ConsentimientoService;
 import com.sie.identidad.application.UsuarioService;
 import com.sie.identidad.application.dto.UsuarioResponse;
+import com.sie.identidad.infrastructure.RepresentanteRepository;
 import com.sie.shared.vinculacion.IVinculacionResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,12 +33,17 @@ class PadreAuthorizationTest {
     private UsuarioService usuarioService;
     @Mock
     private CalificacionesService calificacionesService;
+    @Mock
+    private RepresentanteRepository representanteRepository;
+    @Mock
+    private ConsentimientoService consentimientoService;
 
     private PadreController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new PadreController(vinculacionResolver, usuarioService, calificacionesService, null);
+        controller = new PadreController(vinculacionResolver, usuarioService, calificacionesService,
+                representanteRepository, consentimientoService);
     }
 
     @Test
