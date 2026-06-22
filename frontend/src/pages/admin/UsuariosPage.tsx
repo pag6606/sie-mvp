@@ -88,14 +88,14 @@ export default function UsuariosPage() {
     }
     setRepSaving(true)
     try {
-      const { data: rep } = await api.post('/representantes', {
+      const { data: result } = await api.post('/representantes', {
         cedula: repCedula.trim(),
         nombre: capitalizeWords(repNombre.trim()),
         email: repEmail.trim(),
         telefono: repTelefono.trim(),
         parentesco: repParentesco,
       })
-      await api.post(`/representantes/${rep.id}/vincular`, {
+      await api.post(`/representantes/${result.id}/vincular`, {
         estudianteId: repEstudianteId,
         esPrincipal: true,
       })

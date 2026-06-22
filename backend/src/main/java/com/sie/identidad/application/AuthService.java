@@ -56,9 +56,9 @@ public class AuthService {
                 .map(ur -> ur.getRol().getCodigo().name())
                 .collect(Collectors.toSet());
 
-        if (roles.contains("PADRE")) {
+        if (roles.contains(RolCodigo.PADRE.name())) {
             var representante = representanteRepository.findByUsuarioId(usuario.getId());
-            if (representante.isEmpty() || !representante.get().isActivo()) {
+            if (representante.isEmpty() || !representante.get().isActivo() || representante.get().isDeleted()) {
                 throw new IllegalArgumentException("Cuenta no activada. Solicite a la secretaría la activación de su cuenta de representante.");
             }
         }

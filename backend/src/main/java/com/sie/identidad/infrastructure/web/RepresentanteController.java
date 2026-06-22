@@ -10,6 +10,7 @@ import com.sie.identidad.domain.RolCodigo;
 import com.sie.identidad.infrastructure.RepresentanteEstudianteRepository;
 import com.sie.identidad.infrastructure.RepresentanteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,47 +36,83 @@ public class RepresentanteController {
     }
 
     @PostMapping
-    public ResponseEntity<Representante> crear(@RequestAttribute("colegioId") UUID colegioId,
-                                                @RequestBody Map<String, Object> body) {
-        if (representanteRepository.existsByCedulaAndColegioId(
-                body.get("cedula").toString(), colegioId)) {
+    public ResponseEntity<Map<String, String>> crear(@RequestAttribute("colegioId") UUID colegioId,
+                                                       @RequestBody Map<String, Object> body) {
+        String cedula = body.get("cedula") != null ? body.get("cedula").toString().trim() : null;
+        String nombre = body.get("nombre") != null ? body.get("nombre").toString().trim() : null;
+        String email = body.get("email") != null ? body.get("email").toString().trim() : null;
+        String telefono = body.get("telefono") != null ? body.get("telefono").toString().trim() : "";
+        String parentescoStr = body.get("parentesco") != null ? body.get("parentesco").toString() : "OTRO";
+
+        if (cedula == null || cedula.isEmpty() || nombre == null || nombre.isEmpty() || email == null || email.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "Cédula, nombre y email son obligatorios"));
+        }
+
+        if (representanteRepository.existsByCedulaAndColegioId(cedula, colegioId)) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(null);
+                    .body(Map.of("mensaje", "La cédula ya está registrada"));
+        }
+        if (representanteRepository.existsByEmailAndColegioId(email, colegioId)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("mensaje", "El email ya está registrado"));
+        }
+
+        Parentesco parentesco;
+        try {
+            parentesco = Parentesco.valueOf(parentescoStr);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("mensaje", "Parentesco inválido: " + parentescoStr));
         }
 
         Representante r = new Representante();
         r.setColegioId(colegioId);
-        r.setCedula(body.get("cedula").toString());
-        r.setNombre(body.get("nombre").toString());
-        r.setEmail(body.get("email").toString());
-        r.setTelefono(body.getOrDefault("telefono", "").toString());
-        r.setParentesco(Parentesco.valueOf(body.getOrDefault("parentesco", "OTRO").toString()));
+        r.setCedula(cedula);
+        r.setNombre(nombre);
+        r.setEmail(email);
+        r.setTelefono(telefono);
+        r.setParentesco(parentesco);
         r.setActivo(true);
-        return ResponseEntity.status(HttpStatus.CREATED).body(representanteRepository.save(r));
+        representanteRepository.save(r);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("mensaje", "Representante registrado", "id", r.getId().toString()));
     }
 
     @PostMapping("/{id}/vincular")
-    public ResponseEntity<RepresentanteEstudiante> vincular(@PathVariable UUID id,
-                                                             @RequestBody Map<String, Object> body) {
-        UUID estudianteId = UUID.fromString(body.get("estudianteId").toString());
+    @Transactional
+    public ResponseEntity<Map<String, String>> vincular(@PathVariable UUID id,
+                                                         @RequestBody Map<String, Object> body) {
+        UUID estudianteId;
+        try {
+            estudianteId = UUID.fromString(body.get("estudianteId").toString());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "estudianteId inválido"));
+        }
         boolean esPrincipal = Boolean.TRUE.equals(body.get("esPrincipal"));
 
-        // Por ahora un solo estudiante por padre en Fase 2A
-        if (vinculacionRepository.findByRepresentanteIdAndActivoTrue(id).size() >= 1) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        if (vinculacionRepository.existsByRepresentanteIdAndActivoTrue(id)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("mensaje", "El representante ya tiene un estudiante vinculado"));
         }
 
-        // Si es principal, verificar que no haya otro principal
         if (esPrincipal && vinculacionRepository.countByEstudianteIdAndEsPrincipalTrueAndActivoTrue(estudianteId) > 0) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("mensaje", "El estudiante ya tiene un representante principal"));
         }
 
-        RepresentanteEstudiante re = new RepresentanteEstudiante();
-        re.setRepresentanteId(id);
-        re.setEstudianteId(estudianteId);
-        re.setEsPrincipal(esPrincipal);
-        re.setActivo(true);
-        return ResponseEntity.status(HttpStatus.CREATED).body(vinculacionRepository.save(re));
+        try {
+            RepresentanteEstudiante re = new RepresentanteEstudiante();
+            re.setRepresentanteId(id);
+            re.setEstudianteId(estudianteId);
+            re.setEsPrincipal(esPrincipal);
+            re.setActivo(true);
+            vinculacionRepository.save(re);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Map.of("mensaje", "Vinculación creada", "id", re.getId().toString()));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("mensaje", "La vinculación ya existe"));
+        }
     }
 
     @DeleteMapping("/{representanteId}/vincular/{estudianteId}")
@@ -104,22 +141,28 @@ public class RepresentanteController {
                     .body(Map.of("mensaje", "El representante ya tiene una cuenta activa"));
         }
 
-        UsuarioResponse usuario = usuarioService.crearUsuario(
-                new CrearUsuarioRequest(
-                        r.getEmail(),
-                        r.getNombre(),
-                        Set.of(RolCodigo.PADRE),
-                        null
-                ),
-                colegioId
-        );
+        try {
+            UsuarioResponse usuario = usuarioService.crearUsuario(
+                    new CrearUsuarioRequest(
+                            r.getEmail(),
+                            r.getNombre(),
+                            Set.of(RolCodigo.PADRE),
+                            null
+                    ),
+                    colegioId
+            );
 
-        r.setUsuarioId(usuario.id());
-        representanteRepository.save(r);
+            r.setUsuarioId(usuario.id());
+            representanteRepository.save(r);
 
-        return ResponseEntity.ok(Map.of(
-                "mensaje", "Activación enviada. El representante recibirá un email.",
-                "usuarioId", usuario.id().toString()
-        ));
+            return ResponseEntity.ok(Map.of(
+                    "mensaje", "Activación enviada. El representante recibirá un email.",
+                    "usuarioId", usuario.id().toString()
+            ));
+        } catch (DataIntegrityViolationException e) {
+            // Race condition: otro admin ya activó este representante
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("mensaje", "El representante ya fue activado"));
+        }
     }
 }

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <title>Mis Secciones — SIE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#06B6D4', foreground: '#FFFFFF' },
+          },
+          fontFamily: { sans: ['DM Sans', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    .badge { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium; }
+    .btn-primary { @apply bg-cyan-600 hover:bg-cyan-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors inline-flex items-center gap-2; }
+    .btn-outline { @apply border border-slate-600 hover:bg-slate-700 text-slate-300 font-medium px-4 py-2 rounded-lg text-sm transition-colors inline-flex items-center gap-2; }
+    .card { @apply bg-slate-800 rounded-xl border border-slate-700 shadow-sm; }
+    .table-header { @apply text-left text-xs font-semibold text-slate-400 uppercase tracking-wider px-4 py-3; }
+    .table-cell { @apply px-4 py-3 text-sm text-slate-300; }
+    .table-row { @apply border-b border-slate-700 hover:bg-slate-700/50 transition-colors; }
+    .sidebar-item { @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-700 hover:text-slate-100 transition-colors cursor-pointer; }
+    .sidebar-item.active { @apply bg-cyan-600/20 text-cyan-400 font-medium; }
+  </style>
+</head>
+<body class="h-full bg-slate-900">
+<div class="flex h-screen overflow-hidden">
+  <!-- SIDEBAR -->
+  <aside class="w-64 bg-slate-800 border-slate-700 flex flex-col shrink-0">
+    <div class="h-16 flex items-center px-4 border-b border-slate-700">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-cyan-600 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+        </div>
+        <span class="font-semibold text-slate-100 text-sm">SIE</span>
+      </div>
+    </div>
+    <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+      <a href="dashboard-docente.html" class="sidebar-item active">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Mis Secciones
+      </a>
+      <a href="#" class="sidebar-item">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i> Asistencia
+      </a>
+      <a href="#" class="sidebar-item">
+        <i data-lucide="file-check" class="w-4 h-4"></i> Calificaciones
+      </a>
+      <a href="#" class="sidebar-item">
+        <i data-lucide="settings" class="w-4 h-4"></i> Evaluación
+      </a>
+    </nav>
+    <!-- User footer -->
+    <div class="p-3 border-t border-slate-700 relative">
+      <button onclick="toggleUserMenu()" class="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-slate-700 transition-colors group">
+        <div class="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center shrink-0">
+          <span class="text-xs font-semibold text-white">DL</span>
+        </div>
+        <div class="flex-1 min-w-0 text-left">
+          <p class="text-xs font-semibold text-slate-100 truncate">Diana López</p>
+          <p class="text-xs text-slate-400 truncate">Docente</p>
+        </div>
+        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 shrink-0"></i>
+      </button>
+      <div id="userMenu" class="hidden absolute bottom-full left-3 right-3 mb-1 bg-slate-800 border border-slate-700 rounded-xl shadow-lg z-50 overflow-hidden">
+        <div class="px-4 py-3 bg-slate-700/50 border-b border-slate-700">
+          <p class="text-sm font-semibold text-slate-100">Diana López</p>
+          <p class="text-xs text-slate-400 mt-0.5">diana@colegio.edu.ec</p>
+          <div class="flex items-center gap-1.5 mt-1.5"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span><span class="text-xs text-slate-400">Último acceso: Hoy, 07:45 AM</span></div>
+        </div>
+        <div class="py-1">
+          <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700 transition-colors"><i data-lucide="user-circle" class="w-4 h-4 text-slate-500"></i> Mi perfil</button>
+          <button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700 transition-colors"><i data-lucide="settings" class="w-4 h-4 text-slate-500"></i> Preferencias</button>
+        </div>
+        <div class="border-t border-slate-700 py-1">
+          <button onclick="cerrarSesion()" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors font-medium"><i data-lucide="log-out" class="w-4 h-4"></i> Cerrar sesión</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 shrink-0">
+      <nav class="flex items-center gap-1 text-sm text-slate-400">
+        <a href="dashboard-docente.html" class="hover:text-slate-200">Inicio</a>
+        <i data-lucide="chevron-right" class="w-3 h-3"></i>
+        <span class="text-slate-100 font-medium">Mis Secciones</span>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleNotifPanel()" class="relative p-2 hover:bg-slate-700 rounded-lg transition-colors">
+          <i data-lucide="bell" class="w-4 h-4 text-slate-400"></i>
+          <span class="absolute top-1 right-1 min-w-[16px] h-4 bg-cyan-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">2</span>
+        </button>
+        <div id="notifPanel" class="hidden absolute right-0 top-full mt-2 w-80 bg-slate-800 border border-slate-700 rounded-xl shadow-lg z-50">
+          <div class="flex items-center justify-between px-4 py-3 border-b border-slate-700"><span class="text-sm font-semibold text-slate-100">Notificaciones</span><button class="text-xs text-cyan-400 hover:text-cyan-300 font-medium">Marcar todo como leído</button></div>
+          <div class="divide-y divide-slate-700 max-h-72 overflow-y-auto">
+            <div class="flex gap-3 px-4 py-3 hover:bg-slate-700/50 cursor-pointer">
+              <div class="mt-0.5 shrink-0 w-8 h-8 bg-amber-500/10 rounded-full flex items-center justify-center"><i data-lucide="clock" class="w-4 h-4 text-amber-400"></i></div>
+              <div class="flex-1 min-w-0"><div class="flex items-start justify-between gap-2"><p class="text-xs font-semibold text-slate-100">Asistencia pendiente</p><span class="w-1.5 h-1.5 bg-cyan-500 rounded-full mt-1 shrink-0"></span></div><p class="text-xs text-slate-400 mt-0.5 line-clamp-2">Registra la asistencia de 4to B.</p><p class="text-xs text-slate-500 mt-1">Hace 2 horas</p></div>
+            </div>
+            <div class="flex gap-3 px-4 py-3 hover:bg-slate-700/50 cursor-pointer">
+              <div class="mt-0.5 shrink-0 w-8 h-8 bg-emerald-500/10 rounded-full flex items-center justify-center"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i></div>
+              <div class="flex-1 min-w-0"><p class="text-xs font-semibold text-slate-100">Notas guardadas</p><p class="text-xs text-slate-400 mt-0.5 line-clamp-2">Las notas de 3ro A fueron guardadas.</p><p class="text-xs text-slate-500 mt-1">Ayer</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="w-px h-5 bg-slate-700"></div>
+        <button onclick="toggleUserMenu()" class="flex items-center gap-2 pl-1 pr-3 py-1 hover:bg-slate-700 rounded-lg transition-colors">
+          <div class="w-7 h-7 bg-emerald-600 rounded-full flex items-center justify-center"><span class="text-xs font-semibold text-white">DL</span></div>
+          <div class="text-left hidden sm:block"><p class="text-xs font-semibold text-slate-100 leading-tight">Diana López</p><p class="text-xs text-slate-400 leading-tight">Docente</p></div>
+          <i data-lucide="chevron-down" class="w-3 h-3 text-slate-500"></i>
+        </button>
+      </div>
+    </header>
+    <div class="flex-1 overflow-y-auto p-6">
+      <!-- Page header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-xl font-bold text-slate-100">Mis Secciones</h1>
+          <p class="text-sm text-slate-400 mt-0.5">Gestión de secciones y calificaciones</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select class="text-sm border border-slate-600 rounded-lg px-3 py-2 bg-slate-800 text-slate-200">
+            <option>Período 2024-2025</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="card p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-400 font-medium">Secciones Activas</p>
+              <p class="text-2xl font-bold text-slate-100 mt-1">5</p>
+            </div>
+            <div class="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center"><i data-lucide="book-open" class="w-5 h-5 text-cyan-400"></i></div>
+          </div>
+        </div>
+        <div class="card p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-400 font-medium">Estudiantes Total</p>
+              <p class="text-2xl font-bold text-slate-100 mt-1">142</p>
+            </div>
+            <div class="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-emerald-400"></i></div>
+          </div>
+        </div>
+        <div class="card p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-400 font-medium">Asistencias Pendientes</p>
+              <p class="text-2xl font-bold text-slate-100 mt-1">2</p>
+            </div>
+            <div class="w-10 h-10 bg-amber-500/10 rounded-lg flex items-center justify-center"><i data-lucide="clipboard-list" class="w-5 h-5 text-amber-400"></i></div>
+          </div>
+        </div>
+        <div class="card p-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-400 font-medium">Secciones Cerradas</p>
+              <p class="text-2xl font-bold text-slate-100 mt-1">3</p>
+            </div>
+            <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center"><i data-lucide="check-circle" class="w-5 h-5 text-slate-400"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sections Table -->
+      <div class="card overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-700 flex flex-wrap items-center gap-2">
+          <div class="relative flex-1 min-w-52">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+            <input type="text" class="w-full border border-slate-600 rounded-lg pl-9 pr-4 py-2 text-sm bg-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Buscar sección..." />
+          </div>
+          <select class="text-sm border border-slate-600 rounded-lg px-3 py-2 bg-slate-700 text-slate-200">
+            <option>Todos los estados</option>
+            <option>En curso</option>
+            <option>Pendiente cierre</option>
+            <option>Cerradas</option>
+          </select>
+        </div>
+        <table class="w-full">
+          <thead class="bg-slate-700/30">
+            <tr>
+              <th class="table-header cursor-pointer hover:text-slate-300">Sección <i data-lucide="chevrons-up-down" class="w-3 h-3 inline"></i></th>
+              <th class="table-header">Grado</th>
+              <th class="table-header">Estudiantes</th>
+              <th class="table-header cursor-pointer hover:text-slate-300">Estado <i data-lucide="chevrons-up-down" class="w-3 h-3 inline"></i></th>
+              <th class="table-header">Última Asistencia</th>
+              <th class="table-header w-28">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="table-row cursor-pointer">
+              <td class="table-cell font-medium text-slate-100">4to B — Matemáticas</td>
+              <td class="table-cell text-slate-400">4to de EBG</td>
+              <td class="table-cell"><div class="flex items-center gap-2"><div class="w-6 h-6 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="text-xs font-semibold text-cyan-400">28</span></div></div></td>
+              <td class="table-cell"><span class="badge bg-amber-500/10 text-amber-400">Pendiente cierre</span></td>
+              <td class="table-cell text-slate-500 text-xs">Hace 2 días</td>
+              <td class="table-cell">
+                <div class="flex items-center gap-1">
+                  <button class="p-1.5 hover:bg-cyan-500/10 rounded-lg text-slate-500 hover:text-cyan-400 transition-colors" data-tip="Tomar asistencia"><i data-lucide="clipboard" class="w-4 h-4"></i></button>
+                  <button class="p-1.5 hover:bg-cyan-500/10 rounded-lg text-slate-500 hover:text-cyan-400 transition-colors" data-tip="Ver notas"><i data-lucide="file-check" class="w-4 h-4"></i></button>
+                  <button class="p-1.5 hover:bg-slate-700 rounded-lg text-slate-500 hover:text-slate-300 transition-colors"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr class="table-row cursor-pointer">
+              <td class="table-cell font-medium text-slate-100">3ro A — Matemáticas</td>
+              <td class="table-cell text-slate-400">3ro de EBG</td>
+              <td class="table-cell"><div class="flex items-center gap-2"><div class="w-6 h-6 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="text-xs font-semibold text-cyan-400">32</span></div></div></td>
+              <td class="table-cell"><span class="badge bg-emerald-500/10 text-emerald-400">En curso</span></td>
+              <td class="table-cell text-slate-500 text-xs">Hoy</td>
+              <td class="table-cell">
+                <div class="flex items-center gap-1">
+                  <button class="p-1.5 hover:bg-cyan-500/10 rounded-lg text-slate-500 hover:text-cyan-400 transition-colors" data-tip="Tomar asistencia"><i data-lucide="clipboard" class="w-4 h-4"></i></button>
+                  <button class="p-1.5 hover:bg-cyan-500/10 rounded-lg text-slate-500 hover:text-cyan-400 transition-colors" data-tip="Ver notas"><i data-lucide="file-check" class="w-4 h-4"></i></button>
+                  <button class="p-1.5 hover:bg-slate-700 rounded-lg text-slate-500 hover:text-slate-300 transition-colors"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr class="table-row cursor-pointer">
+              <td class="table-cell font-medium text-slate-100">5to C — Matemáticas</td>
+              <td class="table-cell text-slate-400">5to de EBG</td>
+              <td class="table-cell"><div class="flex items-center gap-2"><div class="w-6 h-6 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="text-xs font-semibold text-cyan-400">30</span></div></div></td>
+              <td class="table-cell"><span class="badge bg-emerald-500/10 text-emerald-400">En curso</span></td>
+              <td class="table-cell text-slate-500 text-xs">Hoy</td>
+              <td class="table-cell">
+                <div class="flex items-center gap-1">
+                  <button class="p-1.5 hover:bg-cyan-500/10 rounded-lg text-slate-500 hover:text-cyan-400 transition-colors" data-tip="Tomar asistencia"><i data-lucide="clipboard" class="w-4 h-4"></i></button>
+                  <button class="p-1.5 hover:bg-cyan-500/10 rounded-lg text-slate-500 hover:text-cyan-400 transition-colors" data-tip="Ver notas"><i data-lucide="file-check" class="w-4 h-4"></i></button>
+                  <button class="p-1.5 hover:bg-slate-700 rounded-lg text-slate-500 hover:text-slate-300 transition-colors"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr class="table-row cursor-pointer">
+              <td class="table-cell font-medium text-slate-100">2do B — Matemáticas</td>
+              <td class="table-cell text-slate-400">2do de EGB</td>
+              <td class="table-cell"><div class="flex items-center gap-2"><div class="w-6 h-6 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="text-xs font-semibold text-cyan-400">26</span></div></div></td>
+              <td class="table-cell"><span class="badge bg-slate-700 text-slate-400">Cerrada</span></td>
+              <td class="table-cell text-slate-500 text-xs">15 Dic</td>
+              <td class="table-cell">
+                <div class="flex items-center gap-1">
+                  <button class="p-1.5 hover:bg-cyan-500/10 rounded-lg text-slate-500 hover:text-cyan-400 transition-colors" data-tip="Ver notas"><i data-lucide="file-check" class="w-4 h-4"></i></button>
+                  <button class="p-1.5 hover:bg-slate-700 rounded-lg text-slate-500 hover:text-slate-300 transition-colors"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr class="table-row cursor-pointer">
+              <td class="table-cell font-medium text-slate-100">1ro A — Matemáticas</td>
+              <td class="table-cell text-slate-400">1ro de EGB</td>
+              <td class="table-cell"><div class="flex items-center gap-2"><div class="w-6 h-6 bg-cyan-500/20 rounded-full flex items-center justify-center"><span class="text-xs font-semibold text-cyan-400">26</span></div></div></td>
+              <td class="table-cell"><span class="badge bg-slate-700 text-slate-400">Cerrada</span></td>
+              <td class="table-cell text-slate-500 text-xs">14 Dic</td>
+              <td class="table-cell">
+                <div class="flex items-center gap-1">
+                  <button class="p-1.5 hover:bg-cyan-500/10 rounded-lg text-slate-500 hover:text-cyan-400 transition-colors" data-tip="Ver notas"><i data-lucide="file-check" class="w-4 h-4"></i></button>
+                  <button class="p-1.5 hover:bg-slate-700 rounded-lg text-slate-500 hover:text-slate-300 transition-colors"><i data-lucide="more-horizontal" class="w-4 h-4"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="flex items-center justify-between px-4 py-3 border-t border-slate-700">
+          <span class="text-xs text-slate-500">Mostrando 1–5 de 5 secciones</span>
+          <div class="flex items-center gap-1">
+            <button class="p-1.5 hover:bg-slate-700 rounded text-slate-500 disabled:opacity-40" disabled><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+            <button class="px-2.5 py-1 text-xs bg-cyan-600 text-white rounded font-medium">1</button>
+            <button class="p-1.5 hover:bg-slate-700 rounded text-slate-500 disabled:opacity-40" disabled><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: Cerrar sesión -->
+<div id="logoutModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+  <div class="bg-slate-800 rounded-2xl shadow-2xl p-6 max-w-sm w-full mx-4 border border-slate-700">
+    <div class="flex flex-col items-center text-center">
+      <div class="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mb-4"><i data-lucide="log-out" class="w-7 h-7 text-red-400"></i></div>
+      <h3 class="text-base font-bold text-slate-100 mb-1">¿Cerrar sesión?</h3>
+      <p class="text-sm text-slate-400 mb-6">Tu sesión se cerrará.</p>
+      <div class="flex gap-3 w-full">
+        <button onclick="document.getElementById('logoutModal').classList.add('hidden')" class="flex-1 btn-outline justify-center">Cancelar</button>
+        <button onclick="window.location.href='index.html'" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors flex items-center justify-center gap-2"><i data-lucide="log-out" class="w-4 h-4"></i> Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  function toggleUserMenu() {
+    const menu = document.getElementById('userMenu');
+    const notif = document.getElementById('notifPanel');
+    if (notif) notif.classList.add('hidden');
+    menu.classList.toggle('hidden');
+  }
+
+  function toggleNotifPanel() {
+    const panel = document.getElementById('notifPanel');
+    const menu = document.getElementById('userMenu');
+    if (menu) menu.classList.add('hidden');
+    panel.classList.toggle('hidden');
+  }
+
+  function cerrarSesion() {
+    document.getElementById('logoutModal').classList.remove('hidden');
+    document.getElementById('userMenu').classList.add('hidden');
+  }
+
+  document.addEventListener('click', function(e) {
+    const userMenu = document.getElementById('userMenu');
+    const notifPanel = document.getElementById('notifPanel');
+    if (userMenu && !e.target.closest('[onclick="toggleUserMenu()"]')) userMenu.classList.add('hidden');
+    if (notifPanel && !e.target.closest('[onclick="toggleNotifPanel()"]')) notifPanel.classList.add('hidden');
+  });
+</script>
+</body>
+</html>

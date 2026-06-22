@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <title>Usuarios — SIE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = { theme: { extend: { colors: { primary: { DEFAULT: '#06B6D4', foreground: '#0F172A' } }, fontFamily: { sans: ['DM Sans', 'sans-serif'] } } } }
+  </script>
+  <style>
+    body { font-family: 'DM Sans', sans-serif; background: #0F172A; color: #F1F5F9; }
+    .badge { @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium; }
+    .btn-primary { @apply bg-cyan-600 hover:bg-cyan-500 text-white font-semibold px-3.5 py-2 rounded-lg text-sm transition-colors inline-flex items-center gap-2; }
+    .btn-outline { @apply border border-slate-700 hover:bg-slate-700 text-slate-100 font-semibold px-3.5 py-2 rounded-lg text-sm transition-colors inline-flex items-center gap-2; }
+    .btn-ghost { @apply hover:bg-slate-700 text-slate-400 font-semibold px-3 py-1.5 rounded-lg text-sm transition-colors inline-flex items-center gap-1.5; }
+    .card { @apply bg-slate-800 rounded-xl border border-slate-700 shadow-sm; }
+    .th { @apply text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-4 py-3 whitespace-nowrap select-none; }
+    .th.sortable { @apply cursor-pointer hover:bg-slate-700 hover:text-slate-100 transition-colors; }
+    .td { @apply px-4 py-3 text-sm text-slate-300 whitespace-nowrap; }
+    .tr { @apply border-b border-slate-800 hover:bg-cyan-500/5 transition-colors; }
+    .cb { @apply w-4 h-4 rounded border-slate-600 text-cyan-600 cursor-pointer accent-cyan-600; }
+    .search-input { border: 1px solid #334155; border-radius: 8px; padding: 8px 12px 8px 36px; font-size: 14px; outline: none; transition: border-color .15s, box-shadow .15s; background: #1E293B; color: #F1F5F9; min-width: 260px; }
+    .search-input:focus { border-color: #06B6D4; box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+    .dropdown { @apply absolute top-full mt-1 bg-slate-800 border border-slate-700 rounded-xl shadow-lg z-40 py-1 min-w-max; }
+    .dd-item { @apply flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700 cursor-pointer transition-colors; }
+    .dd-item.active { @apply text-cyan-400 bg-cyan-500/10 font-semibold; }
+    mark { background: #FEF08A; color: inherit; border-radius: 2px; padding: 0 1px; }
+    .row-actions { opacity: 0; transition: opacity .15s; }
+    .tr:hover .row-actions { opacity: 1; }
+    .input { background: #1E293B; border-color: #334155; color: #F1F5F9; }
+    .input:focus { border-color: #06B6D4; box-shadow: 0 0 0 3px rgba(6,182,212,0.15); }
+    .label { color: #CBD5E1; }
+  </style>
+</head>
+<body class="h-full">
+<div class="flex h-screen overflow-hidden">
+  <aside class="w-64 bg-slate-800 border-r border-slate-700 flex flex-col shrink-0">
+    <div class="h-16 flex items-center px-4 border-b border-slate-700">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-cyan-600 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        </div>
+        <span class="font-semibold text-slate-100 text-sm">SIE</span>
+      </div>
+    </div>
+    <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+      <a href="../dashboard-admin.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-700 hover:text-slate-100 transition-colors cursor-pointer"><i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard</a>
+      <a href="list.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-cyan-500/10 text-cyan-400 font-semibold cursor-pointer"><i data-lucide="users" class="w-4 h-4"></i> Usuarios</a>
+      <a href="../academico/list.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-700 hover:text-slate-100 transition-colors cursor-pointer"><i data-lucide="book-open" class="w-4 h-4"></i> Académico</a>
+      <a href="../matricula/wizard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-slate-400 hover:bg-slate-700 hover:text-slate-100 transition-colors cursor-pointer"><i data-lucide="clipboard-check" class="w-4 h-4"></i> Matrícula</a>
+    </nav>
+    <div class="p-3 border-t border-slate-700 relative">
+      <button onclick="toggleUserMenu()" class="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-slate-700 transition-colors group">
+        <div class="w-8 h-8 bg-cyan-600 rounded-full flex items-center justify-center shrink-0"><span class="text-xs font-semibold text-white">AL</span></div>
+        <div class="flex-1 min-w-0 text-left"><p class="text-xs font-semibold text-slate-100 truncate">Alma管理体系</p><p class="text-xs text-slate-500 truncate">Administrador</p></div>
+        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300 shrink-0"></i>
+      </button>
+      <div id="userMenu" class="hidden absolute bottom-full left-3 right-3 mb-1 bg-slate-800 border border-slate-700 rounded-xl shadow-lg z-50 overflow-hidden">
+        <div class="px-4 py-3 bg-slate-700/50 border-b border-slate-700"><p class="text-sm font-semibold text-slate-100">Alma管理体系</p><p class="text-xs text-slate-500 mt-0.5">admin@sie.edu.ec</p></div>
+        <div class="py-1"><button class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors font-semibold" onclick="window.location.href='../index.html'"><i data-lucide="log-out" class="w-4 h-4"></i> Cerrar sesión</button></div>
+      </div>
+    </div>
+  </aside>
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <header class="h-16 bg-slate-800 border-b border-slate-700 flex items-center justify-between px-6 shrink-0">
+      <nav class="flex items-center gap-1 text-sm text-slate-500"><a href="../dashboard-admin.html" class="hover:text-slate-300">Inicio</a><i data-lucide="chevron-right" class="w-3 h-3"></i><span class="text-slate-100 font-semibold">Usuarios</span></nav>
+      <div class="flex items-center gap-2">
+        <div class="relative"><button onclick="toggleNotifPanel()" class="relative p-2 hover:bg-slate-700 rounded-lg transition-colors"><i data-lucide="bell" class="w-4 h-4 text-slate-500"></i><span class="absolute top-1 right-1 min-w-[16px] h-4 bg-cyan-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">3</span></button></div>
+        <div class="w-px h-5 bg-slate-700"></div>
+        <button onclick="toggleUserMenu()" class="flex items-center gap-2 pl-1 pr-3 py-1 hover:bg-slate-700 rounded-lg transition-colors"><div class="w-7 h-7 bg-cyan-600 rounded-full flex items-center justify-center"><span class="text-xs font-semibold text-white">AL</span></div><div class="text-left hidden sm:block"><p class="text-xs font-semibold text-slate-100 leading-tight">Alma管理体系</p><p class="text-xs text-slate-500 leading-tight">Administrador</p></div><i data-lucide="chevron-down" class="w-3 h-3 text-slate-500"></i></button>
+      </div>
+    </header>
+    <div class="flex-1 overflow-y-auto p-6">
+      <div class="flex items-start justify-between mb-5">
+        <div><h1 class="text-xl font-bold text-slate-100">Usuarios</h1><p class="text-sm text-slate-500 mt-0.5">Gestión de usuarios, roles y permisos del sistema</p></div>
+        <div class="flex items-center gap-2">
+          <button class="btn-outline" onclick="importData()"><i data-lucide="upload" class="w-4 h-4"></i> Importar</button>
+          <a href="form.html?mode=create" class="btn-primary"><i data-lucide="plus" class="w-4 h-4"></i> Nuevo usuario</a>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 mb-5">
+        <div class="bg-slate-800 rounded-xl border border-slate-700 px-4 py-3 flex items-center gap-3 hover:border-slate-600 transition-colors cursor-pointer">
+          <div class="w-9 h-9 bg-cyan-500/10 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="users" class="w-4 h-4 text-cyan-500"></i></div>
+          <div><p class="text-xl font-bold text-slate-100">156</p><p class="text-xs text-slate-500">Total usuarios</p></div>
+        </div>
+        <div class="bg-slate-800 rounded-xl border border-slate-700 px-4 py-3 flex items-center gap-3 hover:border-slate-600 transition-colors cursor-pointer">
+          <div class="w-9 h-9 bg-emerald-500/10 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i></div>
+          <div><p class="text-xl font-bold text-slate-100">142</p><p class="text-xs text-slate-500">Activos</p></div>
+        </div>
+        <div class="bg-slate-800 rounded-xl border border-slate-700 px-4 py-3 flex items-center gap-3 hover:border-slate-600 transition-colors cursor-pointer">
+          <div class="w-9 h-9 bg-red-500/10 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="x-circle" class="w-4 h-4 text-red-500"></i></div>
+          <div><p class="text-xl font-bold text-slate-100">14</p><p class="text-xs text-slate-500">Inactivos</p></div>
+        </div>
+        <div class="bg-slate-800 rounded-xl border border-slate-700 px-4 py-3 flex items-center gap-3 hover:border-slate-600 transition-colors cursor-pointer">
+          <div class="w-9 h-9 bg-amber-500/10 rounded-lg flex items-center justify-center shrink-0"><i data-lucide="clock" class="w-4 h-4 text-amber-500"></i></div>
+          <div><p class="text-xl font-bold text-slate-100">8</p><p class="text-xs text-slate-500">Pendientes</p></div>
+        </div>
+      </div>
+
+      <div class="bg-slate-800 rounded-xl border border-slate-700 shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-700 flex flex-wrap items-center gap-2">
+          <div class="relative flex-1 min-w-52">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+            <input id="globalSearch" type="text" class="search-input w-full" placeholder="Buscar por nombre, correo, cédula..." oninput="onSearch(this.value)" />
+            <button id="clearSearch" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300" onclick="clearSearch()"><i data-lucide="x" class="w-3.5 h-3.5"></i></button>
+          </div>
+          <div class="relative">
+            <button class="btn-outline" onclick="toggleDrop('statusDrop')" id="statusBtn"><i data-lucide="circle-dot" class="w-4 h-4"></i><span id="statusLabel">Estado</span><i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-500"></i></button>
+            <div id="statusDrop" class="dropdown hidden" style="right:0">
+              <div class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">Estado</div>
+              <div class="dd-item active" onclick="setFilter('status','', 'Estado', 'statusDrop','statusBtn')"><span class="w-2 h-2 bg-slate-500 rounded-full"></span> Todos</div>
+              <div class="dd-item" onclick="setFilter('status','activo','Activo','statusDrop','statusBtn')"><span class="w-2 h-2 bg-emerald-500 rounded-full"></span> Activo</div>
+              <div class="dd-item" onclick="setFilter('status','inactivo','Inactivo','statusDrop','statusBtn')"><span class="w-2 h-2 bg-red-500 rounded-full"></span> Inactivo</div>
+            </div>
+          </div>
+          <div class="relative">
+            <button class="btn-outline" onclick="toggleDrop('rolDrop')" id="rolBtn"><i data-lucide="shield" class="w-4 h-4"></i><span id="rolLabel">Rol</span><i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-500"></i></button>
+            <div id="rolDrop" class="dropdown hidden" style="right:0">
+              <div class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">Rol</div>
+              <div class="dd-item active" onclick="setFilter('rol','', 'Rol', 'rolDrop','rolBtn')">Todos</div>
+              <div class="dd-item" onclick="setFilter('rol','Administrador','Administrador','rolDrop','rolBtn')">Administrador</div>
+              <div class="dd-item" onclick="setFilter('rol','Docente','Docente','rolDrop','rolBtn')">Docente</div>
+              <div class="dd-item" onclick="setFilter('rol','Estudiante','Estudiante','rolDrop','rolBtn')">Estudiante</div>
+            </div>
+          </div>
+          <div id="activeFiltersChips" class="flex items-center gap-1.5 flex-wrap"></div>
+          <div class="flex-1"></div>
+          <button class="btn-ghost"><i data-lucide="download" class="w-4 h-4"></i> Exportar</button>
+        </div>
+
+        <div id="bulkBar" class="hidden bg-cyan-600 px-4 py-2.5 flex items-center gap-3">
+          <span class="text-sm font-semibold text-slate-900" id="selCount">0 registros seleccionados</span>
+          <div class="flex items-center gap-1.5 ml-2">
+            <button class="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 text-slate-900 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Activar</button>
+            <button class="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 text-slate-900 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"><i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Desactivar</button>
+            <button class="flex items-center gap-1.5 bg-red-500/80 hover:bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ml-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Eliminar</button>
+          </div>
+          <button onclick="clearSelection()" class="ml-auto text-slate-900/60 hover:text-slate-900 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
+
+        <div class="flex items-center justify-between px-4 py-2 bg-slate-700/30 border-b border-slate-700">
+          <span class="text-xs text-slate-500" id="resultMeta">Mostrando 1–10 de 156 registros</span>
+          <div class="flex items-center gap-2"><span class="text-xs text-slate-600">Filas:</span><select id="pageSizeSelect" onchange="setPageSize(this.value)" class="text-xs border border-slate-600 rounded-lg px-2 py-1 text-slate-300 focus:outline-none focus:ring-1 focus:ring-cyan-500 bg-slate-700"><option value="10" selected>10</option><option value="25">25</option><option value="50">50</option></select></div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[800px]" id="mainTable">
+            <thead><tr class="border-b border-slate-700 bg-slate-800/50" id="tableHead"></tr></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <div id="emptyState" class="hidden py-16 flex flex-col items-center justify-center text-center">
+          <div class="w-16 h-16 bg-slate-700 rounded-full flex items-center justify-center mb-4"><i data-lucide="search-x" class="w-8 h-8 text-slate-500"></i></div>
+          <h3 class="font-semibold text-slate-300 mb-1">Sin resultados</h3>
+          <p class="text-sm text-slate-500 max-w-xs">No se encontraron usuarios con los filtros aplicados.</p>
+        </div>
+
+        <div class="flex items-center justify-between px-4 py-3 border-t border-slate-700" id="pagination">
+          <button id="prevBtn" class="btn-outline text-xs py-1.5 disabled:opacity-40 disabled:cursor-not-allowed" onclick="changePage(-1)"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Anterior</button>
+          <div id="pageNumbers" class="flex items-center gap-1"></div>
+          <button id="nextBtn" class="btn-outline text-xs py-1.5 disabled:opacity-40 disabled:cursor-not-allowed" onclick="changePage(1)">Siguiente <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="quickViewModal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center">
+  <div class="bg-slate-800 w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl shadow-2xl max-h-[85vh] flex flex-col border border-slate-700">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700 shrink-0">
+      <div><h3 class="font-semibold text-slate-100" id="qvTitle">Detalle del usuario</h3><p class="text-xs text-slate-500 mt-0.5" id="qvSubtitle"></p></div>
+      <button onclick="closeQuickView()" class="p-2 hover:bg-slate-700 rounded-lg transition-colors"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+    </div>
+    <div class="flex-1 overflow-y-auto px-6 py-4" id="qvContent"></div>
+    <div class="shrink-0 px-6 py-3 border-t border-slate-700 flex gap-2">
+      <a id="qvEditLink" href="#" class="btn-primary flex-1 justify-center"><i data-lucide="pencil" class="w-4 h-4"></i> Editar</a>
+      <a id="qvDetailLink" href="#" class="btn-outline flex-1 justify-center"><i data-lucide="external-link" class="w-4 h-4"></i> Ver completo</a>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-800 text-slate-100 text-sm px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 min-w-[260px] border border-slate-700">
+  <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400 shrink-0" id="toastIcon"></i>
+  <span id="toastMsg">Operación completada</span>
+</div>
+
+<script>
+lucide.createIcons();
+
+const MOCK_DATA = [
+  { id: 1, cedula: '1712345678', nombre: 'Alma管理体系', email: 'admin@sie.edu.ec', rol: 'Administrador', estado: 'activo', fechaRegistro: '2023-01-15', iniciales: 'AL' },
+  { id: 2, cedula: '0923456789', nombre: 'Diana López', email: 'diana@colegio.edu.ec', rol: 'Docente', estado: 'activo', fechaRegistro: '2023-03-20', iniciales: 'DL' },
+  { id: 3, cedula: '1801234567', nombre: 'Carlos Mora', email: 'carlos@colegio.edu.ec', rol: 'Docente', estado: 'activo', fechaRegistro: '2023-02-10', iniciales: 'CM' },
+  { id: 4, cedula: '0102345678', nombre: 'María Rodríguez', email: 'maria@colegio.edu.ec', rol: 'Docente', estado: 'activo', fechaRegistro: '2023-04-05', iniciales: 'MR' },
+  { id: 5, cedula: '1503456789', nombre: 'Ernesto Vega', email: 'ernesto@colegio.edu.ec', rol: 'Estudiante', estado: 'activo', fechaRegistro: '2024-02-01', iniciales: 'EV' },
+  { id: 6, cedula: '0912345678', nombre: 'Sofia Martínez', email: 'sofia@colegio.edu.ec', rol: 'Estudiante', estado: 'activo', fechaRegistro: '2024-02-01', iniciales: 'SM' },
+  { id: 7, cedula: '1723456789', nombre: 'Juan Pérez', email: 'juan@colegio.edu.ec', rol: 'Estudiante', estado: 'pendiente', fechaRegistro: '2024-11-15', iniciales: 'JP' },
+  { id: 8, cedula: '0801234567', nombre: 'Laura Sánchez', email: 'laura@colegio.edu.ec', rol: 'Estudiante', estado: 'inactivo', fechaRegistro: '2023-09-01', iniciales: 'LS' },
+  { id: 9, cedula: '0934567890', nombre: 'Pedro Jiménez', email: 'pedro@colegio.edu.ec', rol: 'Docente', estado: 'activo', fechaRegistro: '2023-05-12', iniciales: 'PJ' },
+  { id: 10, cedula: '1512345678', nombre: 'Ana García', email: 'ana@colegio.edu.ec', rol: 'Estudiante', estado: 'activo', fechaRegistro: '2024-02-01', iniciales: 'AG' },
+];
+
+const COLUMNS = [
+  { key: 'sel', label: '', visible: true, sortable: false },
+  { key: 'nombre', label: 'Nombre', visible: true, sortable: true },
+  { key: 'cedula', label: 'Cédula', visible: true, sortable: true },
+  { key: 'email', label: 'Correo', visible: true, sortable: true },
+  { key: 'rol', label: 'Rol', visible: true, sortable: true },
+  { key: 'estado', label: 'Estado', visible: true, sortable: false },
+  { key: 'fechaRegistro', label: 'Registro', visible: true, sortable: true },
+  { key: 'acciones', label: 'Acciones', visible: true, sortable: false },
+];
+
+const ROL_STYLES = { Administrador: 'bg-cyan-500/20 text-cyan-400', Docente: 'bg-emerald-500/20 text-emerald-400', Estudiante: 'bg-amber-500/20 text-amber-400' };
+const ESTADO_STYLES = { activo: 'bg-emerald-500/20 text-emerald-400', inactivo: 'bg-red-500/20 text-red-400', pendiente: 'bg-amber-500/20 text-amber-400' };
+const AVATAR_COLORS = { Administrador: 'bg-cyan-600', Docente: 'bg-emerald-600', Estudiante: 'bg-amber-600' };
+
+let state = { data: [...MOCK_DATA], filtered: [...MOCK_DATA], page: 1, pageSize: 10, sortKey: 'nombre', sortDir: 'asc', search: '', filters: { status: '', rol: '' }, selected: new Set() };
+
+function init() { renderHead(); applyFiltersAndRender(); lucide.createIcons(); }
+
+function renderHead() {
+  const visibleCols = COLUMNS.filter(c => c.visible);
+  document.getElementById('tableHead').innerHTML = visibleCols.map(col => {
+    if (col.key === 'sel') return `<th class="th w-10 px-4"><input type="checkbox" class="cb" id="selectAll" onchange="toggleSelectAll(this.checked)"></th>`;
+    const isActive = state.sortKey === col.key;
+    const icon = isActive ? (state.sortDir === 'asc' ? 'arrow-up' : 'arrow-down') : 'chevrons-up-down';
+    return `<th class="th ${col.sortable ? 'sortable' : ''}" ${col.sortable ? `onclick="sortBy('${col.key}')"` : ''}><div class="flex items-center gap-1">${col.label} ${col.sortable ? `<i data-lucide="${icon}" class="w-3 h-3 ${isActive ? 'text-cyan-500' : 'text-slate-600'}"></i>` : ''}</div></th>`;
+  }).join('');
+}
+
+function renderRow(item) {
+  const isSel = state.selected.has(item.id);
+  const q = state.search.toLowerCase();
+  const hi = (text) => { if (!q) return text; const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'); return String(text).replace(re, '<mark>$1</mark>'); };
+  const cells = {
+    sel: `<td class="td w-10 px-4"><input type="checkbox" class="cb row-cb" data-id="${item.id}" ${isSel ? 'checked' : ''} onchange="toggleRow(${item.id}, this.checked)"></td>`,
+    nombre: `<td class="td"><div class="flex items-center gap-2"><div class="w-7 h-7 ${AVATAR_COLORS[item.rol]} rounded-full flex items-center justify-center shrink-0"><span class="text-xs font-semibold text-white">${item.iniciales}</span></div><span class="font-medium text-slate-100">${hi(item.nombre)}</span></div></td>`,
+    cedula: `<td class="td font-mono text-xs text-slate-500">${hi(item.cedula)}</td>`,
+    email: `<td class="td text-slate-500">${hi(item.email)}</td>`,
+    rol: `<td class="td"><span class="badge ${ROL_STYLES[item.rol] || 'bg-slate-700 text-slate-400'}">${item.rol}</span></td>`,
+    estado: `<td class="td"><span class="badge ${ESTADO_STYLES[item.estado] || 'bg-slate-700 text-slate-400'}"><span class="w-1.5 h-1.5 rounded-full mr-1 inline-block ${item.estado==='activo'?'bg-emerald-500':item.estado==='pendiente'?'bg-amber-500':'bg-red-500'}"></span>${item.estado.charAt(0).toUpperCase()+item.estado.slice(1)}</span></td>`,
+    fechaRegistro: `<td class="td text-slate-500">${new Date(item.fechaRegistro+'T00:00:00').toLocaleDateString('es-EC',{day:'2-digit',month:'short',year:'numeric'})}</td>`,
+    acciones: `<td class="td"><div class="row-actions flex items-center gap-0.5"><button class="p-1.5 hover:bg-cyan-500/10 rounded-lg text-slate-500 hover:text-cyan-400 transition-colors" onclick="openQuickView(${item.id}); event.stopPropagation()"><i data-lucide="eye" class="w-3.5 h-3.5"></i></button><button class="p-1.5 hover:bg-cyan-500/10 rounded-lg text-slate-500 hover:text-cyan-400 transition-colors" onclick="window.location='form.html?id=${item.id}&mode=edit'; event.stopPropagation()"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button><button class="p-1.5 hover:bg-slate-700 rounded-lg text-slate-500 hover:text-slate-300 transition-colors" onclick="event.stopPropagation()"><i data-lucide="more-horizontal" class="w-3.5 h-3.5"></i></button></div></td>`,
+  };
+  const visibleCols = COLUMNS.filter(c => c.visible);
+  return `<tr class="tr ${isSel ? 'selected' : ''}" data-id="${item.id}" onclick="openQuickView(${item.id})">${visibleCols.map(c => cells[c.key] || '<td class="td">—</td>').join('')}</tr>`;
+}
+
+function applyFiltersAndRender() {
+  const q = state.search.toLowerCase();
+  const sf = state.filters;
+  state.filtered = state.data.filter(item => {
+    const matchSearch = !q || [item.nombre, item.email, item.cedula].some(v => String(v).toLowerCase().includes(q));
+    const matchStatus = !sf.status || item.estado === sf.status;
+    const matchRol = !sf.rol || item.rol === sf.rol;
+    return matchSearch && matchStatus && matchRol;
+  });
+  state.filtered.sort((a, b) => { let va = a[state.sortKey], vb = b[state.sortKey]; if (typeof va === 'string') { va = va.toLowerCase(); vb = vb.toLowerCase(); } return state.sortDir === 'asc' ? (va > vb ? 1 : va < vb ? -1 : 0) : (va < vb ? 1 : va > vb ? -1 : 0); });
+  renderTable(); renderPagination(); updateMeta(); renderFilterChips();
+}
+
+function renderTable() {
+  const start = (state.page - 1) * state.pageSize;
+  const page = state.filtered.slice(start, start + state.pageSize);
+  const tbody = document.getElementById('tableBody');
+  if (state.filtered.length === 0) { tbody.innerHTML = ''; document.getElementById('emptyState').classList.remove('hidden'); document.getElementById('pagination').classList.add('hidden'); }
+  else { document.getElementById('emptyState').classList.add('hidden'); document.getElementById('pagination').classList.remove('hidden'); tbody.innerHTML = page.map(renderRow).join(''); }
+  lucide.createIcons();
+}
+
+function sortBy(key) { if (state.sortKey === key) state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc'; else { state.sortKey = key; state.sortDir = 'asc'; } state.page = 1; renderHead(); applyFiltersAndRender(); lucide.createIcons(); }
+function onSearch(val) { state.search = val; state.page = 1; document.getElementById('clearSearch').classList.toggle('hidden', !val); applyFiltersAndRender(); }
+function clearSearch() { document.getElementById('globalSearch').value = ''; onSearch(''); }
+function setFilter(key, value, label, dropId, btnId) { state.filters[key] = value; state.page = 1; document.getElementById(dropId).classList.add('hidden'); document.querySelectorAll(`#${dropId} .dd-item`).forEach(el => el.classList.remove('active')); event.target.closest('.dd-item').classList.add('active'); const btn = document.getElementById(btnId); if (btn) { const labelEl = btn.querySelector('span'); if (labelEl) labelEl.textContent = label; btn.classList.toggle('border-cyan-500', !!value); btn.classList.toggle('text-cyan-400', !!value); } applyFiltersAndRender(); }
+function renderFilterChips() { const chips = document.getElementById('activeFiltersChips'); const hasActive = Object.values(state.filters).some(Boolean) || state.search; const active = []; if (state.filters.status) active.push({ label: state.filters.status, key: 'status' }); if (state.filters.rol) active.push({ label: state.filters.rol, key: 'rol' }); chips.innerHTML = active.map(f => `<button onclick="clearChip('${f.key}')" class="inline-flex items-center gap-1 text-xs bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 rounded-full px-2.5 py-1 hover:bg-cyan-500/20 transition-colors font-semibold">${f.label}<i data-lucide="x" class="w-3 h-3"></i></button>`).join(''); if (active.length > 1) chips.innerHTML += `<button onclick="resetAll()" class="text-xs text-slate-500 hover:text-slate-300 font-semibold px-2">Limpiar todo</button>`; lucide.createIcons(); }
+function clearChip(key) { state.filters[key] = ''; applyFiltersAndRender(); }
+function resetAll() { state.filters = { status: '', rol: '' }; state.search = ''; state.page = 1; document.getElementById('globalSearch').value = ''; document.getElementById('clearSearch').classList.add('hidden'); [['statusBtn','Estado'],['rolBtn','Rol']].forEach(([id,label]) => { const btn = document.getElementById(id); if (btn) { const sp = btn.querySelector('span'); if (sp) sp.textContent = label; btn.classList.remove('border-cyan-500','text-cyan-400'); } }); applyFiltersAndRender(); }
+function toggleRow(id, checked) { checked ? state.selected.add(id) : state.selected.delete(id); updateBulkBar(); const row = document.querySelector(`tr[data-id="${id}"]`); if (row) row.classList.toggle('selected', checked); }
+function toggleSelectAll(checked) { const start = (state.page - 1) * state.pageSize; const page = state.filtered.slice(start, start + state.pageSize); page.forEach(item => checked ? state.selected.add(item.id) : state.selected.delete(item.id)); updateBulkBar(); document.querySelectorAll('.row-cb').forEach(cb => { cb.checked = checked; }); document.querySelectorAll('.tr').forEach(tr => tr.classList.toggle('selected', checked)); }
+function clearSelection() { state.selected.clear(); updateBulkBar(); document.querySelectorAll('.row-cb').forEach(cb => cb.checked = false); document.querySelectorAll('.tr').forEach(tr => tr.classList.remove('selected')); const sa = document.getElementById('selectAll'); if (sa) sa.checked = false; }
+function updateBulkBar() { const bar = document.getElementById('bulkBar'); const n = state.selected.size; bar.classList.toggle('hidden', n === 0); document.getElementById('selCount').textContent = `${n} registro${n!==1?'s':''} seleccionado${n!==1?'s':''}`; }
+function renderPagination() { const total = state.filtered.length; const pages = Math.ceil(total / state.pageSize); const cur = state.page; document.getElementById('prevBtn').disabled = cur <= 1; document.getElementById('nextBtn').disabled = cur >= pages; let nums = []; if (pages <= 7) nums = Array.from({length: pages}, (_,i) => i+1); else { nums = [1]; if (cur > 3) nums.push('...'); for (let i = Math.max(2, cur-1); i <= Math.min(pages-1, cur+1); i++) nums.push(i); if (cur < pages-2) nums.push('...'); nums.push(pages); } document.getElementById('pageNumbers').innerHTML = nums.map(n => n === '...' ? `<span class="text-xs text-slate-500 px-1">…</span>` : `<button onclick="goToPage(${n})" class="min-w-[28px] h-7 rounded-lg text-xs font-semibold transition-colors ${n === cur ? 'bg-cyan-600 text-white' : 'hover:bg-slate-700 text-slate-400'}">${n}</button>`).join(''); }
+function changePage(delta) { const pages = Math.ceil(state.filtered.length / state.pageSize); state.page = Math.max(1, Math.min(pages, state.page + delta)); renderTable(); renderPagination(); updateMeta(); }
+function goToPage(n) { state.page = n; renderTable(); renderPagination(); updateMeta(); }
+function setPageSize(size) { state.pageSize = parseInt(size); state.page = 1; renderTable(); renderPagination(); updateMeta(); }
+function updateMeta() { const total = state.filtered.length; const start = Math.min((state.page - 1) * state.pageSize + 1, total); const end = Math.min(state.page * state.pageSize, total); document.getElementById('resultMeta').textContent = total === 0 ? 'Sin resultados' : `Mostrando ${start}–${end} de ${total} registros`; }
+function openQuickView(id) { const item = state.data.find(x => x.id === id); if (!item) return; document.getElementById('qvTitle').textContent = item.nombre; document.getElementById('qvSubtitle').textContent = item.email; document.getElementById('qvEditLink').href = `form.html?id=${id}&mode=edit`; document.getElementById('qvContent').innerHTML = `<dl class="grid grid-cols-2 gap-x-6 gap-y-4">${[['Cédula', item.cedula],['Correo', item.email],['Rol', `<span class="badge ${ROL_STYLES[item.rol]}">${item.rol}</span>`],['Estado', `<span class="badge ${ESTADO_STYLES[item.estado]}">${item.estado}</span>`],['Fecha registro', item.fechaRegistro]].map(([l,v]) => `<div><dt class="text-xs text-slate-500 font-semibold uppercase tracking-wide mb-1">${l}</dt><dd class="text-sm text-slate-200">${v}</dd></div>`).join('')}</dl>`; document.getElementById('quickViewModal').classList.remove('hidden'); lucide.createIcons(); }
+function closeQuickView() { document.getElementById('quickViewModal').classList.add('hidden'); }
+function toggleDrop(id) { document.querySelectorAll('.dropdown').forEach(d => { if (d.id !== id) d.classList.add('hidden'); }); document.getElementById(id).classList.toggle('hidden'); }
+function toggleUserMenu() { const menu = document.getElementById('userMenu'); const notif = document.getElementById('notifPanel'); if (notif) notif.classList.add('hidden'); menu.classList.toggle('hidden'); }
+function toggleNotifPanel() { const panel = document.getElementById('notifPanel'); const menu = document.getElementById('userMenu'); if (menu) menu.classList.add('hidden'); panel.classList.toggle('hidden'); }
+document.addEventListener('click', function(e) { document.querySelectorAll('.dropdown').forEach(d => { if (!e.target.closest('.relative')) d.classList.add('hidden'); }); const userMenu = document.getElementById('userMenu'); const notifPanel = document.getElementById('notifPanel'); if (userMenu && !e.target.closest('[onclick="toggleUserMenu()"]')) userMenu.classList.add('hidden'); if (notifPanel && !e.target.closest('[onclick="toggleNotifPanel()"]')) notifPanel.classList.add('hidden'); });
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

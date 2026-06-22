@@ -5,7 +5,6 @@ import AppLayout from '@/components/AppLayout'
 import { PageHead, Icons } from '@/components/ghanima'
 import { useUsuarios } from '@/hooks/useUsuarios'
 import { InlineError, LoadingSkeleton } from '@/components/UIPatterns'
-import { capitalizeWords } from '@/utils/text'
 
 interface ConsentimientoItem {
   id: string
@@ -15,6 +14,7 @@ interface ConsentimientoItem {
   representanteNombre: string
   representanteCedula: string
   representanteEmail: string
+  representanteUsuarioId: string | null
   tipo: string
   aceptado: boolean
   fechaOtorgamiento: string
@@ -30,21 +30,12 @@ export default function ConsentimientosPage() {
     queryFn: () => api.get('/consentimientos').then(r => r.data),
   })
 
-  const [showForm, setShowForm] = useState(false)
-  const [formEstudianteId, setFormEstudianteId] = useState('')
-  const [formNombre, setFormNombre] = useState('')
-  const [formCedula, setFormCedula] = useState('')
-  const [formEmail, setFormEmail] = useState('')
-  const [formFile, setFormFile] = useState<File | null>(null)
-  const [formError, setFormError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const [revokeError, setRevokeError] = useState('')
   const [tab, setTab] = useState<'registrados' | 'pendientes'>('registrados')
 
-  const estudiantes = usuarios.filter(u => u.roles.includes('ESTUDIANTE'))
+  const estudiantes = usuarios.filter(u => u.roles?.includes('ESTUDIANTE'))
   const idsConConsentimiento = new Set(consentimientos.filter(c => c.aceptado).map(c => c.estudianteId))
   const pendientes = estudiantes.filter(e => !idsConConsentimiento.has(e.id))
-
-  const [revokeError, setRevokeError] = useState('')
 
   const revocar = useMutation({
     mutationFn: (estudianteId: string) => api.post(`/consentimientos/${estudianteId}/revocar`),
@@ -69,39 +60,6 @@ export default function ConsentimientosPage() {
     },
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setFormError('')
-    if (!formEstudianteId) { setFormError('Selecciona un estudiante'); return }
-    if (!formNombre.trim()) { setFormError('El nombre del representante es obligatorio'); return }
-
-    setSubmitting(true)
-    try {
-      await api.post('/consentimientos', {
-        estudianteId: formEstudianteId,
-        representanteNombre: capitalizeWords(formNombre.trim()),
-        representanteCedula: formCedula.trim(),
-        representanteEmail: formEmail.trim(),
-      })
-      if (formFile) {
-        const formData = new FormData()
-        formData.append('file', formFile)
-        await api.post(`/consentimientos/${formEstudianteId}/documento`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        })
-      }
-      queryClient.invalidateQueries({ queryKey: ['consentimientos'] })
-      setShowForm(false)
-      setFormEstudianteId('')
-      setFormFile(null)
-    } catch (err: unknown) {
-      const apiErr = err as import('@/types/api').ApiError
-      setFormError(apiErr.message || apiErr.response?.data?.mensaje || 'Error al registrar')
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
   if (isLoading) return <LoadingSkeleton rows={6} />
 
   const registered = consentimientos.filter(c => c.aceptado)
@@ -112,15 +70,8 @@ export default function ConsentimientosPage() {
         <PageHead
           eyebrow="Cumplimiento"
           title="Consentimientos parentales"
-          subtitle="LOPDP Art. 21, 25 — Consentimiento del representante legal para tratamiento de datos de NNA"
-        >
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-[#8A6A18] text-white px-4 py-2 font-mono text-[0.7rem] font-bold uppercase tracking-[0.18em] hover:bg-[#0A0A0B] transition-colors mt-4"
-          >
-            + Registrar consentimiento
-          </button>
-        </PageHead>
+          subtitle="LOPDP Art. 21, 25 — Consentimiento digital del representante legal para tratamiento de datos de NNA"
+        />
 
         {syncStatus && syncStatus.pendientes > 0 && (
           <div className="flex items-center gap-4 border border-[rgba(226,94,16,0.2)] bg-[rgba(226,94,16,0.06)] border-l-[3px] border-l-[#A8420A] p-4 mb-4">
@@ -148,7 +99,7 @@ export default function ConsentimientosPage() {
             onClick={() => setTab('registrados')}
             className={`rounded-md px-3 py-1.5 text-sm transition-colors ${tab === 'registrados' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}
           >
-            Registrados ({registered.length})
+            Otorgados ({registered.length})
           </button>
           <button
             onClick={() => setTab('pendientes')}
@@ -158,70 +109,17 @@ export default function ConsentimientosPage() {
           </button>
         </div>
 
-        {showForm && (
-          <div className="mb-6 rounded-lg border border-[#8A6A18]/20 bg-white p-6">
-            <h3 className="mb-4 font-medium text-foreground">Registrar consentimiento parental</h3>
-            {formError && <InlineError message={formError} />}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="consEstudiante" className="block text-sm font-medium text-foreground mb-1.5">Estudiante</label>
-                  <select id="consEstudiante" value={formEstudianteId} onChange={e => setFormEstudianteId(e.target.value)}
-                    className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm">
-                    <option value="">Seleccionar estudiante</option>
-                    {pendientes.map(e => (
-                      <option key={e.id} value={e.id}>{e.nombre} ({e.email})</option>
-                    ))}
-                    {pendientes.length === 0 && (
-                      <option disabled>Todos los estudiantes tienen consentimiento</option>
-                    )}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="consNombre" className="block text-sm font-medium text-foreground mb-1.5">Nombre del representante *</label>
-                  <input id="consNombre" value={formNombre} onChange={e => setFormNombre(e.target.value)}
-                    placeholder="María García López" required
-                    className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
-                </div>
-                <div>
-                  <label htmlFor="consCedula" className="block text-sm font-medium text-foreground mb-1.5">Cédula del representante</label>
-                  <input id="consCedula" value={formCedula} onChange={e => setFormCedula(e.target.value)}
-                    placeholder="0912345678" maxLength={10}
-                    className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
-                </div>
-                <div>
-                  <label htmlFor="consEmail" className="block text-sm font-medium text-foreground mb-1.5">Email del representante</label>
-                  <input id="consEmail" type="email" value={formEmail} onChange={e => setFormEmail(e.target.value)}
-                    placeholder="maria@padres.edu.ec"
-                    className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
-                </div>
-                <div className="md:col-span-2">
-                  <label htmlFor="consFile" className="block text-sm font-medium text-foreground mb-1.5">Formulario firmado (PDF)</label>
-                  <input id="consFile" type="file" accept=".pdf,image/*"
-                    onChange={e => setFormFile(e.target.files?.[0] || null)}
-                    className="mt-1 block w-full text-sm text-muted-foreground file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-3 file:py-1.5 file:text-xs file:text-primary-foreground hover:file:bg-primary/90" />
-                  {formFile && <p className="mt-1 text-xs text-muted-foreground">{formFile.name} ({(formFile.size / 1024).toFixed(1)} KB)</p>}
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <button type="submit" disabled={submitting}
-                  className="rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
-                  {submitting ? 'Registrando...' : 'Registrar consentimiento'}
-                </button>
-                <button type="button" onClick={() => { setShowForm(false); setFormError('') }}
-                  className="rounded-md border border-input px-4 py-2 text-sm text-muted-foreground hover:bg-muted">
-                  Cancelar
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
         {revokeError && (
           <div className="mb-4">
             <InlineError message={revokeError} />
           </div>
         )}
+
+        <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-foreground">
+          <Icons.Info className="w-4 h-4 inline mr-1 text-blue-600" />
+          El consentimiento es otorgado digitalmente por el representante desde su cuenta. Para registrar un nuevo representante, usa{' '}
+          <strong>Usuarios → + Representante</strong>. El representante recibirá un email para activar su cuenta y otorgar el consentimiento.
+        </div>
 
         {tab === 'registrados' ? (
           registered.length > 0 ? (
@@ -234,6 +132,7 @@ export default function ConsentimientosPage() {
                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Cédula</th>
                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Fecha</th>
                     <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Fuente</th>
+                    <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Tipo</th>
                     <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Acción</th>
                   </tr>
                 </thead>
@@ -247,12 +146,22 @@ export default function ConsentimientosPage() {
                       <td className="px-4 py-3">
                         <p className="text-sm text-foreground">{c.representanteNombre || '—'}</p>
                         <p className="text-xs text-muted-foreground">{c.representanteEmail || '—'}</p>
+                        {c.representanteUsuarioId && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700 mt-1">
+                            <Icons.Check className="w-2.5 h-2.5" /> Digital
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{c.representanteCedula || '—'}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{c.fechaOtorgamiento?.slice(0, 10)}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${c.fuente === 'LOPDP' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
                           {c.fuente}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${c.representanteUsuarioId ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
+                          {c.representanteUsuarioId ? 'Digital' : 'Admin'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -271,8 +180,8 @@ export default function ConsentimientosPage() {
             </div>
           ) : (
             <div className="rounded-lg border bg-card p-12 text-center">
-              <p className="text-lg font-medium text-foreground">No hay consentimientos registrados</p>
-              <p className="mt-1 text-sm text-muted-foreground">Usa el botón "+ Registrar consentimiento" para registrar el primero</p>
+              <p className="text-lg font-medium text-foreground">No hay consentimientos otorgados</p>
+              <p className="mt-1 text-sm text-muted-foreground">Registra un representante desde Usuarios → + Representante para que active su cuenta y otorgue el consentimiento digital.</p>
             </div>
           )
         ) : (
@@ -292,12 +201,12 @@ export default function ConsentimientosPage() {
                       <td className="px-4 py-3 text-sm font-medium text-foreground">{e.nombre}</td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">{e.email}</td>
                       <td className="px-4 py-3 text-center">
-                        <button
-                          onClick={() => { setFormEstudianteId(e.id); setFormNombre(''); setFormCedula(''); setFormEmail(''); setFormFile(null); setTab('registrados'); setShowForm(true) }}
-                          className="rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground hover:bg-primary/90"
+                        <a
+                          href="/admin/usuarios"
+                          className="rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground hover:bg-primary/90 inline-block"
                         >
-                          Registrar
-                        </button>
+                          Registrar representante
+                        </a>
                       </td>
                     </tr>
                   ))}
@@ -307,7 +216,7 @@ export default function ConsentimientosPage() {
           ) : (
             <div className="rounded-lg border bg-card p-12 text-center">
               <p className="text-lg font-medium text-foreground">Todos los estudiantes tienen consentimiento</p>
-              <p className="mt-1 text-sm text-muted-foreground">No hay estudiantes pendientes de consentimiento parental</p>
+              <p className="mt-1 text-sm text-muted-foreground">No hay estudiantes pendientes de consentimiento parental.</p>
             </div>
           )
         )}

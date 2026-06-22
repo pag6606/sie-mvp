@@ -1,8 +1,11 @@
 package com.sie.identidad.application;
 
 import com.sie.identidad.domain.Consentimiento;
+import com.sie.identidad.domain.Representante;
 import com.sie.identidad.domain.Usuario;
 import com.sie.identidad.infrastructure.ConsentimientoRepository;
+import com.sie.identidad.infrastructure.RepresentanteEstudianteRepository;
+import com.sie.identidad.infrastructure.RepresentanteRepository;
 import com.sie.identidad.infrastructure.UsuarioRepository;
 import com.sie.lopdp.LopdpConsentClient;
 import com.sie.lopdp.LopdpUnavailableException;
@@ -18,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,6 +32,8 @@ public class ConsentimientoService {
 
     private final ConsentimientoRepository consentimientoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final RepresentanteRepository representanteRepository;
+    private final RepresentanteEstudianteRepository vinculacionRepository;
     private final Optional<LopdpConsentClient> lopdpClient;
 
     @Value("${lopdp.enabled:false}")
@@ -136,9 +142,84 @@ public class ConsentimientoService {
         return result.existe();
     }
 
+    @Transactional
+    public ConsentimientoResult otorgar(UUID colegioId, UUID estudianteId, UUID usuarioId) {
+        var existente = consentimientoRepository.findByEstudianteIdAndAceptadoTrue(estudianteId);
+        if (existente.isPresent()) {
+            return toResult(existente.get());
+        }
+
+        var representante = representanteRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new IllegalArgumentException("Representante no encontrado"));
+
+        var vinculacion = vinculacionRepository
+                .findByRepresentanteIdAndEstudianteIdAndActivoTrue(representante.getId(), estudianteId)
+                .orElseThrow(() -> new IllegalArgumentException("El estudiante no está vinculado a este representante"));
+
+        var enrollmentRef = String.format("SIE-%s-%s-%s", colegioId, estudianteId,
+                representante.getCedula() != null ? representante.getCedula() : "sin-cedula");
+
+        Consentimiento c = new Consentimiento();
+        c.setEstudianteId(estudianteId);
+        c.setRepresentanteUsuarioId(usuarioId);
+        c.setRepresentanteNombre(representante.getNombre());
+        c.setRepresentanteCedula(representante.getCedula());
+        c.setRepresentanteEmail(representante.getEmail());
+        c.setColegioId(colegioId);
+        c.setFuente("SIE_LOCAL");
+        c.setAceptado(true);
+        c.setEnrollmentRef(enrollmentRef);
+        c = consentimientoRepository.save(c);
+
+        if (lopdpEnabled && lopdpClient.isPresent()) {
+            try {
+                var estudiante = usuarioRepository.findById(estudianteId).orElse(null);
+                var studentEmail = estudiante != null ? estudiante.getEmail() : "";
+                var studentName = estudiante != null ? estudiante.getNombre() : "";
+                var dob = estudiante != null && estudiante.getDateOfBirth() != null
+                        ? estudiante.getDateOfBirth().toString()
+                        : "2010-01-01";
+                var isMinor = estudiante != null && estudiante.getDateOfBirth() != null
+                        && java.time.Period.between(estudiante.getDateOfBirth(), java.time.LocalDate.now()).getYears() < 18;
+
+                var enrollResult = lopdpClient.get().enroll(
+                        studentEmail, studentName, dob,
+                        representante.getEmail(), representante.getNombre(),
+                        "LEGAL_GUARDIAN", enrollmentRef, isMinor);
+
+                var policyVersion = lopdpClient.get().getActivePolicyVersion();
+                lopdpClient.get().grantConsent(
+                        studentEmail, representante.getEmail(), "ACADEMIC_RECORDS", true,
+                        "EXPLICIT", policyVersion, null);
+
+                c.setFuente("LOPDP");
+                consentimientoRepository.save(c);
+            } catch (Exception e) {
+                log.warn("LOPDP sync failed for estudiante {}, saved locally: {}", estudianteId, e.getMessage());
+            }
+        }
+
+        return toResult(c);
+    }
+
+    public record PendienteItem(UUID estudianteId, String estudianteNombre, String estudianteEmail) {}
+
+    public List<PendienteItem> pendientesParaPadre(UUID usuarioId) {
+        var representante = representanteRepository.findByUsuarioId(usuarioId).orElse(null);
+        if (representante == null) return List.of();
+
+        var vinculaciones = vinculacionRepository.findByRepresentanteIdAndActivoTrue(representante.getId());
+        return vinculaciones.stream()
+                .filter(v -> !consentimientoRepository.existsByEstudianteIdAndAceptadoTrue(v.getEstudianteId()))
+                .map(v -> usuarioRepository.findById(v.getEstudianteId()).orElse(null))
+                .filter(e -> e != null)
+                .map(e -> new PendienteItem(e.getId(), e.getNombre(), e.getEmail()))
+                .toList();
+    }
+
     public record ListaItem(UUID id, UUID estudianteId, String estudianteNombre, String estudianteEmail,
                              String representanteNombre, String representanteCedula, String representanteEmail,
-                             String tipo, boolean aceptado, LocalDateTime fechaOtorgamiento,
+                             UUID representanteUsuarioId, String tipo, boolean aceptado, LocalDateTime fechaOtorgamiento,
                              String documentoUrl, String fuente) {}
 
     public List<ListaItem> listarTodos() {
@@ -153,8 +234,8 @@ public class ConsentimientoService {
                             u.map(Usuario::getNombre).orElse(""),
                             u.map(Usuario::getEmail).orElse(""),
                             c.getRepresentanteNombre(), c.getRepresentanteCedula(),
-                            c.getRepresentanteEmail(), c.getTipo(),
-                            c.isAceptado(), c.getFechaOtorgamiento(),
+                            c.getRepresentanteEmail(), c.getRepresentanteUsuarioId(),
+                            c.getTipo(), c.isAceptado(), c.getFechaOtorgamiento(),
                             c.getDocumentoUrl(), c.getFuente()
                     );
                 }).toList();

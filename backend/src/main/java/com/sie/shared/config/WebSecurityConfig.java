@@ -26,6 +26,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/auth/**", "/actuator/health", "/swagger-ui/**", "/api-docs/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
                         .requestMatchers("/api/usuarios/**").hasRole("ADMINISTRADOR")
+                        .requestMatchers("/api/padre/**").hasRole("PADRE")
+                        .requestMatchers("/api/consentimientos/otorgar").hasRole("PADRE")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

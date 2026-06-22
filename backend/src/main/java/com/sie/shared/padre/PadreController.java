@@ -1,12 +1,15 @@
 package com.sie.shared.padre;
 
 import com.sie.calificaciones.application.CalificacionesService;
+import com.sie.identidad.application.ConsentimientoService;
 import com.sie.identidad.application.UsuarioService;
 import com.sie.identidad.domain.Representante;
 import com.sie.identidad.infrastructure.RepresentanteRepository;
 import com.sie.shared.vinculacion.IVinculacionResolver;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.UUID;
  * No es un Bounded Context — agrega datos de Identidad + Calificaciones.
  * Mismo patrón que DashboardController (ADR-008).
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/padre")
 @RequiredArgsConstructor
@@ -27,6 +31,7 @@ public class PadreController {
     private final UsuarioService usuarioService;
     private final CalificacionesService calificacionesService;
     private final RepresentanteRepository representanteRepository;
+    private final ConsentimientoService consentimientoService;
 
     private UUID resolverYObtenerEstudiante(UUID userId) {
         UUID estudianteId = vinculacionResolver.resolverEstudiante(userId);
@@ -34,6 +39,17 @@ public class PadreController {
             throw new IllegalArgumentException("SIN_VINCULACION");
         }
         return estudianteId;
+    }
+
+    @GetMapping("/consentimiento-status")
+    public ResponseEntity<?> consentimientoStatus(@RequestAttribute("usuarioId") UUID userId) {
+        var pendientes = consentimientoService.pendientesParaPadre(userId);
+        var tienePendientes = !pendientes.isEmpty();
+
+        return ResponseEntity.ok(Map.of(
+                "tienePendientes", tienePendientes,
+                "pendientes", pendientes
+        ));
     }
 
     @GetMapping("/hijo")
@@ -51,6 +67,12 @@ public class PadreController {
                     "error", "SIN_VINCULACION",
                     "mensaje", "No tiene estudiantes vinculados."
             ));
+        } catch (Exception e) {
+            log.error("Error en obtenerHijo para usuario {}: {}", userId, e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of(
+                    "error", "ERROR_INTERNO",
+                    "mensaje", "Error al consultar datos del estudiante."
+            ));
         }
     }
 
@@ -65,6 +87,12 @@ public class PadreController {
                     "error", "SIN_VINCULACION",
                     "mensaje", "No tiene estudiantes vinculados."
             ));
+        } catch (Exception e) {
+            log.error("Error en obtenerCalificaciones para usuario {}: {}", userId, e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of(
+                    "error", "ERROR_INTERNO",
+                    "mensaje", "Error al consultar calificaciones."
+            ));
         }
     }
 
@@ -78,6 +106,12 @@ public class PadreController {
             return ResponseEntity.status(403).body(Map.of(
                     "error", "SIN_VINCULACION",
                     "mensaje", "No tiene estudiantes vinculados."
+            ));
+        } catch (Exception e) {
+            log.error("Error en obtenerAsistencia para usuario {}: {}", userId, e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of(
+                    "error", "ERROR_INTERNO",
+                    "mensaje", "Error al consultar asistencia."
             ));
         }
     }
@@ -98,6 +132,7 @@ public class PadreController {
     }
 
     @PutMapping("/perfil")
+    @Transactional
     public ResponseEntity<?> actualizarPerfil(@RequestAttribute("usuarioId") UUID userId,
                                                @RequestBody Map<String, String> body) {
         Representante r = representanteRepository.findByUsuarioId(userId).orElse(null);

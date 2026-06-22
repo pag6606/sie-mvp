@@ -27,7 +27,7 @@ public class OutboxProcessor {
     @Scheduled(fixedDelayString = "${app.outbox.poll-interval-ms:30000}")
     @Transactional
     public void procesarPendientes() {
-        var pendientes = outboxRepository.findByProcesadoFalseOrderByCreatedAtAsc();
+        var pendientes = outboxRepository.findTop20ByProcesadoFalseOrderByCreatedAtAsc();
         if (pendientes.isEmpty()) return;
 
         log.debug("Procesando {} eventos pendientes del outbox", pendientes.size());
@@ -37,11 +37,12 @@ public class OutboxProcessor {
                 evento.marcarProcesado();
             } catch (Exception e) {
                 log.error("Error procesando evento {} (intento {}/{}): {}",
-                        evento.getId(), evento.getIntentos() + 1, MAX_REINTENTOS, e.getMessage());
+                        evento.getId(), evento.getIntentos() + 1, MAX_REINTENTOS, e.getMessage(), e);
                 evento.marcarError(e.getMessage());
                 if (evento.getIntentos() >= MAX_REINTENTOS) {
                     evento.marcarProcesado();
-                    log.warn("Evento {} excedió reintentos, marcado como procesado", evento.getId());
+                    log.warn("Evento {} excedió reintentos, marcado como procesado. Payload: {}",
+                            evento.getId(), evento.getPayload());
                 }
             }
             outboxRepository.save(evento);
@@ -53,7 +54,11 @@ public class OutboxProcessor {
 
         switch (evento.getTipo()) {
             case "SECCION_CERRADA" -> {
-                UUID representanteId = UUID.fromString(payload.get("representanteId"));
+                String idStr = payload.get("representanteId");
+                if (idStr == null || idStr.equals("null")) {
+                    throw new IllegalArgumentException("representanteId nulo en payload");
+                }
+                UUID representanteId = UUID.fromString(idStr);
                 var representante = representanteRepository.findById(representanteId).orElse(null);
                 if (representante != null && representante.getEmail() != null) {
                     emailService.sendClosingReminder(representante.getEmail(), "Paralelo cerrado");

@@ -70,6 +70,34 @@ public class ConsentimientoController {
         return ResponseEntity.ok(Map.of("existe", false));
     }
 
+    @PostMapping("/otorgar")
+    public ResponseEntity<Map<String, String>> otorgar(
+            @RequestAttribute("usuarioId") UUID usuarioId,
+            @RequestAttribute("colegioId") UUID colegioId,
+            @RequestBody Map<String, String> body) {
+        String raw = body.get("estudianteId");
+        if (raw == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "estudianteId es requerido"));
+        }
+        UUID estudianteId;
+        try {
+            estudianteId = UUID.fromString(raw);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "estudianteId inválido"));
+        }
+
+        try {
+            var result = consentimientoService.otorgar(colegioId, estudianteId, usuarioId);
+            var status = result.existe() ? HttpStatus.OK : HttpStatus.CREATED;
+            return ResponseEntity.status(status)
+                    .body(Map.of("mensaje", "Consentimiento otorgado", "id", result.id()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        }
+    }
+
     @PostMapping("/{estudianteId}/revocar")
     public ResponseEntity<Map<String, String>> revocar(@PathVariable UUID estudianteId) {
         consentimientoService.revocar(estudianteId);

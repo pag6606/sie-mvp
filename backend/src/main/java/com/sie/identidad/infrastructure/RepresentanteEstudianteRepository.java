@@ -14,6 +14,8 @@ public interface RepresentanteEstudianteRepository extends JpaRepository<Represe
 
     List<RepresentanteEstudiante> findByRepresentanteIdAndActivoTrue(UUID representanteId);
 
+    boolean existsByRepresentanteIdAndActivoTrue(UUID representanteId);
+
     List<RepresentanteEstudiante> findByEstudianteIdAndActivoTrue(UUID estudianteId);
 
     long countByEstudianteIdAndEsPrincipalTrueAndActivoTrue(UUID estudianteId);
