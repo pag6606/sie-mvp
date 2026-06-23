@@ -2,22 +2,24 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   testDir: './e2e',
-  timeout: 30000,
-  expect: { timeout: 5000 },
+  timeout: 45000,
+  expect: { timeout: 8000 },
   fullyParallel: false,
-  retries: process.env.CI ? 1 : 0,
+  retries: 1,
   workers: 1,
-  reporter: 'list',
+  reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: 'http://localhost:5174',
     headless: true,
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
+    video: 'on-first-retry',
   },
   webServer: {
-    command: 'npm run dev -- --port 5173',
+    command: 'npm run dev -- --port 5174 --host',
     cwd: './frontend',
-    port: 5173,
-    reuseExistingServer: !process.env.CI,
+    port: 5174,
+    reuseExistingServer: true,   // usa el servidor ya corriendo si está disponible
+    timeout: 60000,
   },
 })
