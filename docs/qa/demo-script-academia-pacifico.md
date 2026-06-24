@@ -108,17 +108,21 @@ cd frontend && npm run dev -- --host
 
 > *"¿Ve algún espacio en blanco donde debería haber una materia? Ese es un gap que el sistema hace visible. En Runachay o en Excel, esto sería invisible."*
 
-> *"¿Ve algún espacio en blanco donde debería haber una materia? Ese es un gap que el sistema hace visible. En Runachay o en Excel, esto sería invisible."*
-
-### 2e. Crear un paralelo (30 segundos)
+### 2e. Crear un paralelo — con regla de negocio (30 segundos)
 
 *[Click en tab Paralelos → + Nuevo paralelo]*
 
-> *"Y cuando necesite crear una sección nueva — un paralelo — lo hace aquí mismo. Selecciona la asignatura, el grado, y el sistema genera el código automáticamente."*
+> *"Y cuando necesite crear una sección nueva — un paralelo — lo hace aquí mismo."*
 
-*[Seleccionar MAT + 8EGB → código auto-generado: 8EGB-A-MAT → Click Crear]*
+*[Seleccionar grado: 8EGB]*
 
-> *"Menos de 30 segundos. Sin abrir otra pantalla."*
+> *"Fíjese: al seleccionar Octavo EGB, el dropdown de asignatura solo muestra las materias que la malla curricular de Octavo EGB incluye según el MinEduc — Lengua, Matemática, Ciencias Naturales, Sociales... **No aparece Física ni Química porque esas son de Bachillerato.** El sistema conoce la malla y no permite crear un paralelo de Física en Octavo EGB."*
+
+*[Seleccionar MAT → código auto-generado: 8EGB-A-MAT → capacidad 30 → Click Crear]*
+
+> *"Menos de 30 segundos. Y si alguien intentara crear un paralelo de Química en Octavo EGB vía la API, el sistema lo rechazaría automáticamente. La regla de negocio está en el backend: no se puede crear un paralelo de una asignatura que no esté en la malla del grado."*
+
+> *"Esto previene errores de configuración: su coordinadora nunca va a terminar con un paralelo de Cálculo en Segundo de Básica."*
 
 ---
 
