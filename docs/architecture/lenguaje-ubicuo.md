@@ -1,7 +1,7 @@
 # Lenguaje Ubicuo por Dominio — SIE
 
-**Versión:** 1.0
-**Fecha:** 13 de junio de 2026
+**Versión:** 2.0
+**Fecha:** 23 de junio de 2026
 **Propósito:** Definir el lenguaje compartido entre el equipo de desarrollo y los expertos del dominio educativo ecuatoriano. Cada bounded context tiene su propio glosario y su propio esquema de base de datos independiente.
 
 ---
@@ -68,8 +68,13 @@
 | **Estado del Período** | Ciclo de vida: BORRADOR → ABIERTO → EN_CURSO → CERRADO | `EstadoPeriodo` | `estado` |
 | **Apertura** | Transición de BORRADOR a ABIERTO. Habilita la matrícula. | — | — |
 | **Cierre de Paralelo** | El docente finaliza el registro de notas. Las calificaciones se vuelven inmutables. | — | — |
+| **Nivel Educativo** | Etapa educativa: EGB (10 años), Bachillerato General Unificado (3 años). | `Nivel` | `academico.niveles` |
+| **Subnivel** | División del nivel EGB: Preparatoria, Básica Elemental, Básica Media, Básica Superior. | `Subnivel` | `academico.subniveles` |
+| **Grado** | Curso/año dentro del nivel: 1EGB…10EGB, 1BGU…3BGU. Refleja la `edad_referencial` del estudiante. | `Grado` | `academico.grados` |
+| **Código de Grado** | Identificador canónico: `1EGB`, `2EGB`, `…`, `10EGB`, `1BGU`, `2BGU`, `3BGU`. | `Grado.codigo` | `codigo` |
+| **Malla Curricular** | Asignación de asignaturas a grados con horas semanales. Define el plan de estudios oficial por grado (MINEDUC-2016-00020-A). | `MallaCurricular` | `academico.malla_curricular` |
 
-### ⚠️ Nota sobre "Asignatura" vs "Asignatura"
+### ⚠️ Nota sobre "Asignatura" vs "Curso" (histórica)
 
 El Ministerio de Educación del Ecuador usa el término **"Asignatura"** para referirse a las materias del plan de estudios (Matemáticas, Lengua, Ciencias Naturales, etc.). El término **"Asignatura"** en Ecuador se refiere al **grado o nivel** (1° EGB, 8° EGB, 1° BGU). El código actual usa `Asignatura` incorrectamente. **Se recomienda renombrar** `Asignatura` → `Asignatura` en una futura iteración para alinearse con el lenguaje ubicuo del dominio.
 
@@ -201,8 +206,10 @@ Estos términos son comunes a todos los bounded contexts:
 |---------|-----------|
 | **Colegio** | Institución educativa. Multi-tenant: cada colegio tiene sus propios datos aislados por `colegio_id`. |
 | **Año Lectivo** | Período anual de clases. En Ecuador: Costa (mayo-diciembre) o Sierra (septiembre-junio). |
-| **Nivel** | Etapa educativa: Inicial, EGB (1°-10°), Bachillerato (1°-3°). |
-| **Malla Curricular** | Conjunto de asignaturas con su carga horaria definida por el MinEduc para cada nivel. |
+| **Nivel** | ✅ Implementado — `Nivel` entity + tabla `academico.niveles`. EGB (1°-10°), BGU (1°-3°). |
+| **Subnivel** | ✅ Implementado — `Subnivel` entity + tabla `academico.subniveles`. Preparatoria, Elemental, Media, Superior. |
+| **Grado** | ✅ Implementado — `Grado` entity + tabla `academico.grados`. Códigos `1EGB`…`10EGB`, `1BGU`…`3BGU`. |
+| **Malla Curricular** | ✅ Implementado — `MallaCurricular` entity + tabla `academico.malla_curricular`. Asignatura × Grado → horas_semanales. ADR-018. |
 | **Hora Pedagógica** | 45 minutos. Unidad de medida estándar en Ecuador. |
 | **LOEI** | Ley Orgánica de Educación Intercultural (Registro Oficial 417, 2011). |
 | **LOPDP** | Ley Orgánica de Protección de Datos Personales (Registro Oficial 459, 2021). |
@@ -245,13 +252,14 @@ Estos términos son comunes a todos los bounded contexts:
 
 ---
 
-## Cambios Pendientes para Alineación con MinEduc
+## Histórico (cambios implementados)
 
-| Actual | MinEduc | Acción | Prioridad |
-|--------|---------|--------|:---:|
-| `Asignatura` | **Asignatura** | Renombrar entidad, tabla, DTOs, endpoint | 🟠 Media |
-| `Seccion` | **Paralelo** | Mantener `Seccion` (el código `MAT-8-A` ya refleja asignatura+paralelo) | 🟢 Baja |
-| `creditos` | **horasSemanales** | ✅ Completado (V18) | — |
+| Cambio | Detalle | Estado |
+|--------|---------|:------:|
+| `creditos`→`horasSemanales` | V18 — alineación con MinEduc | ✅ Completado |
+| `cursos`→`asignaturas` | V19 — rename entidad/tabla (backend) | ✅ Completado |
+| `Nivel/Subnivel/Grado` | V28 + ADR-018 — modelado de estructura EGB/BGU | ✅ Completado |
+| `Malla Curricular` | V28 + ADR-018 — asignatura × grado → horas | ✅ Completado |
 
 ---
 

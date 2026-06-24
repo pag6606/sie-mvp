@@ -25,15 +25,14 @@ const NAV_ITEMS: Record<string, NavSection[]> = {
       items: [
         { label: 'Dashboard', Icon: Icons.Grid, href: '/admin' },
         { label: 'Usuarios', Icon: Icons.Users, href: '/admin/usuarios' },
-        { label: 'Asignaturas', Icon: Icons.Book, href: '/admin/asignaturas' },
-        { label: 'Paralelos', Icon: Icons.Layers, href: '/admin/paralelos' },
         { label: 'Matrícula', Icon: Icons.Clipboard, href: '/admin/matricula' },
         { label: 'Consentimientos', Icon: Icons.Shield, href: '/admin/consentimientos' },
       ]
     },
     {
-      label: 'Sistema',
+      label: 'Académico',
       items: [
+        { label: 'Estructura', Icon: Icons.Layers, href: '/admin/estructura' },
         { label: 'Cierres', Icon: Icons.Check, href: '/admin/cierres' },
         { label: 'Alertas', Icon: Icons.Alert, href: '/admin/alertas' },
       ]

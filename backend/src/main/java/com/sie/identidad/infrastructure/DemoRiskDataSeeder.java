@@ -1,6 +1,7 @@
 package com.sie.identidad.infrastructure;
 
 import com.sie.academico.domain.*;
+import com.sie.academico.infrastructure.GradoRepository;
 import com.sie.calificaciones.domain.*;
 import com.sie.identidad.domain.*;
 import com.sie.matricula.domain.*;
@@ -31,7 +32,12 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
     private static final String[] CURSO_NOMBRES = {"Matemáticas", "Lengua y Literatura", "Ciencias Naturales", "Estudios Sociales", "Inglés", "Computación"};
     private static final String[] CURSO_CODES = {"MAT", "LEN", "CN", "ES", "ING", "COM"};
     private static final String[] PARALELOS = {"A", "B"};
-    private static final String[] GRADOS = {"8vo", "9no", "10mo"};
+
+    private final GradoRepository gradoRepository;
+
+    public DemoRiskDataSeeder(GradoRepository gradoRepository) {
+        this.gradoRepository = gradoRepository;
+    }
 
     private static final String[] ESTUDIANTE_NOMBRES = {
         "Juan Pérez", "María Rodríguez", "Carlos López", "Ana Martínez", "Pedro Gómez",
@@ -75,6 +81,7 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
 
         createPeriodo();
         createCursos();
+        createMalla();
         createParaleloes();
         createEstudiantes();
         enrollEstudiantes();
@@ -108,9 +115,19 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         periodoId = p.getId();
     }
 
-    // ── CURSOS ──
+    // ── CURSOS ── (idempotente: reutiliza asignaturas creadas por PlanEstudiosOficialSeeder)
     private void createCursos() {
         for (int i = 0; i < CURSO_NOMBRES.length; i++) {
+            // Buscar si ya existe por código (puede haber sido creada por el seeder del plan de estudios)
+            List<Asignatura> existing = em.createQuery(
+                    "SELECT a FROM Asignatura a WHERE a.codigo = :codigo AND a.colegioId = :colegio", Asignatura.class)
+                    .setParameter("codigo", CURSO_CODES[i])
+                    .setParameter("colegio", COLEGIO_ID)
+                    .getResultList();
+            if (!existing.isEmpty()) {
+                cursoIds.put(CURSO_CODES[i], existing.get(0).getId());
+                continue;
+            }
             Asignatura c = new Asignatura();
             c.setColegioId(COLEGIO_ID);
             c.setCodigo(CURSO_CODES[i]);
@@ -123,19 +140,65 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         }
     }
 
-    // ── PARALELOES (6: una por grado+paralelo con 1 asignatura c/u) ──
+    // ── MALLA CURRICULAR (6 asignaturas × 3 grados = 18 entradas, ADR-018) ──
+    // Idempotente: no duplica si ya existen (creadas por PlanEstudiosOficialSeeder @Order 5)
+    private void createMalla() {
+        UUID bsSubnivelId = em.createQuery(
+                "SELECT s.id FROM Subnivel s WHERE s.codigo = :codigo AND s.colegioId = :colegio", UUID.class)
+                .setParameter("codigo", "BS").setParameter("colegio", COLEGIO_ID)
+                .getSingleResult();
+        List<Grado> bsGrados = gradoRepository.findBySubnivelIdOrderByOrden(bsSubnivelId);
+
+        int creadas = 0;
+        for (Grado grado : bsGrados) {
+            for (String code : CURSO_CODES) {
+                UUID asigId = cursoIds.get(code);
+                // Verificar si ya existe entrada para esta asignatura + grado
+                Long count = em.createQuery(
+                        "SELECT COUNT(mc) FROM MallaCurricular mc WHERE mc.asignatura.id = :asigId AND mc.grado.id = :gradoId",
+                        Long.class)
+                        .setParameter("asigId", asigId)
+                        .setParameter("gradoId", grado.getId())
+                        .getSingleResult();
+                if (count > 0) continue; // ya existe, saltar
+                MallaCurricular m = new MallaCurricular();
+                m.setColegioId(COLEGIO_ID);
+                m.setAsignatura(em.find(Asignatura.class, asigId));
+                m.setGrado(em.find(Grado.class, grado.getId()));
+                m.setHorasSemanales(4);
+                m.setObligatoria(true);
+                em.persist(m);
+                creadas++;
+            }
+        }
+        if (creadas > 0) {
+            log.info("  Malla curricular creada: {} entradas nuevas ({} ya existían)",
+                    creadas, CURSO_CODES.length * bsGrados.size() - creadas);
+        } else {
+            log.info("  Malla curricular ya existía. Saltando.");
+        }
+    }
+
+    // ── PARALELOS (6: una por grado+paralelo con 1 asignatura c/u) ──
+    // Usa Grados reales de Básica Superior (8EGB, 9EGB, 10EGB) desde GradoRepository (ADR-018).
     private void createParaleloes() {
+        UUID bsSubnivelId = em.createQuery(
+                "SELECT s.id FROM Subnivel s WHERE s.codigo = :codigo AND s.colegioId = :colegio", UUID.class)
+                .setParameter("codigo", "BS").setParameter("colegio", COLEGIO_ID)
+                .getSingleResult();
+        List<Grado> bsGrados = gradoRepository.findBySubnivelIdOrderByOrden(bsSubnivelId);
+
         int[] cursoAsignado = {0, 1, 2, 3, 4, 5}; // MAT, LEN, CN, ES, ING, COM
         int idx = 0;
-        for (String grado : GRADOS) {
+        for (Grado grado : bsGrados) {
             for (String paralelo : PARALELOS) {
-                String codigo = grado + "-" + paralelo;
                 int cursoIdx = cursoAsignado[idx % cursoAsignado.length];
                 Paralelo s = new Paralelo();
                 s.setColegioId(COLEGIO_ID);
                 s.setAsignatura(em.find(Asignatura.class, cursoIds.get(CURSO_CODES[cursoIdx])));
                 s.setPeriodo(em.find(Periodo.class, periodoId));
-                s.setCodigo(codigo + "-" + CURSO_CODES[cursoIdx]);
+                s.setGrado(em.find(Grado.class, grado.getId()));
+                s.setCodigo(grado.getCodigo() + "-" + paralelo + "-" + CURSO_CODES[cursoIdx]);
                 s.setCapacidad(20);
                 
                 em.persist(s);

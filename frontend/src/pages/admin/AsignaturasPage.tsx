@@ -99,7 +99,7 @@ export default function AsignaturasPage() {
   return (
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
-        <PageHead eyebrow="Académico" title="Catálogo de Cursos" subtitle="Administra los asignaturas del plan de estudios.">
+        <PageHead eyebrow="Académico" title="Asignaturas" subtitle="Administra las asignaturas (materias) del plan de estudios.">
           <div className="flex gap-2 mt-4">
             <button onClick={() => setShowForm(!showForm)}
               className="bg-[#8A6A18] text-white px-4 py-2 font-mono text-[0.7rem] font-bold uppercase tracking-[0.18em] hover:bg-[#0A0A0B] transition-colors">+ Nuevo</button>

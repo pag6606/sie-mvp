@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record ParaleloResponse(
         UUID id, String codigo, UUID asignaturaId, UUID periodoId,
+        UUID gradoId, String gradoCodigo,
         int capacidad, int cuposOcupados, int cuposDisponibles,
         boolean hasEsquema,
         List<DocenteInfo> docentes, List<HorarioInfo> horarios

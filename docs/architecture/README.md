@@ -1,7 +1,7 @@
 # Documentación de Arquitectura — SIE
 
 **Sistema de Información Estudiantil** — MVP v0.1.0
-**Última actualización:** 11 de junio de 2026
+**Última actualización:** 23 de junio de 2026
 
 ---
 
@@ -82,6 +82,7 @@ podman run --rm \
 | ADR-015 | [`ADR-015-rate-limiting-lopdp.md`](ADR-015-rate-limiting-lopdp.md) | Rate limiting con Guava `RateLimiter` (100/min enrollment, 30/min consent) y bulk endpoint para CSV |
 | ADR-016 | [`ADR-016-minimizacion-datos-lopdp.md`](ADR-016-minimizacion-datos-lopdp.md) | Eliminación de campos innecesarios y hardcode `dateOfBirth` en payloads a LOPDP |
 | ADR-017 | [`ADR-017-modulo-representantes-padres.md`](ADR-017-modulo-representantes-padres.md) | `Representante` como Aggregate Root en Identidad, `usuario_id` nullable, `IVinculacionResolver` en shared kernel |
+| ADR-018 | [`ADR-018-estructura-academica-egb-bgu.md`](ADR-018-estructura-academica-egb-bgu.md) | Modelado de estructura EGB/BGU: Niveles, Subniveles, Grados y Malla Curricular (V28) |
 
 ### Decisiones adicionales (documento central)
 
@@ -105,8 +106,8 @@ podman run --rm \
 
 **Contenido:**
 - Visión general de arquitectura (monolito modular)
-- 4 bounded contexts: Identidad, Académico, Matrícula, Calificaciones
-- 3 roles: Administrador, Docente, Estudiante
+- 7 bounded contexts: Identidad, Académico (incluye Niveles/Subniveles/Grados + Malla), Matrícula, Calificaciones, Alerta Temprana, Padres/Representantes, LOPDP
+- 4 roles: Administrador, Docente, Estudiante, Padre
 - Stack: Spring Boot 3.3, React 18, PostgreSQL 15, RabbitMQ, Flyway
 - Fase 2 diferidos: Carmenta/MinEduc, IdP externo, email productivo, i18n
 
@@ -119,6 +120,7 @@ podman run --rm \
 | [`propuesta-modulo-padres.md`](propuesta-modulo-padres.md) | Propuesta completa del Módulo de Padres de Familia: benchmark de SIS, requisitos legales LOEI/LOPDP, diseño de modelo de datos, UX mobile-first, plan de implementación Fase 2A/2B (~71 pts) |
 | [`plan-implementacion-alerta-temprana.md`](plan-implementacion-alerta-temprana.md) | Plan de implementación del sistema de Alerta Temprana de Riesgo Académico (~32-40h) |
 | [`decisions/decisions-log.md`](decisions/decisions-log.md) | Bitácora de decisiones de producto desde Step 01 (Init/Stack) hasta Step 12 (Product Brief final) |
+| [`plan-estructura-academica-egb.md`](plan-estructura-academica-egb.md) | Plan de implementación de la estructura EGB/BGU (niveles, subniveles, grados, malla curricular) |
 
 ---
 
@@ -131,7 +133,7 @@ podman run --rm \
 | [`auditoria-bd/remediacion.sql`](auditoria-bd/remediacion.sql) | Scripts SQL de remediación (FKs, índices, CHECK constraints) |
 | [`../reference/normativas-aplicables-sie.md`](../reference/normativas-aplicables-sie.md) | Requisitos de modelo de datos derivados de LOPDP (minimización, retención, consentimiento) |
 
-**Migraciones Flyway:** `backend/src/main/resources/db/migration/` — 13 archivos (V1 a V13)
+**Migraciones Flyway:** `backend/src/main/resources/db/migration/` — 27 archivos (V1 a V27) + V28 (estructura académica)
 
 ---
 
@@ -185,7 +187,7 @@ Estos documentos no están en esta carpeta pero son relevantes para la arquitect
 
 | Archivo | Descripción |
 |---------|-------------|
-| [`docs/qa/manual-test-script.md`](../qa/manual-test-script.md) | Script de pruebas manuales con 72+ casos de prueba |
+| [`docs/qa/manual-test-script.md`](../qa/manual-test-script.md) | Script de pruebas manuales con 100 casos de prueba |
 | [`docs/qa/reviews/`](../qa/reviews/) | Code reviews (CSV-BI con 40 hallazgos) |
 
 ### Releases

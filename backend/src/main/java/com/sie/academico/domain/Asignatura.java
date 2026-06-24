@@ -11,7 +11,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AttributeOverride(name = "colegioId", column = @Column(name = "colegio_id"))
 public class Asignatura extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "area_id", nullable = false)
+    private Area area;
 
     @Column(nullable = false, unique = true)
     private String codigo;
@@ -22,6 +27,11 @@ public class Asignatura extends BaseEntity {
     @Column
     private String descripcion;
 
+    /**
+     * @deprecated El valor real de horas por grado está en {@link MallaCurricular#horasSemanales}.
+     * Este campo se mantiene solo por compatibilidad. No usar para lógica nueva.
+     */
+    @Deprecated
     @Column(nullable = false)
     private int horasSemanales;
 

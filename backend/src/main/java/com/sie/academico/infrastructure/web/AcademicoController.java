@@ -1,6 +1,8 @@
 package com.sie.academico.infrastructure.web;
 
 import com.sie.academico.application.AcademicoService;
+import com.sie.academico.application.AreaService;
+import com.sie.academico.application.EstructuraAcademicaService;
 import com.sie.academico.application.dto.*;
 import com.sie.academico.infrastructure.PeriodoRepository;
 import jakarta.validation.Valid;
@@ -23,6 +25,8 @@ import java.util.UUID;
 public class AcademicoController {
 
     private final AcademicoService service;
+    private final EstructuraAcademicaService estructuraService;
+    private final AreaService areaService;
     private final PeriodoRepository periodoRepository;
 
     @GetMapping("/periodos")
@@ -107,6 +111,127 @@ public class AcademicoController {
     @GetMapping("/me/paralelos")
     public List<ParaleloResponse> misParaleloes(@RequestAttribute("usuarioId") UUID usuarioId) {
         return service.listarParalelosPorDocente(usuarioId);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  ÁREAS DE CONOCIMIENTO (Acuerdo MINEDUC-2023-00008-A)
+    // ═══════════════════════════════════════════════════════════
+
+    @GetMapping("/areas")
+    public List<AreaResponse> listarAreas(@RequestAttribute("colegioId") UUID colegioId) {
+        return areaService.listarAreas(colegioId);
+    }
+
+    @PostMapping("/areas")
+    public ResponseEntity<AreaResponse> crearArea(@Valid @RequestBody CrearAreaRequest req,
+                                                   @RequestAttribute("colegioId") UUID colegioId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(areaService.crearArea(req, colegioId));
+    }
+
+    @PutMapping("/areas/{id}")
+    public AreaResponse actualizarArea(@PathVariable UUID id, @Valid @RequestBody CrearAreaRequest req) {
+        return areaService.actualizarArea(id, req);
+    }
+
+    @DeleteMapping("/areas/{id}")
+    public ResponseEntity<Map<String, String>> eliminarArea(@PathVariable UUID id) {
+        areaService.eliminarArea(id);
+        return ResponseEntity.ok(Map.of("mensaje", "Área eliminada"));
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  ESTRUCTURA ACADÉMICA (ADR-018) — Niveles / Subniveles / Grados / Malla
+    // ═══════════════════════════════════════════════════════════
+
+    @GetMapping("/niveles")
+    public List<NivelTreeResponse> listarArbolNiveles(@RequestAttribute("colegioId") UUID colegioId) {
+        return estructuraService.obtenerArbolCompleto(colegioId);
+    }
+
+    @PostMapping("/niveles")
+    public ResponseEntity<NivelResponse> crearNivel(@Valid @RequestBody CrearNivelRequest req,
+                                                     @RequestAttribute("colegioId") UUID colegioId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(estructuraService.crearNivel(req, colegioId));
+    }
+
+    @PutMapping("/niveles/{id}")
+    public NivelResponse actualizarNivel(@PathVariable UUID id, @Valid @RequestBody CrearNivelRequest req) {
+        return estructuraService.actualizarNivel(id, req);
+    }
+
+    @DeleteMapping("/niveles/{id}")
+    public ResponseEntity<Map<String, String>> eliminarNivel(@PathVariable UUID id) {
+        estructuraService.eliminarNivel(id);
+        return ResponseEntity.ok(Map.of("mensaje", "Nivel eliminado"));
+    }
+
+    @GetMapping("/subniveles")
+    public List<SubnivelResponse> listarSubniveles(@RequestAttribute("colegioId") UUID colegioId) {
+        return estructuraService.listarSubniveles(colegioId);
+    }
+
+    @PostMapping("/subniveles")
+    public ResponseEntity<SubnivelResponse> crearSubnivel(@Valid @RequestBody CrearSubnivelRequest req,
+                                                           @RequestAttribute("colegioId") UUID colegioId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(estructuraService.crearSubnivel(req, colegioId));
+    }
+
+    @PutMapping("/subniveles/{id}")
+    public SubnivelResponse actualizarSubnivel(@PathVariable UUID id, @Valid @RequestBody CrearSubnivelRequest req) {
+        return estructuraService.actualizarSubnivel(id, req);
+    }
+
+    @DeleteMapping("/subniveles/{id}")
+    public ResponseEntity<Map<String, String>> eliminarSubnivel(@PathVariable UUID id) {
+        estructuraService.eliminarSubnivel(id);
+        return ResponseEntity.ok(Map.of("mensaje", "Subnivel eliminado"));
+    }
+
+    @GetMapping("/grados")
+    public List<GradoResponse> listarGrados(
+            @RequestAttribute("colegioId") UUID colegioId,
+            @RequestParam(required = false) UUID subnivelId,
+            @RequestParam(required = false) UUID nivelId) {
+        return estructuraService.listarGrados(colegioId, subnivelId, nivelId);
+    }
+
+    @PostMapping("/grados")
+    public ResponseEntity<GradoResponse> crearGrado(@Valid @RequestBody CrearGradoRequest req,
+                                                     @RequestAttribute("colegioId") UUID colegioId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(estructuraService.crearGrado(req, colegioId));
+    }
+
+    @PutMapping("/grados/{id}")
+    public GradoResponse actualizarGrado(@PathVariable UUID id, @Valid @RequestBody CrearGradoRequest req) {
+        return estructuraService.actualizarGrado(id, req);
+    }
+
+    @DeleteMapping("/grados/{id}")
+    public ResponseEntity<Map<String, String>> eliminarGrado(@PathVariable UUID id) {
+        estructuraService.eliminarGrado(id);
+        return ResponseEntity.ok(Map.of("mensaje", "Grado eliminado"));
+    }
+
+    @GetMapping("/malla")
+    public List<MallaResponse> listarMalla(@RequestParam UUID gradoId) {
+        return estructuraService.listarMalla(gradoId);
+    }
+
+    @PostMapping("/malla")
+    public ResponseEntity<MallaResponse> crearMalla(@Valid @RequestBody CrearMallaRequest req,
+                                                     @RequestAttribute("colegioId") UUID colegioId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(estructuraService.crearMalla(req, colegioId));
+    }
+
+    @PutMapping("/malla/{id}")
+    public MallaResponse actualizarMalla(@PathVariable UUID id, @Valid @RequestBody CrearMallaRequest req) {
+        return estructuraService.actualizarMalla(id, req);
+    }
+
+    @DeleteMapping("/malla/{id}")
+    public ResponseEntity<Map<String, String>> eliminarMalla(@PathVariable UUID id) {
+        estructuraService.eliminarMalla(id);
+        return ResponseEntity.ok(Map.of("mensaje", "Entrada de malla eliminada"));
     }
 }
 

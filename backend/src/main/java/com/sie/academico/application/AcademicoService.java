@@ -3,6 +3,10 @@ package com.sie.academico.application;
 import com.sie.academico.application.dto.*;
 import com.sie.academico.domain.*;
 import com.sie.academico.infrastructure.AsignaturaRepository;
+import com.sie.academico.infrastructure.AreaRepository;
+import com.sie.academico.infrastructure.GradoRepository;
+import com.sie.academico.infrastructure.MallaCurricularRepository;
+import com.sie.academico.infrastructure.NivelRepository;
 import com.sie.academico.infrastructure.PeriodoRepository;
 import com.sie.academico.infrastructure.ParaleloRepository;
 import com.sie.calificaciones.infrastructure.EsquemaEvaluacionRepository;
@@ -24,6 +28,8 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.sie.academico.domain.Nivel;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -32,6 +38,10 @@ public class AcademicoService {
     private final PeriodoRepository periodoRepository;
     private final AsignaturaRepository asignaturaRepository;
     private final ParaleloRepository paraleloRepository;
+    private final GradoRepository gradoRepository;
+    private final AreaRepository areaRepository;
+    private final MallaCurricularRepository mallaRepository;
+    private final NivelRepository nivelRepository;
     private final MatriculaRepository matriculaRepository;
     private final EsquemaEvaluacionRepository esquemaRepository;
 
@@ -93,11 +103,32 @@ public class AcademicoService {
     public AsignaturaResponse crearAsignatura(CrearAsignaturaRequest req, UUID colegioId) {
         if (asignaturaRepository.existsByCodigo(req.codigo()))
             throw new IllegalArgumentException("El código ya existe");
+        Area area = areaRepository.findById(req.areaId())
+                .orElseThrow(() -> new IllegalArgumentException("Área no encontrada: " + req.areaId()));
         Asignatura c = new Asignatura();
+        c.setArea(area);
         c.setCodigo(req.codigo()); c.setNombre(req.nombre());
-        c.setDescripcion(req.descripcion()); c.setHorasSemanales(req.horasSemanales());
+        c.setDescripcion(req.descripcion());
+        c.setHorasSemanales(0); // deprecado — el valor real está en malla
         c.setColegioId(colegioId);
-        return toResponse(asignaturaRepository.save(c));
+        c = asignaturaRepository.save(c);
+
+        // Crear malla curricular junto con la asignatura (opcional)
+        if (req.asignarGrados() != null && !req.asignarGrados().isEmpty()) {
+            for (AsignacionGradoRequest ag : req.asignarGrados()) {
+                Grado g = gradoRepository.findById(UUID.fromString(ag.gradoId()))
+                        .orElseThrow(() -> new IllegalArgumentException("Grado no encontrado: " + ag.gradoId()));
+                MallaCurricular m = new MallaCurricular();
+                m.setColegioId(colegioId);
+                m.setAsignatura(c);
+                m.setGrado(g);
+                m.setHorasSemanales(ag.horasSemanales());
+                m.setObligatoria(ag.obligatoria());
+                mallaRepository.save(m);
+            }
+        }
+
+        return toResponse(c);
     }
 
     public List<AsignaturaResponse> listarAsignaturas() {
@@ -130,6 +161,11 @@ public class AcademicoService {
         Paralelo s = new Paralelo();
         s.setCodigo(req.codigo()); s.setAsignatura(asignatura); s.setPeriodo(periodo);
         s.setCapacidad(req.capacidad()); s.setColegioId(colegioId);
+
+        if (req.gradoId() != null) {
+            s.setGrado(gradoRepository.findById(req.gradoId())
+                    .orElseThrow(() -> new IllegalArgumentException("Grado no encontrado: " + req.gradoId())));
+        }
 
         if (req.horarios() != null) {
             req.horarios().forEach(h -> {
@@ -178,6 +214,7 @@ public class AcademicoService {
             Paralelo s = new Paralelo();
             s.setCodigo(orig.getCodigo()); s.setAsignatura(orig.getAsignatura()); s.setPeriodo(destino);
             s.setCapacidad(orig.getCapacidad()); s.setColegioId(destino.getColegioId());
+            s.setGrado(orig.getGrado());
             orig.getHorarios().forEach(h -> {
                 HorarioSesion hs = new HorarioSesion();
                 hs.setParalelo(s); hs.setDiaSemana(h.getDiaSemana());
@@ -226,12 +263,30 @@ public class AcademicoService {
     }
 
     private AsignaturaResponse toResponse(Asignatura c) {
-        return new AsignaturaResponse(c.getId(), c.getCodigo(), c.getNombre(), c.getDescripcion(), c.getHorasSemanales(), c.isActivo());
+        Area area = null;
+        try { area = c.getArea(); } catch (Exception ignored) {}
+        return new AsignaturaResponse(c.getId(), c.getCodigo(), c.getNombre(), c.getDescripcion(),
+                c.getHorasSemanales(), c.isActivo(),
+                area != null ? area.getId() : null,
+                area != null ? area.getCodigo() : null,
+                area != null ? area.getNombre() : null,
+                calcularNiveles(c.getId()));
+    }
+
+    private List<NivelAsignatura> calcularNiveles(UUID asignaturaId) {
+        return mallaRepository.findByAsignaturaId(asignaturaId).stream()
+                .map(mc -> mc.getGrado().getSubnivel().getNivel())
+                .distinct()
+                .sorted(Comparator.comparingInt(Nivel::getOrden))
+                .map(n -> new NivelAsignatura(n.getId(), n.getCodigo(), n.getNombre()))
+                .toList();
     }
 
     private ParaleloResponse toResponse(Paralelo s, boolean hasEsquema) {
         int ocupados = (int) matriculaRepository.countByParaleloIdAndEstado(s.getId(), EstadoMatricula.ACTIVA);
+        Grado g = s.getGrado();
         return new ParaleloResponse(s.getId(), s.getCodigo(), s.getAsignatura().getId(), s.getPeriodo().getId(),
+                g != null ? g.getId() : null, g != null ? g.getCodigo() : null,
                 s.getCapacidad(), ocupados, s.getCapacidad() - ocupados,
                 hasEsquema,
                 s.getDocentes().stream().map(d -> new DocenteInfo(d.getDocenteId(), d.getRol())).toList(),

@@ -56,7 +56,7 @@ cd backend && ./mvnw test
 cd frontend && npm test
 ```
 
-Resultado esperado: **24/24 e2e, 68/68 backend, 169/169 vitest**.
+Resultado esperado: **29/29 e2e** (24 originales + 5 UA-19), **117/117 backend** (98 originales + 19 nuevos), **169/169 vitest**.
 
 ### Cómo reportar un fallo
 
@@ -858,6 +858,77 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 - [ ] **AC:** count = 200
 - [ ] **NSM:** Tiempo total ≤ 5 minutos (según estimado en onboarding doc)
 
+---
+
+## UA-19 — Estructura Académica EGB/BGU (ADR-018)
+
+> **Normativa:** LOEI Arts. 42-43 (niveles), Acuerdo Ministerial MINEDUC-2016-00020-A (malla curricular).  
+> **Precondición:** Backend reiniciado con perfiles `dev,demo-riesgo`. La migración V28 debe haber ejecutado y el seeder `EstructuraAcademicaSeeder` debe haber creado 2 niveles, 5 subniveles y 13 grados.  
+> **Login:** `admin@sie.edu.ec` / `Admin123!!`
+
+### UA-19.1 Visualizar árbol completo niveles → subniveles → grados
+- [ ] Navegar a `/admin/estructura`
+- [ ] **AC:** Se ve un árbol colapsable con los niveles EGB y BGU
+- [ ] **AC:** Al expandir nivel EGB se ven los subniveles (Preparatoria, Básica Elemental, Básica Media, Básica Superior)
+- [ ] **AC:** Al expandir Básica Superior se ven los grados (8EGB, 9EGB, 10EGB)
+- [ ] **AC:** Cada grado muestra su código, nombre normativo y edad referencial
+
+### UA-19.2 Crear nivel educativo
+- [ ] Click en "+ Nuevo Nivel"
+- [ ] Completar: código = `INI`, nombre = `Inicial`, orden = 3
+- [ ] Click "Crear"
+- [ ] **AC:** El nivel INI aparece en el árbol
+- [ ] **AC:** Persiste al recargar la página
+
+### UA-19.3 Crear subnivel y grado
+- [ ] Dentro de INI, click "+ Subnivel"
+- [ ] Completar: código = `PREINI`, nombre = `Pre-Inicial`, orden = 1
+- [ ] Click "Crear Subnivel"
+- [ ] **AC:** El subnivel PREINI aparece dentro de INI
+- [ ] Click "+ Grado"
+- [ ] Completar: Nro = 1, código = `1INI`, nombre = `Primero Inicial`, orden = 1
+- [ ] Click "Crear Grado"
+- [ ] **AC:** El grado 1INI aparece bajo PREINI
+
+### UA-19.4 Editar inline nombre de nivel
+- [ ] Click ✎ junto al nivel INI
+- [ ] Cambiar nombre a "Educación Inicial"
+- [ ] Click ✓
+- [ ] **AC:** El nombre se actualiza en el árbol sin recargar
+
+### UA-19.5 Eliminar grado sin dependencias
+- [ ] Click ✕ junto al grado 1INI
+- [ ] Confirmar en el modal
+- [ ] **AC:** El grado desaparece del árbol
+
+### UA-19.6 Rechazar eliminación de grado con paralelos
+- [ ] Click ✕ junto al grado 8EGB (tiene paralelos del seed)
+- [ ] **AC:** Error: "No se puede eliminar el grado: tiene paralelos asociados"
+- [ ] **AC:** 8EGG sigue visible
+
+### UA-19.7 Añadir asignatura a malla curricular
+- [ ] Click sobre 8EGB → se abre panel de malla
+- [ ] Click "+ Añadir asignatura"
+- [ ] Seleccionar "MAT — Matemáticas", horas = 5, obligatoria
+- [ ] Click "Añadir"
+- [ ] **AC:** MAT aparece en la tabla de malla de 8EGB (5h/sem)
+
+### UA-19.8 Rechazar duplicado en malla (vía API)
+- [ ] Ejecutar `curl` duplicado (ver script en referencia)
+- [ ] **AC:** Segundo intento retorna HTTP 400 con mensaje de error
+
+### UA-19.9 Eliminar entrada de malla
+- [ ] Click "Eliminar" junto a MAT en la tabla
+- [ ] **AC:** MAT desaparece de la tabla y reaparece en el dropdown
+
+### UA-19.10 Filtrar paralelos por grado
+- [ ] Navegar a `/admin/paralelos`
+- [ ] Seleccionar "8EGB — Octavo de Educación General Básica" en filtro
+- [ ] **AC:** Solo se muestran paralelos con grado 8EGB
+- [ ] **AC:** Columna "Grado" muestra "8EGB"
+- [ ] Volver a "Todos los grados"
+- [ ] **AC:** Vuelven todos los paralelos
+
 ## Resumen de Resultados
 
 > Llenar al final de la ejecución. Una fila por caso. Resultado: `✅ Pass` / `❌ Fail` / `⏭ Skipped` (con motivo).  
@@ -954,8 +1025,18 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 | UA-18.4 | Revocar consentimiento | | |
 | UA-18.5 | Trazabilidad documental (nombre+cédula) | | |
 | UA-18.6 | Registrar 200 consentimientos masivos (NSM ≤ 5 min) | | |
+| UA-19.1 | Visualizar árbol completo niveles → subniveles → grados | | |
+| UA-19.2 | Crear nivel educativo | | |
+| UA-19.3 | Crear subnivel y grado | | |
+| UA-19.4 | Editar inline grado/nivel (nombre, código) | | |
+| UA-19.5 | Eliminar grado sin dependencias | | |
+| UA-19.6 | Rechazar eliminación de grado con paralelos | | |
+| UA-19.7 | Añadir asignatura a malla curricular de un grado | | |
+| UA-19.8 | Rechazar duplicado en malla (misma asignatura + grado) | | |
+| UA-19.9 | Eliminar entrada de malla | | |
+| UA-19.10 | Filtrar paralelos por grado en página Paralelos | | |
 
-**Total:** 89 casos de prueba (62 originales + 10 UA-17 originales + 8 nuevos UA-17.11 a 17.18 + 6 nuevos UA-18.1 a 18.6 para consentimiento parental)  
+**Total:** 100 casos de prueba (62 originales + 10 UA-17 + 8 UA-17.11-18 + 6 UA-18 + 10 nuevo UA-19 + 4 cuenta doble corregida)  
 **Aprobador:** ___________  
 **Fecha:** ___________
 
@@ -963,12 +1044,14 @@ Cada UA referencia la normativa ecuatoriana que aplica. Esto es relevante para a
 
 ## Cambios respecto a v0.2.0 (manual anterior)
 
-Este manual fue actualizado el 2026-06-08 con consentimiento parental. Cambios:
+Este manual fue actualizado el 2026-06-23 con estructura académica EGB/BGU. Cambios:
 
 - **UA-17.1**: agregado "tabla con 200 filas" (era H1)
 - **UA-17.4**: cambio `clic` → `doble-click` (era H7, read-only por defecto)
 - **UA-17.11 a 17.18**: 8 sub-cases nuevos que verifican los fixes H1, H2, H5, H6, H7, H8, C2, C3a, C5
 - **UA-18.1 a 18.6**: **6 casos nuevos** de consentimiento parental (LOPDP Art. 21, 25) — registro, verificación, bloqueo de matrícula, revocación, trazabilidad con `representanteNombre`/`representanteCedula`, y flujo masivo para 200 estudiantes
+- **UA-19.1 a 19.10**: **10 casos nuevos** de estructura académica EGB/BGU (ADR-018) — visualización de árbol, CRUD de niveles/subniveles/grados, editor de malla curricular y filtro de paralelos por grado
+- **Total de casos**: 89 → 100 (10 nuevos)
 - **Todos los checkboxes** reseteados a `[ ]` para ejecución limpia
 - **Tabla de resultados** vacía (sin datos pre-cargados)
 - **Paralelo "Cómo ejecutar la prueba completa"** con checklist pre-test y orden recomendado
@@ -988,3 +1071,8 @@ Este manual fue actualizado el 2026-06-08 con consentimiento parental. Cambios:
 | C2 — CSV injection | UA-17.18 |
 | C3a — emailsPendientes | UA-17.14 |
 | C5 — Fixture compartido | UA-17.15 |
+| ADR-018 — Árbol estructura | UA-19.1 |
+| ADR-018 — CRUD niveles | UA-19.2, UA-19.3, UA-19.4 |
+| ADR-018 — Validación borrado grado | UA-19.6 |
+| ADR-018 — Malla curricular | UA-19.7, UA-19.8, UA-19.9 |
+| ADR-018 — Filtro grado en paralelos | UA-19.10 |

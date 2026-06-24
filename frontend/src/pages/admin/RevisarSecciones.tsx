@@ -319,7 +319,7 @@ export default function RevisarSecciones() {
                 <div>
                   <label htmlFor="formCodigoSeccion" className="block text-sm font-medium text-foreground mb-1.5">Código sección (paralelo)</label>
                   <input id="formCodigoSeccion" value={formCodigo} onChange={e => setFormCodigo(e.target.value)} required
-                    placeholder="1EGB-A"
+                    placeholder="8EGB-A-MAT"
                     className="mt-1 block w-full rounded-md border border-input px-3 py-2 text-sm" />
                 </div>
                 <div>
@@ -370,13 +370,13 @@ export default function RevisarSecciones() {
                 <form onSubmit={e => { e.preventDefault(); handleCrearCursoAlVuelo() }} className="space-y-2">
                   <div className="flex gap-2">
                     <input value={nuevaAsignaturaCodigo} onChange={e => setNuevaAsignaturaCodigo(e.target.value)}
-                      required placeholder="2EGB" className="flex-1 rounded-md border border-input px-3 py-1.5 text-sm" />
+                      required placeholder="CS" className="flex-1 rounded-md border border-input px-3 py-1.5 text-sm" />
                     <input value={nuevaAsignaturaNombre} onChange={e => setNuevaAsignaturaNombre(e.target.value)}
-                      required placeholder="Segundo EGB" className="flex-1 rounded-md border border-input px-3 py-1.5 text-sm" />
+                      required placeholder="Ciencias Sociales" className="flex-1 rounded-md border border-input px-3 py-1.5 text-sm" />
                   </div>
                   <button type="submit" disabled={nuevaAsignaturaSaving}
                     className="rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground">
-                    {nuevaAsignaturaSaving ? 'Creando...' : 'Crear curso'}
+                    {nuevaAsignaturaSaving ? 'Creando...' : 'Crear asignatura'}
                   </button>
                 </form>
               </div>

@@ -16,10 +16,9 @@ const MatriculaPage = lazy(() => import('@/pages/admin/MatriculaPage'))
 const ImportarCSV = lazy(() => import('@/pages/admin/ImportarCSV'))
 const ImportarUsuariosPage = lazy(() => import('@/pages/admin/ImportarUsuariosPage'))
 const UsuariosPage = lazy(() => import('@/pages/admin/UsuariosPage'))
-const ParalelosPage = lazy(() => import('@/pages/admin/ParalelosPage'))
-const AsignaturasPage = lazy(() => import('@/pages/admin/AsignaturasPage'))
 const ConsentimientosPage = lazy(() => import('@/pages/admin/ConsentimientosPage'))
 const AlertaTempranaPage = lazy(() => import('@/pages/admin/AlertaTempranaPage'))
+const EstructuraAcademicaPage = lazy(() => import('@/pages/admin/EstructuraAcademicaPage'))
 const DocenteDashboard = lazy(() => import('@/pages/docente/DocenteDashboard'))
 const AsistenciaPage = lazy(() => import('@/pages/docente/AsistenciaPage'))
 const NotasPage = lazy(() => import('@/pages/docente/NotasPage'))
@@ -48,10 +47,11 @@ export default function App() {
       <Route path="/admin/matricula/importar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><ImportarCSV /></Suspense>} />
       <Route path="/admin/usuarios" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><UsuariosPage /></Suspense>} />
       <Route path="/admin/usuarios/importar" element={<Suspense fallback={<LoadingSkeleton rows={3} />}><ImportarUsuariosPage /></Suspense>} />
-      <Route path="/admin/paralelos" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><ParalelosPage /></Suspense>} />
-      <Route path="/admin/asignaturas" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AsignaturasPage /></Suspense>} />
+      <Route path="/admin/paralelos" element={<Navigate to="/admin/estructura" replace />} />
+      <Route path="/admin/asignaturas" element={<Navigate to="/admin/estructura" replace />} />
       <Route path="/admin/consentimientos" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><ConsentimientosPage /></Suspense>} />
       <Route path="/admin/alertas" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AlertaTempranaPage /></Suspense>} />
+      <Route path="/admin/estructura" element={<Suspense fallback={<LoadingSkeleton rows={6} />}><EstructuraAcademicaPage /></Suspense>} />
       <Route path="/docente" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><DocenteDashboard /></Suspense>} />
       <Route path="/docente/:paraleloId/asistencia" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><AsistenciaPage /></Suspense>} />
       <Route path="/docente/:paraleloId/notas" element={<Suspense fallback={<LoadingSkeleton rows={4} />}><NotasPage /></Suspense>} />

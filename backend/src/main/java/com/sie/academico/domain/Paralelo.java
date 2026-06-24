@@ -25,6 +25,10 @@ public class Paralelo extends BaseEntity {
     @JoinColumn(name = "periodo_id", nullable = false)
     private Periodo periodo;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grado_id")
+    private Grado grado;
+
     @Column(nullable = false)
     private String codigo;
 
