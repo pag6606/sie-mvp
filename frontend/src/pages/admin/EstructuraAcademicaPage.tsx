@@ -921,19 +921,24 @@ function VistaMatriz({ arbol, asignaturas, areas, todasLasMallas, selectedGradoI
             </tr>
           </thead>
           <tbody>
-            {areasConAsigs.map(area => (
-              <tr key={area.id} className="bg-muted/20" data-area={area.codigo}>
-                <td className="px-2 py-1 font-medium flex items-center gap-1 text-[11px]">
-                  {areaBadge(area.codigo, null)} {area.nombre}
-                  <span className="text-[9px] text-muted-foreground ml-1">({area.asignaturas.length})</span>
+            {areasConAsigs.flatMap(area => [
+              // Fila de área (cabecera de sección)
+              <tr key={area.id} className="bg-muted/15" data-area={area.codigo}>
+                <td className="px-2 py-1.5 font-semibold flex items-center gap-1 text-xs border-b border-muted/30">
+                  <span className={`inline-block w-1.5 h-3 rounded-full ${AREA_COLORS[area.codigo]?.split(' ')[0] || 'bg-gray-400'}`}></span>
+                  {areaBadge(area.codigo, null)}
+                  <span className="text-foreground">{area.nombre}</span>
+                  <span className="text-[9px] text-muted-foreground ml-auto">{area.asignaturas.length} asignaturas</span>
                 </td>
-                {gradosFiltrados.map(g => <td key={g.id} className="px-2 py-1"></td>)}
-              </tr>
-            ))}
-            {areasConAsigs.map(area =>
-              area.asignaturas.map((asig: any) => (
-                <tr key={asig.id} className="border-t hover:bg-muted/30">
-                  <td className="px-2 py-1 text-[11px] font-mono">{asig.codigo}</td>
+                {gradosFiltrados.map(g => <td key={g.id} className="border-b border-muted/30"></td>)}
+              </tr>,
+              // Filas de asignaturas (indentadas bajo el área)
+              ...area.asignaturas.map((asig: any) => (
+                <tr key={asig.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="pl-6 py-1 text-[11px] font-mono text-muted-foreground">
+                    <span className="text-[9px] text-gray-300 mr-1">└─</span>
+                    {asig.codigo}
+                  </td>
                   {gradosFiltrados.map(g => {
                     const incluida = mallaSet.has(`${asig.id}-${g.id}`)
                     const mallaEntry = incluida && todasLasMallas.find((m: any) => m.asignaturaId === asig.id && m.gradoId === g.id)
@@ -951,7 +956,7 @@ function VistaMatriz({ arbol, asignaturas, areas, todasLasMallas, selectedGradoI
                   })}
                 </tr>
               ))
-            )}
+            ])}
           </tbody>
         </table>
       </div>
