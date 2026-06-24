@@ -282,6 +282,7 @@ public class EstructuraAcademicaService {
      * Devuelve todas las entradas de malla curricular (sin filtro de grado).
      * Útil para la vista Matriz (asignaturas × grados) en el frontend.
      */
+    @Transactional(readOnly = true)
     public List<MallaResponse> listarTodasLasMallas() {
         return mallaRepository.findAll().stream()
                 .map(this::toMallaResponse)

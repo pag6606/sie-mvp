@@ -244,7 +244,7 @@ export default function EstructuraAcademicaPage() {
                   onPeriodoChange={setSelectedPeriodo}
                   selectedGradoId={selectedGradoId}
                   gradosEnArbol={arbol?.flatMap(n => n.subniveles).flatMap(s => s.grados) ?? []}
-                  asignaturas={asignaturas} />
+                  asignaturas={asignaturas} todasLasMallas={todasLasMallas} />
               )}
             </>
           )}
@@ -658,10 +658,10 @@ function TabAsignaturas({ asignaturas, areas, arbol, todasLasMallas, selectedGra
 // ═══════════════════════════════════════════════════════════════
 //  TAB: PARALELOS (integrado con árbol, grado seleccionado + creación)
 // ═══════════════════════════════════════════════════════════════
-function TabParalelos({ periodos, selectedPeriodo, onPeriodoChange, selectedGradoId, gradosEnArbol, asignaturas }: {
+function TabParalelos({ periodos, selectedPeriodo, onPeriodoChange, selectedGradoId, gradosEnArbol, asignaturas, todasLasMallas }: {
   periodos: any[]; selectedPeriodo: string; onPeriodoChange: (id: string) => void
   selectedGradoId: string | null
-  gradosEnArbol: any[]; asignaturas: any[]
+  gradosEnArbol: any[]; asignaturas: any[]; todasLasMallas: any[]
 }) {
   const qc = useQueryClient()
   const [page, setPage] = useState(0)
@@ -699,6 +699,15 @@ function TabParalelos({ periodos, selectedPeriodo, onPeriodoChange, selectedGrad
       setFormError(err.response?.data?.mensaje || err.response?.data?.error || err.message || 'Error al crear paralelo')
     },
   })
+
+  // Asignaturas disponibles para crear paralelo: solo las que están en la malla del grado seleccionado
+  const asignaturasDisponibles = useMemo(() => {
+    if (!formGradoId || !todasLasMallas || todasLasMallas.length === 0) return asignaturas
+    const mallaGradoIds = new Set(
+      todasLasMallas.filter((m: any) => m.gradoId === formGradoId).map((m: any) => m.asignaturaId)
+    )
+    return asignaturas.filter((a: any) => mallaGradoIds.has(a.id))
+  }, [formGradoId, todasLasMallas, asignaturas])
 
   // Si se seleccionó un grado en el árbol, usarlo como filtro
   const gradoFiltro = selectedGradoId || filtroGrado
@@ -765,9 +774,15 @@ function TabParalelos({ periodos, selectedPeriodo, onPeriodoChange, selectedGrad
               <select value={formAsignaturaId} onChange={e => setFormAsignaturaId(e.target.value)} required
                 className="mt-1 block rounded border border-input px-3 py-2 text-sm min-w-[180px]">
                 <option value="">Seleccionar...</option>
-                {asignaturas.map((a: any) => (
-                  <option key={a.id} value={a.id}>{a.codigo} — {a.nombre}</option>
-                ))}
+                {asignaturasDisponibles.length === 0 && formGradoId ? (
+                  <option value="" disabled>
+                    {todasLasMallas.length === 0 ? 'Cargando mallas...' : 'Este grado no tiene materias en su malla'}
+                  </option>
+                ) : (
+                  asignaturasDisponibles.map((a: any) => (
+                    <option key={a.id} value={a.id}>{a.codigo} — {a.nombre}</option>
+                  ))
+                )}
               </select>
             </div>
             <div>

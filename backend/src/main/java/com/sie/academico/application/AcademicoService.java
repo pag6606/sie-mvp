@@ -163,8 +163,16 @@ public class AcademicoService {
         s.setCapacidad(req.capacidad()); s.setColegioId(colegioId);
 
         if (req.gradoId() != null) {
-            s.setGrado(gradoRepository.findById(req.gradoId())
-                    .orElseThrow(() -> new IllegalArgumentException("Grado no encontrado: " + req.gradoId())));
+            Grado grado = gradoRepository.findById(req.gradoId())
+                    .orElseThrow(() -> new IllegalArgumentException("Grado no encontrado: " + req.gradoId()));
+            // ── Regla de negocio: la asignatura debe estar en la malla curricular del grado ──
+            if (!mallaRepository.existsByAsignaturaIdAndGradoId(req.asignaturaId(), req.gradoId())) {
+                throw new IllegalArgumentException(String.format(
+                    "La asignatura '%s' (%s) no está en la malla curricular del grado %s. " +
+                    "Solo se pueden crear paralelos con asignaturas que pertenezcan a la malla del grado.",
+                    asignatura.getNombre(), asignatura.getCodigo(), grado.getCodigo()));
+            }
+            s.setGrado(grado);
         }
 
         if (req.horarios() != null) {
