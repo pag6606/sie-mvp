@@ -3,7 +3,11 @@
 > **Objetivo:** Registrar una institución educativa completa desde cero en SIE  
 > **Régimen:** Costa 2026-2027 (mayo 2026 — febrero 2027)  
 > **Perfil:** Admin del colegio realizando la configuración inicial asistido por el sistema  
-> **Última actualización:** 2026-06-10 — cambios acumulados:
+> **Última actualización:** 2026-06-24 — cambios acumulados:
+> - Estructura académica EGB/BGU completa (ADR-018): 2 niveles, 5 subniveles, 13 grados
+> - Plan de estudios oficial MINEDUC-2023-00008-A precargado (19 asignaturas, 123 mallas)
+> - 8 áreas de conocimiento del currículo nacional
+> - Hub Académico Unificado (`/admin/estructura`) con tabs Estructura/Asignaturas/Paralelos
 > - Escala de notas 0-10 (LOEI Art. 194) + rediseño NotasPage con barra de stats
 > - Pre-carga de 4 componentes estándar MINEDUC en esquema de evaluación
 > - `hasEsquema` en `SeccionResponse` + wizard guiado en dashboard docente
@@ -25,9 +29,10 @@
 | Nombre | Academia del Pacífico |
 | Representante legal | Dr. Fernando Paredes (fake) |
 | Dirección | Av. Malecón 456, Guayaquil |
-| Niveles | 1ro a 5to de Educación General Básica (EGB) |
-| Paralelos por nivel | A y B |
-| Total paralelos (paralelos) | 10 |
+| Niveles | Educación General Básica (1EGB–10EGB) + Bachillerato (1BGU–3BGU) |
+| Estructura | ✅ Precargada según MINEDUC-2023-00008-A (13 grados, 8 áreas, malla curricular oficial) |
+| Paralelos por grado | A y B |
+| Total paralelos | 10 |
 | Alumnos por paralelo | 20 |
 | Total alumnos | 200 |
 | Docentes | 10 |
@@ -130,7 +135,7 @@ Estos documentos deben existir **antes** de crear el primer usuario estudiante. 
 - [ ] El dashboard muestra banner "Período en configuración — Paso 2 de 4"
 
 ### LOEI relevante
-Art. 42-43: La estructura de niveles EGB (1ro a 10mo) está definida por ley. Nuestro colegio cubre 1ro a 5to (Subnivel de Básica Elemental y Media).
+Art. 42-43: La estructura de niveles EGB (1ro a 10mo) y Bachillerato (1ro a 3ro) está precargada en el sistema según el Acuerdo MINEDUC-2023-00008-A. La malla curricular oficial viene por defecto — el admin solo crea los paralelos.
 
 ---
 
@@ -699,7 +704,7 @@ Muestra el estado de cada paralelo:
 | 0 | Documentos legales + verificar RAT endpoint | 1-2 días | LOPDP Art. 10k, 21 |
 | 1 | Crear período COSTA-2026 | 2 min | LOEI Art. 42-43 |
 | 2 | Crear 5 asignaturas (1EGB-5EGB) | 3 min | LOEI Art. 42-43 |
-| 3 | Crear 10 paralelos (paralelos) | 10 min | — |
+| 3 | Crear 10 paralelos (con grado_id) | 10 min | Estructura precargada → solo crear secciones |
 | 4 | Crear 10 docentes (batch) | 2 min | — |
 | 5 | Asignar docentes a paralelos | 10 min | — |
 | 6.1 | Crear 200 estudiantes (UI wizard CSV) | 2 min | — |
