@@ -275,6 +275,20 @@ public class EstructuraAcademicaService {
     }
 
     // ═══════════════════════════════════════════════════════════
+    //  MATRIZ (todas las mallas para la vista de matriz)
+    // ═══════════════════════════════════════════════════════════
+
+    /**
+     * Devuelve todas las entradas de malla curricular (sin filtro de grado).
+     * Útil para la vista Matriz (asignaturas × grados) en el frontend.
+     */
+    public List<MallaResponse> listarTodasLasMallas() {
+        return mallaRepository.findAll().stream()
+                .map(this::toMallaResponse)
+                .toList();
+    }
+
+    // ═══════════════════════════════════════════════════════════
     //  HELPERS
     // ═══════════════════════════════════════════════════════════
 

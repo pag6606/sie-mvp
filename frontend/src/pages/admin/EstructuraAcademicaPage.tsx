@@ -1,11 +1,12 @@
-import { useState, useMemo } from 'react'
-import { useQueryClient, useMutation } from '@tanstack/react-query'
+import { useState, useMemo, useEffect } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
 import { LoadingSkeleton, InlineError, ConfirmModal } from '@/components/UIPatterns'
 import {
   useEstructuraAcademica,
   useMalla,
+  useTodasLasMallas,
   useCrearNivel,
   useEliminarNivel,
   useCrearSubnivel,
@@ -55,7 +56,7 @@ export default function EstructuraAcademicaPage() {
   const { data: periodos = [] } = usePeriodos()
   const { data: asignaturas = [] } = useAsignaturas()
   const { data: areas = [] } = useAreas()
-  const queryClient = useQueryClient()
+  const { data: todasLasMallas = [] } = useTodasLasMallas()
 
   // ── Active tab ──
   const [activeTab, setActiveTab] = useState<HubTab>('estructura')
@@ -200,6 +201,7 @@ export default function EstructuraAcademicaPage() {
               arbol={arbol}
               asignaturas={asignaturas}
               areas={areas}
+              todasLasMallas={todasLasMallas}
               selectedGradoId={selectedGradoId}
               onSelectCell={(gradoId, _asigId) => {
                 setSelectedGradoId(gradoId)
@@ -227,12 +229,15 @@ export default function EstructuraAcademicaPage() {
                   setMallaFormError={setMallaFormError}
                   crearMallaMtn={crearMallaMtn}
                   eliminarMallaMtn={eliminarMallaMtn}
-                  onRefresh={() => queryClient.invalidateQueries({ queryKey: ['malla'] })}
+                  arbol={arbol}
+                  areas={areas}
+                  todasLasMallas={todasLasMallas}
+                  onSelectGrado={(id: string) => { setSelectedGradoId(id) }}
                 />
               )}
               {activeTab === 'asignaturas' && (
                 <TabAsignaturas asignaturas={asignaturas} areas={areas} arbol={arbol}
-                  onSelectGrado={(gradoId) => { setSelectedGradoId(gradoId); setActiveTab('estructura') }} />
+                  todasLasMallas={todasLasMallas} selectedGradoId={selectedGradoId} />
               )}
               {activeTab === 'paralelos' && (
                 <TabParalelos periodos={periodos} selectedPeriodo={selectedPeriodo}
@@ -337,13 +342,90 @@ function TreePanel({ arbol, selectedGradoId, onSelectGrado, onAddSubnivel, onAdd
 function TabEstructura({ gradoSeleccionado, malla, mallaLoading, asignaturas, selectedGradoId,
   showMallaForm, setShowMallaForm, mallaAsignaturaId, setMallaAsignaturaId, mallaHoras, setMallaHoras,
   mallaObligatoria, setMallaObligatoria, mallaFormError, setMallaFormError,
-  crearMallaMtn, eliminarMallaMtn }: any) {
+  crearMallaMtn, eliminarMallaMtn, arbol, areas, todasLasMallas, onSelectGrado }: any) {
 
   if (!selectedGradoId || !gradoSeleccionado) {
+    const niveles = arbol ?? []
+    const totalNiveles = niveles.length
+    const totalSubniveles = niveles.reduce((s: number, n: any) => s + n.subniveles.length, 0)
+    const totalGrados = niveles.reduce((s: number, n: any) => s + n.subniveles.reduce((s2: number, sn: any) => s2 + sn.grados.length, 0), 0)
+    const totalAsignaturas = asignaturas?.length ?? 0
+    const totalMallas = todasLasMallas?.length ?? 0
+    const totalAreas = areas?.length ?? 0
+    const totalHorasGlobal = todasLasMallas?.reduce((s: number, m: any) => s + m.horasSemanales, 0) ?? 0
+
     return (
-      <div className="rounded-lg border bg-card p-12 text-center">
-        <p className="text-lg text-muted-foreground">Selecciona un grado en el árbol izquierdo</p>
-        <p className="text-sm text-muted-foreground mt-1">Para ver y editar su malla curricular</p>
+      <div>
+        <h2 className="text-lg font-semibold mb-4">📊 Resumen Académico</h2>
+
+        {/* KPIs */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="rounded-lg border bg-card p-4 text-center">
+            <div className="text-2xl font-bold text-foreground">{totalNiveles}</div>
+            <div className="text-xs text-muted-foreground mt-1">Niveles</div>
+            <div className="text-[10px] text-muted-foreground">EGB · BGU</div>
+          </div>
+          <div className="rounded-lg border bg-card p-4 text-center">
+            <div className="text-2xl font-bold text-foreground">{totalSubniveles}</div>
+            <div className="text-xs text-muted-foreground mt-1">Subniveles</div>
+            <div className="text-[10px] text-muted-foreground">PREP · BE · BM · BS · BGU</div>
+          </div>
+          <div className="rounded-lg border bg-card p-4 text-center">
+            <div className="text-2xl font-bold text-foreground">{totalGrados}</div>
+            <div className="text-xs text-muted-foreground mt-1">Grados</div>
+            <div className="text-[10px] text-muted-foreground">1EGB → 3BGU</div>
+          </div>
+          <div className="rounded-lg border bg-card p-4 text-center">
+            <div className="text-2xl font-bold text-foreground">{totalAreas}</div>
+            <div className="text-xs text-muted-foreground mt-1">Áreas</div>
+            <div className="text-[10px] text-muted-foreground">{areas?.map((a: any) => a.codigo).join(' · ')}</div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="rounded-lg border bg-card p-4">
+            <div className="text-sm font-medium">Asignaturas</div>
+            <div className="text-3xl font-bold mt-1">{totalAsignaturas}</div>
+            <div className="text-xs text-muted-foreground mt-1">En el catálogo oficial MinEduc</div>
+          </div>
+          <div className="rounded-lg border bg-card p-4">
+            <div className="text-sm font-medium">Malla Curricular</div>
+            <div className="text-3xl font-bold mt-1">{totalMallas}</div>
+            <div className="text-xs text-muted-foreground mt-1">{totalHorasGlobal} períodos/semana en total</div>
+          </div>
+        </div>
+
+        {/* Grados por nivel con conteo de asignaturas */}
+        <h3 className="text-sm font-semibold mb-3">📘 Grados — haz clic en uno para ver su malla</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+          {niveles.map((nivel: any) => (
+            <div key={nivel.id} className="rounded-lg border bg-card p-3">
+              <div className="text-xs font-semibold text-muted-foreground mb-2">{nivel.codigo}</div>
+              {nivel.subniveles.map((sub: any) => (
+                <div key={sub.id} className="mb-2">
+                  <div className="text-[10px] text-muted-foreground">{sub.codigo}</div>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {sub.grados.map((g: any) => {
+                      const count = todasLasMallas?.filter((m: any) => m.gradoId === g.id).length ?? 0
+                      return (
+                        <button key={g.id}
+                          onClick={() => onSelectGrado?.(g.id)}
+                          className="px-2 py-1 rounded text-[10px] bg-muted hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer">
+                          {g.codigo}
+                          <span className="text-[9px] text-muted-foreground ml-1">({count})</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <p className="text-sm text-muted-foreground mt-4">
+          💡 Selecciona un grado en el árbol izquierdo o haz clic en 📊 Vista Matriz para el panorama completo
+        </p>
       </div>
     )
   }
@@ -448,18 +530,36 @@ function TabEstructura({ gradoSeleccionado, malla, mallaLoading, asignaturas, se
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  TAB: ASIGNATURAS (grouped by area)
+//  TAB: ASIGNATURAS (grouped by area, con filtro por nivel)
 // ═══════════════════════════════════════════════════════════════
-function TabAsignaturas({ asignaturas, areas, arbol, onSelectGrado }: {
-  asignaturas: any[]; areas: any[]; arbol: NivelTreeDTO[] | undefined; onSelectGrado: (gradoId: string) => void
+function TabAsignaturas({ asignaturas, areas, arbol, todasLasMallas, selectedGradoId }: {
+  asignaturas: any[]; areas: any[]; arbol: NivelTreeDTO[] | undefined; todasLasMallas: any[]; selectedGradoId: string | null
 }) {
   const [selectedArea, setSelectedArea] = useState<string>('')
   const [selectedNivel, setSelectedNivel] = useState<string>('')
 
-  // Agrupar asignaturas por área
+  // Sincronizar: cuando se selecciona un grado en el árbol, auto-filtrar su nivel
+  useEffect(() => {
+    if (selectedGradoId && arbol) {
+      for (const nivel of arbol) {
+        for (const sub of nivel.subniveles) {
+          if (sub.grados.some((g: any) => g.id === selectedGradoId)) {
+            setSelectedNivel(nivel.id)
+            return
+          }
+        }
+      }
+    }
+  }, [selectedGradoId, arbol])
+
+  // Agrupar asignaturas por área, filtrando por nivel seleccionado
   const areasConAsigs = areas.map(area => ({
     ...area,
-    asignaturas: asignaturas.filter(a => a.areaId === area.id)
+    // Filtro doble: por área Y por nivel (si seleccionado)
+    asignaturas: asignaturas.filter(a =>
+      a.areaId === area.id &&
+      (!selectedNivel || a.niveles?.some((n: any) => n.nivelId === selectedNivel))
+    )
   })).filter(a => a.asignaturas.length > 0)
 
   const filtered = selectedArea
@@ -467,6 +567,23 @@ function TabAsignaturas({ asignaturas, areas, arbol, onSelectGrado }: {
     : areasConAsigs
 
   const niveles = arbol ?? []
+
+  // Obtener los subniveles precisos para una asignatura desde la malla
+  const subnivelesDeAsignatura = (asigId: string) => {
+    const result: { codigo: string; grados: string[] }[] = []
+    const mallas = todasLasMallas.filter((m: any) => m.asignaturaId === asigId)
+    for (const nivel of arbol ?? []) {
+      for (const sub of nivel.subniveles) {
+        const gIds = sub.grados
+          .filter((g: any) => mallas.some((m: any) => m.gradoId === g.id))
+          .map((g: any) => g.codigo)
+        if (gIds.length > 0) {
+          result.push({ codigo: sub.codigo, grados: gIds })
+        }
+      }
+    }
+    return result
+  }
 
   return (
     <div>
@@ -481,11 +598,19 @@ function TabAsignaturas({ asignaturas, areas, arbol, onSelectGrado }: {
           <option value="">Todos los niveles</option>
           {niveles.map(n => <option key={n.id} value={n.id}>{n.codigo}</option>)}
         </select>
+        <span className="text-xs text-muted-foreground self-center">
+          {filtered.reduce((s, a) => s + a.asignaturas.length, 0)} asignaturas
+          {selectedNivel && ` en ${niveles.find(n => n.id === selectedNivel)?.codigo || ''}`}
+        </span>
       </div>
 
       {filtered.length === 0 ? (
         <div className="rounded-lg border bg-card p-8 text-center">
-          <p className="text-muted-foreground">No hay asignaturas en esta área</p>
+          <p className="text-muted-foreground">
+            {selectedNivel
+              ? 'No hay asignaturas en este nivel educativo'
+              : 'No hay asignaturas en esta área'}
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -497,35 +622,30 @@ function TabAsignaturas({ asignaturas, areas, arbol, onSelectGrado }: {
                 <span className="text-xs text-muted-foreground">({area.asignaturas.length} asignaturas)</span>
               </div>
               <div className="divide-y">
-                {area.asignaturas.map((asig: any) => (
-                  <div key={asig.id} className="px-4 py-3 hover:bg-muted/30 transition-colors">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="font-mono text-sm font-medium">{asig.codigo}</span>
-                        <span className="text-sm ml-2">{asig.nombre}</span>
+                {area.asignaturas.map((asig: any) => {
+                  const subs = subnivelesDeAsignatura(asig.id)
+                  return (
+                    <div key={asig.id} className="px-4 py-3 hover:bg-muted/30 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="font-mono text-sm font-medium">{asig.codigo}</span>
+                          <span className="text-sm ml-2">{asig.nombre}</span>
+                        </div>
                       </div>
+                      {subs.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {subs.map(sub => (
+                            <span key={sub.codigo}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-muted text-muted-foreground">
+                              📘 {sub.codigo}
+                              <span className="text-[9px] opacity-60">{sub.grados.join(', ')}</span>
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    {asig.niveles && asig.niveles.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {asig.niveles.map((n: any) => {
-                          // Find all grados for this nivel + asignatura via arbol
-                          const gradosEnNivel = arbol?.find(a => a.id === n.nivelId)
-                            ?.subniveles.flatMap(s => s.grados) ?? []
-                          return gradosEnNivel.length > 0 ? (
-                            <button key={n.nivelId} onClick={() => {
-                              // select first grade of this nivel
-                              onSelectGrado(gradosEnNivel[0].id)
-                            }}
-                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-muted hover:bg-primary/10 text-muted-foreground hover:text-foreground transition-colors">
-                              📘 {n.nivelCodigo}
-                              <span className="text-[9px] opacity-60">{gradosEnNivel.length} grados</span>
-                            </button>
-                          ) : null
-                        })}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           ))}
@@ -729,40 +849,53 @@ function TabParalelos({ periodos, selectedPeriodo, onPeriodoChange, selectedGrad
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  VISTA MATRIZ (asignaturas × grados)
+//  VISTA MATRIZ (asignaturas × grados) — con datos reales de malla
 // ═══════════════════════════════════════════════════════════════
-function VistaMatriz({ arbol, asignaturas, areas, selectedGradoId, onSelectCell }: {
-  arbol: NivelTreeDTO[] | undefined; asignaturas: any[]; areas: any[]; selectedGradoId: string | null; onSelectCell: (gradoId: string, asigId: string) => void
+function VistaMatriz({ arbol, asignaturas, areas, todasLasMallas, selectedGradoId, onSelectCell }: {
+  arbol: NivelTreeDTO[] | undefined; asignaturas: any[]; areas: any[]; todasLasMallas: any[]
+  selectedGradoId: string | null; onSelectCell: (gradoId: string, asigId: string) => void
 }) {
   const [selectedNivelMatriz, setSelectedNivelMatriz] = useState<string>('')
   const grados = arbol?.flatMap(n => n.subniveles).flatMap(s => s.grados) ?? []
   const niveles = arbol ?? []
 
+  // Filtro por nivel
   const gradosFiltrados = selectedNivelMatriz
-    ? grados.filter(g => g.subnivelId && niveles.find(n => n.subniveles.some(s => s.grados.some(sg => sg.id === g.id))))
+    ? grados.filter(g => {
+        const nivel = niveles.find(n => n.subniveles.some(s => s.grados.some(sg => sg.id === g.id)))
+        return nivel?.id === selectedNivelMatriz
+      })
     : grados
+
+  // Set para lookup rápido: "asignaturaId-gradoId" → exists
+  const mallaSet = new Set(todasLasMallas.map((m: any) => `${m.asignaturaId}-${m.gradoId}`))
 
   // Agrupar asignaturas por área
   const areasConAsigs = areas.map(area => ({
     ...area,
     asignaturas: asignaturas.filter(a => a.areaId === area.id)
-  })).filter(a => a.asignaturas.length > 0)
+  })).filter(a => a.asignaturas.length > 0 && a.asignaturas.some((asig: any) =>
+    todasLasMallas.some((m: any) => m.asignaturaId === asig.id)
+  ))
 
   return (
     <div className="overflow-x-auto">
-      <div className="mb-3">
+      <div className="mb-3 flex gap-3">
         <select value={selectedNivelMatriz} onChange={e => setSelectedNivelMatriz(e.target.value)}
           className="rounded border border-input px-3 py-1.5 text-sm">
           <option value="">Todos los niveles</option>
           {niveles.map(n => <option key={n.id} value={n.id}>{n.codigo}</option>)}
         </select>
+        <span className="text-xs text-muted-foreground self-center">
+          {areasConAsigs.reduce((s: number, a: any) => s + a.asignaturas.length, 0)} asignaturas en {todasLasMallas.length} registros de malla
+        </span>
       </div>
 
       <div className="rounded-lg border bg-card" style={{ maxHeight: '60vh', overflow: 'auto' }}>
         <table className="w-full text-xs">
           <thead className="sticky top-0 bg-muted z-10">
             <tr>
-              <th className="px-2 py-1.5 text-left font-medium text-muted-foreground min-w-[120px]">Área / Asignatura</th>
+              <th className="px-2 py-1.5 text-left font-medium text-muted-foreground min-w-[130px]">Área / Asignatura</th>
               {gradosFiltrados.map(g => (
                 <th key={g.id} className={`px-2 py-1.5 text-center font-medium min-w-[48px] ${
                   selectedGradoId === g.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground'
@@ -774,32 +907,36 @@ function VistaMatriz({ arbol, asignaturas, areas, selectedGradoId, onSelectCell 
           </thead>
           <tbody>
             {areasConAsigs.map(area => (
-              <>
-                <tr key={area.id} className="bg-muted/20">
-                  <td className="px-2 py-1 font-medium flex items-center gap-1 text-[11px]">
-                    {areaBadge(area.codigo, null)} {area.nombre}
-                  </td>
-                  {gradosFiltrados.map(g => <td key={g.id} className="px-2 py-1"></td>)}
-                </tr>
-                {area.asignaturas.map((asig: any) => (
-                  <tr key={asig.id} className="border-t hover:bg-muted/30">
-                    <td className="px-2 py-1 text-[11px] font-mono">{asig.codigo}</td>
-                    {gradosFiltrados.map(g => {
-                      const enMalla = grados.some(sg => sg.subnivelId === g.subnivelId && sg.id === g.id)
-                      return (
-                        <td key={g.id}
-                          onClick={() => onSelectCell(g.id, asig.id)}
-                          className={`px-2 py-1 text-center text-[10px] cursor-pointer transition-colors ${
-                            enMalla ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'text-muted-foreground/30 hover:bg-muted'
-                          }`}>
-                          {enMalla ? '✓' : '·'}
-                        </td>
-                      )
-                    })}
-                  </tr>
-                ))}
-              </>
+              <tr key={area.id} className="bg-muted/20" data-area={area.codigo}>
+                <td className="px-2 py-1 font-medium flex items-center gap-1 text-[11px]">
+                  {areaBadge(area.codigo, null)} {area.nombre}
+                  <span className="text-[9px] text-muted-foreground ml-1">({area.asignaturas.length})</span>
+                </td>
+                {gradosFiltrados.map(g => <td key={g.id} className="px-2 py-1"></td>)}
+              </tr>
             ))}
+            {areasConAsigs.map(area =>
+              area.asignaturas.map((asig: any) => (
+                <tr key={asig.id} className="border-t hover:bg-muted/30">
+                  <td className="px-2 py-1 text-[11px] font-mono">{asig.codigo}</td>
+                  {gradosFiltrados.map(g => {
+                    const incluida = mallaSet.has(`${asig.id}-${g.id}`)
+                    const mallaEntry = incluida && todasLasMallas.find((m: any) => m.asignaturaId === asig.id && m.gradoId === g.id)
+                    return (
+                      <td key={g.id}
+                        onClick={() => onSelectCell(g.id, asig.id)}
+                        className={`px-2 py-1 text-center text-[10px] cursor-pointer transition-colors ${
+                          incluida
+                            ? 'bg-green-50 text-green-700 hover:bg-green-100 font-medium'
+                            : 'text-gray-200 hover:bg-muted'
+                        }`}>
+                        {incluida ? (mallaEntry?.horasSemanales || '✓') : '·'}
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

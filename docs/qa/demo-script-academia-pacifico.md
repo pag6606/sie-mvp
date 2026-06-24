@@ -99,10 +99,14 @@ cd frontend && npm run dev -- --host
 > *"Y si quiere ver el panorama completo de toda la institución, un clic."*
 
 **Señalar:**
-- Filas: asignaturas agrupadas por área
-- Columnas: los 13 grados
-- Celdas verdes con ✓: la asignatura se dicta en ese grado
-- Celdas vacías: gap curricular visible
+- Filas: asignaturas agrupadas por área (con su código)
+- Columnas: los 13 grados (1EGB → 3BGU)
+- Celdas con número: las horas semanales de esa asignatura en ese grado
+- Celdas vacías: la asignatura no se dicta en ese grado (gap visible)
+
+> *"Vea: Matemáticas aparece en casi todos los grados, pero con distintas horas — 25h en 1EGB, 6h en 2EGB-10EGB, 5h en BGU. En cambio Física y Química solo aparecen en Bachillerato. Filosofía solo en 1BGU y 2BGU. El sistema respeta exactamente el plan de estudios del MinEduc: cada asignatura en sus grados correctos, con sus horas exactas."*
+
+> *"¿Ve algún espacio en blanco donde debería haber una materia? Ese es un gap que el sistema hace visible. En Runachay o en Excel, esto sería invisible."*
 
 > *"¿Ve algún espacio en blanco donde debería haber una materia? Ese es un gap que el sistema hace visible. En Runachay o en Excel, esto sería invisible."*
 

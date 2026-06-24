@@ -213,8 +213,11 @@ public class AcademicoController {
     }
 
     @GetMapping("/malla")
-    public List<MallaResponse> listarMalla(@RequestParam UUID gradoId) {
-        return estructuraService.listarMalla(gradoId);
+    public List<MallaResponse> listarMalla(@RequestParam(required = false) UUID gradoId) {
+        if (gradoId != null) {
+            return estructuraService.listarMalla(gradoId);
+        }
+        return estructuraService.listarTodasLasMallas();
     }
 
     @PostMapping("/malla")

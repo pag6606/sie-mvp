@@ -102,6 +102,15 @@ export function useMalla(gradoId: string | undefined) {
   })
 }
 
+export function useTodasLasMallas() {
+  return useQuery<MallaDTO[]>({
+    queryKey: ['malla', 'todas'],
+    queryFn: () => api.get('/malla').then(r => r.data),
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  })
+}
+
 // ── Mutaciones ──
 
 export function useCrearNivel() {
