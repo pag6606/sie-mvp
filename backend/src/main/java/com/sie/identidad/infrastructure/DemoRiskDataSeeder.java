@@ -401,10 +401,9 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         return admins.isEmpty() ? null : admins.get(0).getId();
     }
 
-    // ── MATRICULAR USUARIO DEMO (Ernesto) ──
+    // ── MATRICULAR USUARIO DEMO (Ernesto) en TODOS los paralelos ──
     private void enrollDemoUsers() {
         try {
-            // Buscar el usuario demo por email
             List<Usuario> estudiantes = em.createQuery(
                     "SELECT u FROM Usuario u WHERE u.email = :email AND u.colegioId = :colegio", Usuario.class)
                     .setParameter("email", "ernesto@colegio.edu.ec")
@@ -414,46 +413,51 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
                 log.warn("  enrollDemoUsers: No se encontró usuario ernesto@colegio.edu.ec");
                 return;
             }
-
             if (paraleloIds.isEmpty()) {
                 log.warn("  enrollDemoUsers: No hay paralelos disponibles");
                 return;
             }
 
-            UUID paraleloId = paraleloIds.values().iterator().next();
-
             for (Usuario est : estudiantes) {
-                Long count = em.createQuery(
-                        "SELECT COUNT(m) FROM Matricula m WHERE m.estudianteId = :estId AND m.paraleloId = :parId",
-                        Long.class)
+                int matriculados = 0;
+                // Registrar consentimiento solo una vez
+                Long consCount = em.createQuery(
+                        "SELECT COUNT(c) FROM Consentimiento c WHERE c.estudianteId = :estId", Long.class)
                         .setParameter("estId", est.getId())
-                        .setParameter("parId", paraleloId)
                         .getSingleResult();
-                if (count > 0) {
-                    log.info("  Demo user ya matriculado: {}", est.getEmail());
-                    continue;
+                if (consCount == 0) {
+                    Consentimiento c = new Consentimiento();
+                    c.setEstudianteId(est.getId());
+                    c.setRepresentanteNombre("Representante de " + est.getNombre());
+                    c.setRepresentanteCedula("0999999999");
+                    c.setRepresentanteEmail("demo@familia.edu.ec");
+                    c.setTipo("PARENTAL");
+                    c.setAceptado(true);
+                    c.setFechaOtorgamiento(LocalDateTime.now());
+                    c.setColegioId(COLEGIO_ID);
+                    em.persist(c);
+                    log.info("  Consentimiento registrado para {}", est.getEmail());
                 }
 
-                // Registrar consentimiento parental (LOPDP Art. 21)
-                Consentimiento c = new Consentimiento();
-                c.setEstudianteId(est.getId());
-                c.setRepresentanteNombre("Representante de " + est.getNombre());
-                c.setRepresentanteCedula("0999999999");
-                c.setRepresentanteEmail("demo@familia.edu.ec");
-                c.setTipo("PARENTAL");
-                c.setAceptado(true);
-                c.setFechaOtorgamiento(LocalDateTime.now());
-                c.setColegioId(COLEGIO_ID);
-                em.persist(c);
+                for (UUID paraleloId : paraleloIds.values()) {
+                    Long count = em.createQuery(
+                            "SELECT COUNT(m) FROM Matricula m WHERE m.estudianteId = :estId AND m.paraleloId = :parId",
+                            Long.class)
+                            .setParameter("estId", est.getId())
+                            .setParameter("parId", paraleloId)
+                            .getSingleResult();
+                    if (count > 0) continue;
 
-                Matricula m = new Matricula();
-                m.setColegioId(COLEGIO_ID);
-                m.setEstudianteId(est.getId());
-                m.setParaleloId(paraleloId);
-                m.setFecha(LocalDateTime.now());
-                m.setEstado(EstadoMatricula.ACTIVA);
-                em.persist(m);
-                log.info("  Demo user matriculado: {} → {}", est.getEmail(), paraleloId);
+                    Matricula m = new Matricula();
+                    m.setColegioId(COLEGIO_ID);
+                    m.setEstudianteId(est.getId());
+                    m.setParaleloId(paraleloId);
+                    m.setFecha(LocalDateTime.now());
+                    m.setEstado(EstadoMatricula.ACTIVA);
+                    em.persist(m);
+                    matriculados++;
+                }
+                log.info("  Demo user matriculado en {} paralelos: {}", matriculados, est.getEmail());
             }
         } catch (Exception e) {
             log.error("  enrollDemoUsers falló: {}", e.getMessage());
