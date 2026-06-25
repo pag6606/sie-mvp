@@ -60,7 +60,7 @@ public class CalificacionesService {
             var asistencias = q.getResultList();
             long presentes = asistencias.stream().filter(a -> a.getEstado() != EstadoAsistencia.AUSENTE).count();
             double pct = asistencias.isEmpty() ? 0 : (double) presentes / asistencias.size() * 100;
-            return new AsistenciaResponse(m.getId(), m.getEstudianteId(), nombreEstudiante(m.getEstudianteId()), pct, asistencias.size(), (int) presentes);
+            return new AsistenciaResponse(m.getId(), m.getEstudianteId(), nombreEstudiante(m.getEstudianteId()), "", pct, asistencias.size(), (int) presentes);
         }).toList();
     }
 
@@ -146,7 +146,7 @@ public class CalificacionesService {
                     .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(1, RoundingMode.HALF_UP)
                     : null;
 
-            return new NotaResponse(m.getId(), m.getEstudianteId(), nombreEstudiante(m.getEstudianteId()), calculada, componentes);
+            return new NotaResponse(m.getId(), m.getEstudianteId(), nombreEstudiante(m.getEstudianteId()), "", calculada, componentes);
         }).toList();
     }
 
@@ -200,8 +200,22 @@ public class CalificacionesService {
 
     public List<NotaResponse> misNotas(UUID estudianteId) {
         return matriculaRepository.findByEstudianteId(estudianteId).stream()
-                .flatMap(m -> obtenerNotas(m.getParaleloId()).stream()
-                        .filter(n -> n.estudianteId().equals(estudianteId))) // filter to this student
+                .flatMap(m -> {
+                    final String cursoNombre;
+                    try {
+                        Paralelo p = em.find(Paralelo.class, m.getParaleloId());
+                        if (p != null && p.getAsignatura() != null) {
+                            cursoNombre = p.getAsignatura().getNombre();
+                        } else {
+                            cursoNombre = "";
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    return obtenerNotas(m.getParaleloId()).stream()
+                            .filter(n -> n.estudianteId().equals(estudianteId))
+                            .map(n -> new NotaResponse(n.matriculaId(), n.estudianteId(), n.estudianteNombre(), cursoNombre, n.notaFinal(), n.componentes()));
+                })
                 .toList();
     }
 
@@ -222,7 +236,7 @@ public class CalificacionesService {
                         }
                     } catch (Exception ignored) {}
                     return new AsistenciaResponse(m.getId(), m.getEstudianteId(),
-                            nombreAsignatura.isEmpty() ? nombreEstudiante(m.getEstudianteId()) : nombreAsignatura,
+                            nombreEstudiante(m.getEstudianteId()), nombreAsignatura,
                             pct, asistencias.size(), (int) presentes);
                 })
                 .toList();
@@ -242,10 +256,10 @@ public class CalificacionesService {
     // ── DTOs ──
 
     public record AsistenciaEntry(UUID matriculaId, EstadoAsistencia estado) {}
-    public record AsistenciaResponse(UUID matriculaId, UUID estudianteId, String estudianteNombre, double porcentaje, int totalSesiones, int presentes) {}
+    public record AsistenciaResponse(UUID matriculaId, UUID estudianteId, String estudianteNombre, String cursoNombre, double porcentaje, int totalSesiones, int presentes) {}
     public record ComponenteEntry(String nombre, BigDecimal peso) { public ComponenteEntry(String n, double p) { this(n, BigDecimal.valueOf(p)); } }
     public record NotaEntry(UUID matriculaId, UUID componenteId, BigDecimal valor) {}
     public record ComponenteNota(UUID componenteId, String nombre, BigDecimal peso, BigDecimal valor) {}
-    public record NotaResponse(UUID matriculaId, UUID estudianteId, String estudianteNombre, BigDecimal notaFinal, List<ComponenteNota> componentes) {}
+    public record NotaResponse(UUID matriculaId, UUID estudianteId, String estudianteNombre, String cursoNombre, BigDecimal notaFinal, List<ComponenteNota> componentes) {}
     public record CierreStatusResponse(UUID paraleloId, String codigo, String asignatura, String estado) {}
 }

@@ -7,8 +7,8 @@ import AppLayout from '@/components/AppLayout'
 import { PageHead } from '@/components/ghanima'
 
 interface MatriculaData { id: string; estudianteId: string; paraleloId: string; estudianteNombre: string; cursoNombre: string }
-interface NotaResp { cursoNombre?: string; notaFinal: number; componentes: { nombre: string; peso: number; valor: number }[] }
-interface AsistenciaResp { cursoNombre?: string; porcentaje: number; totalSesiones: number; presentes: number }
+interface NotaResp { cursoNombre: string; notaFinal: number; componentes: { nombre: string; peso: number; valor: number }[] }
+interface AsistenciaResp { cursoNombre: string; porcentaje: number; totalSesiones: number; presentes: number }
 
 export default function EstudianteDashboard() {
   const [tab, setTab] = useState<'horario' | 'notas'>('horario')
@@ -119,7 +119,7 @@ function NotasTab({ notas, asistencia, onBoletin }: { notas: NotaResp[]; asisten
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-semibold text-foreground text-sm">
-                    {n.cursoNombre || 'Sección (paralelo)'}
+                    {n.cursoNombre}
                   </p>
                   <div className="mt-2 space-y-1">
                     {n.componentes.map((c, ci) => (
@@ -163,7 +163,7 @@ function NotasTab({ notas, asistencia, onBoletin }: { notas: NotaResp[]; asisten
               <div key={i}>
                 <div className="flex justify-between mb-1.5">
                   <span className="text-sm font-medium text-foreground">
-                    {a.cursoNombre || `Materia ${i + 1}`}
+                    {a.cursoNombre}
                   </span>
                   <span className="text-sm font-bold text-foreground">{Math.round(a.porcentaje)}%</span>
                 </div>
