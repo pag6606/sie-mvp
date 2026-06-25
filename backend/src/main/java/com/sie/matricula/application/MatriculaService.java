@@ -105,7 +105,13 @@ public class MatriculaService {
     public List<MatriculaResponse> listarPorEstudiante(UUID estudianteId) {
         var usuario = usuarioRepository.findById(estudianteId).orElse(null);
         return matriculaRepository.findByEstudianteId(estudianteId).stream()
-                .map(m -> toResponse(m, usuario != null ? usuario.getNombre() : "", ""))
+                .map(m -> {
+                    var paralelo = paraleloRepository.findById(m.getParaleloId()).orElse(null);
+                    var nombreAsignatura = paralelo != null && paralelo.getAsignatura() != null
+                            ? paralelo.getAsignatura().getNombre()
+                            : "";
+                    return toResponse(m, usuario != null ? usuario.getNombre() : "", nombreAsignatura);
+                })
                 .toList();
     }
 

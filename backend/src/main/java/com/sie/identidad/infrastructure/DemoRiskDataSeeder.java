@@ -88,10 +88,10 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         createParaleloes();
         createEstudiantes();
         enrollEstudiantes();
+        enrollDemoUsers();
         assignDocente();
         createEsquemasYNotas();
         createAsistencias();
-        enrollDemoUsers();
 
         log.info("DemoRiskDataSeeder: COMPLETADO. {} asignaturas, {} paralelos, {} estudiantes.",
                 CURSO_NOMBRES.length, paraleloIds.size(), estudianteIds.size());
@@ -325,6 +325,7 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
                 em.persist(ce);
                 compIds.add(ce.getId());
             }
+            em.flush(); // asegura que los componentes estén en BD antes de las notas
 
             // Obtener matrículas de esta sección
             List<Matricula> matriculas = em.createQuery(
@@ -402,44 +403,60 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
 
     // ── MATRICULAR USUARIO DEMO (Ernesto) ──
     private void enrollDemoUsers() {
-        List<Usuario> estudiantes = em.createQuery(
-                "SELECT u FROM Usuario u WHERE u.email IN :emails AND u.colegioId = :colegio", Usuario.class)
-                .setParameter("emails", List.of("ernesto@colegio.edu.ec"))
-                .setParameter("colegio", COLEGIO_ID)
-                .getResultList();
-        if (estudiantes.isEmpty()) return;
+        try {
+            // Buscar el usuario demo por email
+            List<Usuario> estudiantes = em.createQuery(
+                    "SELECT u FROM Usuario u WHERE u.email = :email AND u.colegioId = :colegio", Usuario.class)
+                    .setParameter("email", "ernesto@colegio.edu.ec")
+                    .setParameter("colegio", COLEGIO_ID)
+                    .getResultList();
+            if (estudiantes.isEmpty()) {
+                log.warn("  enrollDemoUsers: No se encontró usuario ernesto@colegio.edu.ec");
+                return;
+            }
 
-        UUID paraleloId = paraleloIds.values().iterator().next();
+            if (paraleloIds.isEmpty()) {
+                log.warn("  enrollDemoUsers: No hay paralelos disponibles");
+                return;
+            }
 
-        for (Usuario est : estudiantes) {
-            Long count = em.createQuery(
-                    "SELECT COUNT(m) FROM Matricula m WHERE m.estudianteId = :estId AND m.paraleloId = :parId AND m.estado = 'ACTIVA'",
-                    Long.class)
-                    .setParameter("estId", est.getId())
-                    .setParameter("parId", paraleloId)
-                    .getSingleResult();
-            if (count > 0) continue;
+            UUID paraleloId = paraleloIds.values().iterator().next();
 
-            // Registrar consentimiento parental (LOPDP Art. 21)
-            Consentimiento c = new Consentimiento();
-            c.setEstudianteId(est.getId());
-            c.setRepresentanteNombre("Representante de " + est.getNombre());
-            c.setRepresentanteCedula("0999999999");
-            c.setRepresentanteEmail("demo@familia.edu.ec");
-            c.setTipo("PARENTAL");
-            c.setAceptado(true);
-            c.setFechaOtorgamiento(LocalDateTime.now());
-            c.setColegioId(COLEGIO_ID);
-            em.persist(c);
+            for (Usuario est : estudiantes) {
+                Long count = em.createQuery(
+                        "SELECT COUNT(m) FROM Matricula m WHERE m.estudianteId = :estId AND m.paraleloId = :parId",
+                        Long.class)
+                        .setParameter("estId", est.getId())
+                        .setParameter("parId", paraleloId)
+                        .getSingleResult();
+                if (count > 0) {
+                    log.info("  Demo user ya matriculado: {}", est.getEmail());
+                    continue;
+                }
 
-            Matricula m = new Matricula();
-            m.setColegioId(COLEGIO_ID);
-            m.setEstudianteId(est.getId());
-            m.setParaleloId(paraleloId);
-            m.setFecha(LocalDateTime.now());
-            m.setEstado(EstadoMatricula.ACTIVA);
-            em.persist(m);
-            log.info("  Demo user matriculado: {} → {}", est.getEmail(), paraleloId);
+                // Registrar consentimiento parental (LOPDP Art. 21)
+                Consentimiento c = new Consentimiento();
+                c.setEstudianteId(est.getId());
+                c.setRepresentanteNombre("Representante de " + est.getNombre());
+                c.setRepresentanteCedula("0999999999");
+                c.setRepresentanteEmail("demo@familia.edu.ec");
+                c.setTipo("PARENTAL");
+                c.setAceptado(true);
+                c.setFechaOtorgamiento(LocalDateTime.now());
+                c.setColegioId(COLEGIO_ID);
+                em.persist(c);
+
+                Matricula m = new Matricula();
+                m.setColegioId(COLEGIO_ID);
+                m.setEstudianteId(est.getId());
+                m.setParaleloId(paraleloId);
+                m.setFecha(LocalDateTime.now());
+                m.setEstado(EstadoMatricula.ACTIVA);
+                em.persist(m);
+                log.info("  Demo user matriculado: {} → {}", est.getEmail(), paraleloId);
+            }
+        } catch (Exception e) {
+            log.error("  enrollDemoUsers falló: {}", e.getMessage());
         }
     }
 }
