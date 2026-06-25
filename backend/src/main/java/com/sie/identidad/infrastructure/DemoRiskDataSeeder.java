@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +35,11 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
     private static final String[] PARALELOS = {"A", "B"};
 
     private final GradoRepository gradoRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DemoRiskDataSeeder(GradoRepository gradoRepository) {
+    public DemoRiskDataSeeder(GradoRepository gradoRepository, PasswordEncoder passwordEncoder) {
         this.gradoRepository = gradoRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     private static final String[] ESTUDIANTE_NOMBRES = {
@@ -88,6 +91,7 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
         assignDocente();
         createEsquemasYNotas();
         createAsistencias();
+        enrollDemoUsers();
 
         log.info("DemoRiskDataSeeder: COMPLETADO. {} asignaturas, {} paralelos, {} estudiantes.",
                 CURSO_NOMBRES.length, paraleloIds.size(), estudianteIds.size());
@@ -220,7 +224,7 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
             u.setColegioId(COLEGIO_ID);
             u.setEmail("est" + (i + 1) + "@colegio.edu.ec");
             u.setNombre(i < ESTUDIANTE_NOMBRES.length ? ESTUDIANTE_NOMBRES[i] : "Estudiante " + (i + 1));
-            u.setHashPassword("$2a$12$dummy1234567890123456789012");
+            u.setHashPassword(passwordEncoder.encode("Estudiante1!"));
             u.setActivo(true);
             u.setPrimerLogin(false);
             em.persist(u);
@@ -394,5 +398,48 @@ public class DemoRiskDataSeeder implements CommandLineRunner {
                 .setParameter("codigo", RolCodigo.ADMINISTRADOR).setParameter("colegio", COLEGIO_ID)
                 .getResultList();
         return admins.isEmpty() ? null : admins.get(0).getId();
+    }
+
+    // ── MATRICULAR USUARIO DEMO (Ernesto) ──
+    private void enrollDemoUsers() {
+        List<Usuario> estudiantes = em.createQuery(
+                "SELECT u FROM Usuario u WHERE u.email IN :emails AND u.colegioId = :colegio", Usuario.class)
+                .setParameter("emails", List.of("ernesto@colegio.edu.ec"))
+                .setParameter("colegio", COLEGIO_ID)
+                .getResultList();
+        if (estudiantes.isEmpty()) return;
+
+        UUID paraleloId = paraleloIds.values().iterator().next();
+
+        for (Usuario est : estudiantes) {
+            Long count = em.createQuery(
+                    "SELECT COUNT(m) FROM Matricula m WHERE m.estudianteId = :estId AND m.paraleloId = :parId AND m.estado = 'ACTIVA'",
+                    Long.class)
+                    .setParameter("estId", est.getId())
+                    .setParameter("parId", paraleloId)
+                    .getSingleResult();
+            if (count > 0) continue;
+
+            // Registrar consentimiento parental (LOPDP Art. 21)
+            Consentimiento c = new Consentimiento();
+            c.setEstudianteId(est.getId());
+            c.setRepresentanteNombre("Representante de " + est.getNombre());
+            c.setRepresentanteCedula("0999999999");
+            c.setRepresentanteEmail("demo@familia.edu.ec");
+            c.setTipo("PARENTAL");
+            c.setAceptado(true);
+            c.setFechaOtorgamiento(LocalDateTime.now());
+            c.setColegioId(COLEGIO_ID);
+            em.persist(c);
+
+            Matricula m = new Matricula();
+            m.setColegioId(COLEGIO_ID);
+            m.setEstudianteId(est.getId());
+            m.setParaleloId(paraleloId);
+            m.setFecha(LocalDateTime.now());
+            m.setEstado(EstadoMatricula.ACTIVA);
+            em.persist(m);
+            log.info("  Demo user matriculado: {} → {}", est.getEmail(), paraleloId);
+        }
     }
 }
