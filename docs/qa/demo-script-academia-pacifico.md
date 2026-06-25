@@ -22,6 +22,7 @@ cd frontend && npm run dev -- --host
 - [ ] Estructura precargada: 2 niveles, 5 subniveles, 13 grados, 8 áreas, 19 asignaturas, 123 mallas
 - [ ] Alerta Temprana: 6 paralelos con datos de riesgo (90 estudiantes)
 - [ ] Mailpit en `http://localhost:8025` (para verificar emails)
+- [ ] Padre de familia: `padre@familia.edu.ec` / `Admin123!!` vinculado a Ernesto
 
 ---
 
@@ -197,7 +198,7 @@ cd frontend && npm run dev -- --host
 **Esquema de evaluación:**
 *[Click en Esquema de Evaluación]*
 
-> *"Diana define cómo va a evaluar: Tareas 30%, Participación 20%, Parcial 25%, Final 25%. El sistema valida que sume 100%. Y vienen 4 componentes estándar MinEduc precargados — no tiene que inventarlos."*
+> *"Diana define cómo va a evaluar: Tareas 30%, Participación 20%, Parcial 25%, Final 25%. El sistema valida que sume 100%."*
 
 **Notas:**
 *[Click en Notas]*
@@ -210,14 +211,30 @@ cd frontend && npm run dev -- --host
 
 > *"Y el estudiante también tiene acceso. Ernesto entra y ve su panel."*
 
-**Mostrar EstudianteDashboard:**
-- Horario
-- Calificaciones por asignatura
-- Asistencia
+**Mostrar:**
+- **Horario**: Lista de sus 6 paralelos con el nombre real de cada materia: Matemática, Lengua y Literatura, Ciencias Naturales, Estudios Sociales, Inglés, Computación
+- **Notas**: Cada materia con sus componentes (Tareas 9.6/10, Participación 8.7/10, etc.) y la nota final calculada (9.2)
+- **Asistencia**: Barra de progreso por materia con porcentaje y conteo: "Matemática — 93% (14/15 sesiones)"
 
 *[Click en Mi Boletín]*
 
-> *"Y puede descargar su boletín en PDF — con las notas, asistencia y observaciones. Formato oficial listo para imprimir."*
+> *"Y puede descargar su boletín en PDF — con todas las materias, notas y asistencia."*
+
+### 4c. Carlos — El padre de familia (1 minuto) 🆕
+
+*[Logout → Login como padre@familia.edu.ec / Admin123!!]*
+
+> *"Y el padre de familia también tiene acceso. Carlos, papá de Ernesto, entra y ve exactamente lo mismo que el estudiante — sin necesidad de llamar a secretaría."*
+
+**Mostrar PadreDashboard:**
+- Información del hijo vinculado (Ernesto López)
+- **Calificaciones**: Mismas 6 materias con notas finales
+- **Asistencia**: Mismos porcentajes que ve el estudiante
+- **Consentimiento**: Estado del consentimiento parental
+
+> *"El padre ve las mismas calificaciones y asistencia que el estudiante. En tiempo real. Sin esperar a que le entreguen un boletín impreso."*
+
+> *"Y si el padre quiere revocar el consentimiento de datos, puede hacerlo desde aquí — el sistema bloquea la matrícula automáticamente cumpliendo la LOPDP Artículo 21."*
 
 ---
 
@@ -282,7 +299,7 @@ cd frontend && npm run dev -- --host
 | 0-2 | Apertura | Diagnóstico: 3 problemas que el colegio tiene hoy |
 | 2-5 | Hub Académico | Estructura EGB/BGU + malla MinEduc precargada + áreas + matriz + paralelos |
 | 5-8 | Alerta Temprana | Semáforo de riesgo + drill-down + 3 perfiles de estudiante |
-| 8-12 | Diana + Ernesto | Asistencia, notas, esquema, boletín — el día a día real |
+| 8-12 | Diana + Ernesto + Carlos | Asistencia, notas, esquema, boletín + vista del padre de familia 🆕 |
 | 12-14 | Wizard + CSV | Configuración de período en 3 min + importación 200 estudiantes en 2 min |
 | 14-15 | LOPDP + Cierre | Cumplimiento legal + pregunta que quedó resonando |
 
@@ -298,6 +315,9 @@ cd frontend && npm run dev -- --host
 
 **"¿La malla curricular se puede modificar?"**
 > *"Sí. La malla viene precargada según el Acuerdo Ministerial 2023-00008-A, pero el administrador puede añadir, editar o eliminar asignaturas por grado. La autonomía pedagógica está garantizada."*
+
+**"¿Pueden los padres ver las calificaciones en línea?"**
+> *"Sí. El padre tiene su propio acceso con un rol específico. Ve exactamente las mismas calificaciones y asistencia que el estudiante, en tiempo real. Y puede gestionar el consentimiento parental desde su cuenta."*
 
 **"¿Funciona sin internet?"**
 > *"Todo corre en su servidor local. Si su colegio tiene electricidad, SIE funciona."*
