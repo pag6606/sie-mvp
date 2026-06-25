@@ -207,7 +207,24 @@ public class CalificacionesService {
 
     public List<AsistenciaResponse> miAsistencia(UUID estudianteId) {
         return matriculaRepository.findByEstudianteId(estudianteId).stream()
-                .flatMap(m -> obtenerAsistencia(m.getParaleloId(), LocalDate.now().minusYears(1), LocalDate.now()).stream())
+                .map(m -> {
+                    var q = em.createQuery("SELECT a FROM Asistencia a WHERE a.matriculaId=?1", Asistencia.class);
+                    q.setParameter(1, m.getId());
+                    var asistencias = q.getResultList();
+                    long presentes = asistencias.stream().filter(a -> a.getEstado() != EstadoAsistencia.AUSENTE).count();
+                    double pct = asistencias.isEmpty() ? 0 : (double) presentes / asistencias.size() * 100;
+                    // Buscar el nombre de la asignatura asociada a esta matrícula
+                    String nombreAsignatura = "";
+                    try {
+                        var p = em.find(Paralelo.class, m.getParaleloId());
+                        if (p != null && p.getAsignatura() != null) {
+                            nombreAsignatura = p.getAsignatura().getNombre();
+                        }
+                    } catch (Exception ignored) {}
+                    return new AsistenciaResponse(m.getId(), m.getEstudianteId(),
+                            nombreAsignatura.isEmpty() ? nombreEstudiante(m.getEstudianteId()) : nombreAsignatura,
+                            pct, asistencias.size(), (int) presentes);
+                })
                 .toList();
     }
 
