@@ -36,6 +36,16 @@ public class GlobalExceptionHandler {
         ));
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalState(IllegalStateException ex) {
+        log.warn("Conflict (illegal state): {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "codigo", "ESTADO_INVALIDO",
+                "mensaje", ex.getMessage(),
+                "timestamp", LocalDateTime.now().toString()
+        ));
+    }
+
     @ExceptionHandler(BatchImportException.class)
     public ResponseEntity<Map<String, Object>> handleBatchImport(BatchImportException ex) {
         log.warn("Batch import failed (atomic rollback): {}", ex.getMessage());
