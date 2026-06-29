@@ -63,6 +63,8 @@ class PadreAuthorizationTest {
         UUID estudianteId = UUID.randomUUID();
 
         when(vinculacionResolver.resolverEstudiante(usuarioId)).thenReturn(estudianteId);
+        when(consentimientoService.verificar(estudianteId)).thenReturn(
+                new ConsentimientoService.ConsentimientoResult(true, "consent-1", null, null, null));
         when(usuarioService.obtenerUsuario(estudianteId)).thenReturn(
                 new UsuarioResponse(estudianteId, "hijo@mail.com", "Juan Pérez",
                         Set.of(), true, false, null, null));
@@ -90,6 +92,8 @@ class PadreAuthorizationTest {
         List<?> notas = List.of(Map.of("asignatura", "Matemáticas", "notaFinal", 8.5));
 
         when(vinculacionResolver.resolverEstudiante(usuarioId)).thenReturn(estudianteId);
+        when(consentimientoService.verificar(estudianteId)).thenReturn(
+                new ConsentimientoService.ConsentimientoResult(true, "consent-1", null, null, null));
         when(calificacionesService.misNotas(estudianteId)).thenReturn((List) notas);
 
         ResponseEntity<?> response = controller.obtenerCalificaciones(usuarioId);
@@ -113,11 +117,54 @@ class PadreAuthorizationTest {
         List<?> asistencia = List.of(Map.of("fecha", "2026-01-15", "estado", "PRESENTE"));
 
         when(vinculacionResolver.resolverEstudiante(usuarioId)).thenReturn(estudianteId);
+        when(consentimientoService.verificar(estudianteId)).thenReturn(
+                new ConsentimientoService.ConsentimientoResult(true, "consent-1", null, null, null));
         when(calificacionesService.miAsistencia(estudianteId)).thenReturn((List) asistencia);
 
         ResponseEntity<?> response = controller.obtenerAsistencia(usuarioId);
         assertEquals(200, response.getStatusCode().value());
         assertEquals(asistencia, response.getBody());
+    }
+
+    // ── Gate LOPDP (Art. 21): sin consentimiento vigente → 403 CONSENT_PENDIENTE ──
+
+    @Test
+    void obtenerHijo_sinConsentimiento_retorna403ConsentPendiente() {
+        UUID usuarioId = UUID.randomUUID();
+        UUID estudianteId = UUID.randomUUID();
+        when(vinculacionResolver.resolverEstudiante(usuarioId)).thenReturn(estudianteId);
+        when(consentimientoService.verificar(estudianteId)).thenReturn(
+                new ConsentimientoService.ConsentimientoResult(false, null, null, null, null));
+
+        ResponseEntity<?> response = controller.obtenerHijo(usuarioId);
+        assertEquals(403, response.getStatusCode().value());
+        assertEquals("CONSENT_PENDIENTE", ((Map<?, ?>) response.getBody()).get("error"));
+    }
+
+    @Test
+    void obtenerCalificaciones_sinConsentimiento_retorna403ConsentPendiente() {
+        UUID usuarioId = UUID.randomUUID();
+        UUID estudianteId = UUID.randomUUID();
+        when(vinculacionResolver.resolverEstudiante(usuarioId)).thenReturn(estudianteId);
+        when(consentimientoService.verificar(estudianteId)).thenReturn(
+                new ConsentimientoService.ConsentimientoResult(false, null, null, null, null));
+
+        ResponseEntity<?> response = controller.obtenerCalificaciones(usuarioId);
+        assertEquals(403, response.getStatusCode().value());
+        assertEquals("CONSENT_PENDIENTE", ((Map<?, ?>) response.getBody()).get("error"));
+    }
+
+    @Test
+    void obtenerAsistencia_sinConsentimiento_retorna403ConsentPendiente() {
+        UUID usuarioId = UUID.randomUUID();
+        UUID estudianteId = UUID.randomUUID();
+        when(vinculacionResolver.resolverEstudiante(usuarioId)).thenReturn(estudianteId);
+        when(consentimientoService.verificar(estudianteId)).thenReturn(
+                new ConsentimientoService.ConsentimientoResult(false, null, null, null, null));
+
+        ResponseEntity<?> response = controller.obtenerAsistencia(usuarioId);
+        assertEquals(403, response.getStatusCode().value());
+        assertEquals("CONSENT_PENDIENTE", ((Map<?, ?>) response.getBody()).get("error"));
     }
 
     @Test

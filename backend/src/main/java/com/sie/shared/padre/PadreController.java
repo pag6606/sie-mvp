@@ -38,6 +38,11 @@ public class PadreController {
         if (estudianteId == null) {
             throw new IllegalArgumentException("SIN_VINCULACION");
         }
+        // Gate LOPDP (Art. 21): sin consentimiento vigente no se exponen datos del NNA.
+        var consent = consentimientoService.verificar(estudianteId);
+        if (!consent.existe()) {
+            throw new IllegalStateException("CONSENT_PENDIENTE");
+        }
         return estudianteId;
     }
 
@@ -67,6 +72,11 @@ public class PadreController {
                     "error", "SIN_VINCULACION",
                     "mensaje", "No tiene estudiantes vinculados."
             ));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(403).body(Map.of(
+                    "error", "CONSENT_PENDIENTE",
+                    "mensaje", "Debe otorgar el consentimiento (LOPDP) para ver los datos de su representado."
+            ));
         } catch (Exception e) {
             log.error("Error en obtenerHijo para usuario {}: {}", userId, e.getMessage(), e);
             return ResponseEntity.status(500).body(Map.of(
@@ -87,6 +97,11 @@ public class PadreController {
                     "error", "SIN_VINCULACION",
                     "mensaje", "No tiene estudiantes vinculados."
             ));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(403).body(Map.of(
+                    "error", "CONSENT_PENDIENTE",
+                    "mensaje", "Debe otorgar el consentimiento (LOPDP) para ver los datos de su representado."
+            ));
         } catch (Exception e) {
             log.error("Error en obtenerCalificaciones para usuario {}: {}", userId, e.getMessage(), e);
             return ResponseEntity.status(500).body(Map.of(
@@ -106,6 +121,11 @@ public class PadreController {
             return ResponseEntity.status(403).body(Map.of(
                     "error", "SIN_VINCULACION",
                     "mensaje", "No tiene estudiantes vinculados."
+            ));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(403).body(Map.of(
+                    "error", "CONSENT_PENDIENTE",
+                    "mensaje", "Debe otorgar el consentimiento (LOPDP) para ver los datos de su representado."
             ));
         } catch (Exception e) {
             log.error("Error en obtenerAsistencia para usuario {}: {}", userId, e.getMessage(), e);
