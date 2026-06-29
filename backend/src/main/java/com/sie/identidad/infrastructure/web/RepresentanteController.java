@@ -81,6 +81,7 @@ public class RepresentanteController {
     @PostMapping("/{id}/vincular")
     @Transactional
     public ResponseEntity<Map<String, String>> vincular(@PathVariable UUID id,
+                                                         @RequestAttribute("colegioId") UUID colegioId,
                                                          @RequestBody Map<String, Object> body) {
         UUID estudianteId;
         try {
@@ -102,6 +103,7 @@ public class RepresentanteController {
 
         try {
             RepresentanteEstudiante re = new RepresentanteEstudiante();
+            re.setColegioId(colegioId);
             re.setRepresentanteId(id);
             re.setEstudianteId(estudianteId);
             re.setEsPrincipal(esPrincipal);

@@ -31,8 +31,9 @@ public class AcademicoController {
 
     @GetMapping("/periodos")
     public Page<PeriodoResponse> listarPeriodos(
+            @RequestAttribute("colegioId") UUID colegioId,
             @PageableDefault(size = 10, sort = "fechaInicio", direction = Sort.Direction.DESC) Pageable pageable) {
-        return periodoRepository.findAll(pageable)
+        return periodoRepository.findByColegioId(colegioId, pageable)
                 .map(p -> new PeriodoResponse(p.getId(), p.getCodigo(), p.getNombre(),
                         p.getFechaInicio(), p.getFechaFin(), p.getEstado(),
                         p.getFechaCierreQ1(), p.getFechaCierreQ2(), p.getPesoQuimestre()));
