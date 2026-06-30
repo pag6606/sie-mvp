@@ -1,5 +1,5 @@
 # generated: 2026-06-03
-# last_updated: 2026-06-03
+# last_updated: 2026-06-29
 # project: sis-mvp
 # project_key: SIE
 # tracking_system: file-system
@@ -24,7 +24,7 @@
 #   - done: Retrospective has been completed
 
 generated: 2026-06-03
-last_updated: 2026-06-03
+last_updated: 2026-06-29
 project: sis-mvp
 project_key: SIE
 tracking_system: file-system
@@ -97,3 +97,14 @@ development_status:
   6-01-paginacion-server-side-backend: done
   6-02-controles-de-paginacion-frontend: done
   epic-6-retrospective: optional
+
+  # ── Epic 7: Quimestres en Notas (gap funcional demo 7EGB) ──
+  # Creado por Mary (BA) el 2026-06-29 tras detectar que las notas
+  # no tienen quimestre y la demo no puede diferenciar Q1 (cargado)
+  # de Q2 (pendiente). Trazabilidad LOEI Art. 194 rota.
+  epic-7: in-progress
+  7-1-quimestres-en-notas-backend: ready-for-dev
+  7-2-quimestres-en-notas-frontend: ready-for-dev
+  7-3-quimestres-script-setup: ready-for-dev
+  7-4-quimestres-docs: ready-for-dev
+  epic-7-retrospective: optional
