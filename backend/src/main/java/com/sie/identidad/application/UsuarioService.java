@@ -94,8 +94,10 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
-    public Page<UsuarioResponse> listarUsuarios(UUID colegioId, Pageable pageable) {
-        return usuarioRepository.findByColegioId(colegioId, pageable).map(this::toResponse);
+    public Page<UsuarioResponse> listarUsuarios(UUID colegioId, String cohorte, Pageable pageable) {
+        String filtro = (cohorte == null || cohorte.isBlank()) ? null : cohorte.trim();
+        return usuarioRepository.findByColegioIdAndCohorte(colegioId, filtro, pageable)
+                .map(this::toResponse);
     }
 
     @Transactional

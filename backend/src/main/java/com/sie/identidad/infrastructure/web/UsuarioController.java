@@ -33,13 +33,14 @@ public class UsuarioController {
     public ResponseEntity<?> buscarUsuario(
             @RequestAttribute("colegioId") UUID colegioId,
             @RequestParam(required = false) String email,
+            @RequestParam(required = false) String cohorte,
             @PageableDefault(size = 25, sort = "nombre") Pageable pageable) {
         if (email != null) {
             var usuario = usuarioRepository.findByEmailAndColegioId(email, colegioId)
                     .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
             return ResponseEntity.ok(usuarioService.obtenerUsuario(usuario.getId()));
         }
-        return ResponseEntity.ok(usuarioService.listarUsuarios(colegioId, pageable));
+        return ResponseEntity.ok(usuarioService.listarUsuarios(colegioId, cohorte, pageable));
     }
 
     @PostMapping
