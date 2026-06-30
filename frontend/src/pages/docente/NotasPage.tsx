@@ -8,7 +8,7 @@ import { PageHead } from '@/components/ghanima'
 import { ApiError } from '@/types/api'
 
 interface ComponenteNota { componenteId: string; nombre: string; peso: number; valor: number | null }
-interface NotaEstudiante { matriculaId: string; estudianteId: string; estudianteNombre: string; notaFinal: number | null; componentes: ComponenteNota[] }
+interface NotaEstudiante { matriculaId: string; estudianteId: string; estudianteNombre: string; quimestre?: number; quimestreLabel?: string; notaFinal: number | null; componentes: ComponenteNota[] }
 
 const NOTA_MAX = 10
 const NOTA_MIN = 0
@@ -24,12 +24,13 @@ function notaColor(valor: number | null): string {
 export default function NotasPage() {
   const { paraleloId } = useParams()
   const [editing, setEditing] = useState<Record<string, number>>({})
+  const [quimestre, setQuimestre] = useState<1 | 2>(1)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const { data: notas = [], isLoading: loading, isError, error: queryError } = useQuery<NotaEstudiante[]>({
-    queryKey: ['notas', paraleloId],
-    queryFn: () => api.get(`/paralelos/${paraleloId}/notas`).then(r => r.data),
+    queryKey: ['notas', paraleloId, quimestre],
+    queryFn: () => api.get(`/paralelos/${paraleloId}/notas?quimestre=${quimestre}`).then(r => r.data),
     enabled: !!paraleloId,
   })
 
@@ -45,7 +46,10 @@ export default function NotasPage() {
       api.post(`/paralelos/${paraleloId}/notas`, { entries }),
     onSuccess: () => {
       setEditing({})
-      queryClient.invalidateQueries({ queryKey: ['notas', paraleloId] })
+      queryClient.invalidateQueries({ queryKey: ['notas', paraleloId, quimestre] })
+      // También invalidar el otro quimestre por si se cambió de Q1 a Q2
+      const otroQ = quimestre === 1 ? 2 : 1
+      queryClient.invalidateQueries({ queryKey: ['notas', paraleloId, otroQ] })
     },
     onError: () => {},
   })
@@ -77,14 +81,14 @@ export default function NotasPage() {
     pendientes: notas.filter(n => n.notaFinal == null).length,
   }
 
-  const handleCerrar = () => navigate(`/docente/${paraleloId}/cerrar`)
+  const handleCerrar = () => navigate(`/docente/${paraleloId}/cerrar?q=${quimestre}`)
 
   if (loading) return <LoadingSkeleton rows={4} />
 
   if (isError) return (
     <AppLayout role="docente">
       <div className="p-6 md:p-8">
-        <InlineError message={(queryError as ApiError)?.response?.data?.mensaje || 'Error al cargar notas'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['notas', paraleloId] })} />
+        <InlineError message={(queryError as ApiError)?.response?.data?.mensaje || 'Error al cargar notas'} onRetry={() => queryClient.invalidateQueries({ queryKey: ['notas', paraleloId, quimestre] })} />
       </div>
     </AppLayout>
   )
@@ -106,7 +110,26 @@ export default function NotasPage() {
         )}
 
         <div className="mb-2 flex items-center justify-between">
-          <PageHead eyebrow="Docente" title={`Notas — ${paraleloCodigo}`} className="mb-0" />
+          <PageHead eyebrow="Docente" title={`Notas — ${paraleloCodigo}`} className="mb-0">
+            {/* Selector de quimestre */}
+            <div className="mt-2 flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Quimestre:</span>
+              <select
+                value={quimestre}
+                onChange={e => { setQuimestre(Number(e.target.value) as 1 | 2); setEditing({}) }}
+                className="rounded-md border border-input bg-white px-3 py-1 text-sm text-foreground"
+              >
+                <option value={1}>Q1</option>
+                <option value={2}>Q2</option>
+              </select>
+              <span className="text-xs text-muted-foreground/80 ml-2">
+                {stats.total > 0
+                  ? `Q${quimestre}: ${stats.completos}/${stats.total} estudiantes con nota · ${stats.aprobados} aprobados · ${stats.reprobados} reprobados`
+                  : `Q${quimestre} — sin notas cargadas`
+                }
+              </span>
+            </div>
+          </PageHead>
           <div className="flex gap-2">
             <button onClick={handleGuardar} disabled={guardarMutation.isPending || Object.keys(editing).length === 0}
               className="rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground disabled:opacity-50">
@@ -114,13 +137,13 @@ export default function NotasPage() {
             </button>
             <button onClick={handleCerrar}
               className="rounded-md border border-destructive px-4 py-2 text-sm text-destructive hover:bg-destructive/10">
-              Cerrar sección (paralelo)
+              Cerrar Q{quimestre}
             </button>
           </div>
         </div>
 
         <p className="mb-4 text-xs text-muted-foreground">
-          Escala: 0-10 · Aprobación: {APROBACION}.0 (LOEI Art. 194) · Período académico completo
+          Escala: 0-10 · Aprobación: {APROBACION}.0 (LOEI Art. 194) · Período académico completo · Quimestre Q{quimestre}
           {componentes.length > 0 && (
             <span className="ml-3">
               {componentes.map((c, i) => (
@@ -173,7 +196,7 @@ export default function NotasPage() {
             </thead>
             <tbody>
               {notas.map((n, ni) => (
-                <tr key={n.matriculaId} className="border-b hover:bg-muted/30 transition-colors">
+                <tr key={`${n.matriculaId}-${quimestre}`} className="border-b hover:bg-muted/30 transition-colors">
                   <td className="px-4 py-3 text-sm font-medium text-foreground sticky left-0 bg-card z-10">
                     {n.estudianteNombre}
                   </td>
