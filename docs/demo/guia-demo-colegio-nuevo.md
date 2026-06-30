@@ -176,7 +176,16 @@ SQL
 
 **Pantalla:** Usuarios → Representante (o el script curl si preferís mostrar la API).
 
-1. **Listar usuarios** → mostrar que `admin@sie.edu.ec` ve 41 cuentas demo (1 docente + 20 estudiantes + 20 padres) — y que **NO ve a `admin2@sie.edu.ec`** (multitenant: vive en otro colegio).
+1. **Listar usuarios** → ir a **Usuarios**. La pantalla ahora muestra **tres cosas de un vistazo** que son la prueba del multitenant y del cohorte:
+   - **Banner verde:** *"Aislamiento verificado: solo ve usuarios de este colegio"*
+   - **Conteos en vivo:** **41** demo7 · **20** estudiantes · **20** padres · **1** docente · **135** total colegio
+   - **Dropdown "Cohorte:"** con opciones: *Todos · Demo 7EGB completa · Solo paralelo A · Solo paralelo B · Solo padres de la demo · Estudiantes del DemoRiskDataSeeder*
+
+   Narrá mientras hacés:
+   - Con *Cohorte: Todos*, la tabla tiene 135 usuarios mezclados (los 41 de la demo + 94 del DemoRiskDataSeeder de 8-10 EGB).
+   - Cambiá a *"Demo 7EGB completa"*: la tabla se filtra a 41 (1 docente + 20 est + 20 padres). Todos los emails arrancan con `demo7`.
+   - Cambiá a *"Solo paralelo A"*: 10 (docente + 10 estudiantes del paralelo A).
+   - El **banner verde** es la prueba visual: *"¿Ven? El colegio 2 (con su admin2) no aparece. Solo este colegio."*
 2. **Representantes** → mostrar `María Torres` vinculada a Ana Torres (`esPrincipal=true`).
 3. **Consentimientos** → `GET /api/consentimientos` → los 20 con `aceptado=true`, `fuente=SIE_LOCAL`.
 4. **Mostrar el módulo LOPDP:** `GET /api/auth/lopdp-token` (con token del admin) → enseñar el token de sesión al sistema LOPDP-EC. Mencionar que la integración es real (configurable vía `lopdp.url`).
