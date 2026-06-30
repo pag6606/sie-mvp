@@ -199,9 +199,11 @@ SQL
 1. **Mis Secciones** → `7EGB-A-MAT` y `7EGB-B-MAT` (ambos Matemática, 7EGB, **el mismo docente enseña los dos**).
 2. **Esquema de evaluación** → ya está definido (idéntico en A y B):
    - Tareas 30 % · Participación 20 % · Parcial 25 % · Final 25 % (suma 100)
-3. **Notas** → ver la planilla. Mostrar el cálculo: la columna `notaFinal` se calcula ponderada automáticamente.
+3. **Selector de quimestre (Q1 / Q2)** → arriba de la planilla de notas, un dropdown permite elegir entre Q1 y Q2. El indicador muestra el estado: *"Q1: 10/10 estudiantes con nota · 5 aprobados · 2 reprobados"* o *"Q2 — sin notas cargadas"*.
+4. **Notas** → ver la planilla. Mostrar el cálculo: la columna `notaFinal` se calcula ponderada automáticamente.
    - En **A**: 10 estudiantes, distribución **5/3/2** (5 altas · 3 medias · 2 bajas).
    - En **B**: 10 estudiantes, distribución **4/4/2** (4 altas · 4 medias · 2 bajas).
+   - Cambiar a **Q2**: se ven solo 2 estudiantes (los de la muestra, todos >= 7). El resto del curso aparece como "sin notas cargadas" en Q2.
 4. **Asistencia** → `GET /api/paralelos/{id}/asistencia?desde=2026-05-01&hasta=2026-07-31` → 10 sesiones, todas PRESENTE (100 %), en **ambos** paralelos.
 5. **Intentar cerrar la sección** (mostrar el bloqueo normativo):
    ```
@@ -261,6 +263,9 @@ SQL
 Volvé al admin. Mostrá el **dashboard de cierres** una vez más:
 
 - El paralelo 7EGB-A-MAT sigue **LISTA** pero sin cerrar (las 2 notas < 7 bloquean el cierre — es el caso real del aula).
+- **Q1** tiene 40 notas cargadas (10 estudiantes × 4 componentes) en A y 40 en B.
+- **Q2** tiene 8 notas de muestra (2 estudiantes × 4 componentes) en cada paralelo, el resto **pendiente**.
+- La **`fechaCierreQ2`** (2027-02-26) está en el futuro — es lo que la institución cierra al final del año lectivo, sumando 50 % + 50 %.
 - El **Q2 (`fechaCierreQ2` en 2027-02-26) está abierto** y no tiene notas — es lo que la institución cierra al final del año lectivo.
 
 🎤 *Relato final:* *"Q1 está cargado, trazable y alineado a la normativa. Q2 queda pendiente — la institución lo cierra al final del año, sumando 50 % + 50 %."*
@@ -273,7 +278,7 @@ Volvé al admin. Mostrá el **dashboard de cierres** una vez más:
 |---|---|---|---|
 | 1 | 🔴 Admin | Período (2 quimestres), estructura EGB, **paralelos A y B** | 5' |
 | 2 | 🔴 Admin | **20 estudiantes**, **20 padres**, vinculaciones, consentimientos LOPDP | 7' |
-| 3 | 🟠 Docente | Esquema, notas Q1 (A: 5/3/2 · B: 4/4/2), asistencia 100 %, intento de cierre de **ambos** | 5' |
+| 3 | 🟠 Docente | Selector de quimestre (Q1 cargado, Q2 con muestra), notas, asistencia, intento de cierre | 5' |
 | 4 | 🔴 Admin | Dashboard de cierres (A y B en LISTA, sin cerrar) + demo multitenant (2 colegios) | 4' |
 | 5 | 🟡 Estudiante | Boletín Q1 (Ana 9,5 o Karen 9,0) + asistencia | 3' |
 | 6 | 🟣 Padre | Notas del hijo + **gate LOPDP** (revocar → 403) | 5' |
@@ -356,4 +361,4 @@ Volvé al admin. Mostrá el **dashboard de cierres** una vez más:
 
 ---
 
-> *Esta guía fue preparada tras validar el setup contra la base de datos real: **2 paralelos** (A y B), **20 matrículas**, **20 vinculaciones**, **20 consentimientos**, **80 notas** (A: 5/3/2 confirmado · B: 4/4/2 confirmado), **200 sesiones de asistencia** (100 % PRESENTE), gate LOPDP probado en ambos sentidos (consent OK → 200, consent revocado → 403 CONSENT_PENDIENTE). Mismo docente enseña ambos paralelos.*
+> *Esta guía fue preparada tras validar el setup contra la base de datos real: **2 paralelos** (A y B), **20 matrículas**, **20 vinculaciones**, **20 consentimientos**, **80 notas Q1** (A: 5/3/2 · B: 4/4/2), **16 notas Q2 de muestra** (2 estudiantes × 4 componentes × 2 paralelos), **200 sesiones de asistencia** (100 % PRESENTE), gate LOPDP probado en ambos sentidos (consent OK → 200, consent revocado → 403 CONSENT_PENDIENTE). Mismo docente enseña ambos paralelos.*

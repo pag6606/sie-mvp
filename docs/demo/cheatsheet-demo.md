@@ -37,11 +37,11 @@ python3 docs/demo/setup-7egb-demo.py                      # ← poblar A y B con
 |---|---|---|---|
 | 1 | 5' | 🔴 | Período `COSTA-2026` (2 quimestres, 50/50, LOEI Art. 194) + estructura EGB + paralelos 7EGB-A/B |
 | 2 | 7' | 🔴 | 20 estudiantes + 20 padres + 20 vinculaciones + 20 consentimientos LOPDP |
-| 3 | 5' | 🟠 | Diana ve A (5/3/2) y B (4/4/2), 100% asistencia, **intenta cerrar → HTTP 409** |
+| 3 | 5' | 🟠 | Selector Q1/Q2: Q1 carga completa, Q2 con 16 notas de muestra, **intenta cerrar → HTTP 409** |
 | 4 | 4' | 🔴 | Dashboard de cierres (A y B en **LISTA**, sin cerrar) + multitenant 2 colegios |
 | 5 | 3' | 🟡 | Ana 9.5 / Iván 5.4 — el sistema **no esconde nada** |
 | 6 | 5' | 🟣 | Padre ve notas del hijo → **⭐ GATE LOPDP** (ver abajo) |
-| 7 | 3' | 🔴 | Q2 pendiente — *"la institución lo cierra al final del año"* |
+| 7 | 3' | 🔴 | Q1 completo + Q2 con muestra — *"la institución cierra Q2 al final del año"* |
 
 ---
 
@@ -73,10 +73,10 @@ python3 docs/demo/setup-7egb-demo.py                      # ← poblar A y B con
 
 ## 📊 Distribución de notas (referencia rápida)
 
-| Paralelo | 🔵 Altas | 🟡 Medias | 🔴 Bajas | Total |
+| Paralelo | 🔵 Altas Q1 | 🟡 Medias Q1 | 🔴 Bajas Q1 | Q2 (muestra) |
 |---|--:|--:|--:|--:|
-| **7EGB-A-MAT** | 5 | 3 | 2 | 10 |
-| **7EGB-B-MAT** | 4 | 4 | 2 | 10 |
+| **7EGB-A-MAT** | 5 | 3 | 2 | 8 notas (2 est) |
+| **7EGB-B-MAT** | 4 | 4 | 2 | 8 notas (2 est) |
 
 *Esquema: Tareas 30 % + Participación 20 % + Parcial 25 % + Final 25 % (suma 100). Asistencia 100 %.*
 
@@ -128,4 +128,4 @@ POST /api/paralelos/{id}/cerrar
 
 ---
 
-> ✅ **Demo validada en 2 runs contra la BD real** (jun 2026): 20 matrículas · 20 vinculaciones · 20 consentimientos LOPDP · 80 notas Q1 (A: 5/3/2 confirmado · B: 4/4/2 confirmado) · 200 sesiones de asistencia 100% PRESENTE · gate LOPDP OK (200 → 403 → 200) · HTTP 409 del cierre OK.
+> ✅ **Demo validada en 2 runs contra la BD real** (jun 2026): 20 matrículas · 20 vinculaciones · 20 consentimientos LOPDP · **80 notas Q1** (A: 5/3/2 · B: 4/4/2) · **16 notas Q2 de muestra** · 200 sesiones de asistencia 100% PRESENTE · gate LOPDP OK (200 → 403 → 200) · HTTP 409 del cierre OK · Quimestre en notas (selector Q1/Q2 en planilla docente).
