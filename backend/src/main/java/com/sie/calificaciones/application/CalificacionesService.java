@@ -149,15 +149,33 @@ public class CalificacionesService {
             nq.setParameter(1, m.getId());
             List<Nota> todasLasNotas = nq.getResultList();
 
-            // Si hay filtro de quimestre, agrupar solo ese quimestre
-            // Si no hay filtro, agrupar por quimestre (máximo 2 grupos: Q1 y Q2)
+            // Si no hay filtro de quimestre: emitir UNA fila por matrícula
+            // (comportamiento histórico, necesario para crear notas por primera vez)
+            if (quimestre == null) {
+                Map<UUID, BigDecimal> notasMap = todasLasNotas.stream()
+                        .collect(Collectors.toMap(Nota::getComponenteId, Nota::getValor));
+                List<ComponenteNota> componentes = esquema.getComponentes().stream().map(c -> {
+                    var valor = notasMap.get(c.getId());
+                    return new ComponenteNota(c.getId(), c.getNombre(), c.getPesoPorcentaje(), valor);
+                }).toList();
+                var calculada = componentes.stream().allMatch(cn -> cn.valor() != null)
+                        ? componentes.stream().map(cn -> cn.valor().multiply(cn.peso()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(1, RoundingMode.HALF_UP)
+                        : null;
+                resultado.add(new NotaResponse(m.getId(), m.getEstudianteId(), nombreEstudiante(m.getEstudianteId()),
+                        "", null, null, calculada, componentes));
+                continue;
+            }
+
+            // Con filtro de quimestre: agrupar por quimestre
             Map<Short, List<Nota>> notasPorQuimestre = todasLasNotas.stream()
                     .collect(Collectors.groupingBy(Nota::getQuimestre));
 
+            if (notasPorQuimestre.isEmpty()) continue; // este quimestre no tiene notas → no emitir fila
+
             for (var entry : notasPorQuimestre.entrySet()) {
                 short qv = entry.getKey();
-                if (quimestre != null && qv != quimestre.shortValue()) continue;
-
+                if (qv != quimestre.shortValue()) continue;
                 List<Nota> notasQ = entry.getValue();
                 Map<UUID, BigDecimal> notasMap = notasQ.stream()
                         .collect(Collectors.toMap(Nota::getComponenteId, Nota::getValor));
@@ -165,12 +183,10 @@ public class CalificacionesService {
                     var valor = notasMap.get(c.getId());
                     return new ComponenteNota(c.getId(), c.getNombre(), c.getPesoPorcentaje(), valor);
                 }).toList();
-
                 var calculada = componentes.stream().allMatch(cn -> cn.valor() != null)
                         ? componentes.stream().map(cn -> cn.valor().multiply(cn.peso()).divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP))
                         .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(1, RoundingMode.HALF_UP)
                         : null;
-
                 resultado.add(new NotaResponse(m.getId(), m.getEstudianteId(), nombreEstudiante(m.getEstudianteId()),
                         "", qv, "Q" + qv, calculada, componentes));
             }

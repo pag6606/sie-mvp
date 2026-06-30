@@ -139,16 +139,34 @@ def build_cohort(admin, paralelo_id, label, nombres_est, nombres_padre,
 
     # Notas Q1
     _, notas = api("GET", f"/api/paralelos/{paralelo_id}/notas", admin)
-    entries = [{"matriculaId": n["matriculaId"], "componenteId": c["componenteId"], "valor": v}
+    entries = [{"matriculaId": n["matriculaId"], "componenteId": c["componenteId"], "valor": v, "quimestre": 1}
                for n, perfil in zip(notas, notas_q1)
                for c, v in zip(n["componentes"], perfil)]
     api("POST", f"/api/paralelos/{paralelo_id}/notas", admin, {"entries": entries})
     # Re-GET para leer la notaFinal ya calculada por el backend
-    _, notas_calc = api("GET", f"/api/paralelos/{paralelo_id}/notas", admin)
+    _, notas_calc = api("GET", f"/api/paralelos/{paralelo_id}/notas?quimestre=1", admin)
     altas  = sum(1 for n in notas_calc if n["notaFinal"] is not None and n["notaFinal"] >= 8.0)
     medias = sum(1 for n in notas_calc if n["notaFinal"] is not None and 7.0 <= n["notaFinal"] < 8.0)
     bajas  = sum(1 for n in notas_calc if n["notaFinal"] is not None and n["notaFinal"] < 7.0)
     print(f"  ✚ Esquema + Notas Q1 ({altas} altas / {medias} medias / {bajas} bajas).")
+
+    # ── Notas Q2 de muestra (2 estudiantes, todas >= 7) ──
+    try:
+        n_muestra = 2
+        # Verificar si ya hay notas de Q2 (idempotencia)
+        _, notas_q2_exist = api("GET", f"/api/paralelos/{paralelo_id}/notas?quimestre=2", admin)
+        if notas_q2_exist and len(notas_q2_exist) > 0:
+            print(f"  (Q2 ya tiene {len(notas_q2_exist)} items, saltando.)")
+        else:
+            perfiles_q2 = [(8.0, 9.0, 8.5, 9.0), (7.5, 8.0, 8.0, 8.5)]
+            notas_q2 = notas[:n_muestra]
+            entries_q2 = [{"matriculaId": n["matriculaId"], "componenteId": c["componenteId"], "valor": v, "quimestre": 2}
+                          for n, perfil in zip(notas_q2, perfiles_q2)
+                          for c, v in zip(n["componentes"], perfil)]
+            api("POST", f"/api/paralelos/{paralelo_id}/notas", admin, {"entries": entries_q2})
+            print(f"  ✚ Notas Q2 de muestra ({n_muestra} estudiantes, todas >= 7).")
+    except Exception as e:
+        print(f"  (Q2 de muestra saltado: {e})")
 
     # Asistencia 100% (10 sesiones PRESENTE)
     fechas = ["2026-05-08","2026-05-15","2026-05-22","2026-05-29","2026-06-05",
@@ -235,7 +253,7 @@ def main():
     print(f"✚ Passwords asignados a todas las cuentas demo.")
 
     print("\n" + "=" * 60)
-    print("✅ DEMO 7EGB LISTA — A y B · Quimestre 1 cargado · Q2 pendiente")
+    print("✅ DEMO 7EGB LISTA — A y B · Q1 completo + Q2 de muestra")
     print("=" * 60)
     print(f"Docente:        {DOCENTE_EMAIL} / {DOCENTE_PWD}")
     print(f"Estudiantes A:  demo7a1..demo7a10@sie.edu.ec / {EST_PWD}")
