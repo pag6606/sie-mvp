@@ -4,7 +4,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import api from '@/services/api'
 import AppLayout from '@/components/AppLayout'
 import { PageHead } from '@/components/ghanima'
-import { useUsuariosPaginados } from '@/hooks/useUsuarios'
+import Callout from '@/components/ghanima/Callout'
+import { useUsuariosPaginados, useUsuariosConteos } from '@/hooks/useUsuarios'
 import Pagination from '@/components/Pagination'
 import { LoadingSkeleton, InlineError } from '@/components/UIPatterns'
 import { ApiError } from '@/types/api'
@@ -12,9 +13,11 @@ import { capitalizeWords } from '@/utils/text'
 
 
 export default function UsuariosPage() {
-  const { data, isLoading, page, setPage } = useUsuariosPaginados()
+  const [cohorte, setCohorte] = useState<string>('')
+  const { data, isLoading, page, setPage } = useUsuariosPaginados(cohorte)
   const usuarios = data?.content ?? []
   const totalPages = data?.totalPages ?? 1
+  const { data: conteos } = useUsuariosConteos()
 
   const { data: estudiantes = [] } = useQuery<any[]>({
     queryKey: ['estudiantes'],
@@ -129,7 +132,25 @@ export default function UsuariosPage() {
     <AppLayout role="admin">
       <div className="p-6 md:p-8">
         <PageHead eyebrow="Administración" title="Gestión de Usuarios" subtitle="Crea, importa y administra los usuarios del sistema.">
-          <div className="flex gap-2 mt-4">
+          {/* Banner de aislamiento multitenant — clave para la demo */}
+          <Callout
+            variant="ok"
+            className="mt-4"
+            title="Aislamiento verificado: solo ve usuarios de este colegio"
+            subtitle="Los demás colegios registrados en el sistema (000…002) no son visibles desde esta cuenta."
+          />
+          {/* Conteos vivos de la cohorte — referencia rápida para la demo */}
+          {conteos && (
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+              <span><strong className="text-foreground">{conteos.demo7}</strong> <span className="text-muted-foreground">demo7</span></span>
+              <span><strong className="text-foreground">{conteos.estudiantes}</strong> <span className="text-muted-foreground">estudiantes</span></span>
+              <span><strong className="text-foreground">{conteos.padres}</strong> <span className="text-muted-foreground">padres</span></span>
+              <span><strong className="text-foreground">{conteos.docente}</strong> <span className="text-muted-foreground">docente</span></span>
+              <span className="text-muted-foreground/60">·</span>
+              <span><strong className="text-foreground">{conteos.total}</strong> <span className="text-muted-foreground">total colegio</span></span>
+            </div>
+          )}
+          <div className="flex flex-wrap gap-2 mt-4">
             <button onClick={() => { setShowForm(!showForm); if (showRepForm) setShowRepForm(false) }}
               className="bg-[#8A6A18] text-white px-4 py-2 font-mono text-[0.7rem] font-bold uppercase tracking-[0.18em] hover:bg-[#0A0A0B] transition-colors">+ Nuevo usuario</button>
             <button onClick={() => { setShowRepForm(!showRepForm); if (showForm) setShowForm(false) }}
@@ -138,6 +159,37 @@ export default function UsuariosPage() {
               className="border border-[#8A6A18] text-[#8A6A18] px-4 py-2 font-mono text-[0.7rem] font-bold uppercase tracking-[0.18em] hover:bg-[#8A6A18] hover:text-white transition-colors">📥 Importar CSV</button>
           </div>
         </PageHead>
+
+        {/* Filtro de cohorte — clave para la demo, ayuda a ver solo los 41 demo7 */}
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <label htmlFor="cohorte-filter" className="text-sm font-medium text-muted-foreground">Cohorte:</label>
+          <select
+            id="cohorte-filter"
+            value={cohorte}
+            onChange={e => { setCohorte(e.target.value); setPage(0) }}
+            className="rounded-md border border-input bg-white px-3 py-1.5 text-sm text-foreground"
+          >
+            <option value="">Todos los usuarios del colegio</option>
+            <option value="demo7">Demo 7EGB completa (1 docente + 20 est + 20 padres)</option>
+            <option value="demo7a">Solo paralelo A (docente + 10 estudiantes)</option>
+            <option value="demo7b">Solo paralelo B (docente + 10 estudiantes)</option>
+            <option value="demo7p">Solo padres de la demo (A + B)</option>
+            <option value="est">Estudiantes del DemoRiskDataSeeder</option>
+          </select>
+          {cohorte && (
+            <button
+              onClick={() => { setCohorte(''); setPage(0) }}
+              className="text-xs text-muted-foreground hover:text-foreground underline"
+            >
+              Limpiar filtro
+            </button>
+          )}
+          {data && (
+            <span className="text-xs text-muted-foreground/80 ml-auto">
+              Mostrando {usuarios.length} de {data.totalElements} usuarios
+            </span>
+          )}
+        </div>
 
         {showForm && (
           <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-6">
