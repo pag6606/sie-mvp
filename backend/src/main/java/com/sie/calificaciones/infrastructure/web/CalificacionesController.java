@@ -50,14 +50,27 @@ public class CalificacionesController {
     }
 
     @GetMapping("/paralelos/{id}/notas")
-    public List<NotaResponse> obtenerNotas(@PathVariable UUID id) {
+    public List<NotaResponse> obtenerNotas(@PathVariable UUID id,
+            @RequestParam(required = false) Short quimestre) {
+        if (quimestre != null) {
+            return service.obtenerNotas(id, quimestre);
+        }
         return service.obtenerNotas(id);
     }
 
     @PostMapping("/paralelos/{id}/cerrar")
     public ResponseEntity<Map<String, String>> cerrarParalelo(@PathVariable UUID id,
+            @RequestBody(required = false) Map<String, Object> body,
             @RequestAttribute("usuarioId") UUID usuarioId, @RequestAttribute("colegioId") UUID colegioId) {
-        service.cerrarParalelo(id, usuarioId, colegioId);
+        Short quimestre = null;
+        if (body != null && body.containsKey("quimestre")) {
+            quimestre = ((Number) body.get("quimestre")).shortValue();
+        }
+        if (quimestre != null) {
+            service.cerrarParalelo(id, quimestre, usuarioId, colegioId);
+        } else {
+            service.cerrarParalelo(id, usuarioId, colegioId);
+        }
         return ResponseEntity.ok(Map.of("mensaje", "Sección cerrada"));
     }
 

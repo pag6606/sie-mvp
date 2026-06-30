@@ -9,6 +9,9 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+
 @Entity @Table(name = "notas", schema = "calificaciones")
 @Getter @Setter @NoArgsConstructor
 public class Nota extends BaseEntity {
@@ -27,4 +30,8 @@ public class Nota extends BaseEntity {
 
     @Column(name = "ingresado_por")
     private java.util.UUID ingresadoPor;
+
+    @Min(1) @Max(2)
+    @Column(nullable = false)
+    private Short quimestre = 1;
 }
